@@ -1137,6 +1137,8 @@ const DEFAULT_DATA = {
   appliances: [],
   goals: [],
   scenarios: [],
+  expenseCategories: ['Mortgage / Rent', 'Insurance', 'Utilities', 'Groceries', 'Transport', 'Childcare / Education', 'Health', 'Entertainment', 'Subscriptions', 'Dining Out', 'Clothing', 'Personal Care', 'Savings / Investment', 'Other'],
+  incomeCategories: ['Salary', 'Freelance / Contract', 'Rental Income', 'Government / Benefits', 'Investment', 'Other'],
   budget: {
     income: [],
     expenses: [],
@@ -1156,6 +1158,8 @@ function loadData() {
     if (!d.scenarios)  d.scenarios  = [];
     if (!d.furniture) d.furniture = [];
     if (!d.appliances) d.appliances = [];
+    if (!d.expenseCategories) d.expenseCategories = JSON.parse(JSON.stringify(DEFAULT_DATA.expenseCategories));
+    if (!d.incomeCategories)  d.incomeCategories  = JSON.parse(JSON.stringify(DEFAULT_DATA.incomeCategories));
     // migrate dueDay → dueDate
     if (d.budget && d.budget.expenses) {
       const now = new Date();
@@ -1964,7 +1968,8 @@ function getExpenseOccurrences(e, year, month) {
   return [];
 }
 
-const EXPENSE_CATEGORIES = ['Mortgage / Rent', 'Insurance', 'Utilities', 'Groceries', 'Transport', 'Childcare / Education', 'Health', 'Entertainment', 'Subscriptions', 'Dining Out', 'Clothing', 'Personal Care', 'Savings / Investment', 'Other'];
+function expenseCategories() { return state.expenseCategories || DEFAULT_DATA.expenseCategories; }
+function incomeCategories()  { return state.incomeCategories  || DEFAULT_DATA.incomeCategories; }
 
 // ─────────────────────────────────────────────────
 // GOALS
@@ -2132,7 +2137,7 @@ function goalForm(g = {}) {
         <div class="form-group">
           <label class="form-label">Expense Category</label>
           <select class="form-select" id="f-goal-category">
-            ${EXPENSE_CATEGORIES.map(c => `<option value="${c}" ${g.category===c?'selected':''}>${c}</option>`).join('')}
+            ${expenseCategories().map(c => `<option value="${c}" ${g.category===c?'selected':''}>${c}</option>`).join('')}
           </select>
         </div>
         <div class="form-group">
@@ -2488,7 +2493,7 @@ function adjForm(sc) {
         <div class="form-group" id="adj-cat-wrap" style="display:none">
           <label class="form-label">Category</label>
           <select class="form-select" id="f-adj-cat">
-            ${EXPENSE_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('')}
+            ${expenseCategories().map(c => `<option value="${c}">${c}</option>`).join('')}
           </select>
         </div>
       </div>
@@ -2649,7 +2654,7 @@ function loadColors() {
     if (!c.expense) c.expense = {};
     if (!c.build)   c.build   = {};
     if (!c.income)  c.income  = DEFAULT_COLORS.income;
-    EXPENSE_CATEGORIES.forEach(cat => { if (!c.expense[cat]) c.expense[cat] = DEFAULT_COLORS.expense[cat] || '#94a3b8'; });
+    expenseCategories().forEach(cat => { if (!c.expense[cat]) c.expense[cat] = DEFAULT_COLORS.expense[cat] || '#94a3b8'; });
     Object.keys(DEFAULT_COLORS.build).forEach(k => { if (!c.build[k]) c.build[k] = DEFAULT_COLORS.build[k]; });
     return c;
   } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_COLORS)); }
@@ -2667,6 +2672,35 @@ function updateColor(type, key, value) {
   renderBudget();
   renderBuild();
   renderDashboard();
+}
+
+function addCategory(type) {
+  const input = document.getElementById(`new-cat-${type}`);
+  const name = (input.value || '').trim();
+  if (!name) { input.focus(); return; }
+  const list = type === 'expense' ? state.expenseCategories : state.incomeCategories;
+  if (list.includes(name)) { alert('That category already exists.'); return; }
+  list.push(name);
+  saveData(state);
+  input.value = '';
+  renderSettings();
+  renderBudget();
+}
+
+function removeCategory(type, name) {
+  const list = type === 'expense' ? state.expenseCategories : state.incomeCategories;
+  const inUse = type === 'expense'
+    ? state.budget.expenses.some(e => e.category === name) ||
+      Object.values(state.budget.months || {}).some(m => (m.expenses||[]).some(e => e.category === name))
+    : false;
+  if (inUse) {
+    if (!confirm(`"${name}" is used by existing expenses. Remove anyway?`)) return;
+  }
+  const idx = list.indexOf(name);
+  if (idx !== -1) list.splice(idx, 1);
+  saveData(state);
+  renderSettings();
+  renderBudget();
 }
 
 function renderSettings() {
@@ -2709,12 +2743,53 @@ function renderSettings() {
     <div class="section">
       <div class="section-header">
         <div>
-          <div class="section-title">Monthly Budget — Expense Categories</div>
+          <div class="section-title">Expense Categories</div>
+          <div class="section-subtitle">Manage the categories available in expense dropdowns</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        ${expenseCategories().map(cat => `
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;font-size:13px">
+            <span style="width:10px;height:10px;border-radius:50%;background:${colors.expense[cat] || '#94a3b8'};flex-shrink:0"></span>
+            ${cat}
+            <button onclick="removeCategory('expense','${cat.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:15px;line-height:1;padding:0 2px" title="Remove">&times;</button>
+          </span>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;max-width:420px">
+        <input id="new-cat-expense" type="text" class="form-control" placeholder="New category name…" onkeydown="if(event.key==='Enter')addCategory('expense')" style="flex:1">
+        <button class="btn btn-primary btn-sm" onclick="addCategory('expense')">Add</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Income Categories</div>
+          <div class="section-subtitle">Manage the categories available in income dropdowns</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        ${incomeCategories().map(cat => `
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;font-size:13px">
+            ${cat}
+            <button onclick="removeCategory('income','${cat.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:15px;line-height:1;padding:0 2px" title="Remove">&times;</button>
+          </span>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;max-width:420px">
+        <input id="new-cat-income" type="text" class="form-control" placeholder="New category name…" onkeydown="if(event.key==='Enter')addCategory('income')" style="flex:1">
+        <button class="btn btn-primary btn-sm" onclick="addCategory('income')">Add</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Monthly Budget — Expense Category Colours</div>
           <div class="section-subtitle">Colour shown as a left-border stripe on each expense row</div>
         </div>
       </div>
       <div class="color-grid">
-        ${EXPENSE_CATEGORIES.map(cat => swatch('expense', cat, cat, colors.expense[cat] || DEFAULT_COLORS.expense[cat] || '#94a3b8')).join('')}
+        ${expenseCategories().map(cat => swatch('expense', cat, cat, colors.expense[cat] || DEFAULT_COLORS.expense[cat] || '#94a3b8')).join('')}
       </div>
     </div>
 
@@ -3323,7 +3398,7 @@ function expenseForm(e = {}) {
       <div class="form-group">
         <label class="form-label">Category</label>
         <select class="form-select" id="f-exp-cat">
-          ${EXPENSE_CATEGORIES.map(c => `<option value="${c}" ${(e.category||'Other')===c?'selected':''}>${c}</option>`).join('')}
+          ${expenseCategories().map(c => `<option value="${c}" ${(e.category||'Other')===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </div>
     </div>
