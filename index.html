@@ -1,0 +1,3951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Finance</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --primary: #2563eb;
+      --primary-light: #eff6ff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --sidebar-w: 230px;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ─── Sidebar ─────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #1e293b;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-logo span { font-size: 22px; }
+
+    .sidebar nav { padding: 12px 10px; flex: 1; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+      user-select: none;
+    }
+
+    .nav-item:hover { background: #334155; color: #fff; }
+    .nav-item.active { background: var(--primary); color: #fff; }
+    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-actions {
+      padding: 16px 10px;
+      border-top: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-actions button {
+      background: #334155;
+      border: none;
+      color: #94a3b8;
+      border-radius: 7px;
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .sidebar-actions button:hover { background: #475569; color: #fff; }
+
+    /* ─── Main ────────────────────────────────── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 32px;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .page-header p {
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    /* ─── Cards ───────────────────────────────── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .card-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .card-value.green { color: var(--success); }
+    .card-value.red { color: var(--danger); }
+    .card-value.orange { color: var(--warning); }
+
+    /* ─── Progress bar ────────────────────────── */
+    .progress-wrap { margin-top: 10px; }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    .progress-fill.green { background: var(--success); }
+    .progress-fill.orange { background: var(--warning); }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ─── Section blocks ──────────────────────── */
+    .section {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ─── Table ───────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    .amount { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .amount.muted { color: var(--text-muted); font-weight: 400; }
+
+    td.actions { width: 80px; white-space: nowrap; }
+
+    /* ─── Badges ──────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge.paid { background: var(--success-light); color: var(--success); }
+    .badge.pending { background: var(--warning-light); color: #92400e; }
+    .badge.unpaid { background: #f1f5f9; color: var(--text-muted); }
+    .badge.overdue { background: var(--danger-light); color: var(--danger); }
+    .badge.partial { background: #ede9fe; color: #5b21b6; }
+
+    /* ─── Buttons ─────────────────────────────── */
+    .btn {
+      border: none;
+      border-radius: 7px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-ghost { background: transparent; color: var(--text-muted); padding: 6px 8px; }
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+    .btn-danger-ghost { background: transparent; color: var(--danger); padding: 6px 8px; }
+    .btn-danger-ghost:hover { background: var(--danger-light); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    /* ─── Modal ───────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-overlay.hidden { display: none; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title { font-size: 16px; font-weight: 600; }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .modal-body { padding: 20px 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* ─── Form fields ─────────────────────────── */
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    .form-input:focus, .form-select:focus { border-color: var(--primary); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ─── Empty state ─────────────────────────── */
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+    /* ─── Budget specific ─────────────────────── */
+    .budget-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 720px) {
+      .budget-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .main { padding: 20px 16px; }
+      .sidebar { display: none; }
+    }
+
+    .surplus-banner {
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .surplus-banner.positive { background: var(--success-light); border: 1px solid #a7f3d0; }
+    .surplus-banner.negative { background: var(--danger-light); border: 1px solid #fecaca; }
+
+    .surplus-label { font-size: 13px; font-weight: 500; }
+    .surplus-amount { font-size: 20px; font-weight: 700; }
+    .surplus-banner.positive .surplus-amount { color: var(--success); }
+    .surplus-banner.negative .surplus-amount { color: var(--danger); }
+
+    /* ─── Dashboard summary ───────────────────── */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: 1fr 1fr; }
+    }
+
+    .next-payment {
+      background: var(--primary-light);
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 14px;
+    }
+
+    .next-payment-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: 4px; }
+    .next-payment-name { font-size: 14px; font-weight: 600; }
+    .next-payment-amount { font-size: 20px; font-weight: 700; color: var(--primary); }
+
+    .contract-total-badge {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+
+    /* ─── Month picker ────────────────────────── */
+    .month-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .month-picker-label {
+      font-size: 15px;
+      font-weight: 600;
+      min-width: 130px;
+      text-align: center;
+    }
+
+    .month-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+
+    .month-btn:hover { background: var(--bg); color: var(--text); }
+
+    /* ─── Receipts ────────────────────────────── */
+    .attach-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .attach-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+    .attach-btn.has-files { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+    .receipt-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface2);
+      margin-bottom: 8px;
+    }
+
+    .receipt-icon { font-size: 22px; flex-shrink: 0; }
+
+    .receipt-info { flex: 1; min-width: 0; }
+    .receipt-name { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .receipt-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px 16px;
+      text-align: center;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+
+    .drop-zone.drag-over { border-color: var(--primary); background: var(--primary-light); }
+    .drop-zone-icon { font-size: 28px; margin-bottom: 8px; }
+
+    /* ─── Sortable columns ────────────────────── */
+    th.sortable {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    th.sortable:hover { color: var(--text); }
+
+    .sort-icon {
+      display: inline-block;
+      margin-left: 3px;
+      opacity: 0.3;
+      font-size: 10px;
+      font-style: normal;
+    }
+
+    th.sort-active { color: var(--primary) !important; }
+    th.sort-active .sort-icon { opacity: 1; }
+
+    /* ─── Variance ────────────────────────────── */
+    .var-over  { color: var(--danger);  font-weight: 600; }
+    .var-under { color: var(--success); font-weight: 600; }
+    .var-none  { color: var(--text-muted); }
+
+    .actual-cell { cursor: pointer; }
+    .actual-cell:hover { background: var(--primary-light); border-radius: 4px; }
+
+    .actual-input {
+      width: 100px;
+      padding: 4px 7px;
+      border: 1px solid var(--primary);
+      border-radius: 5px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    /* ─── Chart ───────────────────────────────── */
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    /* ─── Calendar ────────────────────────────── */
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .cal-header-cell {
+      background: var(--surface2);
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .cal-cell {
+      background: var(--surface);
+      min-height: 90px;
+      padding: 6px;
+      vertical-align: top;
+      cursor: default;
+    }
+
+    .cal-cell.other-month { background: var(--surface2); }
+    .cal-cell.today { background: var(--primary-light); }
+
+    .cal-day-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .cal-cell.today .cal-day-num { color: var(--primary); }
+
+    .cal-event {
+      font-size: 11px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-bottom: 2px;
+      background: var(--primary-light);
+      color: var(--primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    .cal-event:hover { background: #bfdbfe; }
+
+    .cal-event.income {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .cal-event.income:hover { background: #a7f3d0; }
+
+    .cal-more {
+      font-size: 10px;
+      color: var(--text-muted);
+      padding: 1px 4px;
+      cursor: pointer;
+    }
+
+    .cal-day-total {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ─── Mini date picker ────────────────────── */
+    .date-picker-wrap { position: relative; }
+
+    .date-picker-trigger {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      transition: border-color 0.15s;
+    }
+
+    .date-picker-trigger:hover { border-color: var(--primary); }
+    .date-picker-trigger.has-value { color: var(--text); }
+
+    .date-picker-popup {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      z-index: 300;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+      padding: 12px;
+      width: 256px;
+    }
+
+    .date-picker-popup.hidden { display: none; }
+
+    .dp-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .dp-month-label { font-size: 13px; font-weight: 600; }
+
+    .dp-nav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: 5px;
+      line-height: 1;
+    }
+
+    .dp-nav-btn:hover { background: var(--bg); color: var(--text); }
+
+    .dp-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .dp-day-hdr {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 3px 0 5px;
+      text-transform: uppercase;
+    }
+
+    .dp-day {
+      text-align: center;
+      padding: 6px 2px;
+      border-radius: 5px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .dp-day:hover { background: var(--primary-light); color: var(--primary); }
+    .dp-day.dp-other { color: #d1d5db; pointer-events: none; }
+    .dp-day.dp-today { font-weight: 700; color: var(--primary); }
+    .dp-day.dp-selected { background: var(--primary); color: #fff; font-weight: 600; }
+    .dp-day.dp-selected:hover { background: #1d4ed8; }
+
+    .dp-clear {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      text-align: right;
+    }
+
+    .dp-clear-btn {
+      background: none;
+      border: none;
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .dp-clear-btn:hover { color: var(--danger); background: var(--danger-light); }
+
+    /* ─── Settings / Color Swatches ──────────── */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .color-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,0,0,0.12);
+      flex-shrink: 0;
+      transition: background 0.1s;
+    }
+    .color-row span { flex: 1; font-size: 13px; }
+    .color-row input[type=color] {
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 2px;
+      background: none;
+    }
+
+    /* ─── Goals ──────────────────────────────── */
+    .goal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .goal-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .goal-card-title { font-weight: 600; font-size: 14px; }
+    .goal-card-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .progress-bar-wrap { background: var(--surface2); border-radius: 99px; height: 8px; overflow: hidden; margin: 10px 0 6px; }
+    .progress-bar-fill { height: 100%; border-radius: 99px; transition: width 0.3s; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+
+    /* ─── Scenarios ───────────────────────────── */
+    .scenario-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .scenario-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; cursor: pointer; gap: 12px;
+    }
+    .scenario-card-header:hover { background: var(--surface2); }
+    .scenario-card-body { border-top: 1px solid var(--border); padding: 20px; display: none; }
+    .scenario-card-body.open { display: block; }
+    .scenario-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; }
+    .compare-col { background: var(--surface2); border-radius: 8px; padding: 14px 16px; }
+    .compare-col-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 10px; }
+    .compare-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+    .compare-row:last-child { border-bottom: none; font-weight: 700; }
+    .adj-list { margin-top: 12px; }
+    .adj-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .adj-item:last-child { border-bottom: none; }
+    .adj-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Sidebar ───────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span>🏠</span> Home Finance
+  </div>
+  <nav>
+    <div class="nav-item active" data-tab="dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </div>
+    <div class="nav-item" data-tab="build">
+      <span class="nav-icon">🏗️</span> Build Costs
+    </div>
+    <div class="nav-item" data-tab="budget">
+      <span class="nav-icon">💰</span> Monthly Budget
+    </div>
+    <div class="nav-item" data-tab="calendar">
+      <span class="nav-icon">📅</span> Calendar
+    </div>
+    <div class="nav-item" data-tab="goals">
+      <span class="nav-icon">🎯</span> Goals
+    </div>
+    <div class="nav-item" data-tab="scenarios">
+      <span class="nav-icon">🔬</span> Scenarios
+    </div>
+    <div class="nav-item" data-tab="settings">
+      <span class="nav-icon">⚙️</span> Settings
+    </div>
+  </nav>
+  <div class="sidebar-actions">
+    <button onclick="exportData()">⬇️ Export backup</button>
+    <button onclick="document.getElementById('importFile').click()">⬆️ Import backup</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+</aside>
+
+<!-- ─── Main ──────────────────────────────────── -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div class="tab-panel active" id="tab-dashboard">
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p>Overview of your build and household finances</p>
+    </div>
+    <div id="dashboard-content"></div>
+  </div>
+
+  <!-- BUILD COSTS -->
+  <div class="tab-panel" id="tab-build">
+    <div class="page-header">
+      <h1>Build Costs</h1>
+      <p>Fixed price contract progress payments and outside-contract extras</p>
+    </div>
+    <div id="build-content"></div>
+  </div>
+
+  <!-- MONTHLY BUDGET -->
+  <div class="tab-panel" id="tab-budget">
+    <div class="page-header">
+      <h1>Monthly Budget</h1>
+      <p>Household income and expenses</p>
+    </div>
+    <div id="budget-content"></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="tab-panel" id="tab-calendar">
+    <div class="page-header">
+      <h1>Calendar</h1>
+      <p>Upcoming expense due dates</p>
+    </div>
+    <div id="calendar-content"></div>
+  </div>
+
+  <!-- GOALS -->
+  <div class="tab-panel" id="tab-goals">
+    <div class="page-header">
+      <h1>Goals</h1>
+      <p>Track financial targets and spending reduction goals</p>
+    </div>
+    <div id="goals-content"></div>
+  </div>
+
+  <!-- SCENARIOS -->
+  <div class="tab-panel" id="tab-scenarios">
+    <div class="page-header">
+      <h1>Scenarios</h1>
+      <p>Model "what if" changes to your income and expenses</p>
+    </div>
+    <div id="scenarios-content"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="tab-panel" id="tab-settings">
+    <div class="page-header">
+      <h1>Settings</h1>
+      <p>Customise colours for categories and sections</p>
+    </div>
+    <div id="settings-content"></div>
+  </div>
+
+</main>
+
+<!-- ─── Modals ────────────────────────────────── -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add item</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────
+
+const STORAGE_KEY = 'home_finance_v1';
+
+const DEFAULT_DATA = {
+  buildContract: {
+    total: 790000,
+    stages: [
+      { id: 1, name: 'Deposit',               amount: 39500,  paid: false, paidDate: '', invoiceRef: '', notes: '' },
+      { id: 2, name: 'Base / Slab',            amount: 79000,  paid: false, paidDate: '', invoiceRef: '', notes: '' },
+      { id: 3, name: 'Frame',                  amount: 118500, paid: false, paidDate: '', invoiceRef: '', notes: '' },
+      { id: 4, name: 'Lock-up / Enclosed',     amount: 276500, paid: false, paidDate: '', invoiceRef: '', notes: '' },
+      { id: 5, name: 'Fixing / Fitout',        amount: 197500, paid: false, paidDate: '', invoiceRef: '', notes: '' },
+      { id: 6, name: 'Practical Completion',   amount: 79000,  paid: false, paidDate: '', invoiceRef: '', notes: '' },
+    ]
+  },
+  extras: [
+    { id: 1, name: 'Solar',        vendor: '', totalAmount: 0, amountPaid: 0, dueDate: '', notes: '' },
+    { id: 2, name: 'Landscaping',  vendor: '', totalAmount: 0, amountPaid: 0, dueDate: '', notes: '' },
+  ],
+  furniture: [],
+  appliances: [],
+  goals: [],
+  scenarios: [],
+  budget: {
+    income: [],
+    expenses: [],
+    actuals: {},
+    months: {}
+  }
+};
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    const d = JSON.parse(raw);
+    if (!d.budget.actuals) d.budget.actuals = {};
+    if (!d.budget.months)  d.budget.months  = {};
+    if (!d.goals)      d.goals      = [];
+    if (!d.scenarios)  d.scenarios  = [];
+    if (!d.furniture) d.furniture = [];
+    if (!d.appliances) d.appliances = [];
+    // migrate dueDay → dueDate
+    if (d.budget && d.budget.expenses) {
+      const now = new Date();
+      d.budget.expenses.forEach(e => {
+        if (e.dueDay && !e.dueDate) {
+          const y = now.getFullYear(), mo = now.getMonth() + 1;
+          const day = Math.min(e.dueDay, new Date(y, mo, 0).getDate());
+          e.dueDate = `${y}-${String(mo).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+          delete e.dueDay;
+        }
+        if (e.frequency === 'annual') e.frequency = 'annually';
+      });
+    }
+    return d;
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+// ─── Per-month budget helpers ──────────────────────
+function getMonthData(monthStr) {
+  const m = state.budget.months && state.budget.months[monthStr];
+  return m || { income: state.budget.income, expenses: state.budget.expenses };
+}
+
+function isMonthCustomized(monthStr) {
+  return !!(state.budget.months && state.budget.months[monthStr]);
+}
+
+function ensureMonthOverride(monthStr) {
+  if (!state.budget.months) state.budget.months = {};
+  if (!state.budget.months[monthStr]) {
+    state.budget.months[monthStr] = {
+      income:   JSON.parse(JSON.stringify(state.budget.income)),
+      expenses: JSON.parse(JSON.stringify(state.budget.expenses))
+    };
+  }
+  return state.budget.months[monthStr];
+}
+
+// ─── Scope confirmation modal ──────────────────────
+let _scopePending = null;
+
+function confirmScope(onThisMonth, onAllMonths) {
+  _scopePending = { onThisMonth, onAllMonths };
+  const mLabel = monthLabel(selectedBudgetMonth);
+  document.getElementById('modal-title').textContent = 'Apply changes';
+  document.getElementById('modal-body').innerHTML = `
+    <p style="font-size:14px;line-height:1.6;margin:0;color:var(--text-muted)">
+      Apply this change to <strong style="color:var(--text)">${mLabel}</strong> only,
+      or update the default for all months?
+    </p>
+    ${isMonthCustomized(selectedBudgetMonth) ? `<p style="font-size:12px;color:var(--primary);margin-top:10px;margin-bottom:0">
+      <em>${mLabel}</em> already has its own custom budget.</p>` : ''}
+  `;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-secondary" onclick="doScopeAll()">Apply to all months</button>
+    <button class="btn btn-primary" onclick="doScopeMonth()">Apply to ${mLabel}</button>
+  `;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function doScopeMonth() {
+  if (_scopePending) { _scopePending.onThisMonth(); _scopePending = null; }
+  closeModal();
+}
+
+function doScopeAll() {
+  if (_scopePending) { _scopePending.onAllMonths(); _scopePending = null; }
+  closeModal();
+}
+
+let state = loadData();
+let selectedBudgetMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+
+// ─── Mini date picker ─────────────────────────────
+let dpViewYear = new Date().getFullYear();
+let dpViewMonth = new Date().getMonth() + 1;
+
+function dpDateInput() {
+  return document.getElementById('f-exp-duedate') || document.getElementById('f-inc-duedate');
+}
+
+function openDatePicker(evt) {
+  evt.stopPropagation();
+  const popup = document.getElementById('dp-popup');
+  if (!popup) return;
+  const val = (dpDateInput() || {}).value || '';
+  if (val) {
+    [dpViewYear, dpViewMonth] = val.split('-').map(Number);
+  } else {
+    const n = new Date(); dpViewYear = n.getFullYear(); dpViewMonth = n.getMonth() + 1;
+  }
+  popup.classList.remove('hidden');
+  renderDpCalendar();
+  function onOut(e) {
+    const wrap = document.getElementById('dp-wrap');
+    if (wrap && !wrap.contains(e.target)) popup.classList.add('hidden');
+    else document.addEventListener('click', onOut, { once: true });
+  }
+  document.addEventListener('click', onOut, { once: true });
+}
+
+function renderDpCalendar() {
+  const popup = document.getElementById('dp-popup');
+  if (!popup) return;
+  const year = dpViewYear, month = dpViewMonth;
+  const firstDow = new Date(year, month - 1, 1).getDay();
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const today = new Date();
+  const sel = (dpDateInput() || {}).value || '';
+  const label = new Date(year, month - 1, 1).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+
+  let html = `
+    <div class="dp-nav">
+      <button class="dp-nav-btn" onclick="dpPrevMonth(event)">&#8249;</button>
+      <span class="dp-month-label">${label}</span>
+      <button class="dp-nav-btn" onclick="dpNextMonth(event)">&#8250;</button>
+    </div>
+    <div class="dp-grid">
+      ${['S','M','T','W','T','F','S'].map(d => `<div class="dp-day-hdr">${d}</div>`).join('')}
+  `;
+  for (let i = 0; i < firstDow; i++) html += `<div class="dp-day dp-other"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear()===year && today.getMonth()+1===month && today.getDate()===d;
+    const cls = ['dp-day', isToday?'dp-today':'', sel===ds?'dp-selected':''].filter(Boolean).join(' ');
+    html += `<div class="${cls}" onclick="dpSelectDate('${ds}',event)">${d}</div>`;
+  }
+  html += `</div>`;
+  if (sel) html += `<div class="dp-clear"><button class="dp-clear-btn" onclick="dpClearDate(event)">Clear date</button></div>`;
+  popup.innerHTML = html;
+}
+
+function dpPrevMonth(evt) {
+  evt.stopPropagation();
+  if (dpViewMonth === 1) { dpViewMonth = 12; dpViewYear--; } else dpViewMonth--;
+  renderDpCalendar();
+}
+
+function dpNextMonth(evt) {
+  evt.stopPropagation();
+  if (dpViewMonth === 12) { dpViewMonth = 1; dpViewYear++; } else dpViewMonth++;
+  renderDpCalendar();
+}
+
+function dpSelectDate(ds, evt) {
+  if (evt) evt.stopPropagation();
+  const inp = dpDateInput(); if (inp) inp.value = ds;
+  const [y, m, d] = ds.split('-');
+  document.getElementById('dp-display').textContent = `${d}/${m}/${y}`;
+  document.getElementById('dp-trigger').classList.add('has-value');
+  document.getElementById('dp-popup').classList.add('hidden');
+  const rw = document.getElementById('dp-repeats-wrap');
+  if (rw) rw.style.display = '';
+}
+
+function dpClearDate(evt) {
+  evt.stopPropagation();
+  const inp = dpDateInput(); if (inp) inp.value = '';
+  document.getElementById('dp-display').textContent = 'Select a date';
+  document.getElementById('dp-trigger').classList.remove('has-value');
+  document.getElementById('dp-popup').classList.add('hidden');
+  const rw = document.getElementById('dp-repeats-wrap');
+  if (rw) rw.style.display = 'none';
+}
+
+function prevMonth() {
+  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  renderBudget();
+}
+
+function nextMonth() {
+  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const d = new Date(y, m, 1);
+  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  renderBudget();
+}
+
+function monthLabel(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+}
+
+function monthShortLabel(ym) {
+  const [y, m] = ym.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString('en-AU', { month: 'short', year: '2-digit' });
+}
+
+function getLast6Months() {
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  return months;
+}
+
+function getActual(expenseId, month) {
+  return (state.budget.actuals[month] || {})[expenseId] || 0;
+}
+
+function setActual(expenseId, month, val) {
+  if (!state.budget.actuals[month]) state.budget.actuals[month] = {};
+  state.budget.actuals[month][expenseId] = val;
+  saveData(state);
+}
+
+function editActual(expenseId) {
+  const cell = document.getElementById(`actual-${expenseId}`);
+  const current = getActual(expenseId, selectedBudgetMonth);
+  cell.innerHTML = `<input type="number" class="actual-input" id="ai-${expenseId}" value="${current || ''}" min="0" placeholder="0">`;
+  const input = document.getElementById(`ai-${expenseId}`);
+  input.focus(); input.select();
+  function save() {
+    setActual(expenseId, selectedBudgetMonth, parseFloat(input.value) || 0);
+    renderBudget();
+  }
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') save();
+    if (e.key === 'Escape') renderBudget();
+  });
+}
+
+function nextId(arr) {
+  return arr.length ? Math.max(...arr.map(x => x.id)) + 1 : 1;
+}
+
+// ─────────────────────────────────────────────────
+// FORMATTING
+// ─────────────────────────────────────────────────
+
+const fmt = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
+const fmtD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+function aud(n) { return fmt.format(n || 0); }
+function audD(n) { return fmtD.format(n || 0); }
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function isOverdue(dueDate) {
+  if (!dueDate) return false;
+  return new Date(dueDate) < new Date() ;
+}
+
+// ─────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────
+
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + el.dataset.tab).classList.add('active');
+    renderAll();
+  });
+});
+
+// ─────────────────────────────────────────────────
+// DASHBOARD
+// ─────────────────────────────────────────────────
+
+function renderDashboard() {
+  const d = state;
+  const c = d.buildContract;
+
+  const contractPaid = c.stages.filter(s => s.paid).reduce((sum, s) => sum + s.amount, 0);
+  const contractRemaining = c.total - contractPaid;
+  const paidPct = Math.round(contractPaid / c.total * 100);
+
+  const extrasTotalCost = d.extras.reduce((sum, e) => sum + (e.totalAmount || 0), 0);
+  const extrasPaid = d.extras.reduce((sum, e) => sum + (e.amountPaid || 0), 0);
+  const extrasRemaining = extrasTotalCost - extrasPaid;
+
+  const monthlyIncome = monthlyTotal(d.budget.income);
+  const monthlyExpenses = monthlyTotal(d.budget.expenses);
+  const surplus = monthlyIncome - monthlyExpenses;
+
+  const totalOutstanding = contractRemaining + extrasRemaining;
+
+  const nextStage = c.stages.find(s => !s.paid);
+
+  let html = `
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Contract Paid</div>
+        <div class="card-value">${aud(contractPaid)}</div>
+        <div class="card-sub">of ${aud(c.total)} contract</div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" style="width:${paidPct}%"></div></div>
+          <div class="progress-labels"><span>${paidPct}% paid</span><span>${aud(contractRemaining)} remaining</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Extras Outstanding</div>
+        <div class="card-value ${extrasRemaining > 0 ? 'orange' : 'green'}">${aud(extrasRemaining)}</div>
+        <div class="card-sub">${aud(extrasPaid)} paid of ${aud(extrasTotalCost)} total</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Total Still to Pay</div>
+        <div class="card-value red">${aud(totalOutstanding)}</div>
+        <div class="card-sub">Contract + extras remaining</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monthly ${surplus >= 0 ? 'Surplus' : 'Deficit'}</div>
+        <div class="card-value ${surplus >= 0 ? 'green' : 'red'}">${aud(Math.abs(surplus))}</div>
+        <div class="card-sub">${aud(monthlyIncome)} in · ${aud(monthlyExpenses)} out</div>
+      </div>
+    </div>
+  `;
+
+  if (nextStage) {
+    html += `
+      <div class="section" style="margin-bottom:24px">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Next Contract Payment</div>
+            <div class="section-subtitle">Building contract progress</div>
+          </div>
+        </div>
+        <div style="padding:16px 20px">
+          <div class="next-payment">
+            <div class="next-payment-label">Up next</div>
+            <div class="next-payment-name">${nextStage.name}</div>
+            <div class="next-payment-amount">${aud(nextStage.amount)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Upcoming extras
+  const unpaidExtras = d.extras.filter(e => (e.totalAmount || 0) > (e.amountPaid || 0));
+  if (unpaidExtras.length > 0) {
+    html += `
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Outstanding Extras</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Item</th><th>Vendor</th><th>Remaining</th><th>Due</th></tr></thead>
+            <tbody>
+              ${unpaidExtras.map(e => {
+                const rem = (e.totalAmount || 0) - (e.amountPaid || 0);
+                const od = isOverdue(e.dueDate) && rem > 0;
+                return `<tr>
+                  <td>${e.name}</td>
+                  <td>${e.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
+                  <td class="amount">${aud(rem)}</td>
+                  <td>${od ? `<span class="badge overdue">${fmtDate(e.dueDate)}</span>` : fmtDate(e.dueDate)}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  // 6-month budget vs actual chart
+  const last6 = getLast6Months();
+  const totalBudgetMo = monthlyTotal(state.budget.expenses);
+  const chartData = last6.map(mo => {
+    const actual = Object.values(state.budget.actuals[mo] || {}).reduce((s, v) => s + v, 0);
+    return { label: monthShortLabel(mo), budget: totalBudgetMo, actual, mo };
+  });
+  const hasAnyActual = chartData.some(d => d.actual > 0);
+
+  if (totalBudgetMo > 0 || hasAnyActual) {
+    const maxVal = Math.max(...chartData.flatMap(d => [d.budget, d.actual]), 1);
+    const W = 600, PL = 58, PR = 10, PT = 10, PB = 30;
+    const chartH = 180 - PT - PB;
+    const chartW = W - PL - PR;
+    const groupW = chartW / chartData.length;
+    const barW = groupW * 0.28;
+    const gap = groupW * 0.04;
+
+    const ySteps = [0, 0.25, 0.5, 0.75, 1];
+    const yLines = ySteps.map(p => {
+      const y = PT + chartH - p * chartH;
+      return `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="${PL - 5}" y="${y + 4}" text-anchor="end" font-size="9" fill="#94a3b8">${aud(p * maxVal)}</text>`;
+    }).join('');
+
+    const bars = chartData.map((d, i) => {
+      const x = PL + i * groupW + groupW * 0.08;
+      const bH = d.budget > 0 ? (d.budget / maxVal) * chartH : 0;
+      const aH = d.actual > 0 ? (d.actual / maxVal) * chartH : 0;
+      const aColor = d.actual > d.budget ? '#ef4444' : '#10b981';
+      const lx = x + barW + gap / 2 + barW / 2;
+      return `
+        <rect x="${x}" y="${PT + chartH - bH}" width="${barW}" height="${bH}" fill="#2563eb" opacity="0.65" rx="2"/>
+        <rect x="${x + barW + gap}" y="${PT + chartH - aH}" width="${barW}" height="${aH}" fill="${aColor}" opacity="0.8" rx="2"/>
+        <text x="${lx}" y="${PT + chartH + 16}" text-anchor="middle" font-size="10" fill="#64748b">${d.label}</text>
+      `;
+    }).join('');
+
+    html += `
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Budget vs Actual — Last 6 Months</div>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:#2563eb;opacity:0.65"></span>Budget</span>
+            <span><span class="legend-dot" style="background:#10b981;opacity:0.8"></span>Actual (under)</span>
+            <span><span class="legend-dot" style="background:#ef4444;opacity:0.8"></span>Actual (over)</span>
+          </div>
+        </div>
+        <div style="padding:16px 20px 8px">
+          <svg viewBox="0 0 ${W} ${PT + chartH + PB}" style="width:100%;height:auto;display:block">
+            ${yLines}${bars}
+          </svg>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById('dashboard-content').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────────
+// BUILD COSTS
+// ─────────────────────────────────────────────────
+
+function renderBuild() {
+  const c = state.buildContract;
+  const contractPaid = c.stages.filter(s => s.paid).reduce((sum, s) => sum + s.amount, 0);
+  const contractRemaining = c.total - contractPaid;
+
+  let html = `
+    <div class="section" style="border-left:4px solid ${colors.build.contract}">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Fixed Price Contract</div>
+          <div class="section-subtitle">Progress payment stages</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="contract-total-badge">Contract: ${aud(c.total)}</span>
+          <button class="btn btn-primary btn-sm" onclick="openEditContractTotal()">Edit total</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddStage()">+ Stage</button>
+        </div>
+      </div>
+      <div style="padding:12px 20px 0">
+        <div style="display:flex;gap:24px;font-size:13px;margin-bottom:12px">
+          <span style="color:var(--success);font-weight:600">${aud(contractPaid)} paid</span>
+          <span style="color:var(--text-muted)">·</span>
+          <span style="color:var(--danger);font-weight:600">${aud(contractRemaining)} remaining</span>
+          <span style="color:var(--text-muted)">·</span>
+          <span style="color:var(--text-muted)">${Math.round(contractPaid/c.total*100)}% complete</span>
+        </div>
+        <div class="progress-bar" style="height:10px;margin-bottom:16px">
+          <div class="progress-fill green" style="width:${Math.round(contractPaid/c.total*100)}%"></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Stage</th><th>Amount</th><th>% of Contract</th><th>Status</th><th>Funding</th><th>Paid Date</th><th>Invoice Ref</th><th></th></tr></thead>
+          <tbody>
+            ${c.stages.map(s => {
+              const pct = ((s.amount / c.total) * 100).toFixed(1);
+              const badge = s.paid
+                ? `<span class="badge paid">Paid</span>`
+                : `<span class="badge unpaid">Unpaid</span>`;
+              return `<tr>
+                <td style="font-weight:500">${s.name}</td>
+                <td class="amount">${aud(s.amount)}</td>
+                <td style="color:var(--text-muted)">${pct}%</td>
+                <td>${badge}</td>
+                <td>${fundingBadge(s.funding || 'loan')}</td>
+                <td>${fmtDate(s.paidDate)}</td>
+                <td style="color:var(--text-muted)">${s.invoiceRef || '—'}</td>
+                <td class="actions">
+                  ${attachBtn(`stage-${s.id}`, s.name)}
+                  <button class="btn btn-ghost btn-sm" onclick="openEditStage(${s.id})">✏️</button>
+                  <button class="btn btn-danger-ghost btn-sm" onclick="deleteStage(${s.id})">🗑</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Extras
+  const extras = state.extras;
+  const extrasTotalCost = extras.reduce((sum, e) => sum + (e.totalAmount || 0), 0);
+  const extrasPaid = extras.reduce((sum, e) => sum + (e.amountPaid || 0), 0);
+
+  html += `
+    <div class="section" style="border-left:4px solid ${colors.build.extras}">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Outside Contract</div>
+          <div class="section-subtitle">Landscaping, solar, and other extras</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${extrasTotalCost > 0 ? `<span class="contract-total-badge">${aud(extrasPaid)} / ${aud(extrasTotalCost)}</span>` : ''}
+          <button class="btn btn-primary btn-sm" onclick="openAddExtra()">+ Item</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Vendor</th><th>Total Cost</th><th>Paid</th><th>Remaining</th><th>Due Date</th><th>Status</th><th>Funding</th><th></th></tr></thead>
+          <tbody>
+            ${extras.length === 0 ? `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>No items yet. Add landscaping, solar, or other extras.</div></td></tr>` : extras.map(e => {
+              const rem = (e.totalAmount || 0) - (e.amountPaid || 0);
+              const statusBadge = {
+                'not-quoted': `<span class="badge unpaid">Not Quoted</span>`,
+                'quoted':     `<span class="badge pending">Quoted</span>`,
+                'approved':   `<span class="badge" style="background:#ede9fe;color:#5b21b6">Approved</span>`,
+                'partial':    `<span class="badge partial">Partially Paid</span>`,
+                'paid':       `<span class="badge paid">Paid</span>`,
+              };
+              const od = e.dueDate && isOverdue(e.dueDate) && e.status !== 'paid';
+              const badge = statusBadge[e.status || 'not-quoted'] + (od ? ` <span class="badge overdue">Overdue</span>` : '');
+              return `<tr>
+                <td style="font-weight:500">${e.name}</td>
+                <td>${e.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
+                <td class="amount">${e.totalAmount ? aud(e.totalAmount) : '<span class="amount muted">TBC</span>'}</td>
+                <td class="amount">${aud(e.amountPaid)}</td>
+                <td class="amount ${rem > 0 ? '' : 'muted'}">${rem > 0 ? aud(rem) : '—'}</td>
+                <td>${fmtDate(e.dueDate)}</td>
+                <td>${badge}</td>
+                <td>${fundingBadge(e.funding || 'loan')}</td>
+                <td class="actions">
+                  ${attachBtn(`extra-${e.id}`, e.name)}
+                  <button class="btn btn-ghost btn-sm" onclick="openEditExtra(${e.id})">✏️</button>
+                  <button class="btn btn-danger-ghost btn-sm" onclick="deleteExtra(${e.id})">🗑</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // ── Furniture ──────────────────────────────────
+  const furn = state.furniture;
+  const furnTotal    = furn.reduce((s, f) => s + (f.price || 0), 0);
+  const furnPurchased = furn.filter(f => f.status === 'delivered' || f.status === 'ordered');
+  const furnToBuy    = furn.filter(f => f.status === 'to-purchase');
+  const furnCostDone = furnPurchased.reduce((s, f) => s + (f.price || 0), 0);
+  const furnCostLeft = furnToBuy.reduce((s, f) => s + (f.price || 0), 0);
+
+  const FURN_ROOMS = ['Living Room','Dining Room','Kitchen','Master Bedroom','Bedroom 2','Bedroom 3','Study / Office','Bathroom','Laundry','Outdoor / Alfresco','Other'];
+
+  html += `
+    <div class="section" style="border-left:4px solid ${colors.build.furniture}">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Furniture</div>
+          <div class="section-subtitle">${furn.length} items · ${aud(furnCostDone)} purchased · ${aud(furnCostLeft)} remaining</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${furn.length > 0 ? `
+          <div style="display:flex;gap:6px">
+            <span class="badge paid">${furn.filter(f=>f.status==='delivered').length} delivered</span>
+            <span class="badge partial">${furn.filter(f=>f.status==='ordered').length} ordered</span>
+            <span class="badge unpaid">${furnToBuy.length} to buy</span>
+          </div>` : ''}
+          <button class="btn btn-primary btn-sm" onclick="openAddFurniture()">+ Item</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Room</th><th>Store / Vendor</th><th>Price</th><th>Status</th><th>Funding</th><th>Delivery Date</th><th>Notes</th><th></th></tr></thead>
+          <tbody>
+            ${furn.length === 0
+              ? `<tr><td colspan="8"><div class="empty"><div class="empty-icon">🛋️</div>No furniture items yet. Add sofas, beds, appliances and more.</div></td></tr>`
+              : furn.map(f => {
+                  const statusMap = {
+                    'to-purchase': `<span class="badge unpaid">To Purchase</span>`,
+                    'ordered':     `<span class="badge partial">Ordered</span>`,
+                    'delivered':   `<span class="badge paid">Delivered</span>`,
+                  };
+                  const delivOd = f.deliveryDate && f.status !== 'delivered' && isOverdue(f.deliveryDate);
+                  return `<tr>
+                    <td style="font-weight:500">${f.name}</td>
+                    <td style="color:var(--text-muted)">${f.room || '—'}</td>
+                    <td>${f.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
+                    <td class="amount">${f.price ? aud(f.price) : '<span class="amount muted">TBC</span>'}</td>
+                    <td>${statusMap[f.status] || statusMap['to-purchase']}</td>
+                    <td>${fundingBadge(f.funding || 'own-funds')}</td>
+                    <td>${f.deliveryDate ? (delivOd ? `<span class="badge overdue">${fmtDate(f.deliveryDate)}</span>` : fmtDate(f.deliveryDate)) : '<span style="color:var(--text-muted)">—</span>'}</td>
+                    <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.notes || '—'}</td>
+                    <td class="actions">
+                      ${attachBtn(`furniture-${f.id}`, f.name)}
+                      <button class="btn btn-ghost btn-sm" onclick="openEditFurniture(${f.id})">✏️</button>
+                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteFurniture(${f.id})">🗑</button>
+                    </td>
+                  </tr>`;
+                }).join('')}
+          </tbody>
+          ${furn.length > 0 ? `
+          <tfoot>
+            <tr style="background:var(--surface2);border-top:2px solid var(--border)">
+              <td colspan="3" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">Total</td>
+              <td class="amount" style="padding:11px 16px;font-weight:700">${aud(furnTotal)}</td>
+              <td colspan="4" style="padding:11px 16px;font-size:12px;color:var(--text-muted)">
+                ${aud(furnCostDone)} purchased · ${aud(furnCostLeft)} still to buy
+              </td>
+            </tr>
+          </tfoot>` : ''}
+        </table>
+      </div>
+    </div>
+  `;
+
+  // ── Appliances ──────────────────────────────────
+  const appl = state.appliances;
+  const applTotal     = appl.reduce((s, a) => s + (a.price || 0), 0);
+  const applPurchased = appl.filter(a => a.status === 'delivered' || a.status === 'ordered');
+  const applToBuy     = appl.filter(a => a.status === 'to-purchase');
+  const applCostDone  = applPurchased.reduce((s, a) => s + (a.price || 0), 0);
+  const applCostLeft  = applToBuy.reduce((s, a) => s + (a.price || 0), 0);
+
+  html += `
+    <div class="section" style="border-left:4px solid ${colors.build.appliances}">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Appliances</div>
+          <div class="section-subtitle">${appl.length} items · ${aud(applCostDone)} purchased · ${aud(applCostLeft)} remaining</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${appl.length > 0 ? `
+          <div style="display:flex;gap:6px">
+            <span class="badge paid">${appl.filter(a=>a.status==='delivered').length} delivered</span>
+            <span class="badge partial">${appl.filter(a=>a.status==='ordered').length} ordered</span>
+            <span class="badge unpaid">${applToBuy.length} to buy</span>
+          </div>` : ''}
+          <button class="btn btn-primary btn-sm" onclick="openAddAppliance()">+ Item</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Item</th><th>Room</th><th>Store / Vendor</th><th>Price</th><th>Status</th><th>Funding</th><th>Delivery Date</th><th>Notes</th><th></th></tr></thead>
+          <tbody>
+            ${appl.length === 0
+              ? `<tr><td colspan="9"><div class="empty"><div class="empty-icon">🍳</div>No appliances yet. Add fridges, dishwashers, ovens and more.</div></td></tr>`
+              : appl.map(a => {
+                  const statusMap = {
+                    'to-purchase': `<span class="badge unpaid">To Purchase</span>`,
+                    'ordered':     `<span class="badge partial">Ordered</span>`,
+                    'delivered':   `<span class="badge paid">Delivered</span>`,
+                  };
+                  const delivOd = a.deliveryDate && a.status !== 'delivered' && isOverdue(a.deliveryDate);
+                  return `<tr>
+                    <td style="font-weight:500">${a.name}</td>
+                    <td style="color:var(--text-muted)">${a.room || '—'}</td>
+                    <td>${a.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
+                    <td class="amount">${a.price ? aud(a.price) : '<span class="amount muted">TBC</span>'}</td>
+                    <td>${statusMap[a.status] || statusMap['to-purchase']}</td>
+                    <td>${fundingBadge(a.funding || 'own-funds')}</td>
+                    <td>${a.deliveryDate ? (delivOd ? `<span class="badge overdue">${fmtDate(a.deliveryDate)}</span>` : fmtDate(a.deliveryDate)) : '<span style="color:var(--text-muted)">—</span>'}</td>
+                    <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.notes || '—'}</td>
+                    <td class="actions">
+                      ${attachBtn(`appliance-${a.id}`, a.name)}
+                      <button class="btn btn-ghost btn-sm" onclick="openEditAppliance(${a.id})">✏️</button>
+                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteAppliance(${a.id})">🗑</button>
+                    </td>
+                  </tr>`;
+                }).join('')}
+          </tbody>
+          ${appl.length > 0 ? `
+          <tfoot>
+            <tr style="background:var(--surface2);border-top:2px solid var(--border)">
+              <td colspan="3" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">Total</td>
+              <td class="amount" style="padding:11px 16px;font-weight:700">${aud(applTotal)}</td>
+              <td colspan="4" style="padding:11px 16px;font-size:12px;color:var(--text-muted)">
+                ${aud(applCostDone)} purchased · ${aud(applCostLeft)} still to buy
+              </td>
+            </tr>
+          </tfoot>` : ''}
+        </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('build-content').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────────
+// MONTHLY BUDGET
+// ─────────────────────────────────────────────────
+
+function freqToMonthly(amount, freq) {
+  if (freq === 'daily')        return amount * 365 / 12;
+  if (freq === 'weekly')       return amount * 52 / 12;
+  if (freq === 'fortnightly')  return amount * 26 / 12;
+  if (freq === 'quarterly')    return amount / 3;
+  if (freq === 'annually' || freq === 'annual') return amount / 12;
+  return amount; // monthly
+}
+
+function monthlyTotal(items) {
+  return items.reduce((sum, i) => sum + itemMonthly(i), 0);
+}
+
+function freqLabel(f) {
+  return { daily:'/day', weekly:'/wk', fortnightly:'/fn', monthly:'/mo', quarterly:'/qtr', annually:'/yr', annual:'/yr' }[f] || '/mo';
+}
+
+function freqDisplay(f) {
+  return { daily:'Daily', weekly:'Weekly', fortnightly:'Fortnightly', monthly:'Monthly', quarterly:'Quarterly', annually:'Annually', annual:'Annually', custom:'Custom' }[f] || 'Monthly';
+}
+
+function freqDisplayItem(item) {
+  if ((item.frequency || 'monthly') === 'custom') {
+    return `Every ${item.customEvery || 1} ${item.customUnit || 'weeks'}`;
+  }
+  return freqDisplay(item.frequency || 'monthly');
+}
+
+function freqLabelItem(item) {
+  if ((item.frequency || 'monthly') === 'custom') {
+    const n = item.customEvery || 1;
+    const u = item.customUnit === 'months' ? 'mo' : 'wk';
+    return `/${n}${u}`;
+  }
+  return freqLabel(item.frequency || 'monthly');
+}
+
+function itemMonthly(item) {
+  const freq = item.frequency || 'monthly';
+  if (freq === 'custom') {
+    const n = item.customEvery || 1;
+    return item.customUnit === 'months'
+      ? (item.amount || 0) / n
+      : (item.amount || 0) * 52 / (n * 12);
+  }
+  return freqToMonthly(item.amount || 0, freq);
+}
+
+function getExpenseOccurrences(e, year, month) {
+  if (!e.dueDate) return [];
+  const [dy, dm, dd] = e.dueDate.split('-').map(Number);
+  const freq = e.frequency || 'monthly';
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  if (freq === 'monthly') {
+    return [Math.min(dd, daysInMonth)];
+  }
+  if (freq === 'annually' || freq === 'annual') {
+    return month === dm ? [Math.min(dd, daysInMonth)] : [];
+  }
+  if (freq === 'quarterly') {
+    const diff = (year * 12 + month - 1) - (dy * 12 + dm - 1);
+    return diff >= 0 && diff % 3 === 0 ? [Math.min(dd, daysInMonth)] : [];
+  }
+  if (freq === 'weekly') {
+    const baseDow = new Date(dy, dm - 1, dd).getDay();
+    const days = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      if (new Date(year, month - 1, d).getDay() === baseDow) days.push(d);
+    }
+    return days;
+  }
+  if (freq === 'fortnightly') {
+    const base = new Date(dy, dm - 1, dd);
+    const days = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const diff = Math.round((new Date(year, month - 1, d) - base) / 86400000);
+      if (diff >= 0 && diff % 14 === 0) days.push(d);
+    }
+    return days;
+  }
+  if (freq === 'daily') {
+    return Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  }
+  if (freq === 'custom') {
+    const n = e.customEvery || 1;
+    const unit = e.customUnit || 'weeks';
+    if (unit === 'weeks') {
+      const base = new Date(dy, dm - 1, dd);
+      const days = [];
+      for (let d = 1; d <= daysInMonth; d++) {
+        const diff = Math.round((new Date(year, month - 1, d) - base) / 86400000);
+        if (diff >= 0 && diff % (n * 7) === 0) days.push(d);
+      }
+      return days;
+    }
+    if (unit === 'months') {
+      const diff = (year * 12 + month - 1) - (dy * 12 + dm - 1);
+      return diff >= 0 && diff % n === 0 ? [Math.min(dd, daysInMonth)] : [];
+    }
+  }
+  return [];
+}
+
+const EXPENSE_CATEGORIES = ['Mortgage / Rent', 'Insurance', 'Utilities', 'Groceries', 'Transport', 'Childcare / Education', 'Health', 'Entertainment', 'Subscriptions', 'Dining Out', 'Clothing', 'Personal Care', 'Savings / Investment', 'Other'];
+
+// ─────────────────────────────────────────────────
+// GOALS
+// ─────────────────────────────────────────────────
+
+const GOAL_TYPES = [
+  { value: 'spending',  label: 'Spending Limit',   icon: '📉' },
+  { value: 'savings',   label: 'Savings Target',   icon: '🏦' },
+  { value: 'income',    label: 'Income Target',    icon: '📈' },
+];
+
+function goalProgress(g) {
+  if (g.type === 'spending') {
+    // Use latest month actual for that category
+    const months = Object.keys(state.budget.actuals).sort().reverse();
+    let actual = null;
+    for (const m of months) {
+      const catTotal = (getMonthData(m).expenses || [])
+        .filter(e => (e.category || 'Other') === g.category)
+        .reduce((s, e) => s + (state.budget.actuals[m]?.[e.id] || 0), 0);
+      if (catTotal > 0) { actual = catTotal; break; }
+    }
+    const target = g.targetMonthly || 0;
+    if (actual === null) return { pct: null, label: 'No actuals yet', actual: null, target };
+    const pct = target > 0 ? Math.max(0, Math.min(100, (actual / target) * 100)) : 0;
+    const ok = actual <= target;
+    return { pct, label: `${aud(actual)} actual vs ${aud(target)} limit`, actual, target, ok };
+  }
+  if (g.type === 'savings') {
+    const cur = g.currentSaved || 0;
+    const tgt = g.targetTotal || 1;
+    const pct = Math.min(100, (cur / tgt) * 100);
+    return { pct, label: `${aud(cur)} of ${aud(tgt)} saved`, ok: cur >= tgt };
+  }
+  if (g.type === 'income') {
+    const cur = monthlyTotal(getMonthData(selectedBudgetMonth).income);
+    const tgt = g.targetMonthly || 1;
+    const pct = Math.min(100, (cur / tgt) * 100);
+    return { pct, label: `${aud(cur)}/mo of ${aud(tgt)}/mo target`, ok: cur >= tgt };
+  }
+  return { pct: 0, label: '', ok: false };
+}
+
+function renderGoals() {
+  const goals = state.goals;
+  const active = goals.filter(g => g.status === 'active');
+  const achieved = goals.filter(g => g.status === 'achieved');
+
+  let html = '';
+
+  if (goals.length > 0) {
+    html += `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:24px">
+        <div class="section" style="padding:16px 20px;margin-bottom:0">
+          <div style="font-size:24px;font-weight:700;color:var(--primary)">${active.length}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Active goals</div>
+        </div>
+        <div class="section" style="padding:16px 20px;margin-bottom:0">
+          <div style="font-size:24px;font-weight:700;color:var(--success)">${achieved.length}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Achieved</div>
+        </div>
+        <div class="section" style="padding:16px 20px;margin-bottom:0">
+          <div style="font-size:24px;font-weight:700">${goals.filter(g=>g.type==='spending'&&g.status==='active').length}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Spending limits</div>
+        </div>
+        <div class="section" style="padding:16px 20px;margin-bottom:0">
+          <div style="font-size:24px;font-weight:700">${goals.filter(g=>g.type==='savings'&&g.status==='active').length}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Savings targets</div>
+        </div>
+      </div>`;
+  }
+
+  // Group: active first, then achieved, then abandoned
+  const grouped = [
+    ...goals.filter(g => g.status === 'active'),
+    ...goals.filter(g => g.status === 'achieved'),
+    ...goals.filter(g => g.status === 'abandoned'),
+  ];
+
+  html += `<div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+    <button class="btn btn-primary" onclick="openAddGoal()">+ New Goal</button>
+  </div>`;
+
+  if (grouped.length === 0) {
+    html += `<div class="empty"><div class="empty-icon">🎯</div>No goals yet. Set a spending limit, savings target, or income goal.</div>`;
+  } else {
+    grouped.forEach(g => {
+      const typeInfo = GOAL_TYPES.find(t => t.value === g.type) || GOAL_TYPES[0];
+      const prog = goalProgress(g);
+      const statusBadge = {
+        active:    `<span class="badge" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe">Active</span>`,
+        achieved:  `<span class="badge paid">Achieved</span>`,
+        abandoned: `<span class="badge" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0">Abandoned</span>`,
+      }[g.status] || '';
+
+      const deadline = g.deadline ? (() => {
+        const [y,m,d] = g.deadline.split('-');
+        const daysLeft = Math.ceil((new Date(g.deadline) - new Date()) / 86400000);
+        const label = `${d}/${m}/${y}`;
+        if (daysLeft < 0) return `<span style="color:var(--danger)">${label} (overdue)</span>`;
+        if (daysLeft <= 30) return `<span style="color:var(--warning,#f59e0b)">${label} (${daysLeft}d left)</span>`;
+        return label;
+      })() : '—';
+
+      let progressHtml = '';
+      if (prog.pct !== null) {
+        const fillColor = g.type === 'spending'
+          ? (prog.ok ? 'var(--success)' : 'var(--danger)')
+          : 'var(--primary)';
+        const pctDisplay = g.type === 'spending'
+          ? (prog.ok ? `✓ Under limit` : `${Math.round(prog.pct)}% of limit`)
+          : `${Math.round(prog.pct)}%`;
+        progressHtml = `
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" style="width:${Math.min(100,prog.pct)}%;background:${fillColor}"></div>
+          </div>
+          <div class="progress-label">
+            <span>${prog.label}</span>
+            <span style="font-weight:600;color:${fillColor}">${pctDisplay}</span>
+          </div>`;
+      } else {
+        progressHtml = `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">No actuals recorded yet</div>`;
+      }
+
+      html += `
+        <div class="goal-card" style="opacity:${g.status==='abandoned'?'0.6':'1'}">
+          <div class="goal-card-header">
+            <div>
+              <div class="goal-card-title">${typeInfo.icon} ${g.name}</div>
+              <div class="goal-card-meta">
+                ${typeInfo.label}${g.category ? ` · ${g.category}` : ''} · Target date: ${deadline}
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+              ${statusBadge}
+              ${g.status === 'active' ? `<button class="btn btn-ghost btn-sm" title="Mark achieved" onclick="markGoalAchieved(${g.id})">✓</button>` : ''}
+              <button class="btn btn-ghost btn-sm" onclick="openEditGoal(${g.id})">✏️</button>
+              <button class="btn btn-danger-ghost btn-sm" onclick="deleteGoal(${g.id})">🗑</button>
+            </div>
+          </div>
+          ${progressHtml}
+          ${g.notes ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">${g.notes}</div>` : ''}
+        </div>`;
+    });
+  }
+
+  document.getElementById('goals-content').innerHTML = html;
+}
+
+function goalForm(g = {}) {
+  const type = g.type || 'spending';
+  return `
+    <div class="form-group">
+      <label class="form-label">Goal Name</label>
+      <input class="form-input" id="f-goal-name" type="text" value="${g.name || ''}" placeholder="e.g. Cut dining out">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="f-goal-type" onchange="toggleGoalFields()">
+        ${GOAL_TYPES.map(t => `<option value="${t.value}" ${type===t.value?'selected':''}>${t.icon} ${t.label}</option>`).join('')}
+      </select>
+    </div>
+    <div id="goal-spending-fields" style="display:${type==='spending'?'':'none'}">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Expense Category</label>
+          <select class="form-select" id="f-goal-category">
+            ${EXPENSE_CATEGORIES.map(c => `<option value="${c}" ${g.category===c?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Limit (AUD)</label>
+          <input class="form-input" id="f-goal-target-monthly" type="number" min="0" value="${g.targetMonthly||''}" placeholder="e.g. 300">
+        </div>
+      </div>
+    </div>
+    <div id="goal-savings-fields" style="display:${type==='savings'?'':'none'}">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Target Amount (AUD)</label>
+          <input class="form-input" id="f-goal-target-total" type="number" min="0" value="${g.targetTotal||''}" placeholder="e.g. 50000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Currently Saved (AUD)</label>
+          <input class="form-input" id="f-goal-current-saved" type="number" min="0" value="${g.currentSaved||''}" placeholder="0">
+        </div>
+      </div>
+    </div>
+    <div id="goal-income-fields" style="display:${type==='income'?'':'none'}">
+      <div class="form-group">
+        <label class="form-label">Target Monthly Income (AUD)</label>
+        <input class="form-input" id="f-goal-target-monthly-inc" type="number" min="0" value="${g.targetMonthly||''}" placeholder="e.g. 8000">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Target Date</label>
+        <input class="form-input" id="f-goal-deadline" type="date" value="${g.deadline||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="f-goal-status">
+          <option value="active"    ${(g.status||'active')==='active'?'selected':''}>Active</option>
+          <option value="achieved"  ${g.status==='achieved'?'selected':''}>Achieved</option>
+          <option value="abandoned" ${g.status==='abandoned'?'selected':''}>Abandoned</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="f-goal-notes" type="text" value="${g.notes||''}" placeholder="Optional notes">
+    </div>
+  `;
+}
+
+function toggleGoalFields() {
+  const type = document.getElementById('f-goal-type').value;
+  document.getElementById('goal-spending-fields').style.display = type === 'spending' ? '' : 'none';
+  document.getElementById('goal-savings-fields').style.display  = type === 'savings'  ? '' : 'none';
+  document.getElementById('goal-income-fields').style.display   = type === 'income'   ? '' : 'none';
+}
+
+function goalFromForm(id) {
+  const type = document.getElementById('f-goal-type').value;
+  const obj = {
+    id,
+    name:     document.getElementById('f-goal-name').value.trim(),
+    type,
+    status:   document.getElementById('f-goal-status').value,
+    deadline: document.getElementById('f-goal-deadline').value || null,
+    notes:    document.getElementById('f-goal-notes').value.trim(),
+  };
+  if (type === 'spending') {
+    obj.category      = document.getElementById('f-goal-category').value;
+    obj.targetMonthly = parseFloat(document.getElementById('f-goal-target-monthly').value) || 0;
+  }
+  if (type === 'savings') {
+    obj.targetTotal    = parseFloat(document.getElementById('f-goal-target-total').value) || 0;
+    obj.currentSaved   = parseFloat(document.getElementById('f-goal-current-saved').value) || 0;
+  }
+  if (type === 'income') {
+    obj.targetMonthly = parseFloat(document.getElementById('f-goal-target-monthly-inc').value) || 0;
+  }
+  return obj;
+}
+
+function openAddGoal() {
+  openModal('New Goal', goalForm(), () => {
+    const g = goalFromForm(nextId(state.goals));
+    if (!g.name) return;
+    state.goals.push(g);
+    saveData(state); closeModal(); renderGoals();
+  });
+}
+
+function openEditGoal(id) {
+  const g = state.goals.find(x => x.id === id);
+  openModal('Edit Goal', goalForm(g), () => {
+    Object.assign(g, goalFromForm(id));
+    saveData(state); closeModal(); renderGoals();
+  });
+}
+
+function deleteGoal(id) {
+  if (!confirm('Delete this goal?')) return;
+  state.goals = state.goals.filter(g => g.id !== id);
+  saveData(state); renderGoals();
+}
+
+function markGoalAchieved(id) {
+  const g = state.goals.find(x => x.id === id);
+  if (g) { g.status = 'achieved'; saveData(state); renderGoals(); }
+}
+
+// ─────────────────────────────────────────────────
+// SCENARIOS
+// ─────────────────────────────────────────────────
+
+let openScenarioId = null;
+
+const ADJ_TYPES = [
+  { value: 'add-income',     label: 'Add income source',      icon: '💰' },
+  { value: 'remove-income',  label: 'Remove income source',   icon: '➖' },
+  { value: 'reduce-income',  label: 'Reduce income amount',   icon: '📉' },
+  { value: 'add-expense',    label: 'Add new expense',        icon: '➕' },
+  { value: 'remove-expense', label: 'Remove expense',         icon: '✂️' },
+  { value: 'reduce-expense', label: 'Reduce expense amount',  icon: '📉' },
+];
+
+function calcScenario(scenario) {
+  const base = getMonthData(selectedBudgetMonth);
+  let income   = JSON.parse(JSON.stringify(base.income));
+  let expenses = JSON.parse(JSON.stringify(base.expenses));
+
+  (scenario.adjustments || []).forEach(adj => {
+    if (adj.type === 'add-income') {
+      income.push({ id: -(adj.id||0), name: adj.name, amount: adj.amount||0, frequency: adj.frequency||'monthly' });
+    } else if (adj.type === 'remove-income') {
+      income = income.filter(i => i.id !== adj.itemId);
+    } else if (adj.type === 'reduce-income') {
+      const i = income.find(x => x.id === adj.itemId);
+      if (i) i.amount = adj.changeType === 'percent'
+        ? Math.max(0, i.amount * (1 - adj.changeAmount/100))
+        : Math.max(0, i.amount - (adj.changeAmount||0));
+    } else if (adj.type === 'add-expense') {
+      expenses.push({ id: -(adj.id||0), name: adj.name, amount: adj.amount||0, frequency: adj.frequency||'monthly', category: adj.category||'Other' });
+    } else if (adj.type === 'remove-expense') {
+      expenses = expenses.filter(e => e.id !== adj.itemId);
+    } else if (adj.type === 'reduce-expense') {
+      const e = expenses.find(x => x.id === adj.itemId);
+      if (e) e.amount = adj.changeType === 'percent'
+        ? Math.max(0, e.amount * (1 - adj.changeAmount/100))
+        : Math.max(0, e.amount - (adj.changeAmount||0));
+    }
+  });
+
+  return {
+    income, expenses,
+    totalIncome:   monthlyTotal(income),
+    totalExpenses: monthlyTotal(expenses),
+    surplus: monthlyTotal(income) - monthlyTotal(expenses),
+  };
+}
+
+function renderScenarios() {
+  const scenarios = state.scenarios;
+  const base = getMonthData(selectedBudgetMonth);
+  const baseTotalIncome   = monthlyTotal(base.income);
+  const baseTotalExpenses = monthlyTotal(base.expenses);
+  const baseSurplus       = baseTotalIncome - baseTotalExpenses;
+
+  let html = `<div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+    <button class="btn btn-primary" onclick="openAddScenario()">+ New Scenario</button>
+  </div>`;
+
+  if (scenarios.length === 0) {
+    html += `<div class="empty"><div class="empty-icon">🔬</div>No scenarios yet. Create one to model income changes, expense cuts, or lifestyle adjustments.</div>`;
+  } else {
+    scenarios.forEach(sc => {
+      const result = calcScenario(sc);
+      const incomeDiff   = result.totalIncome   - baseTotalIncome;
+      const expenseDiff  = result.totalExpenses - baseTotalExpenses;
+      const surplusDiff  = result.surplus       - baseSurplus;
+      const isOpen = openScenarioId === sc.id;
+
+      const diffBadge = (val, invertColors) => {
+        if (val === 0) return `<span style="color:var(--text-muted)">no change</span>`;
+        const pos = invertColors ? val < 0 : val > 0;
+        const color = pos ? 'var(--success)' : 'var(--danger)';
+        return `<span style="color:${color};font-weight:600">${val > 0 ? '+' : ''}${aud(val)}/mo</span>`;
+      };
+
+      html += `
+        <div class="scenario-card">
+          <div class="scenario-card-header" onclick="toggleScenario(${sc.id})">
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:14px">${sc.name}</div>
+              ${sc.description ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${sc.description}</div>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+              <div style="text-align:right">
+                <div style="font-size:11px;color:var(--text-muted)">Surplus impact</div>
+                <div style="font-size:14px;font-weight:700;color:${surplusDiff>=0?'var(--success)':'var(--danger)'}">${surplusDiff>=0?'+':''}${aud(surplusDiff)}/mo</div>
+              </div>
+              <div style="display:flex;gap:4px">
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditScenario(${sc.id})">✏️</button>
+                <button class="btn btn-danger-ghost btn-sm" onclick="event.stopPropagation();deleteScenario(${sc.id})">🗑</button>
+              </div>
+              <span style="color:var(--text-muted);font-size:18px">${isOpen ? '▲' : '▼'}</span>
+            </div>
+          </div>
+          <div class="scenario-card-body${isOpen?' open':''}">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <div style="font-size:13px;font-weight:600">Adjustments (${(sc.adjustments||[]).length})</div>
+              <button class="btn btn-primary btn-sm" onclick="openAddAdjustment(${sc.id})">+ Adjustment</button>
+            </div>
+            <div class="adj-list">
+              ${(sc.adjustments||[]).length === 0
+                ? `<div style="font-size:13px;color:var(--text-muted);padding:8px 0">No adjustments yet. Add income or expense changes.</div>`
+                : (sc.adjustments||[]).map(adj => {
+                    const at = ADJ_TYPES.find(t => t.value === adj.type) || ADJ_TYPES[0];
+                    let detail = '';
+                    if (adj.type === 'add-income' || adj.type === 'add-expense') {
+                      detail = `${adj.name} · ${aud(adj.amount||0)}/${adj.frequency||'mo'}${adj.category?' · '+adj.category:''}`;
+                    } else if (adj.type === 'remove-income' || adj.type === 'remove-expense') {
+                      detail = adj.itemName || '—';
+                    } else if (adj.type === 'reduce-income' || adj.type === 'reduce-expense') {
+                      detail = `${adj.itemName} · reduce by ${adj.changeType==='percent'?adj.changeAmount+'%':aud(adj.changeAmount||0)}`;
+                    }
+                    return `<div class="adj-item">
+                      <span class="adj-icon">${at.icon}</span>
+                      <div style="flex:1">
+                        <span style="font-weight:500">${at.label}</span>
+                        <span style="color:var(--text-muted);margin-left:6px">${detail}</span>
+                      </div>
+                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteAdjustment(${sc.id},${adj.id})">🗑</button>
+                    </div>`;
+                  }).join('')
+              }
+            </div>
+            <div class="scenario-compare">
+              <div class="compare-col">
+                <div class="compare-col-title">Current Budget</div>
+                <div class="compare-row"><span>Monthly Income</span><span class="amount" style="color:var(--success)">${aud(baseTotalIncome)}</span></div>
+                <div class="compare-row"><span>Monthly Expenses</span><span class="amount" style="color:var(--danger)">${aud(baseTotalExpenses)}</span></div>
+                <div class="compare-row"><span>Monthly Surplus</span><span class="amount" style="color:${baseSurplus>=0?'var(--success)':'var(--danger)'}">${aud(baseSurplus)}</span></div>
+                <div class="compare-row"><span style="color:var(--text-muted);font-size:12px">Annual surplus</span><span style="color:var(--text-muted);font-size:12px">${aud(baseSurplus*12)}</span></div>
+              </div>
+              <div class="compare-col" style="border:2px solid var(--primary)">
+                <div class="compare-col-title" style="color:var(--primary)">Scenario: ${sc.name}</div>
+                <div class="compare-row">
+                  <span>Monthly Income</span>
+                  <span class="amount" style="color:var(--success)">${aud(result.totalIncome)} ${incomeDiff!==0?`<small style="color:${incomeDiff>0?'var(--success)':'var(--danger)'}">(${incomeDiff>0?'+':''}${aud(incomeDiff)})</small>`:''}</span>
+                </div>
+                <div class="compare-row">
+                  <span>Monthly Expenses</span>
+                  <span class="amount" style="color:var(--danger)">${aud(result.totalExpenses)} ${expenseDiff!==0?`<small style="color:${expenseDiff<0?'var(--success)':'var(--danger)'}">(${expenseDiff>0?'+':''}${aud(expenseDiff)})</small>`:''}</span>
+                </div>
+                <div class="compare-row">
+                  <span>Monthly Surplus</span>
+                  <span class="amount" style="color:${result.surplus>=0?'var(--success)':'var(--danger)'};font-weight:700">${aud(result.surplus)}</span>
+                </div>
+                <div class="compare-row">
+                  <span style="font-size:12px">Annual surplus</span>
+                  <span style="font-size:12px;font-weight:600;color:${result.surplus>=0?'var(--success)':'var(--danger)'}">${aud(result.surplus*12)} ${surplusDiff!==0?`<small>(${surplusDiff>0?'+':''}${aud(surplusDiff*12)}/yr)</small>`:''}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+
+  document.getElementById('scenarios-content').innerHTML = html;
+}
+
+function toggleScenario(id) {
+  openScenarioId = openScenarioId === id ? null : id;
+  renderScenarios();
+}
+
+function scenarioForm(sc = {}) {
+  return `
+    <div class="form-group">
+      <label class="form-label">Scenario Name</label>
+      <input class="form-input" id="f-sc-name" type="text" value="${sc.name||''}" placeholder="e.g. Pick up second job">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="f-sc-desc" type="text" value="${sc.description||''}" placeholder="Brief description of what you're testing">
+    </div>
+  `;
+}
+
+function scenarioFromForm(id, existing = {}) {
+  return {
+    id,
+    name:        document.getElementById('f-sc-name').value.trim(),
+    description: document.getElementById('f-sc-desc').value.trim(),
+    adjustments: existing.adjustments || [],
+  };
+}
+
+function openAddScenario() {
+  openModal('New Scenario', scenarioForm(), () => {
+    const sc = scenarioFromForm(nextId(state.scenarios));
+    if (!sc.name) return;
+    state.scenarios.push(sc);
+    saveData(state); closeModal(); renderScenarios();
+  });
+}
+
+function openEditScenario(id) {
+  const sc = state.scenarios.find(x => x.id === id);
+  openModal('Edit Scenario', scenarioForm(sc), () => {
+    const updated = scenarioFromForm(id, sc);
+    Object.assign(sc, updated);
+    saveData(state); closeModal(); renderScenarios();
+  });
+}
+
+function deleteScenario(id) {
+  if (!confirm('Delete this scenario?')) return;
+  state.scenarios = state.scenarios.filter(s => s.id !== id);
+  if (openScenarioId === id) openScenarioId = null;
+  saveData(state); renderScenarios();
+}
+
+function adjForm(sc) {
+  const base = getMonthData(selectedBudgetMonth);
+  const incomeOpts = base.income.map(i => `<option value="${i.id}">${i.name} (${aud(itemMonthly(i))}/mo)</option>`).join('');
+  const expenseOpts = base.expenses.map(e => `<option value="${e.id}">${e.name} (${aud(itemMonthly(e))}/mo)</option>`).join('');
+  return `
+    <div class="form-group">
+      <label class="form-label">Adjustment Type</label>
+      <select class="form-select" id="f-adj-type" onchange="toggleAdjFields()">
+        ${ADJ_TYPES.map(t => `<option value="${t.value}">${t.icon} ${t.label}</option>`).join('')}
+      </select>
+    </div>
+    <div id="adj-add-income" style="display:block">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input class="form-input" id="f-adj-name" type="text" placeholder="e.g. Weekend job">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount (AUD)</label>
+          <input class="form-input" id="f-adj-amount" type="number" min="0" placeholder="e.g. 800">
+        </div>
+      </div>
+      <div class="form-row" id="adj-add-income-extra">
+        <div class="form-group">
+          <label class="form-label">Frequency</label>
+          <select class="form-select" id="f-adj-freq">
+            <option value="weekly">Weekly</option>
+            <option value="fortnightly">Fortnightly</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="annually">Annually</option>
+          </select>
+        </div>
+        <div class="form-group" id="adj-cat-wrap" style="display:none">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="f-adj-cat">
+            ${EXPENSE_CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="adj-remove-income" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Select Income to Remove</label>
+        <select class="form-select" id="f-adj-inc-sel">${incomeOpts || '<option value="">No income sources</option>'}</select>
+      </div>
+    </div>
+    <div id="adj-reduce-income" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Select Income to Reduce</label>
+        <select class="form-select" id="f-adj-inc-reduce-sel">${incomeOpts || '<option value="">No income sources</option>'}</select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Reduce by</label>
+          <input class="form-input" id="f-adj-change-amount" type="number" min="0" placeholder="Amount">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="f-adj-change-type-inc">
+            <option value="flat">$ flat amount</option>
+            <option value="percent">% percentage</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="adj-remove-expense" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Select Expense to Remove</label>
+        <select class="form-select" id="f-adj-exp-sel">${expenseOpts || '<option value="">No expenses</option>'}</select>
+      </div>
+    </div>
+    <div id="adj-reduce-expense" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Select Expense to Reduce</label>
+        <select class="form-select" id="f-adj-exp-reduce-sel">${expenseOpts || '<option value="">No expenses</option>'}</select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Reduce by</label>
+          <input class="form-input" id="f-adj-change-amount-exp" type="number" min="0" placeholder="Amount">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="f-adj-change-type-exp">
+            <option value="flat">$ flat amount</option>
+            <option value="percent">% percentage</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAdjFields() {
+  const type = document.getElementById('f-adj-type').value;
+  document.getElementById('adj-add-income').style.display     = (type === 'add-income' || type === 'add-expense') ? '' : 'none';
+  document.getElementById('adj-add-income-extra').style.display = (type === 'add-income' || type === 'add-expense') ? '' : 'none';
+  document.getElementById('adj-cat-wrap').style.display       = type === 'add-expense' ? '' : 'none';
+  document.getElementById('adj-remove-income').style.display  = type === 'remove-income'  ? '' : 'none';
+  document.getElementById('adj-reduce-income').style.display  = type === 'reduce-income'  ? '' : 'none';
+  document.getElementById('adj-remove-expense').style.display = type === 'remove-expense' ? '' : 'none';
+  document.getElementById('adj-reduce-expense').style.display = type === 'reduce-expense' ? '' : 'none';
+}
+
+function openAddAdjustment(scenarioId) {
+  const sc = state.scenarios.find(x => x.id === scenarioId);
+  if (!sc) return;
+  openModal('Add Adjustment', adjForm(sc), () => {
+    const type = document.getElementById('f-adj-type').value;
+    const base = getMonthData(selectedBudgetMonth);
+    const adj = { id: nextId(sc.adjustments || []), type };
+    if (type === 'add-income') {
+      adj.name = document.getElementById('f-adj-name').value.trim();
+      adj.amount = parseFloat(document.getElementById('f-adj-amount').value) || 0;
+      adj.frequency = document.getElementById('f-adj-freq').value;
+      if (!adj.name) return;
+    } else if (type === 'add-expense') {
+      adj.name = document.getElementById('f-adj-name').value.trim();
+      adj.amount = parseFloat(document.getElementById('f-adj-amount').value) || 0;
+      adj.frequency = document.getElementById('f-adj-freq').value;
+      adj.category = document.getElementById('f-adj-cat').value;
+      if (!adj.name) return;
+    } else if (type === 'remove-income') {
+      const sel = document.getElementById('f-adj-inc-sel');
+      adj.itemId = parseInt(sel.value);
+      adj.itemName = sel.options[sel.selectedIndex]?.text || '';
+    } else if (type === 'reduce-income') {
+      const sel = document.getElementById('f-adj-inc-reduce-sel');
+      adj.itemId = parseInt(sel.value);
+      adj.itemName = base.income.find(i => i.id === adj.itemId)?.name || '';
+      adj.changeAmount = parseFloat(document.getElementById('f-adj-change-amount').value) || 0;
+      adj.changeType = document.getElementById('f-adj-change-type-inc').value;
+    } else if (type === 'remove-expense') {
+      const sel = document.getElementById('f-adj-exp-sel');
+      adj.itemId = parseInt(sel.value);
+      adj.itemName = sel.options[sel.selectedIndex]?.text || '';
+    } else if (type === 'reduce-expense') {
+      const sel = document.getElementById('f-adj-exp-reduce-sel');
+      adj.itemId = parseInt(sel.value);
+      adj.itemName = base.expenses.find(e => e.id === adj.itemId)?.name || '';
+      adj.changeAmount = parseFloat(document.getElementById('f-adj-change-amount-exp').value) || 0;
+      adj.changeType = document.getElementById('f-adj-change-type-exp').value;
+    }
+    if (!sc.adjustments) sc.adjustments = [];
+    sc.adjustments.push(adj);
+    saveData(state); closeModal(); renderScenarios();
+  });
+}
+
+function deleteAdjustment(scenarioId, adjId) {
+  const sc = state.scenarios.find(x => x.id === scenarioId);
+  if (!sc) return;
+  sc.adjustments = (sc.adjustments || []).filter(a => a.id !== adjId);
+  saveData(state); renderScenarios();
+}
+
+// ─────────────────────────────────────────────────
+// COLOUR SETTINGS
+// ─────────────────────────────────────────────────
+
+const COLORS_KEY = 'home_finance_colors_v1';
+
+const DEFAULT_COLORS = {
+  expense: {
+    'Mortgage / Rent':       '#6366f1',
+    'Insurance':             '#8b5cf6',
+    'Utilities':             '#06b6d4',
+    'Groceries':             '#10b981',
+    'Transport':             '#f59e0b',
+    'Childcare / Education': '#3b82f6',
+    'Health':                '#ef4444',
+    'Entertainment':         '#f97316',
+    'Subscriptions':         '#84cc16',
+    'Dining Out':            '#14b8a6',
+    'Clothing':              '#ec4899',
+    'Personal Care':         '#a855f7',
+    'Savings / Investment':  '#22c55e',
+    'Other':                 '#94a3b8',
+  },
+  income: '#10b981',
+  build: {
+    contract:   '#3b82f6',
+    extras:     '#f59e0b',
+    furniture:  '#8b5cf6',
+    appliances: '#ef4444',
+  }
+};
+
+function loadColors() {
+  try {
+    const raw = localStorage.getItem(COLORS_KEY);
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_COLORS));
+    const c = JSON.parse(raw);
+    if (!c.expense) c.expense = {};
+    if (!c.build)   c.build   = {};
+    if (!c.income)  c.income  = DEFAULT_COLORS.income;
+    EXPENSE_CATEGORIES.forEach(cat => { if (!c.expense[cat]) c.expense[cat] = DEFAULT_COLORS.expense[cat] || '#94a3b8'; });
+    Object.keys(DEFAULT_COLORS.build).forEach(k => { if (!c.build[k]) c.build[k] = DEFAULT_COLORS.build[k]; });
+    return c;
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_COLORS)); }
+}
+
+function saveColors(c) { localStorage.setItem(COLORS_KEY, JSON.stringify(c)); }
+
+let colors = loadColors();
+
+function updateColor(type, key, value) {
+  if (type === 'expense') colors.expense[key] = value;
+  else if (type === 'income') colors.income = value;
+  else if (type === 'build') colors.build[key] = value;
+  saveColors(colors);
+  renderBudget();
+  renderBuild();
+  renderDashboard();
+}
+
+function renderSettings() {
+  function safeId(s) { return s.replace(/[^a-z0-9]/gi, '_'); }
+  function swatch(type, key, label, color) {
+    const sid = `${type}_${safeId(key)}`;
+    return `
+      <div class="color-row">
+        <div class="color-dot" id="dot-${sid}" style="background:${color}"></div>
+        <span>${label}</span>
+        <input type="color" value="${color}"
+          oninput="document.getElementById('dot-${sid}').style.background=this.value"
+          onchange="updateColor('${type}','${key}',this.value)">
+      </div>`;
+  }
+
+  const rawData = localStorage.getItem(STORAGE_KEY);
+  const dataSize = rawData ? (rawData.length / 1024).toFixed(1) : 0;
+  const dataStatus = rawData
+    ? `<span style="color:var(--success);font-weight:600">✓ Data found in localStorage (${dataSize} KB)</span>`
+    : `<span style="color:var(--danger);font-weight:600">⚠ No data in localStorage</span>`;
+
+  let html = `
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Data &amp; Recovery</div>
+          <div class="section-subtitle">${dataStatus}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary btn-sm" onclick="exportData()">Export JSON backup</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">Import JSON backup</button>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+        </div>
+      </div>
+      ${rawData ? `<button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">Show raw localStorage data</button>
+      <pre style="display:none;margin-top:8px;background:var(--surface2);padding:12px;border-radius:8px;font-size:11px;overflow:auto;max-height:200px;white-space:pre-wrap;word-break:break-all">${rawData.replace(/</g,'&lt;')}</pre>` : ''}
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Monthly Budget — Expense Categories</div>
+          <div class="section-subtitle">Colour shown as a left-border stripe on each expense row</div>
+        </div>
+      </div>
+      <div class="color-grid">
+        ${EXPENSE_CATEGORIES.map(cat => swatch('expense', cat, cat, colors.expense[cat] || DEFAULT_COLORS.expense[cat] || '#94a3b8')).join('')}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Monthly Budget — Income</div>
+          <div class="section-subtitle">Colour applied to all income rows</div>
+        </div>
+      </div>
+      <div class="color-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 220px))">
+        ${swatch('income', 'income', 'Income', colors.income)}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Build Costs — Sections</div>
+          <div class="section-subtitle">Colour shown as a left-border accent on each build cost section</div>
+        </div>
+      </div>
+      <div class="color-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 220px))">
+        ${swatch('build', 'contract',   'Fixed Price Contract',  colors.build.contract)}
+        ${swatch('build', 'extras',     'Outside Contract',      colors.build.extras)}
+        ${swatch('build', 'furniture',  'Furniture',             colors.build.furniture)}
+        ${swatch('build', 'appliances', 'Appliances',            colors.build.appliances)}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('settings-content').innerHTML = html;
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `home-budget-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.budget) { alert('Invalid backup file — missing budget data.'); return; }
+      if (!confirm('This will replace ALL current data with the backup. Continue?')) return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
+      location.reload();
+    } catch(err) { alert('Failed to read backup file: ' + err.message); }
+  };
+  reader.readAsText(file);
+}
+
+function renderBudget() {
+  const b = state.budget;
+  const { income: mi, expenses: me } = getMonthData(selectedBudgetMonth);
+  const totalIncome = monthlyTotal(mi);
+  const totalBudgetExpenses = monthlyTotal(me);
+  const surplus = totalIncome - totalBudgetExpenses;
+
+  // Actuals for selected month
+  const monthActuals = b.actuals[selectedBudgetMonth] || {};
+  const totalActual = me.reduce((sum, e) => sum + (monthActuals[e.id] || 0), 0);
+  const totalVariance = totalBudgetExpenses - totalActual;
+
+  const surplusClass = surplus >= 0 ? 'positive' : 'negative';
+  const surplusLabel = surplus >= 0 ? 'Budget Surplus' : 'Budget Deficit';
+
+  let html = '';
+
+  // Month picker
+  const customBadge = isMonthCustomized(selectedBudgetMonth)
+    ? `<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--primary);color:#fff;margin-left:8px">Custom</span>`
+    : '';
+  html += `
+    <div class="month-picker">
+      <button class="month-btn" onclick="prevMonth()">&#8249;</button>
+      <div class="month-picker-label">${monthLabel(selectedBudgetMonth)}${customBadge}</div>
+      <button class="month-btn" onclick="nextMonth()">&#8250;</button>
+    </div>
+  `;
+
+  if (mi.length > 0 || me.length > 0) {
+    html += `
+      <div class="surplus-banner ${surplusClass}" style="margin-bottom:20px">
+        <div>
+          <div class="surplus-label">${surplusLabel} (budgeted)</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${aud(totalIncome)}/mo income · ${aud(totalBudgetExpenses)}/mo budgeted</div>
+        </div>
+        <div class="surplus-amount">${aud(Math.abs(surplus))}/mo</div>
+      </div>
+    `;
+  }
+
+  // Income — full width
+  html += `
+    <div class="section" style="margin-bottom:20px">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Income</div>
+          <div class="section-subtitle">${aud(totalIncome)}/mo total</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddIncome()">+ Income</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Source</th><th>Amount</th><th>Due</th><th>Repeats</th><th>Monthly</th><th></th></tr></thead>
+          <tbody>
+            ${mi.length === 0 ? `<tr><td colspan="6"><div class="empty"><div class="empty-icon">💵</div>Add your income sources</div></td></tr>` : mi.map(i => {
+              const dueLabel = i.dueDate ? (() => { const [y,m,d] = i.dueDate.split('-'); return `${d}/${m}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
+              return `<tr>
+              <td style="font-weight:500;border-left:4px solid ${colors.income}">${i.name}</td>
+              <td class="amount">${audD(i.amount)}</td>
+              <td>${dueLabel}</td>
+              <td style="color:var(--text-muted)">${freqDisplayItem(i)}</td>
+              <td class="amount" style="color:var(--success)">${aud(itemMonthly(i))}/mo</td>
+              <td class="actions">
+                <button class="btn btn-ghost btn-sm" onclick="openEditIncome(${i.id})">✏️</button>
+                <button class="btn btn-danger-ghost btn-sm" onclick="deleteIncome(${i.id})">🗑</button>
+              </td>
+            </tr>`;}).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  // Expenses with budget vs actual
+  const hasActuals = totalActual > 0;
+
+  // Category filter
+  const allCats = ['all', ...Array.from(new Set(me.map(e => e.category || 'Other'))).sort()];
+  const filteredExpenses = expenseFilterCat === 'all'
+    ? me
+    : me.filter(e => (e.category || 'Other') === expenseFilterCat);
+  const catBudget = filteredExpenses.reduce((s, e) => s + itemMonthly(e), 0);
+  const catActual = filteredExpenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const catVariance = catBudget - catActual;
+  const isFiltered = expenseFilterCat !== 'all';
+
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Expenses${isFiltered ? ` <span style="font-size:12px;color:var(--text-muted);font-weight:400">— ${expenseFilterCat}</span>` : ''}</div>
+          <div class="section-subtitle">
+            Budget: ${aud(isFiltered ? catBudget : totalBudgetExpenses)}/mo
+            ${hasActuals || catActual > 0 ? ` · Actual: ${aud(isFiltered ? catActual : totalActual)} · <span class="${(isFiltered ? catVariance : totalVariance) >= 0 ? 'var-under' : 'var-over'}">${(isFiltered ? catVariance : totalVariance) >= 0 ? '▼' : '▲'} ${aud(Math.abs(isFiltered ? catVariance : totalVariance))}</span>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <select class="form-select" style="width:auto;padding:6px 10px;font-size:12px" onchange="setExpenseFilter(this.value)">
+            ${allCats.map(c => `<option value="${c}" ${expenseFilterCat===c?'selected':''}>${c === 'all' ? 'All categories' : c}</option>`).join('')}
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="openAddExpense()">+ Expense</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              ${thSort('name', 'Item')}
+              ${thSort('category', 'Category')}
+              ${thSort('frequency', 'Frequency')}
+              ${thSort('due', 'Due')}
+              ${thSort('budget', 'Budget/mo')}
+              <th>Actual <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-muted)">(click to edit)</span></th>
+              ${thSort('variance', 'Variance')}
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filteredExpenses.length === 0
+              ? `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>${me.length === 0 ? 'Add your household expenses' : 'No expenses in this category'}</div></td></tr>`
+              : (() => {
+                  const sorted = [...filteredExpenses].sort((a, b) => {
+                    if (!expenseSortCol) return 0;
+                    let av, bv;
+                    if (expenseSortCol === 'name')      { av = a.name.toLowerCase();                              bv = b.name.toLowerCase(); }
+                    else if (expenseSortCol === 'category')  { av = (a.category||'Other').toLowerCase();          bv = (b.category||'Other').toLowerCase(); }
+                    else if (expenseSortCol === 'frequency') { av = freqDisplayItem(a);                          bv = freqDisplayItem(b); }
+                    else if (expenseSortCol === 'due')       { av = a.dueDate || '\uffff';                        bv = b.dueDate || '\uffff'; }
+                    else if (expenseSortCol === 'budget')    { av = itemMonthly(a);                               bv = itemMonthly(b); }
+                    else if (expenseSortCol === 'actual')    { av = getActual(a.id, selectedBudgetMonth);         bv = getActual(b.id, selectedBudgetMonth); }
+                    else if (expenseSortCol === 'variance')  { av = itemMonthly(a) - getActual(a.id, selectedBudgetMonth); bv = itemMonthly(b) - getActual(b.id, selectedBudgetMonth); }
+                    else return 0;
+                    return av < bv ? (expenseSortDir === 'asc' ? -1 : 1) : av > bv ? (expenseSortDir === 'asc' ? 1 : -1) : 0;
+                  });
+                  return sorted.map(e => {
+                  const budgetMo = itemMonthly(e);
+                  const actual = getActual(e.id, selectedBudgetMonth);
+                  const variance = budgetMo - actual;
+                  const hasActual = actual > 0;
+                  let varianceHtml;
+                  if (!hasActual) varianceHtml = `<span class="var-none">—</span>`;
+                  else if (variance >= 0) varianceHtml = `<span class="var-under">▼ ${aud(variance)}</span>`;
+                  else varianceHtml = `<span class="var-over">▲ ${aud(Math.abs(variance))}</span>`;
+                  const dueLabel = e.dueDate ? (() => { const [y,mo,d] = e.dueDate.split('-'); return `${d}/${mo}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
+                  const rowColor = colors.expense[e.category || 'Other'] || '#94a3b8';
+                  return `<tr>
+                    <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}</td>
+                    <td><span style="display:inline-block;padding:2px 10px;border-radius:99px;background:${rowColor};color:#fff;font-size:11px;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span></td>
+                    <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
+                    <td>${dueLabel}</td>
+                    <td class="amount">${aud(budgetMo)}</td>
+                    <td class="actual-cell amount" id="actual-${e.id}" onclick="editActual(${e.id})">${hasActual ? aud(actual) : '<span style="color:var(--text-muted);font-size:12px">+ add</span>'}</td>
+                    <td>${varianceHtml}</td>
+                    <td class="actions">
+                      <button class="btn btn-ghost btn-sm" onclick="openEditExpense(${e.id})">✏️</button>
+                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteExpense(${e.id})">🗑</button>
+                    </td>
+                  </tr>`;
+                  }).join('');
+                })()
+            }
+          </tbody>
+          ${filteredExpenses.length > 0 ? `
+          <tfoot>
+            <tr style="background:var(--surface2);border-top:2px solid var(--border)">
+              <td colspan="4" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">
+                Total ${isFiltered ? expenseFilterCat : 'all categories'}
+              </td>
+              <td class="amount" style="padding:11px 16px;font-weight:700">${aud(catBudget)}/mo</td>
+              <td class="amount" style="padding:11px 16px;font-weight:700">${catActual > 0 ? aud(catActual) : '—'}</td>
+              <td style="padding:11px 16px;font-weight:700">${catActual > 0 ? `<span class="${catVariance >= 0 ? 'var-under' : 'var-over'}">${catVariance >= 0 ? '▼' : '▲'} ${aud(Math.abs(catVariance))}</span>` : '—'}</td>
+              <td></td>
+            </tr>
+          </tfoot>` : ''}
+        </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('budget-content').innerHTML = html;
+}
+
+// ─────────────────────────────────────────────────
+// MODALS
+// ─────────────────────────────────────────────────
+
+function openModal(title, bodyHtml, onSave) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" id="modal-save-btn">Save</button>
+  `;
+  document.getElementById('modal-save-btn').addEventListener('click', onSave);
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+// ─── Contract total ───────────────────────────────
+
+function openEditContractTotal() {
+  openModal('Edit Contract Total', `
+    <div class="form-group">
+      <label class="form-label">Fixed Price Contract Total (AUD)</label>
+      <input class="form-input" id="f-contract-total" type="number" value="${state.buildContract.total}" min="0">
+    </div>
+  `, () => {
+    const v = parseFloat(document.getElementById('f-contract-total').value);
+    if (!isNaN(v) && v > 0) {
+      state.buildContract.total = v;
+      saveData(state);
+      closeModal();
+      renderAll();
+    }
+  });
+}
+
+// ─── Stages ───────────────────────────────────────
+
+function stageForm(s = {}) {
+  return `
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Stage Name</label>
+        <input class="form-input" id="f-stage-name" type="text" value="${s.name || ''}" placeholder="e.g. Base / Slab">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount (AUD)</label>
+        <input class="form-input" id="f-stage-amount" type="number" value="${s.amount || ''}" min="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Paid Date</label>
+        <input class="form-input" id="f-stage-paiddate" type="date" value="${s.paidDate || ''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Invoice / Ref</label>
+        <input class="form-input" id="f-stage-ref" type="text" value="${s.invoiceRef || ''}" placeholder="Optional">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;padding-top:22px">
+        <input type="checkbox" id="f-stage-paid" ${s.paid ? 'checked' : ''}>
+        <label for="f-stage-paid" style="font-size:13px;cursor:pointer">Mark as paid</label>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Funding</label>
+        <select class="form-select" id="f-stage-funding">
+          <option value="loan"       ${(s.funding||'loan')==='loan'      ?'selected':''}>Loan</option>
+          <option value="own-funds"  ${s.funding==='own-funds' ?'selected':''}>Own Funds</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="f-stage-notes" type="text" value="${s.notes || ''}" placeholder="Optional">
+    </div>
+  `;
+}
+
+function stageFromForm(id) {
+  return {
+    id,
+    name:       document.getElementById('f-stage-name').value.trim(),
+    amount:     parseFloat(document.getElementById('f-stage-amount').value) || 0,
+    paid:       document.getElementById('f-stage-paid').checked,
+    paidDate:   document.getElementById('f-stage-paiddate').value,
+    invoiceRef: document.getElementById('f-stage-ref').value.trim(),
+    funding:    document.getElementById('f-stage-funding').value,
+    notes:      document.getElementById('f-stage-notes').value.trim(),
+  };
+}
+
+function openAddStage() {
+  openModal('Add Contract Stage', stageForm(), () => {
+    const s = stageFromForm(nextId(state.buildContract.stages));
+    if (!s.name) return;
+    state.buildContract.stages.push(s);
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function openEditStage(id) {
+  const s = state.buildContract.stages.find(x => x.id === id);
+  openModal('Edit Stage', stageForm(s), () => {
+    Object.assign(s, stageFromForm(id));
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function deleteStage(id) {
+  if (!confirm('Delete this stage?')) return;
+  state.buildContract.stages = state.buildContract.stages.filter(s => s.id !== id);
+  saveData(state); renderAll();
+}
+
+// ─── Extras ───────────────────────────────────────
+
+const EXTRA_STATUSES = [
+  { value: 'not-quoted', label: 'Not Quoted' },
+  { value: 'quoted',     label: 'Quoted' },
+  { value: 'approved',   label: 'Approved' },
+  { value: 'partial',    label: 'Partially Paid' },
+  { value: 'paid',       label: 'Paid' },
+];
+
+function extraForm(e = {}) {
+  const currentStatus = e.status || (e.totalAmount ? 'approved' : 'not-quoted');
+  return `
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Item Name</label>
+        <input class="form-input" id="f-extra-name" type="text" value="${e.name || ''}" placeholder="e.g. Solar">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vendor / Contractor</label>
+        <input class="form-input" id="f-extra-vendor" type="text" value="${e.vendor || ''}" placeholder="Company name">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="f-extra-status">
+          ${EXTRA_STATUSES.map(s => `<option value="${s.value}" ${currentStatus === s.value ? 'selected' : ''}>${s.label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Due Date</label>
+        <input class="form-input" id="f-extra-due" type="date" value="${e.dueDate || ''}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Total Cost (AUD)</label>
+        <input class="form-input" id="f-extra-total" type="number" value="${e.totalAmount || ''}" min="0" placeholder="Leave blank if TBC">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount Paid (AUD)</label>
+        <input class="form-input" id="f-extra-paid" type="number" value="${e.amountPaid || ''}" min="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Funding</label>
+        <select class="form-select" id="f-extra-funding">
+          <option value="loan"      ${(e.funding||'loan')==='loan'     ?'selected':''}>Loan</option>
+          <option value="own-funds" ${e.funding==='own-funds'?'selected':''}>Own Funds</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input class="form-input" id="f-extra-notes" type="text" value="${e.notes || ''}" placeholder="Optional">
+      </div>
+    </div>
+  `;
+}
+
+function extraFromForm(id) {
+  return {
+    id,
+    name:        document.getElementById('f-extra-name').value.trim(),
+    vendor:      document.getElementById('f-extra-vendor').value.trim(),
+    status:      document.getElementById('f-extra-status').value,
+    funding:     document.getElementById('f-extra-funding').value,
+    totalAmount: parseFloat(document.getElementById('f-extra-total').value) || 0,
+    amountPaid:  parseFloat(document.getElementById('f-extra-paid').value) || 0,
+    dueDate:     document.getElementById('f-extra-due').value,
+    notes:       document.getElementById('f-extra-notes').value.trim(),
+  };
+}
+
+function openAddExtra() {
+  openModal('Add Outside Contract Item', extraForm(), () => {
+    const e = extraFromForm(nextId(state.extras));
+    if (!e.name) return;
+    state.extras.push(e);
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function openEditExtra(id) {
+  const e = state.extras.find(x => x.id === id);
+  openModal('Edit Item', extraForm(e), () => {
+    Object.assign(e, extraFromForm(id));
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function deleteExtra(id) {
+  if (!confirm('Delete this item?')) return;
+  state.extras = state.extras.filter(e => e.id !== id);
+  saveData(state); renderAll();
+}
+
+// ─── Income ───────────────────────────────────────
+
+function incomeForm(i = {}) {
+  const displayDate = i.dueDate ? (() => { const [y,m,d] = i.dueDate.split('-'); return `${d}/${m}/${y}`; })() : '';
+  const REPEATS = ['weekly','fortnightly','monthly','quarterly','annually','custom'];
+  const isCustom = i.frequency === 'custom';
+  return `
+    <div class="form-group">
+      <label class="form-label">Source / Description</label>
+      <input class="form-input" id="f-inc-name" type="text" value="${i.name || ''}" placeholder="e.g. Salary — Chris">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount (AUD)</label>
+      <input class="form-input" id="f-inc-amount" type="number" value="${i.amount || ''}" min="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Frequency</label>
+      <select class="form-select" id="f-inc-freq" onchange="toggleCustomFreq('inc')">
+        ${REPEATS.map(f => `<option value="${f}" ${(i.frequency||'monthly')===f?'selected':''}>${f === 'custom' ? 'Custom' : f.charAt(0).toUpperCase()+f.slice(1)}</option>`).join('')}
+      </select>
+      <div id="f-inc-custom-wrap" style="display:${isCustom ? 'flex' : 'none'};align-items:center;gap:8px;margin-top:8px">
+        <span style="font-size:13px;color:var(--text-muted);white-space:nowrap">Every</span>
+        <input class="form-input" id="f-inc-custom-n" type="number" min="1" value="${i.customEvery || ''}" style="width:70px" placeholder="e.g. 10">
+        <select class="form-select" id="f-inc-custom-unit" style="flex:1">
+          <option value="weeks" ${(i.customUnit||'weeks')==='weeks'?'selected':''}>weeks</option>
+          <option value="months" ${i.customUnit==='months'?'selected':''}>months</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Due Date</label>
+      <input type="hidden" id="f-inc-duedate" value="${i.dueDate || ''}">
+      <div class="date-picker-wrap" id="dp-wrap">
+        <div class="date-picker-trigger${i.dueDate ? ' has-value' : ''}" id="dp-trigger" onclick="openDatePicker(event)">
+          <span id="dp-display">${displayDate || 'Select a date'}</span>
+          <span style="opacity:0.5;font-size:15px">&#128197;</span>
+        </div>
+        <div class="date-picker-popup hidden" id="dp-popup"></div>
+      </div>
+    </div>
+  `;
+}
+
+function incomeFromForm(id) {
+  const freq = document.getElementById('f-inc-freq') ? document.getElementById('f-inc-freq').value : 'monthly';
+  const obj = {
+    id,
+    name:      document.getElementById('f-inc-name').value.trim(),
+    amount:    parseFloat(document.getElementById('f-inc-amount').value) || 0,
+    frequency: freq,
+    dueDate:   document.getElementById('f-inc-duedate').value || null,
+  };
+  if (freq === 'custom') {
+    obj.customEvery = parseInt(document.getElementById('f-inc-custom-n').value) || 1;
+    obj.customUnit  = document.getElementById('f-inc-custom-unit').value;
+  }
+  return obj;
+}
+
+function openAddIncome() {
+  openModal('Add Income', incomeForm(), () => {
+    const item = incomeFromForm(nextId(getMonthData(selectedBudgetMonth).income));
+    if (!item.name) return;
+    confirmScope(
+      () => {
+        const mb = ensureMonthOverride(selectedBudgetMonth);
+        item.id = nextId(mb.income);
+        mb.income.push(item);
+        saveData(state); renderAll();
+      },
+      () => {
+        item.id = nextId(state.budget.income);
+        state.budget.income.push(item);
+        saveData(state); renderAll();
+      }
+    );
+  });
+}
+
+function openEditIncome(id) {
+  const src = getMonthData(selectedBudgetMonth).income.find(x => x.id === id);
+  openModal('Edit Income', incomeForm(src), () => {
+    const updated = incomeFromForm(id);
+    confirmScope(
+      () => {
+        const mb = ensureMonthOverride(selectedBudgetMonth);
+        const item = mb.income.find(x => x.id === id);
+        if (item) Object.assign(item, updated); else mb.income.push(updated);
+        saveData(state); renderAll();
+      },
+      () => {
+        const item = state.budget.income.find(x => x.id === id);
+        if (item) Object.assign(item, updated);
+        saveData(state); renderAll();
+      }
+    );
+  });
+}
+
+function deleteIncome(id) {
+  const src = getMonthData(selectedBudgetMonth).income.find(x => x.id === id);
+  const name = src ? src.name : 'this income';
+  _scopePending = null;
+  document.getElementById('modal-title').textContent = 'Delete income';
+  document.getElementById('modal-body').innerHTML = `
+    <p style="font-size:14px;line-height:1.6;margin:0;color:var(--text-muted)">
+      Delete <strong style="color:var(--text)">${name}</strong>? Apply to
+      <strong style="color:var(--text)">${monthLabel(selectedBudgetMonth)}</strong> only,
+      or remove from all months?
+    </p>`;
+  _scopePending = {
+    onThisMonth: () => {
+      const mb = ensureMonthOverride(selectedBudgetMonth);
+      mb.income = mb.income.filter(i => i.id !== id);
+      saveData(state); renderAll();
+    },
+    onAllMonths: () => {
+      state.budget.income = state.budget.income.filter(i => i.id !== id);
+      if (state.budget.months) Object.values(state.budget.months).forEach(m => { m.income = m.income.filter(i => i.id !== id); });
+      saveData(state); renderAll();
+    }
+  };
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-secondary" onclick="doScopeAll()">Remove from all months</button>
+    <button class="btn btn-danger" onclick="doScopeMonth()">Delete from ${monthLabel(selectedBudgetMonth)}</button>
+  `;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+// ─── Expenses ─────────────────────────────────────
+
+function expenseForm(e = {}) {
+  const displayDate = e.dueDate ? (() => { const [y,m,d] = e.dueDate.split('-'); return `${d}/${m}/${y}`; })() : '';
+  const REPEATS = ['weekly','fortnightly','monthly','quarterly','annually','custom'];
+  const isCustom = e.frequency === 'custom';
+  return `
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <input class="form-input" id="f-exp-name" type="text" value="${e.name || ''}" placeholder="e.g. Mortgage">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="f-exp-cat">
+          ${EXPENSE_CATEGORIES.map(c => `<option value="${c}" ${(e.category||'Other')===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount (AUD)</label>
+      <input class="form-input" id="f-exp-amount" type="number" value="${e.amount || ''}" min="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Frequency</label>
+      <select class="form-select" id="f-exp-freq" onchange="toggleCustomFreq('exp')">
+        ${REPEATS.map(f => `<option value="${f}" ${(e.frequency||'monthly')===f?'selected':''}>${f === 'custom' ? 'Custom' : f.charAt(0).toUpperCase()+f.slice(1)}</option>`).join('')}
+      </select>
+      <div id="f-exp-custom-wrap" style="display:${isCustom ? 'flex' : 'none'};align-items:center;gap:8px;margin-top:8px">
+        <span style="font-size:13px;color:var(--text-muted);white-space:nowrap">Every</span>
+        <input class="form-input" id="f-exp-custom-n" type="number" min="1" value="${e.customEvery || ''}" style="width:70px" placeholder="e.g. 10">
+        <select class="form-select" id="f-exp-custom-unit" style="flex:1">
+          <option value="weeks" ${(e.customUnit||'weeks')==='weeks'?'selected':''}>weeks</option>
+          <option value="months" ${e.customUnit==='months'?'selected':''}>months</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Due Date</label>
+      <input type="hidden" id="f-exp-duedate" value="${e.dueDate || ''}">
+      <div class="date-picker-wrap" id="dp-wrap">
+        <div class="date-picker-trigger${e.dueDate ? ' has-value' : ''}" id="dp-trigger" onclick="openDatePicker(event)">
+          <span id="dp-display">${displayDate || 'Select a date'}</span>
+          <span style="opacity:0.5;font-size:15px">&#128197;</span>
+        </div>
+        <div class="date-picker-popup hidden" id="dp-popup"></div>
+      </div>
+    </div>
+  `;
+}
+
+function expenseFromForm(id) {
+  const freq = document.getElementById('f-exp-freq') ? document.getElementById('f-exp-freq').value : 'monthly';
+  const obj = {
+    id,
+    name:      document.getElementById('f-exp-name').value.trim(),
+    category:  document.getElementById('f-exp-cat').value,
+    amount:    parseFloat(document.getElementById('f-exp-amount').value) || 0,
+    frequency: freq,
+    dueDate:   document.getElementById('f-exp-duedate').value || null,
+  };
+  if (freq === 'custom') {
+    obj.customEvery = parseInt(document.getElementById('f-exp-custom-n').value) || 1;
+    obj.customUnit  = document.getElementById('f-exp-custom-unit').value;
+  }
+  return obj;
+}
+
+function toggleCustomFreq(prefix) {
+  const val = document.getElementById(`f-${prefix}-freq`).value;
+  const wrap = document.getElementById(`f-${prefix}-custom-wrap`);
+  if (wrap) wrap.style.display = val === 'custom' ? 'flex' : 'none';
+}
+
+function openAddExpense() {
+  openModal('Add Expense', expenseForm(), () => {
+    const item = expenseFromForm(nextId(getMonthData(selectedBudgetMonth).expenses));
+    if (!item.name) return;
+    confirmScope(
+      () => {
+        const mb = ensureMonthOverride(selectedBudgetMonth);
+        item.id = nextId(mb.expenses);
+        mb.expenses.push(item);
+        saveData(state); renderAll();
+      },
+      () => {
+        item.id = nextId(state.budget.expenses);
+        state.budget.expenses.push(item);
+        saveData(state); renderAll();
+      }
+    );
+  });
+}
+
+function openEditExpense(id) {
+  const src = getMonthData(selectedBudgetMonth).expenses.find(x => x.id === id);
+  openModal('Edit Expense', expenseForm(src), () => {
+    const updated = expenseFromForm(id);
+    confirmScope(
+      () => {
+        const mb = ensureMonthOverride(selectedBudgetMonth);
+        const item = mb.expenses.find(x => x.id === id);
+        if (item) Object.assign(item, updated); else mb.expenses.push(updated);
+        saveData(state); renderAll();
+      },
+      () => {
+        const item = state.budget.expenses.find(x => x.id === id);
+        if (item) Object.assign(item, updated);
+        saveData(state); renderAll();
+      }
+    );
+  });
+}
+
+function deleteExpense(id) {
+  const src = getMonthData(selectedBudgetMonth).expenses.find(x => x.id === id);
+  const name = src ? src.name : 'this expense';
+  _scopePending = {
+    onThisMonth: () => {
+      const mb = ensureMonthOverride(selectedBudgetMonth);
+      mb.expenses = mb.expenses.filter(e => e.id !== id);
+      saveData(state); renderAll();
+    },
+    onAllMonths: () => {
+      state.budget.expenses = state.budget.expenses.filter(e => e.id !== id);
+      if (state.budget.months) Object.values(state.budget.months).forEach(m => { m.expenses = m.expenses.filter(e => e.id !== id); });
+      saveData(state); renderAll();
+    }
+  };
+  document.getElementById('modal-title').textContent = 'Delete expense';
+  document.getElementById('modal-body').innerHTML = `
+    <p style="font-size:14px;line-height:1.6;margin:0;color:var(--text-muted)">
+      Delete <strong style="color:var(--text)">${name}</strong>? Apply to
+      <strong style="color:var(--text)">${monthLabel(selectedBudgetMonth)}</strong> only,
+      or remove from all months?
+    </p>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-secondary" onclick="doScopeAll()">Remove from all months</button>
+    <button class="btn btn-danger" onclick="doScopeMonth()">Delete from ${monthLabel(selectedBudgetMonth)}</button>
+  `;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+// ─────────────────────────────────────────────────
+// EXPORT / IMPORT
+// ─────────────────────────────────────────────────
+
+function exportData() {
+  const json = JSON.stringify(state, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `home-finance-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.buildContract || !imported.budget) throw new Error('Invalid file');
+      if (!confirm('This will replace all current data. Continue?')) return;
+      state = imported;
+      saveData(state);
+      renderAll();
+      alert('Data imported successfully.');
+    } catch(err) {
+      alert('Import failed: invalid file format.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ─────────────────────────────────────────────────
+// RENDER ALL
+// ─────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────
+// FURNITURE
+// ─────────────────────────────────────────────────
+
+const FURN_ROOMS = ['Living Room','Dining Room','Kitchen','Master Bedroom','Bedroom 2','Bedroom 3','Study / Office','Bathroom','Laundry','Outdoor / Alfresco','Other'];
+
+function furnitureForm(f = {}) {
+  const displayDate = f.deliveryDate ? (() => { const [y,m,d] = f.deliveryDate.split('-'); return `${d}/${m}/${y}`; })() : '';
+  return `
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Item Name</label>
+        <input class="form-input" id="f-furn-name" type="text" value="${f.name || ''}" placeholder="e.g. 3-seater sofa">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Room</label>
+        <select class="form-select" id="f-furn-room">
+          <option value="">— Select room —</option>
+          ${FURN_ROOMS.map(r => `<option value="${r}" ${f.room===r?'selected':''}>${r}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Store / Vendor</label>
+        <input class="form-input" id="f-furn-vendor" type="text" value="${f.vendor || ''}" placeholder="e.g. Nick Scali">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price (AUD)</label>
+        <input class="form-input" id="f-furn-price" type="number" value="${f.price || ''}" min="0" placeholder="Leave blank if TBC">
+      </div>
+    </div>
+    <div class="form-row" style="align-items:flex-start">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="f-furn-status">
+          <option value="to-purchase" ${(!f.status||f.status==='to-purchase')?'selected':''}>To Purchase</option>
+          <option value="ordered"     ${f.status==='ordered'?'selected':''}>Ordered</option>
+          <option value="delivered"   ${f.status==='delivered'?'selected':''}>Delivered</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Date</label>
+        <input type="hidden" id="f-exp-duedate" value="${f.deliveryDate || ''}">
+        <div class="date-picker-wrap" id="dp-wrap">
+          <div class="date-picker-trigger${f.deliveryDate ? ' has-value' : ''}" id="dp-trigger" onclick="openDatePicker(event)">
+            <span id="dp-display">${displayDate || 'Select a date'}</span>
+            <span style="opacity:0.5;font-size:15px">&#128197;</span>
+          </div>
+          <div class="date-picker-popup hidden" id="dp-popup"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="f-furn-notes" type="text" value="${f.notes || ''}" placeholder="Optional — colour, dimensions, order number...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Funding</label>
+      <select class="form-select" id="f-furn-funding">
+        <option value="own-funds" ${(f.funding||'own-funds')==='own-funds'?'selected':''}>Own Funds</option>
+        <option value="loan"      ${f.funding==='loan'     ?'selected':''}>Loan</option>
+      </select>
+    </div>
+  `;
+}
+
+function furnitureFromForm(id) {
+  return {
+    id,
+    name:         document.getElementById('f-furn-name').value.trim(),
+    room:         document.getElementById('f-furn-room').value,
+    vendor:       document.getElementById('f-furn-vendor').value.trim(),
+    price:        parseFloat(document.getElementById('f-furn-price').value) || 0,
+    status:       document.getElementById('f-furn-status').value,
+    funding:      document.getElementById('f-furn-funding').value,
+    deliveryDate: document.getElementById('f-exp-duedate').value || null,
+    notes:        document.getElementById('f-furn-notes').value.trim(),
+  };
+}
+
+function openAddFurniture() {
+  openModal('Add Furniture Item', furnitureForm(), () => {
+    const f = furnitureFromForm(nextId(state.furniture));
+    if (!f.name) return;
+    state.furniture.push(f);
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function openEditFurniture(id) {
+  const f = state.furniture.find(x => x.id === id);
+  openModal('Edit Furniture Item', furnitureForm(f), () => {
+    Object.assign(f, furnitureFromForm(id));
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function deleteFurniture(id) {
+  if (!confirm('Delete this item?')) return;
+  state.furniture = state.furniture.filter(f => f.id !== id);
+  saveData(state); renderAll();
+}
+
+// ─────────────────────────────────────────────────
+// APPLIANCES
+// ─────────────────────────────────────────────────
+
+function applianceForm(a = {}) {
+  const displayDate = a.deliveryDate ? (() => { const [y,m,d] = a.deliveryDate.split('-'); return `${d}/${m}/${y}`; })() : '';
+  return `
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Item Name</label>
+        <input class="form-input" id="f-appl-name" type="text" value="${a.name || ''}" placeholder="e.g. Dishwasher">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Room</label>
+        <select class="form-select" id="f-appl-room">
+          <option value="">— Select room —</option>
+          ${FURN_ROOMS.map(r => `<option value="${r}" ${a.room===r?'selected':''}>${r}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Store / Vendor</label>
+        <input class="form-input" id="f-appl-vendor" type="text" value="${a.vendor || ''}" placeholder="e.g. Harvey Norman">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price (AUD)</label>
+        <input class="form-input" id="f-appl-price" type="number" value="${a.price || ''}" min="0" placeholder="Leave blank if TBC">
+      </div>
+    </div>
+    <div class="form-row" style="align-items:flex-start">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="f-appl-status">
+          <option value="to-purchase" ${(!a.status||a.status==='to-purchase')?'selected':''}>To Purchase</option>
+          <option value="ordered"     ${a.status==='ordered'?'selected':''}>Ordered</option>
+          <option value="delivered"   ${a.status==='delivered'?'selected':''}>Delivered</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Date</label>
+        <input type="hidden" id="f-exp-duedate" value="${a.deliveryDate || ''}">
+        <div class="date-picker-wrap" id="dp-wrap">
+          <div class="date-picker-trigger${a.deliveryDate ? ' has-value' : ''}" id="dp-trigger" onclick="openDatePicker(event)">
+            <span id="dp-display">${displayDate || 'Select a date'}</span>
+            <span style="opacity:0.5;font-size:15px">&#128197;</span>
+          </div>
+          <div class="date-picker-popup hidden" id="dp-popup"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="f-appl-notes" type="text" value="${a.notes || ''}" placeholder="Optional — model number, colour, order reference...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Funding</label>
+      <select class="form-select" id="f-appl-funding">
+        <option value="own-funds" ${(a.funding||'own-funds')==='own-funds'?'selected':''}>Own Funds</option>
+        <option value="loan"      ${a.funding==='loan'?'selected':''}>Loan</option>
+      </select>
+    </div>
+  `;
+}
+
+function applianceFromForm(id) {
+  return {
+    id,
+    name:         document.getElementById('f-appl-name').value.trim(),
+    room:         document.getElementById('f-appl-room').value,
+    vendor:       document.getElementById('f-appl-vendor').value.trim(),
+    price:        parseFloat(document.getElementById('f-appl-price').value) || 0,
+    status:       document.getElementById('f-appl-status').value,
+    funding:      document.getElementById('f-appl-funding').value,
+    deliveryDate: document.getElementById('f-exp-duedate').value || null,
+    notes:        document.getElementById('f-appl-notes').value.trim(),
+  };
+}
+
+function openAddAppliance() {
+  openModal('Add Appliance', applianceForm(), () => {
+    const a = applianceFromForm(nextId(state.appliances));
+    if (!a.name) return;
+    state.appliances.push(a);
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function openEditAppliance(id) {
+  const a = state.appliances.find(x => x.id === id);
+  openModal('Edit Appliance', applianceForm(a), () => {
+    Object.assign(a, applianceFromForm(id));
+    saveData(state); closeModal(); renderAll();
+  });
+}
+
+function deleteAppliance(id) {
+  if (!confirm('Delete this item?')) return;
+  state.appliances = state.appliances.filter(a => a.id !== id);
+  saveData(state); renderAll();
+}
+
+// ─────────────────────────────────────────────────
+// CALENDAR
+// ─────────────────────────────────────────────────
+
+let calendarMonth = new Date().toISOString().slice(0, 7);
+
+let expenseSortCol = null;
+let expenseSortDir = 'asc';
+let expenseFilterCat = 'all';
+
+function setExpenseFilter(val) {
+  expenseFilterCat = val;
+  renderBudget();
+}
+
+function sortExpenses(col) {
+  expenseSortDir = expenseSortCol === col && expenseSortDir === 'asc' ? 'desc' : 'asc';
+  expenseSortCol = col;
+  renderBudget();
+}
+
+function thSort(col, label, extra = '') {
+  const active = expenseSortCol === col;
+  const icon = active ? (expenseSortDir === 'asc' ? '↑' : '↓') : '↕';
+  return `<th class="sortable${active ? ' sort-active' : ''}" onclick="sortExpenses('${col}')">${label}${extra}<span class="sort-icon">${icon}</span></th>`;
+}
+
+function prevCalMonth() {
+  const [y, m] = calendarMonth.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  calendarMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  renderCalendar();
+}
+
+function nextCalMonth() {
+  const [y, m] = calendarMonth.split('-').map(Number);
+  const d = new Date(y, m, 1);
+  calendarMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  renderCalendar();
+}
+
+function ordinal(n) {
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+function renderCalendar() {
+  const [year, month] = calendarMonth.split('-').map(Number);
+  const today = new Date();
+  const firstDay = new Date(year, month - 1, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const startDow = firstDay.getDay(); // 0=Sun
+
+  // Build day-keyed maps for expenses and income
+  const byDay = {};       // expenses
+  const incomeByDay = {}; // income
+  state.budget.expenses.forEach(e => {
+    getExpenseOccurrences(e, year, month).forEach(day => {
+      if (!byDay[day]) byDay[day] = [];
+      byDay[day].push(e);
+    });
+  });
+  state.budget.income.forEach(i => {
+    getExpenseOccurrences(i, year, month).forEach(day => {
+      if (!incomeByDay[day]) incomeByDay[day] = [];
+      incomeByDay[day].push(i);
+    });
+  });
+
+  const monthName = firstDay.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+
+  let html = `
+    <div class="month-picker" style="margin-bottom:16px">
+      <button class="month-btn" onclick="prevCalMonth()">&#8249;</button>
+      <div class="month-picker-label">${monthName}</div>
+      <button class="month-btn" onclick="nextCalMonth()">&#8250;</button>
+    </div>
+  `;
+
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  html += `<div class="cal-grid">`;
+  DAYS.forEach(d => { html += `<div class="cal-header-cell">${d}</div>`; });
+
+  // Leading blanks
+  for (let i = 0; i < startDow; i++) {
+    html += `<div class="cal-cell other-month"></div>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const isToday = today.getFullYear() === year && today.getMonth() + 1 === month && today.getDate() === day;
+    const events = byDay[day] || [];
+    const incEvents = incomeByDay[day] || [];
+    const allEvents = [...incEvents.map(i => ({...i, _type:'income'})), ...events.map(e => ({...e, _type:'expense'}))];
+    const totalDue = events.reduce((s, e) => s + itemMonthly(e), 0);
+
+    let eventsHtml = '';
+    const maxShow = 3;
+    allEvents.slice(0, maxShow).forEach(ev => {
+      const cls = ev._type === 'income' ? 'cal-event income' : 'cal-event';
+      eventsHtml += `<div class="${cls}" title="${ev.name} — ${audD(ev.amount)}${freqLabelItem(ev)}">${ev.name}</div>`;
+    });
+    if (allEvents.length > maxShow) {
+      eventsHtml += `<div class="cal-more">+${allEvents.length - maxShow} more</div>`;
+    }
+    if (events.length > 0) {
+      eventsHtml += `<div class="cal-day-total">-${aud(totalDue)}</div>`;
+    }
+
+    html += `
+      <div class="cal-cell${isToday ? ' today' : ''}">
+        <div class="cal-day-num">${day}</div>
+        ${eventsHtml}
+      </div>
+    `;
+  }
+
+  // Trailing blanks to complete last row
+  const totalCells = startDow + daysInMonth;
+  const remainder = totalCells % 7;
+  if (remainder > 0) {
+    for (let i = 0; i < 7 - remainder; i++) {
+      html += `<div class="cal-cell other-month"></div>`;
+    }
+  }
+
+  html += `</div>`;
+
+  // Upcoming list below calendar
+  const upcomingExpenses = [], upcomingIncome = [];
+  for (let day = 1; day <= daysInMonth; day++) {
+    (byDay[day] || []).forEach(e => upcomingExpenses.push({ day, e }));
+    (incomeByDay[day] || []).forEach(i => upcomingIncome.push({ day, i }));
+  }
+  const hasAny = upcomingExpenses.length > 0 || upcomingIncome.length > 0;
+
+  if (hasAny) {
+    const allRows = [
+      ...upcomingIncome.map(({day, i}) => ({ day, name: i.name, type: 'income', amount: i.amount, frequency: i.frequency })),
+      ...upcomingExpenses.map(({day, e}) => ({ day, name: e.name, type: 'expense', category: e.category, amount: e.amount, frequency: e.frequency }))
+    ].sort((a, b) => a.day - b.day);
+
+    html += `
+      <div class="section" style="margin-top:24px">
+        <div class="section-header"><div class="section-title">All Due Dates — ${monthName}</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Due</th><th>Name</th><th>Type</th><th>Amount</th><th>Repeats</th></tr></thead>
+            <tbody>
+              ${allRows.map(r => `<tr>
+                <td style="font-weight:600;color:var(--primary)">${ordinal(r.day)}</td>
+                <td style="font-weight:500">${r.name}</td>
+                <td>${r.type === 'income'
+                  ? `<span class="badge paid">Income</span>`
+                  : `<span class="badge unpaid">${r.category || 'Expense'}</span>`}</td>
+                <td class="amount" style="color:${r.type==='income'?'var(--success)':'var(--danger)'}">${r.type==='income'?'+':'−'}${audD(r.amount)}${freqLabelItem(r)}</td>
+                <td style="color:var(--text-muted)">${freqDisplayItem(r)}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  } else {
+    html += `<div class="empty" style="margin-top:24px"><div class="empty-icon">📅</div>No due dates set yet. Edit your income and expenses to add dates.</div>`;
+  }
+
+  document.getElementById('calendar-content').innerHTML = html;
+}
+
+function safeRender(fn) {
+  try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
+}
+
+function renderAll() {
+  safeRender(renderDashboard);
+  safeRender(renderBuild);
+  safeRender(renderBudget);
+  safeRender(renderCalendar);
+  safeRender(renderGoals);
+  safeRender(renderScenarios);
+  safeRender(renderSettings);
+}
+
+// ─────────────────────────────────────────────────
+// RECEIPTS (IndexedDB)
+// ─────────────────────────────────────────────────
+
+let receiptsDB = null;
+let receiptCounts = {};
+
+function getDB() {
+  if (receiptsDB) return Promise.resolve(receiptsDB);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('home_finance_receipts', 1);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('receipts')) {
+        const store = db.createObjectStore('receipts', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('itemKey', 'itemKey', { unique: false });
+      }
+    };
+    req.onsuccess = e => { receiptsDB = e.target.result; resolve(receiptsDB); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function refreshReceiptCounts() {
+  const db = await getDB();
+  return new Promise(resolve => {
+    const req = db.transaction('receipts', 'readonly').objectStore('receipts').getAll();
+    req.onsuccess = () => {
+      receiptCounts = {};
+      req.result.forEach(r => { receiptCounts[r.itemKey] = (receiptCounts[r.itemKey] || 0) + 1; });
+      resolve();
+    };
+  });
+}
+
+async function getReceipts(itemKey) {
+  const db = await getDB();
+  return new Promise(resolve => {
+    const req = db.transaction('receipts', 'readonly').objectStore('receipts').index('itemKey').getAll(itemKey);
+    req.onsuccess = () => resolve(req.result);
+  });
+}
+
+async function saveReceipt(itemKey, file) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('receipts', 'readwrite');
+    const req = tx.objectStore('receipts').add({
+      itemKey, fileName: file.name, fileType: file.type,
+      fileSize: file.size, data: file, uploadedAt: new Date().toISOString()
+    });
+    req.onsuccess = () => resolve(); req.onerror = () => reject(req.error);
+  });
+}
+
+async function deleteReceiptById(id) {
+  const db = await getDB();
+  return new Promise(resolve => {
+    const tx = db.transaction('receipts', 'readwrite');
+    tx.objectStore('receipts').delete(id);
+    tx.oncomplete = resolve;
+  });
+}
+
+function fundingBadge(f) {
+  return f === 'own-funds'
+    ? `<span class="badge" style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0">Own Funds</span>`
+    : `<span class="badge" style="background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe">Loan</span>`;
+}
+
+function attachBtn(itemKey, itemName) {
+  const count = receiptCounts[itemKey] || 0;
+  return `<button class="attach-btn${count ? ' has-files' : ''}" onclick="openReceiptsModal('${itemKey}','${itemName.replace(/'/g,'\\\'')}')" title="${count ? count + ' receipt(s)' : 'Add receipt'}">📎${count ? ` ${count}` : ''}</button>`;
+}
+
+
+function fileSizeStr(bytes) {
+  return bytes > 1048576 ? `${(bytes/1048576).toFixed(1)} MB` : `${Math.round(bytes/1024)} KB`;
+}
+
+function fileIcon(type) {
+  if (type === 'application/pdf') return '📄';
+  if (type.startsWith('image/')) return '🖼️';
+  return '📎';
+}
+
+async function openReceiptsModal(itemKey, itemName) {
+  openModal(`Receipts — ${itemName}`, '<div style="padding:20px;text-align:center;color:var(--text-muted)">Loading…</div>', () => {});
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+  await renderReceiptsList(itemKey, itemName);
+}
+
+async function renderReceiptsList(itemKey, itemName) {
+  const safeKey = itemKey;
+  const safeName = itemName.replace(/'/g, '\\\'');
+  const list = await getReceipts(itemKey);
+  let html = '';
+
+  if (list.length) {
+    list.forEach(r => {
+      const isLink = r.type === 'link';
+      const icon = isLink ? '🔗' : fileIcon(r.fileType);
+      const title = isLink ? (r.linkName || r.url) : r.fileName;
+      const meta = isLink
+        ? `<span style="color:var(--text-muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:260px">${r.url}</span>`
+        : `<span>${fileSizeStr(r.fileSize)} · ${new Date(r.uploadedAt).toLocaleDateString('en-AU')}</span>`;
+      const action = isLink
+        ? `<button class="btn btn-ghost btn-sm" onclick="window.open('${r.url.replace(/'/g,'\\\'').replace(/"/g,'&quot;')}','_blank')">Open</button>`
+        : `<button class="btn btn-ghost btn-sm" onclick="viewReceipt(${r.id})">View</button>`;
+      html += `
+        <div class="receipt-row">
+          <div class="receipt-icon">${icon}</div>
+          <div class="receipt-info">
+            <div class="receipt-name">${title}</div>
+            <div class="receipt-meta">${meta} · ${new Date(r.uploadedAt).toLocaleDateString('en-AU')}</div>
+          </div>
+          ${action}
+          <button class="btn btn-danger-ghost btn-sm" onclick="removeReceipt(${r.id},'${safeKey}','${safeName}')" title="Delete">🗑</button>
+        </div>`;
+    });
+  } else {
+    html += `<div class="empty" style="padding:20px 0 16px"><div class="empty-icon">📎</div>No attachments yet</div>`;
+  }
+
+  // Add link form
+  html += `
+    <div style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:10px">🔗 Add Link</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input class="form-input" id="link-url" type="url" placeholder="https://drive.google.com/…" style="font-size:13px">
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="link-name" type="text" placeholder="Label (optional — e.g. Invoice #1234)" style="font-size:13px;flex:1">
+          <button class="btn btn-primary btn-sm" onclick="addLink('${safeKey}','${safeName}')">Add</button>
+        </div>
+      </div>
+    </div>`;
+
+  // Upload area
+  html += `
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('receipt-file-input').click()">
+      <div class="drop-zone-icon">⬆️</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Drop files here or click to upload</div>
+      <div style="font-size:11px;color:var(--text-muted)">PDF, JPG, PNG, HEIC, WEBP</div>
+      <input type="file" id="receipt-file-input" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png,.heic,.webp,image/*,application/pdf" onchange="uploadReceiptFiles('${safeKey}','${safeName}')" onclick="event.stopPropagation()">
+    </div>`;
+
+  document.getElementById('modal-body').innerHTML = html;
+
+  const zone = document.getElementById('drop-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', async e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    await uploadFiles(itemKey, itemName, Array.from(e.dataTransfer.files));
+  });
+}
+
+async function addLink(itemKey, itemName) {
+  const url = document.getElementById('link-url').value.trim();
+  if (!url) { document.getElementById('link-url').focus(); return; }
+  const linkName = document.getElementById('link-name').value.trim();
+  const db = await getDB();
+  await new Promise((resolve, reject) => {
+    const tx = db.transaction('receipts', 'readwrite');
+    const req = tx.objectStore('receipts').add({
+      itemKey, type: 'link', url, linkName,
+      uploadedAt: new Date().toISOString()
+    });
+    req.onsuccess = resolve; req.onerror = () => reject(req.error);
+  });
+  await refreshReceiptCounts();
+  renderBuild();
+  await renderReceiptsList(itemKey, itemName);
+}
+
+async function uploadReceiptFiles(itemKey, itemName) {
+  const input = document.getElementById('receipt-file-input');
+  await uploadFiles(itemKey, itemName, Array.from(input.files));
+}
+
+async function uploadFiles(itemKey, itemName, files) {
+  for (const f of files) await saveReceipt(itemKey, f);
+  await refreshReceiptCounts();
+  renderBuild();
+  await renderReceiptsList(itemKey, itemName);
+}
+
+async function viewReceipt(id) {
+  const db = await getDB();
+  const r = await new Promise(resolve => {
+    const req = db.transaction('receipts','readonly').objectStore('receipts').get(id);
+    req.onsuccess = () => resolve(req.result);
+  });
+  if (r.type === 'link') { window.open(r.url, '_blank'); return; }
+  const url = URL.createObjectURL(r.data);
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+}
+
+async function removeReceipt(id, itemKey, itemName) {
+  if (!confirm('Delete this receipt?')) return;
+  await deleteReceiptById(id);
+  await refreshReceiptCounts();
+  renderBuild();
+  await renderReceiptsList(itemKey, itemName);
+}
+
+// Init
+refreshReceiptCounts().then(() => renderAll());
+</script>
+</body>
+</html>
