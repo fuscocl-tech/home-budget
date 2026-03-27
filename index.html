@@ -106,6 +106,45 @@
 
     .sidebar-actions button:hover { background: #475569; color: #fff; }
 
+    /* ─── Sidebar user ────────────────────────── */
+    .sidebar-user {
+      display: none; align-items: center; gap: 8px;
+      padding: 10px 12px; border-top: 1px solid #334155;
+      color: #cbd5e1;
+    }
+    .sidebar-user img {
+      width: 30px; height: 30px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0; background: #475569;
+    }
+    .sidebar-user-name {
+      flex: 1; font-size: 11px; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+    }
+    .sidebar-user-out {
+      font-size: 11px; padding: 3px 8px; background: #475569;
+      border: none; color: #cbd5e1; border-radius: 4px;
+      cursor: pointer; flex-shrink: 0; transition: background .15s;
+    }
+    .sidebar-user-out:hover { background: #ef4444; color: #fff; }
+
+    /* ─── Login overlay ───────────────────────── */
+    #login-overlay {
+      position: fixed; inset: 0; background: #1e293b;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 18px; z-index: 9999;
+    }
+    #login-overlay.hidden { display: none !important; }
+    .google-sign-in-btn {
+      display: flex; align-items: center; gap: 12px;
+      background: #fff; color: #3c4043; border: none;
+      border-radius: 8px; padding: 13px 28px;
+      font-size: 15px; font-weight: 500; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      transition: box-shadow .15s;
+    }
+    .google-sign-in-btn:hover { box-shadow: 0 4px 16px rgba(0,0,0,.35); }
+    .google-sign-in-btn svg { flex-shrink: 0; }
+
     /* ─── Main ────────────────────────────────── */
     .main {
       flex: 1;
@@ -851,8 +890,23 @@
     .adj-item:last-child { border-bottom: none; }
     .adj-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+<!-- ─── Login overlay ────────────────────────── -->
+<div id="login-overlay">
+  <div style="font-size:52px">🏠</div>
+  <h1 style="color:#fff;font-size:26px;font-weight:700;margin:0">Home Finance</h1>
+  <p style="color:#94a3b8;font-size:14px;margin:0">Sign in to access your family budget</p>
+  <button class="google-sign-in-btn" onclick="signInWithGoogle()">
+    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+    Sign in with Google
+  </button>
+  <p id="login-error" style="color:#f87171;font-size:13px;margin:0;display:none"></p>
+</div>
 
 <!-- ─── Sidebar ───────────────────────────────── -->
 <aside class="sidebar">
@@ -886,6 +940,11 @@
     <button onclick="exportData()">⬇️ Export backup</button>
     <button onclick="document.getElementById('importFile').click()">⬆️ Import backup</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  </div>
+  <div class="sidebar-user" id="sidebar-user">
+    <img id="user-photo" src="" alt="">
+    <span class="sidebar-user-name" id="user-name"></span>
+    <button class="sidebar-user-out" onclick="signOutUser()" title="Sign out">↩</button>
   </div>
 </aside>
 
@@ -971,6 +1030,88 @@
 
 <script>
 // ─────────────────────────────────────────────────
+// FIREBASE
+// ─────────────────────────────────────────────────
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBiQq8lIf5yCKGDyinGjLaeAE100u7vF90",
+  authDomain: "home-budget-b0f28.firebaseapp.com",
+  projectId: "home-budget-b0f28",
+  storageBucket: "home-budget-b0f28.firebasestorage.app",
+  messagingSenderId: "777614158624",
+  appId: "1:777614158624:web:a8636d1b5894ae4d3e8545"
+};
+
+firebase.initializeApp(firebaseConfig);
+const fbAuth = firebase.auth();
+const fbStore = firebase.firestore();
+
+let _currentUser = null;
+let _fsUnsubscribe = null;
+
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  fbAuth.signInWithPopup(provider).catch(err => {
+    const el = document.getElementById('login-error');
+    if (el) { el.textContent = err.message; el.style.display = ''; }
+  });
+}
+
+function signOutUser() {
+  if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
+  fbAuth.signOut();
+}
+
+function _applyMigrations(d) {
+  if (!d.budget) d.budget = { income: [], expenses: [], actuals: {}, months: {} };
+  if (!d.budget.actuals) d.budget.actuals = {};
+  if (!d.budget.months) d.budget.months = {};
+  if (!d.goals) d.goals = [];
+  if (!d.scenarios) d.scenarios = [];
+  if (!d.furniture) d.furniture = [];
+  if (!d.appliances) d.appliances = [];
+  return d;
+}
+
+function _startFirestoreSync() {
+  if (_fsUnsubscribe) _fsUnsubscribe();
+  _fsUnsubscribe = fbStore.collection('family').doc('shared').onSnapshot(snap => {
+    if (snap.exists) {
+      const d = _applyMigrations(snap.data());
+      Object.assign(state, d);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } else {
+      // First user to sign in: push local data up to Firestore
+      fbStore.collection('family').doc('shared').set(state);
+    }
+    refreshReceiptCounts().then(() => renderAll());
+  }, err => {
+    console.error('Firestore sync error:', err);
+    renderAll(); // Render with whatever local state we have
+  });
+}
+
+fbAuth.onAuthStateChanged(user => {
+  _currentUser = user;
+  const overlay = document.getElementById('login-overlay');
+  const userEl  = document.getElementById('sidebar-user');
+  const photoEl = document.getElementById('user-photo');
+  const nameEl  = document.getElementById('user-name');
+
+  if (user) {
+    if (overlay) overlay.classList.add('hidden');
+    if (userEl)  userEl.style.display = 'flex';
+    if (photoEl) photoEl.src = user.photoURL || '';
+    if (nameEl)  nameEl.textContent = user.displayName || user.email || '';
+    _startFirestoreSync();
+  } else {
+    if (overlay) overlay.classList.remove('hidden');
+    if (userEl)  userEl.style.display = 'none';
+    if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
+  }
+});
+
+// ─────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────
 
@@ -1034,6 +1175,11 @@ function loadData() {
 
 function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  if (_currentUser) {
+    fbStore.collection('family').doc('shared').set(data).catch(err => {
+      console.error('Firestore save error:', err);
+    });
+  }
 }
 
 // ─── Per-month budget helpers ──────────────────────
@@ -3944,8 +4090,7 @@ async function removeReceipt(id, itemKey, itemName) {
   await renderReceiptsList(itemKey, itemName);
 }
 
-// Init
-refreshReceiptCounts().then(() => renderAll());
+// Init — rendering is triggered by Firestore onSnapshot after auth resolves
 </script>
 </body>
 </html>
