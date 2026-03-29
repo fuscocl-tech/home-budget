@@ -4188,7 +4188,7 @@ function renderCalendar() {
             <thead><tr><th>Due</th><th>Name</th><th>Type</th><th>Amount</th><th>Repeats</th></tr></thead>
             <tbody>
               ${allRows.map(r => `<tr>
-                <td style="font-weight:600;color:var(--primary)">${ordinal(r.day)}</td>
+                <td style="font-weight:600;color:var(--primary)">${new Date(year, month-1, r.day).toLocaleDateString('en-AU', {month:'long',day:'numeric'})}</td>
                 <td style="font-weight:500">${r.name}</td>
                 <td>${r.type === 'income'
                   ? `<span class="badge paid">Income</span>`
