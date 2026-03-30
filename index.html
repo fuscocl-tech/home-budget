@@ -1060,6 +1060,17 @@ const fbStore = firebase.firestore();
 
 let _currentUser = null;
 let _fsUnsubscribe = null;
+let _pendingLogEntry = null;
+
+function logActivity(action, detail) {
+  _pendingLogEntry = {
+    ts:     new Date().toISOString(),
+    name:   _currentUser ? (_currentUser.displayName || _currentUser.email || 'Unknown') : 'Unknown',
+    photo:  _currentUser ? (_currentUser.photoURL || '') : '',
+    action,
+    detail: detail || ''
+  };
+}
 
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -1149,6 +1160,7 @@ const DEFAULT_DATA = {
   appliances: [],
   goals: [],
   scenarios: [],
+  activityLog: [],
   expenseCategories: ['Mortgage / Rent', 'Insurance', 'Utilities', 'Groceries', 'Transport', 'Childcare / Education', 'Health', 'Entertainment', 'Subscriptions', 'Dining Out', 'Clothing', 'Personal Care', 'Savings / Investment', 'Other'],
   incomeCategories: ['Salary', 'Freelance / Contract', 'Rental Income', 'Government / Benefits', 'Investment', 'Other'],
   budget: {
@@ -1170,6 +1182,7 @@ function loadData() {
     if (!d.scenarios)  d.scenarios  = [];
     if (!d.furniture) d.furniture = [];
     if (!d.appliances) d.appliances = [];
+    if (!d.activityLog) d.activityLog = [];
     if (!d.expenseCategories) d.expenseCategories = JSON.parse(JSON.stringify(DEFAULT_DATA.expenseCategories));
     if (!d.incomeCategories)  d.incomeCategories  = JSON.parse(JSON.stringify(DEFAULT_DATA.incomeCategories));
     // migrate dueDay → dueDate
@@ -1190,6 +1203,12 @@ function loadData() {
 }
 
 function saveData(data) {
+  if (_pendingLogEntry) {
+    if (!data.activityLog) data.activityLog = [];
+    data.activityLog.unshift(_pendingLogEntry);
+    if (data.activityLog.length > 200) data.activityLog.length = 200;
+    _pendingLogEntry = null;
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if (_currentUser) {
     fbStore.collection('family').doc('shared').set(data).catch(err => {
@@ -2938,6 +2957,13 @@ function updateColor(type, key, value) {
   renderDashboard();
 }
 
+function clearActivityLog() {
+  if (!confirm('Clear the entire activity log? This cannot be undone.')) return;
+  state.activityLog = [];
+  saveData(state);
+  renderSettings();
+}
+
 function addCategory(type) {
   const input = document.getElementById(`new-cat-${type}`);
   const name = (input.value || '').trim();
@@ -2945,6 +2971,7 @@ function addCategory(type) {
   const list = type === 'expense' ? state.expenseCategories : state.incomeCategories;
   if (list.includes(name)) { alert('That category already exists.'); return; }
   list.push(name);
+  logActivity(`Added ${type} category`, name);
   saveData(state);
   input.value = '';
   renderSettings();
@@ -2962,6 +2989,7 @@ function removeCategory(type, name) {
   }
   const idx = list.indexOf(name);
   if (idx !== -1) list.splice(idx, 1);
+  logActivity(`Removed ${type} category`, name);
   saveData(state);
   renderSettings();
   renderBudget();
@@ -2987,7 +3015,62 @@ function renderSettings() {
     ? `<span style="color:var(--success);font-weight:600">✓ Data found in localStorage (${dataSize} KB)</span>`
     : `<span style="color:var(--danger);font-weight:600">⚠ No data in localStorage</span>`;
 
+  const log = state.activityLog || [];
+
+  function fmtLogTime(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' })
+      + ' ' + d.toLocaleTimeString('en-AU', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  function avatarHtml(entry) {
+    if (entry.photo) return `<img src="${entry.photo}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`;
+    const initial = (entry.name || '?')[0].toUpperCase();
+    return `<div style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">${initial}</div>`;
+  }
+
+  const actionColors = {
+    'Added':   '#10b981',
+    'Edited':  '#3b82f6',
+    'Deleted': '#ef4444',
+    'Updated': '#f59e0b',
+    'Imported':'#8b5cf6',
+    'Removed': '#ef4444',
+  };
+
+  function actionBadgeColor(action) {
+    const word = action.split(' ')[0];
+    return actionColors[word] || '#94a3b8';
+  }
+
   let html = `
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Activity Log</div>
+          <div class="section-subtitle">${log.length} recorded action${log.length !== 1 ? 's' : ''} — synced across all devices</div>
+        </div>
+        ${log.length > 0 ? `<button class="btn btn-ghost btn-sm" onclick="clearActivityLog()" style="color:var(--danger)">Clear log</button>` : ''}
+      </div>
+      ${log.length === 0
+        ? `<div style="padding:24px 20px;text-align:center;color:var(--text-muted);font-size:13px">No activity recorded yet. Changes you and your wife make will appear here.</div>`
+        : `<div style="max-height:480px;overflow-y:auto">
+            ${log.slice(0, 100).map(entry => `
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border)">
+                ${avatarHtml(entry)}
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+                    <span style="font-weight:600;font-size:13px">${entry.name}</span>
+                    <span style="display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:${actionBadgeColor(entry.action)}">${entry.action}</span>
+                    ${entry.detail ? `<span style="font-size:13px;color:var(--text)">${entry.detail}</span>` : ''}
+                  </div>
+                  <div style="font-size:11px;color:var(--text-muted)">${fmtLogTime(entry.ts)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>`}
+    </div>
+
     <div class="section">
       <div class="section-header">
         <div>
@@ -3313,6 +3396,7 @@ function openModal(title, bodyHtml, onSave) {
 }
 
 function closeModal() {
+  _pendingLogEntry = null;
   document.getElementById('modal-overlay').classList.add('hidden');
 }
 
@@ -3331,6 +3415,7 @@ function openEditContractTotal() {
   `, () => {
     const v = parseFloat(document.getElementById('f-contract-total').value);
     if (!isNaN(v) && v > 0) {
+      logActivity('Updated contract total', aud(v));
       state.buildContract.total = v;
       saveData(state);
       closeModal();
@@ -3400,6 +3485,7 @@ function openAddStage() {
   openModal('Add Contract Stage', stageForm(), () => {
     const s = stageFromForm(nextId(state.buildContract.stages));
     if (!s.name) return;
+    logActivity('Added build stage', s.name);
     state.buildContract.stages.push(s);
     saveData(state); closeModal(); renderAll();
   });
@@ -3408,13 +3494,17 @@ function openAddStage() {
 function openEditStage(id) {
   const s = state.buildContract.stages.find(x => x.id === id);
   openModal('Edit Stage', stageForm(s), () => {
-    Object.assign(s, stageFromForm(id));
+    const updated = stageFromForm(id);
+    logActivity('Edited build stage', updated.name || s.name);
+    Object.assign(s, updated);
     saveData(state); closeModal(); renderAll();
   });
 }
 
 function deleteStage(id) {
   if (!confirm('Delete this stage?')) return;
+  const s = state.buildContract.stages.find(x => x.id === id);
+  logActivity('Deleted build stage', s ? s.name : '');
   state.buildContract.stages = state.buildContract.stages.filter(s => s.id !== id);
   saveData(state); renderAll();
 }
@@ -3498,6 +3588,7 @@ function openAddExtra() {
   openModal('Add Outside Contract Item', extraForm(), () => {
     const e = extraFromForm(nextId(state.extras));
     if (!e.name) return;
+    logActivity('Added extra item', e.name);
     state.extras.push(e);
     saveData(state); closeModal(); renderAll();
   });
@@ -3506,13 +3597,17 @@ function openAddExtra() {
 function openEditExtra(id) {
   const e = state.extras.find(x => x.id === id);
   openModal('Edit Item', extraForm(e), () => {
-    Object.assign(e, extraFromForm(id));
+    const updated = extraFromForm(id);
+    logActivity('Edited extra item', updated.name || e.name);
+    Object.assign(e, updated);
     saveData(state); closeModal(); renderAll();
   });
 }
 
 function deleteExtra(id) {
   if (!confirm('Delete this item?')) return;
+  const e = state.extras.find(x => x.id === id);
+  logActivity('Deleted extra item', e ? e.name : '');
   state.extras = state.extras.filter(e => e.id !== id);
   saveData(state); renderAll();
 }
@@ -3580,6 +3675,7 @@ function openAddIncome() {
   openModal('Add Income', incomeForm(), () => {
     const item = incomeFromForm(nextId(getMonthData(selectedBudgetMonth).income));
     if (!item.name) return;
+    logActivity('Added income', item.name);
     confirmScope(
       () => {
         const mb = ensureMonthOverride(selectedBudgetMonth);
@@ -3600,6 +3696,7 @@ function openEditIncome(id) {
   const src = getMonthData(selectedBudgetMonth).income.find(x => x.id === id);
   openModal('Edit Income', incomeForm(src), () => {
     const updated = incomeFromForm(id);
+    logActivity('Edited income', updated.name || (src && src.name) || '');
     confirmScope(
       () => {
         const mb = ensureMonthOverride(selectedBudgetMonth);
@@ -3619,6 +3716,7 @@ function openEditIncome(id) {
 function deleteIncome(id) {
   const src = getMonthData(selectedBudgetMonth).income.find(x => x.id === id);
   const name = src ? src.name : 'this income';
+  logActivity('Deleted income', name);
   _scopePending = null;
   document.getElementById('modal-title').textContent = 'Delete income';
   document.getElementById('modal-body').innerHTML = `
@@ -3725,6 +3823,7 @@ function openAddExpense() {
   openModal('Add Expense', expenseForm(), () => {
     const item = expenseFromForm(nextId(getMonthData(selectedBudgetMonth).expenses));
     if (!item.name) return;
+    logActivity('Added expense', `${item.name} (${item.category || 'Other'})`);
     confirmScope(
       () => {
         const mb = ensureMonthOverride(selectedBudgetMonth);
@@ -3745,6 +3844,7 @@ function openEditExpense(id) {
   const src = getMonthData(selectedBudgetMonth).expenses.find(x => x.id === id);
   openModal('Edit Expense', expenseForm(src), () => {
     const updated = expenseFromForm(id);
+    logActivity('Edited expense', `${updated.name || (src && src.name) || ''} (${updated.category || 'Other'})`);
     confirmScope(
       () => {
         const mb = ensureMonthOverride(selectedBudgetMonth);
@@ -3764,6 +3864,7 @@ function openEditExpense(id) {
 function deleteExpense(id) {
   const src = getMonthData(selectedBudgetMonth).expenses.find(x => x.id === id);
   const name = src ? src.name : 'this expense';
+  logActivity('Deleted expense', name);
   _scopePending = {
     onThisMonth: () => {
       const mb = ensureMonthOverride(selectedBudgetMonth);
@@ -3817,6 +3918,7 @@ function importData(event) {
       if (!imported.buildContract || !imported.budget) throw new Error('Invalid file');
       if (!confirm('This will replace all current data. Continue?')) return;
       state = imported;
+      logActivity('Imported backup data', file.name);
       saveData(state);
       renderAll();
       alert('Data imported successfully.');
@@ -3917,6 +4019,7 @@ function openAddFurniture() {
   openModal('Add Furniture Item', furnitureForm(), () => {
     const f = furnitureFromForm(nextId(state.furniture));
     if (!f.name) return;
+    logActivity('Added furniture', f.name);
     state.furniture.push(f);
     saveData(state); closeModal(); renderAll();
   });
@@ -3925,13 +4028,17 @@ function openAddFurniture() {
 function openEditFurniture(id) {
   const f = state.furniture.find(x => x.id === id);
   openModal('Edit Furniture Item', furnitureForm(f), () => {
-    Object.assign(f, furnitureFromForm(id));
+    const updated = furnitureFromForm(id);
+    logActivity('Edited furniture', updated.name || f.name);
+    Object.assign(f, updated);
     saveData(state); closeModal(); renderAll();
   });
 }
 
 function deleteFurniture(id) {
   if (!confirm('Delete this item?')) return;
+  const f = state.furniture.find(x => x.id === id);
+  logActivity('Deleted furniture', f ? f.name : '');
   state.furniture = state.furniture.filter(f => f.id !== id);
   saveData(state); renderAll();
 }
@@ -4019,6 +4126,7 @@ function openAddAppliance() {
   openModal('Add Appliance', applianceForm(), () => {
     const a = applianceFromForm(nextId(state.appliances));
     if (!a.name) return;
+    logActivity('Added appliance', a.name);
     state.appliances.push(a);
     saveData(state); closeModal(); renderAll();
   });
@@ -4027,13 +4135,17 @@ function openAddAppliance() {
 function openEditAppliance(id) {
   const a = state.appliances.find(x => x.id === id);
   openModal('Edit Appliance', applianceForm(a), () => {
-    Object.assign(a, applianceFromForm(id));
+    const updated = applianceFromForm(id);
+    logActivity('Edited appliance', updated.name || a.name);
+    Object.assign(a, updated);
     saveData(state); closeModal(); renderAll();
   });
 }
 
 function deleteAppliance(id) {
   if (!confirm('Delete this item?')) return;
+  const a = state.appliances.find(x => x.id === id);
+  logActivity('Deleted appliance', a ? a.name : '');
   state.appliances = state.appliances.filter(a => a.id !== id);
   saveData(state); renderAll();
 }
