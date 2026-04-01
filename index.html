@@ -2,8 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Home Finance</title>
+  <link rel="manifest" href="/home-budget/manifest.json">
+  <meta name="theme-color" content="#1e293b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Home Finance">
+  <link rel="apple-touch-icon" href="/home-budget/icons/icon.svg">
   <style>
     :root {
       --bg: #f0f4f8;
@@ -935,11 +942,15 @@
     <div class="nav-item" data-tab="scenarios">
       <span class="nav-icon">🔬</span> Scenarios
     </div>
+    <div class="nav-item" data-tab="insights">
+      <span class="nav-icon">🤖</span> Insights
+    </div>
     <div class="nav-item" data-tab="settings">
       <span class="nav-icon">⚙️</span> Settings
     </div>
   </nav>
   <div class="sidebar-actions">
+    <button id="install-btn" style="display:none" onclick="installApp()">📱 Add to Home Screen</button>
     <button onclick="exportData()">⬇️ Export backup</button>
     <button onclick="document.getElementById('importFile').click()">⬆️ Import backup</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
@@ -1015,6 +1026,15 @@
       <p>Model "what if" changes to your income and expenses</p>
     </div>
     <div id="scenarios-content"></div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="tab-panel" id="tab-insights">
+    <div class="page-header">
+      <h1>Insights</h1>
+      <p>AI-powered analysis of your finances</p>
+    </div>
+    <div id="insights-content"></div>
   </div>
 
   <!-- SETTINGS -->
@@ -2957,6 +2977,362 @@ function updateColor(type, key, value) {
   renderDashboard();
 }
 
+// ─────────────────────────────────────────────────
+// INSIGHTS
+// ─────────────────────────────────────────────────
+
+const INSIGHTS_KEY = 'home_finance_ai_key';
+
+function getAIKey() { return localStorage.getItem(INSIGHTS_KEY) || ''; }
+function saveAIKey(k) { localStorage.setItem(INSIGHTS_KEY, k); }
+
+function generateSmartInsights() {
+  const md           = getMonthData(selectedBudgetMonth);
+  const totalIncome  = monthlyTotal(md.income);
+  const totalExpenses= monthlyTotal(md.expenses);
+  const surplus      = totalIncome - totalExpenses;
+  const savingsRate  = totalIncome > 0 ? surplus / totalIncome * 100 : 0;
+
+  const byCategory = {};
+  md.expenses.forEach(e => {
+    const cat = e.category || 'Other';
+    byCategory[cat] = (byCategory[cat] || 0) + itemMonthly(e);
+  });
+  const sortedCats = Object.entries(byCategory).sort((a,b) => b[1]-a[1]);
+
+  const last6    = getLast6Months();
+  const avg6Exp  = last6.reduce((s, mo) => s + monthlyTotal(getMonthData(mo).expenses), 0) / 6;
+  const avg6Inc  = last6.reduce((s, mo) => s + monthlyTotal(getMonthData(mo).income),   0) / 6;
+
+  const insights = [];
+
+  // Savings rate
+  if (savingsRate >= 20) {
+    insights.push({ level:'good',    icon:'🌟', title:'Excellent savings rate',
+      body:`You're saving ${Math.round(savingsRate)}% of income — above the recommended 20%. Keep it up and consider putting the surplus toward your goals.` });
+  } else if (savingsRate >= 10) {
+    insights.push({ level:'ok',      icon:'📈', title:'Decent savings rate',
+      body:`You're saving ${Math.round(savingsRate)}% of income. Pushing to 20% would mean an extra ${aud((totalIncome * 0.2) - surplus)}/month going toward your future.` });
+  } else if (savingsRate > 0) {
+    insights.push({ level:'warning', icon:'⚠️', title:'Low savings rate',
+      body:`Only ${Math.round(savingsRate)}% of income is being saved (${aud(surplus)}/month). Look for the biggest discretionary expense you can reduce.` });
+  } else if (totalIncome > 0) {
+    insights.push({ level:'alert',   icon:'🚨', title:'Spending exceeds income',
+      body:`You're spending ${aud(Math.abs(surplus))} more than you earn each month. This requires urgent attention — identify what can be cut immediately.` });
+  }
+
+  // Trend vs 6-month average
+  if (avg6Exp > 0) {
+    const diff = totalExpenses - avg6Exp;
+    const pct  = Math.round(Math.abs(diff) / avg6Exp * 100);
+    if (diff > avg6Exp * 0.1) {
+      insights.push({ level:'warning', icon:'📊', title:'Expenses above your average',
+        body:`This month's expenses are ${pct}% above your 6-month average (${aud(avg6Exp)}). The extra ${aud(diff)} could be a one-off — worth reviewing.` });
+    } else if (diff < -avg6Exp * 0.08 && avg6Exp > 0) {
+      insights.push({ level:'good',    icon:'📊', title:'Expenses below your average',
+        body:`Nice — this month you spent ${pct}% less than your 6-month average. That's ${aud(Math.abs(diff))} extra in your pocket.` });
+    }
+  }
+
+  // Top expense category
+  if (sortedCats.length > 0) {
+    const [topCat, topAmt] = sortedCats[0];
+    const pct = totalExpenses > 0 ? Math.round(topAmt / totalExpenses * 100) : 0;
+    if (pct > 45 && topCat !== 'Mortgage / Rent') {
+      insights.push({ level:'warning', icon:'💸', title:`${topCat} is dominating your budget`,
+        body:`${topCat} makes up ${pct}% of your total expenses (${aud(topAmt)}/month). Reducing this by 20% would save ${aud(topAmt * 0.2)}/month.` });
+    }
+  }
+
+  // Dining Out
+  const dining = byCategory['Dining Out'] || 0;
+  if (dining > 0 && totalExpenses > 0 && dining / totalExpenses > 0.08) {
+    insights.push({ level:'ok', icon:'🍽️', title:'Dining out is notable',
+      body:`You're spending ${aud(dining)}/month dining out. Cooking at home 2–3 more times a week could save ${aud(dining * 0.35)}/month.` });
+  }
+
+  // Income diversity
+  if (md.income.length === 1 && totalIncome > 0) {
+    insights.push({ level:'info', icon:'💡', title:'Single income source',
+      body:'You rely on one income stream. Even a small side income (freelance, rental, etc.) would significantly improve your financial resilience.' });
+  }
+
+  // Build costs buffer
+  const contractPaid     = state.buildContract.stages.filter(s=>s.paid).reduce((s,x)=>s+x.amount,0);
+  const contractRemaining= state.buildContract.total - contractPaid;
+  if (contractRemaining > 0 && surplus > 0) {
+    const monthsBuffer = Math.round(contractRemaining / surplus);
+    insights.push({ level:'info', icon:'🏗️', title:'Build payments still ahead',
+      body:`You have ${aud(contractRemaining)} left in contract payments. At your current savings rate that represents ${monthsBuffer} month${monthsBuffer !== 1 ? 's' : ''} of surplus — plan accordingly.` });
+  }
+
+  // Goals
+  const activeGoals = (state.goals || []).filter(g => !g.achieved);
+  if (activeGoals.length > 0 && surplus > 0) {
+    insights.push({ level:'good', icon:'🎯', title:`${activeGoals.length} active goal${activeGoals.length > 1 ? 's' : ''}`,
+      body:`Your ${aud(surplus)}/month surplus can work toward your goals. Review the Goals page to see progress and adjust contributions.` });
+  }
+
+  // Empty budget
+  if (md.expenses.length === 0) {
+    insights.push({ level:'info', icon:'📝', title:'Add your expenses',
+      body:'Head to Monthly Budget and add your regular expenses to unlock personalised insights.' });
+  }
+
+  return insights;
+}
+
+async function runAIInsights() {
+  const key = getAIKey();
+  if (!key) {
+    document.getElementById('ai-output').innerHTML = `
+      <div style="padding:20px;text-align:center;color:var(--text-muted)">
+        <p style="margin-bottom:12px">Enter your Anthropic API key in the field above to enable AI insights.</p>
+        <p style="font-size:12px">Get a key at <strong>console.anthropic.com</strong></p>
+      </div>`;
+    return;
+  }
+
+  const btn = document.getElementById('ai-run-btn');
+  btn.disabled = true;
+  btn.textContent = 'Analysing…';
+
+  const md           = getMonthData(selectedBudgetMonth);
+  const totalIncome  = monthlyTotal(md.income);
+  const totalExpenses= monthlyTotal(md.expenses);
+  const surplus      = totalIncome - totalExpenses;
+  const savingsRate  = totalIncome > 0 ? Math.round(surplus / totalIncome * 100) : 0;
+
+  const byCategory = {};
+  md.expenses.forEach(e => {
+    byCategory[e.category || 'Other'] = (byCategory[e.category || 'Other'] || 0) + itemMonthly(e);
+  });
+
+  const last6 = getLast6Months().map(mo => {
+    const m = getMonthData(mo);
+    return { month: mo, income: monthlyTotal(m.income), expenses: monthlyTotal(m.expenses) };
+  });
+
+  const budgetSummary = {
+    month: monthLabel(selectedBudgetMonth),
+    monthlyIncome: totalIncome,
+    monthlyExpenses: totalExpenses,
+    surplus,
+    savingsRatePct: savingsRate,
+    expensesByCategory: byCategory,
+    incomeStreams: md.income.map(i => ({ name: i.name, monthlyAmount: itemMonthly(i) })),
+    last6MonthsTrend: last6,
+    activeGoals: (state.goals || []).filter(g => !g.achieved).map(g => ({ name: g.name, type: g.type })),
+    buildRemaining: state.buildContract.total - state.buildContract.stages.filter(s=>s.paid).reduce((s,x)=>s+x.amount,0),
+    currency: 'AUD'
+  };
+
+  const prompt = `You are a friendly but direct personal finance advisor for an Australian family. Analyse their budget data and give 4-6 concise, specific, actionable insights.
+
+Budget data for ${budgetSummary.month}:
+${JSON.stringify(budgetSummary, null, 2)}
+
+Format your response as a JSON array of insight objects, each with:
+- "title": short headline (max 8 words)
+- "body": 1-2 sentences with specific numbers from the data
+- "level": one of "good", "ok", "warning", "alert", "info"
+- "icon": a single relevant emoji
+- "action": one-line actionable recommendation (optional)
+
+Reply with ONLY the JSON array, no other text.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-request-header': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const text = data.content[0].text.trim();
+    const aiInsights = JSON.parse(text);
+    renderInsightCards(aiInsights, true);
+  } catch(err) {
+    let msg = err.message;
+    if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('CORS')) {
+      msg = `CORS blocked — the browser can't call the Anthropic API directly. We need a small proxy (Cloudflare Worker). Ask me to set it up — it takes 5 minutes and is free.`;
+    }
+    document.getElementById('ai-output').innerHTML = `
+      <div style="padding:16px 20px;background:var(--danger-light);border-radius:8px;color:var(--danger);font-size:13px">
+        <strong>Error:</strong> ${msg}
+      </div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✨ Generate AI Insights';
+  }
+}
+
+function renderInsightCards(insights, isAI) {
+  const levelStyles = {
+    good:    { bg:'#f0fdf4', border:'#86efac', icon_bg:'#dcfce7', text:'#166534' },
+    ok:      { bg:'#eff6ff', border:'#93c5fd', icon_bg:'#dbeafe', text:'#1e40af' },
+    warning: { bg:'#fffbeb', border:'#fcd34d', icon_bg:'#fef3c7', text:'#92400e' },
+    alert:   { bg:'#fef2f2', border:'#fca5a5', icon_bg:'#fee2e2', text:'#991b1b' },
+    info:    { bg:'#f8fafc', border:'#cbd5e1', icon_bg:'#f1f5f9', text:'#475569' },
+  };
+
+  const html = insights.map(ins => {
+    const s = levelStyles[ins.level] || levelStyles.info;
+    return `
+      <div style="background:${s.bg};border:1.5px solid ${s.border};border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start">
+        <div style="width:38px;height:38px;border-radius:10px;background:${s.icon_bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${ins.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:14px;color:${s.text};margin-bottom:4px">${ins.title}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.5">${ins.body}</div>
+          ${ins.action ? `<div style="margin-top:8px;font-size:12px;font-weight:600;color:${s.text}">→ ${ins.action}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('ai-output').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      ${isAI ? `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-bottom:4px"><span>✨</span> Generated by Claude AI · ${monthLabel(selectedBudgetMonth)}</div>` : ''}
+      ${html}
+    </div>`;
+}
+
+function renderInsights() {
+  const aiKey  = getAIKey();
+  const smart  = generateSmartInsights();
+  const md     = getMonthData(selectedBudgetMonth);
+  const income = monthlyTotal(md.income);
+  const exp    = monthlyTotal(md.expenses);
+  const surplus= income - exp;
+  const rate   = income > 0 ? Math.round(surplus / income * 100) : 0;
+
+  // Health score
+  let score = 0;
+  if (rate >= 20) score += 40; else if (rate >= 10) score += 28; else if (rate > 0) score += 14;
+  if (md.income.length > 1) score += 10;
+  if ((state.goals || []).some(g => !g.achieved)) score += 15;
+  const contractPaid = state.buildContract.stages.filter(s=>s.paid).reduce((s,x)=>s+x.amount,0);
+  if (contractPaid > 0) score += 10;
+  if (exp > 0 && exp < income) score += 25;
+  const scoreColor = score >= 70 ? '#10b981' : score >= 45 ? '#f59e0b' : '#ef4444';
+  const scoreLabel = score >= 70 ? 'Great shape' : score >= 45 ? 'On track' : 'Needs attention';
+
+  document.getElementById('insights-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="prevInsightsMonth()" style="font-size:16px;padding:2px 10px">‹</button>
+      <span style="font-size:16px;font-weight:600;min-width:140px;text-align:center">${monthLabel(selectedBudgetMonth)}</span>
+      <button class="btn btn-sm" onclick="nextInsightsMonth()" style="font-size:16px;padding:2px 10px">›</button>
+    </div>
+
+    <div class="cards" style="margin-bottom:24px">
+      <div class="card" style="border-top:3px solid ${scoreColor}">
+        <div class="card-label">Financial Health</div>
+        <div class="card-value" style="color:${scoreColor}">${score}/100</div>
+        <div class="card-sub">${scoreLabel}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Savings Rate</div>
+        <div class="card-value ${rate >= 20 ? 'green' : rate >= 10 ? 'orange' : 'red'}">${rate}%</div>
+        <div class="card-sub">${aud(Math.max(surplus,0))}/month saved</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Monthly Surplus</div>
+        <div class="card-value ${surplus >= 0 ? 'green' : 'red'}">${aud(Math.abs(surplus))}</div>
+        <div class="card-sub">${surplus >= 0 ? 'available' : 'overspending'}</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Income / Expenses</div>
+        <div class="card-value">${aud(income)}</div>
+        <div class="card-sub">vs ${aud(exp)} out</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px">
+
+      <!-- Smart insights (always shown) -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">📊 Smart Insights</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${generateSmartInsightsHTML(smart)}
+        </div>
+      </div>
+
+      <!-- AI insights panel -->
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">✨ AI Insights (Claude)</div>
+        <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">Anthropic API Key</div>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="ai-key-input" class="form-input" style="flex:1;font-size:13px"
+              placeholder="sk-ant-…" value="${aiKey}"
+              onchange="saveAIKey(this.value)">
+            <button class="btn btn-primary btn-sm" id="ai-run-btn" onclick="runAIInsights()">✨ Generate AI Insights</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Key stored locally on this device only. Get one at console.anthropic.com</div>
+        </div>
+        <div id="ai-output">
+          <div style="padding:32px 20px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--surface2);border-radius:12px;border:1.5px dashed var(--border)">
+            Enter your API key and click Generate to get personalised AI insights from Claude.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
+}
+
+function generateSmartInsightsHTML(insights) {
+  const levelStyles = {
+    good:    { bg:'#f0fdf4', border:'#86efac', text:'#166534' },
+    ok:      { bg:'#eff6ff', border:'#93c5fd', text:'#1e40af' },
+    warning: { bg:'#fffbeb', border:'#fcd34d', text:'#92400e' },
+    alert:   { bg:'#fef2f2', border:'#fca5a5', text:'#991b1b' },
+    info:    { bg:'#f8fafc', border:'#cbd5e1', text:'#475569' },
+  };
+  return insights.map(ins => {
+    const s = levelStyles[ins.level] || levelStyles.info;
+    return `
+      <div style="background:${s.bg};border:1.5px solid ${s.border};border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
+        <span style="font-size:20px;flex-shrink:0;line-height:1.3">${ins.icon}</span>
+        <div>
+          <div style="font-weight:700;font-size:13px;color:${s.text};margin-bottom:3px">${ins.title}</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.5">${ins.body}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function prevInsightsMonth() {
+  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  safeRender(renderInsights);
+  safeRender(renderMoneyDashboard);
+  safeRender(renderBudget);
+}
+
+function nextInsightsMonth() {
+  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const d = new Date(y, m, 1);
+  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  safeRender(renderInsights);
+  safeRender(renderMoneyDashboard);
+  safeRender(renderBudget);
+}
+
 function clearActivityLog() {
   if (!confirm('Clear the entire activity log? This cannot be undone.')) return;
   state.activityLog = [];
@@ -4325,6 +4701,7 @@ function safeRender(fn) {
 }
 
 function renderAll() {
+  safeRender(renderInsights);
   safeRender(renderMoneyDashboard);
   safeRender(renderDashboard);
   safeRender(renderBuild);
@@ -4540,6 +4917,34 @@ async function removeReceipt(id, itemKey, itemName) {
   await refreshReceiptCounts();
   renderBuild();
   await renderReceiptsList(itemKey, itemName);
+}
+
+// ─── PWA install prompt ───────────────────────────
+let _installPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  const btn = document.getElementById('install-btn');
+  if (btn) btn.style.display = 'flex';
+});
+
+window.addEventListener('appinstalled', () => {
+  _installPrompt = null;
+  const btn = document.getElementById('install-btn');
+  if (btn) btn.style.display = 'none';
+});
+
+function installApp() {
+  if (!_installPrompt) return;
+  _installPrompt.prompt();
+  _installPrompt.userChoice.then(() => { _installPrompt = null; });
+}
+
+// ─── Service Worker ───────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/home-budget/sw.js', { scope: '/home-budget/' })
+    .catch(err => console.warn('SW registration failed:', err));
 }
 
 // Init — rendering is triggered by Firestore onSnapshot after auth resolves
