@@ -3082,17 +3082,9 @@ function generateSmartInsights() {
   return insights;
 }
 
-async function runAIInsights() {
-  const key = getAIKey();
-  if (!key) {
-    document.getElementById('ai-output').innerHTML = `
-      <div style="padding:20px;text-align:center;color:var(--text-muted)">
-        <p style="margin-bottom:12px">Enter your Anthropic API key in the field above to enable AI insights.</p>
-        <p style="font-size:12px">Get a key at <strong>console.anthropic.com</strong></p>
-      </div>`;
-    return;
-  }
+const PROXY_URL = 'https://home-finance-proxy.fuscocl.workers.dev';
 
+async function runAIInsights() {
   const btn = document.getElementById('ai-run-btn');
   btn.disabled = true;
   btn.textContent = 'Analysing…';
@@ -3142,14 +3134,9 @@ Format your response as a JSON array of insight objects, each with:
 Reply with ONLY the JSON array, no other text.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(PROXY_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-request-header': 'true'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
@@ -3273,19 +3260,12 @@ function renderInsights() {
       <!-- AI insights panel -->
       <div>
         <div style="font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">✨ AI Insights (Claude)</div>
-        <div style="background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:8px">Anthropic API Key</div>
-          <div style="display:flex;gap:8px">
-            <input type="password" id="ai-key-input" class="form-input" style="flex:1;font-size:13px"
-              placeholder="sk-ant-…" value="${aiKey}"
-              onchange="saveAIKey(this.value)">
-            <button class="btn btn-primary btn-sm" id="ai-run-btn" onclick="runAIInsights()">✨ Generate AI Insights</button>
-          </div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Key stored locally on this device only. Get one at console.anthropic.com</div>
+        <div style="margin-bottom:12px">
+          <button class="btn btn-primary" id="ai-run-btn" onclick="runAIInsights()" style="width:100%;justify-content:center">✨ Generate AI Insights</button>
         </div>
         <div id="ai-output">
           <div style="padding:32px 20px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--surface2);border-radius:12px;border:1.5px dashed var(--border)">
-            Enter your API key and click Generate to get personalised AI insights from Claude.
+            Click Generate to get personalised AI insights from Claude.
           </div>
         </div>
       </div>
