@@ -1181,6 +1181,7 @@ const DEFAULT_DATA = {
   goals: [],
   scenarios: [],
   activityLog: [],
+  householdProfile: { adults: 2, children: 0 },
   expenseCategories: ['Mortgage / Rent', 'Insurance', 'Utilities', 'Groceries', 'Transport', 'Childcare / Education', 'Health', 'Entertainment', 'Subscriptions', 'Dining Out', 'Clothing', 'Personal Care', 'Savings / Investment', 'Other'],
   incomeCategories: ['Salary', 'Freelance / Contract', 'Rental Income', 'Government / Benefits', 'Investment', 'Other'],
   budget: {
@@ -1203,6 +1204,7 @@ function loadData() {
     if (!d.furniture) d.furniture = [];
     if (!d.appliances) d.appliances = [];
     if (!d.activityLog) d.activityLog = [];
+    if (!d.householdProfile) d.householdProfile = { adults: 2, children: 0 };
     if (!d.expenseCategories) d.expenseCategories = JSON.parse(JSON.stringify(DEFAULT_DATA.expenseCategories));
     if (!d.incomeCategories)  d.incomeCategories  = JSON.parse(JSON.stringify(DEFAULT_DATA.incomeCategories));
     // migrate dueDay → dueDate
@@ -2977,9 +2979,125 @@ function updateColor(type, key, value) {
   renderDashboard();
 }
 
+function updateHouseholdProfile(field, value) {
+  if (!state.householdProfile) state.householdProfile = { adults: 2, children: 0 };
+  state.householdProfile[field] = value;
+  saveData(state);
+  safeRender(renderInsights);
+}
+
 // ─────────────────────────────────────────────────
 // INSIGHTS
 // ─────────────────────────────────────────────────
+
+function getBenchmarks(monthlyIncome, adults, children) {
+  const people = adults + children;
+  // Australian household benchmarks (ABS Household Expenditure Survey + MoneySmart + ACCC)
+  return [
+    {
+      category: 'Mortgage / Rent',
+      min: monthlyIncome * 0.20,
+      max: monthlyIncome * 0.30,
+      label: '20–30% of income',
+      source: 'ABS / MoneySmart',
+      needs: true
+    },
+    {
+      category: 'Groceries',
+      min: 380 + (adults - 1) * 260 + children * 160,
+      max: 560 + (adults - 1) * 360 + children * 220,
+      label: `$${Math.round(380 + (adults-1)*260 + children*160)}–$${Math.round(560 + (adults-1)*360 + children*220)}/month for ${people} ${people===1?'person':'people'}`,
+      source: 'ABS HES 2022',
+      needs: true
+    },
+    {
+      category: 'Transport',
+      min: monthlyIncome * 0.08,
+      max: monthlyIncome * 0.15,
+      label: '8–15% of income',
+      source: 'ABS HES 2022',
+      needs: true
+    },
+    {
+      category: 'Utilities',
+      min: 180 + adults * 25 + children * 15,
+      max: 360 + adults * 40 + children * 25,
+      label: `$${Math.round(180+adults*25+children*15)}–$${Math.round(360+adults*40+children*25)}/month`,
+      source: 'AER / ABS',
+      needs: true
+    },
+    {
+      category: 'Insurance',
+      min: 180 + adults * 40 + children * 20,
+      max: 420 + adults * 60 + children * 30,
+      label: `$${Math.round(180+adults*40+children*20)}–$${Math.round(420+adults*60+children*30)}/month`,
+      source: 'APRA industry avg',
+      needs: true
+    },
+    {
+      category: 'Health',
+      min: 60 * adults + 30 * children,
+      max: 180 * adults + 60 * children,
+      label: `$${60*adults+30*children}–$${180*adults+60*children}/month`,
+      source: 'AIHW / ABS',
+      needs: true
+    },
+    ...(children > 0 ? [{
+      category: 'Childcare / Education',
+      min: 700 * children,
+      max: 2200 * children,
+      label: `$700–$2,200/month per child (before subsidies)`,
+      source: 'ACCC Childcare Report',
+      needs: true
+    }] : []),
+    {
+      category: 'Dining Out',
+      min: monthlyIncome * 0.02,
+      max: monthlyIncome * 0.05,
+      label: '2–5% of income',
+      source: 'MoneySmart',
+      needs: false
+    },
+    {
+      category: 'Entertainment',
+      min: monthlyIncome * 0.02,
+      max: monthlyIncome * 0.05,
+      label: '2–5% of income',
+      source: 'MoneySmart',
+      needs: false
+    },
+    {
+      category: 'Subscriptions',
+      min: 30,
+      max: 120,
+      label: '$30–$120/month',
+      source: 'Industry average',
+      needs: false
+    },
+    {
+      category: 'Clothing',
+      min: 50 * adults + 30 * children,
+      max: 150 * adults + 80 * children,
+      label: `$${50*adults+30*children}–$${150*adults+80*children}/month`,
+      source: 'ABS HES 2022',
+      needs: false
+    },
+    {
+      category: 'Savings / Investment',
+      min: monthlyIncome * 0.10,
+      max: monthlyIncome * 0.20,
+      label: '10–20% of income (aim for 20%)',
+      source: '50/30/20 rule',
+      needs: false
+    },
+  ];
+}
+
+function getBenchmarkStatus(actual, min, max) {
+  if (actual < min * 0.9) return 'under';
+  if (actual > max * 1.1) return 'over';
+  return 'within';
+}
 
 const INSIGHTS_KEY = 'home_finance_ai_key';
 
@@ -3105,13 +3223,27 @@ async function runAIInsights() {
     return { month: mo, income: monthlyTotal(m.income), expenses: monthlyTotal(m.expenses) };
   });
 
+  const profile  = state.householdProfile || { adults: 2, children: 0 };
+  const benchmarks = getBenchmarks(totalIncome, profile.adults, profile.children)
+    .filter(b => byCategory[b.category] !== undefined)
+    .map(b => ({
+      category: b.category,
+      yourSpend: Math.round(byCategory[b.category] || 0),
+      benchmarkMin: Math.round(b.min),
+      benchmarkMax: Math.round(b.max),
+      benchmarkLabel: b.label,
+      status: getBenchmarkStatus(byCategory[b.category] || 0, b.min, b.max)
+    }));
+
   const budgetSummary = {
     month: monthLabel(selectedBudgetMonth),
+    household: { adults: profile.adults, children: profile.children, totalPeople: profile.adults + profile.children },
     monthlyIncome: totalIncome,
     monthlyExpenses: totalExpenses,
     surplus,
     savingsRatePct: savingsRate,
     expensesByCategory: byCategory,
+    benchmarkComparisons: benchmarks,
     incomeStreams: md.income.map(i => ({ name: i.name, monthlyAmount: itemMonthly(i) })),
     last6MonthsTrend: last6,
     activeGoals: (state.goals || []).filter(g => !g.achieved).map(g => ({ name: g.name, type: g.type })),
@@ -3119,10 +3251,16 @@ async function runAIInsights() {
     currency: 'AUD'
   };
 
-  const prompt = `You are a friendly but direct personal finance advisor for an Australian family. Analyse their budget data and give 4-6 concise, specific, actionable insights.
+  const prompt = `You are a friendly but direct personal finance advisor for an Australian family. Analyse their budget data and benchmark comparisons, then give 4-6 concise, specific, actionable insights.
 
 Budget data for ${budgetSummary.month}:
 ${JSON.stringify(budgetSummary, null, 2)}
+
+Focus especially on:
+- Where their spending is above or below Australian household benchmarks for their household size
+- How their 50/30/20 split compares to the ideal
+- Specific opportunities to improve based on the benchmark data
+- What they're doing well compared to benchmarks
 
 Format your response as a JSON array of insight objects, each with:
 - "title": short headline (max 8 words)
@@ -3199,14 +3337,127 @@ function renderInsightCards(insights, isAI) {
     </div>`;
 }
 
+function renderBenchmarksSection(income, adults, children, byCategory) {
+  const benchmarks = getBenchmarks(income, adults, children);
+  const people = adults + children;
+
+  // 50/30/20 calculation
+  const NEEDS_CATS  = ['Mortgage / Rent','Insurance','Utilities','Groceries','Transport','Health','Childcare / Education'];
+  const WANTS_CATS  = ['Dining Out','Entertainment','Subscriptions','Clothing','Personal Care'];
+  const SAVING_CATS = ['Savings / Investment'];
+
+  const needsTotal   = Object.entries(byCategory).filter(([c]) => NEEDS_CATS.includes(c)).reduce((s,[,v]) => s+v, 0);
+  const wantsTotal   = Object.entries(byCategory).filter(([c]) => WANTS_CATS.includes(c)).reduce((s,[,v]) => s+v, 0);
+  const savingsTotal = Object.entries(byCategory).filter(([c]) => SAVING_CATS.includes(c)).reduce((s,[,v]) => s+v, 0);
+  const needsPct   = income > 0 ? Math.round(needsTotal   / income * 100) : 0;
+  const wantsPct   = income > 0 ? Math.round(wantsTotal   / income * 100) : 0;
+  const savingsPct = income > 0 ? Math.round(savingsTotal / income * 100) : 0;
+
+  function ruleBar(label, actual, target, color) {
+    const pct = Math.min(actual, 100);
+    const over = actual > target;
+    return `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span style="font-weight:600">${label}</span>
+          <span style="color:${over ? 'var(--danger)' : 'var(--success)'};font-weight:600">
+            ${actual}% <span style="font-weight:400;color:var(--text-muted)">/ ${target}% target</span>
+          </span>
+        </div>
+        <div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;position:relative">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${Math.min(target,100)}%;border-right:2px dashed #94a3b8;z-index:1"></div>
+          <div style="height:100%;width:${pct}%;background:${over ? 'var(--danger)' : color};border-radius:4px;opacity:0.85;transition:width .3s"></div>
+        </div>
+      </div>`;
+  }
+
+  // Benchmark rows
+  const rows = benchmarks.filter(b => byCategory[b.category] !== undefined || b.category === 'Savings / Investment').map(b => {
+    const actual = byCategory[b.category] || 0;
+    const status = getBenchmarkStatus(actual, b.min, b.max);
+    const statusColor = status === 'under' ? '#3b82f6' : status === 'within' ? '#10b981' : '#ef4444';
+    const statusLabel = status === 'under' ? 'Below avg' : status === 'within' ? 'On track' : 'Above avg';
+    const barPct = b.max > 0 ? Math.min(actual / (b.max * 1.5) * 100, 100) : 0;
+    const benchmarkPct = b.max > 0 ? Math.min(b.max / (b.max * 1.5) * 100, 100) : 0;
+    const catColor = colors.expense[b.category] || '#94a3b8';
+    return `
+      <tr>
+        <td style="border-left:3px solid ${catColor};font-weight:500">${b.category}</td>
+        <td class="amount" style="font-weight:600">${actual > 0 ? aud(actual) : '<span style="color:var(--text-muted)">—</span>'}</td>
+        <td style="color:var(--text-muted);font-size:12px">${b.label}</td>
+        <td style="min-width:100px">
+          <div style="position:relative;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden">
+            <div style="position:absolute;left:0;top:0;height:100%;width:${benchmarkPct.toFixed(1)}%;background:#e2e8f0;border-radius:4px"></div>
+            ${actual > 0 ? `<div style="position:absolute;left:0;top:0;height:100%;width:${barPct.toFixed(1)}%;background:${statusColor};border-radius:4px;opacity:0.85"></div>` : ''}
+          </div>
+        </td>
+        <td><span style="font-size:11px;padding:2px 7px;border-radius:99px;background:${statusColor}20;color:${statusColor};font-weight:600;white-space:nowrap">${statusLabel}</span></td>
+        <td style="font-size:11px;color:var(--text-muted)">${b.source}</td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <div class="section" style="margin-bottom:20px">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Budget Benchmarks</div>
+          <div class="section-subtitle">Australian household averages for ${adults} adult${adults!==1?'s':''}${children > 0 ? ` + ${children} child${children!==1?'ren':''}` : ''} · Sources: ABS HES 2022, MoneySmart, ACCC</div>
+        </div>
+        <a href="/home-budget/#" onclick="document.querySelector('[data-tab=settings]').click();return false"
+           style="font-size:12px;color:var(--primary)">Edit household profile</a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;padding:4px 20px 16px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">50/30/20 Rule</div>
+          ${ruleBar('Needs (housing, food, transport…)', needsPct, 50, '#3b82f6')}
+          ${ruleBar('Wants (dining, entertainment…)',    wantsPct, 30, '#f59e0b')}
+          ${ruleBar('Savings / investments',             savingsPct, 20, '#10b981')}
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Dashed line = target. ${income === 0 ? 'Add income to activate.' : ''}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted)">
+          <div style="font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;color:var(--text-muted)">Your split vs 50/30/20</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            ${[
+              { label:'Needs', pct:needsPct, target:50, amt:needsTotal, color:'#3b82f6' },
+              { label:'Wants', pct:wantsPct, target:30, amt:wantsTotal, color:'#f59e0b' },
+              { label:'Saving', pct:savingsPct, target:20, amt:savingsTotal, color:'#10b981' },
+            ].map(r => `
+              <div style="text-align:center;min-width:70px">
+                <div style="font-size:22px;font-weight:800;color:${r.pct > r.target * 1.1 ? 'var(--danger)' : r.pct >= r.target * 0.8 ? r.color : 'var(--text-muted)'}">${r.pct}%</div>
+                <div style="font-size:11px;font-weight:600;color:var(--text-muted)">${r.label}</div>
+                <div style="font-size:11px;color:var(--text-muted)">${aud(r.amt)}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      ${rows ? `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Category</th><th class="amount">Your spend</th><th>Benchmark range</th><th>Bar</th><th>Status</th><th>Source</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>` : `<div style="padding:16px 20px;color:var(--text-muted);font-size:13px">Add expenses to see benchmark comparisons.</div>`}
+    </div>`;
+}
+
 function renderInsights() {
-  const aiKey  = getAIKey();
-  const smart  = generateSmartInsights();
-  const md     = getMonthData(selectedBudgetMonth);
-  const income = monthlyTotal(md.income);
-  const exp    = monthlyTotal(md.expenses);
-  const surplus= income - exp;
-  const rate   = income > 0 ? Math.round(surplus / income * 100) : 0;
+  const aiKey   = getAIKey();
+  const smart   = generateSmartInsights();
+  const md      = getMonthData(selectedBudgetMonth);
+  const income  = monthlyTotal(md.income);
+  const exp     = monthlyTotal(md.expenses);
+  const surplus = income - exp;
+  const rate    = income > 0 ? Math.round(surplus / income * 100) : 0;
+  const adults   = (state.householdProfile || {}).adults   || 2;
+  const children = (state.householdProfile || {}).children || 0;
+
+  const byCategory = {};
+  md.expenses.forEach(e => {
+    const cat = e.category || 'Other';
+    byCategory[cat] = (byCategory[cat] || 0) + itemMonthly(e);
+  });
 
   // Health score
   let score = 0;
@@ -3249,7 +3500,9 @@ function renderInsights() {
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px">
+    ${renderBenchmarksSection(income, adults, children, byCategory)}
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;margin-top:20px">
 
       <!-- Smart insights (always shown) -->
       <div>
@@ -3443,6 +3696,27 @@ function renderSettings() {
       </div>
       ${rawData ? `<button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">Show raw localStorage data</button>
       <pre style="display:none;margin-top:8px;background:var(--surface2);padding:12px;border-radius:8px;font-size:11px;overflow:auto;max-height:200px;white-space:pre-wrap;word-break:break-all">${rawData.replace(/</g,'&lt;')}</pre>` : ''}
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Household Profile</div>
+          <div class="section-subtitle">Used to calculate budget benchmarks in the Insights page</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px;padding:4px 0 8px;flex-wrap:wrap">
+        <div class="form-group" style="max-width:160px">
+          <label class="form-label">Number of Adults</label>
+          <input type="number" class="form-input" min="1" max="10" value="${state.householdProfile.adults}"
+            onchange="updateHouseholdProfile('adults', parseInt(this.value)||1)">
+        </div>
+        <div class="form-group" style="max-width:160px">
+          <label class="form-label">Number of Children</label>
+          <input type="number" class="form-input" min="0" max="10" value="${state.householdProfile.children}"
+            onchange="updateHouseholdProfile('children', parseInt(this.value)||0)">
+        </div>
+      </div>
     </div>
 
     <div class="section">
