@@ -1181,7 +1181,11 @@ const DEFAULT_DATA = {
   goals: [],
   scenarios: [],
   activityLog: [],
-  householdProfile: { adults: 2, children: 0 },
+  householdProfile: {
+    members: [{ role: 'adult', age: null }, { role: 'adult', age: null }],
+    pets: [],
+    cars: 1
+  },
   expenseCategories: ['Mortgage / Rent', 'Insurance', 'Utilities', 'Groceries', 'Transport', 'Childcare / Education', 'Health', 'Entertainment', 'Subscriptions', 'Dining Out', 'Clothing', 'Personal Care', 'Savings / Investment', 'Other'],
   incomeCategories: ['Salary', 'Freelance / Contract', 'Rental Income', 'Government / Benefits', 'Investment', 'Other'],
   budget: {
@@ -1204,7 +1208,23 @@ function loadData() {
     if (!d.furniture) d.furniture = [];
     if (!d.appliances) d.appliances = [];
     if (!d.activityLog) d.activityLog = [];
-    if (!d.householdProfile) d.householdProfile = { adults: 2, children: 0 };
+    if (!d.householdProfile) {
+      d.householdProfile = { members: [{ role:'adult', age:null },{ role:'adult', age:null }], pets: [], cars: 1 };
+    } else if ('adults' in d.householdProfile) {
+      // migrate old { adults, children } → new richer format
+      const a = d.householdProfile.adults || 2;
+      const c = d.householdProfile.children || 0;
+      d.householdProfile = {
+        members: [
+          ...Array.from({length: a}, () => ({ role:'adult', age:null })),
+          ...Array.from({length: c}, () => ({ role:'child', age:null }))
+        ],
+        pets: [],
+        cars: 1
+      };
+    }
+    if (!d.householdProfile.pets)  d.householdProfile.pets = [];
+    if (d.householdProfile.cars === undefined) d.householdProfile.cars = 1;
     if (!d.expenseCategories) d.expenseCategories = JSON.parse(JSON.stringify(DEFAULT_DATA.expenseCategories));
     if (!d.incomeCategories)  d.incomeCategories  = JSON.parse(JSON.stringify(DEFAULT_DATA.incomeCategories));
     // migrate dueDay → dueDate
@@ -2979,11 +2999,41 @@ function updateColor(type, key, value) {
   renderDashboard();
 }
 
-function updateHouseholdProfile(field, value) {
-  if (!state.householdProfile) state.householdProfile = { adults: 2, children: 0 };
-  state.householdProfile[field] = value;
+function profileAdults()   { return (state.householdProfile.members||[]).filter(m=>m.role==='adult').length  || 1; }
+function profileChildren() { return (state.householdProfile.members||[]).filter(m=>m.role==='child').length; }
+
+function addHouseholdMember(role) {
+  state.householdProfile.members.push({ role: role||'adult', age: null });
+  saveData(state); renderSettings();
+}
+function removeHouseholdMember(idx) {
+  state.householdProfile.members.splice(idx, 1);
+  saveData(state); renderSettings();
+}
+function updateMember(idx, field, value) {
+  const m = state.householdProfile.members[idx];
+  if (!m) return;
+  m[field] = value;
   saveData(state);
-  safeRender(renderInsights);
+  if (field === 'role') renderSettings();
+}
+function addPet(type) {
+  state.householdProfile.pets.push({ type: type||'dog', name: '' });
+  saveData(state); renderSettings();
+}
+function removePet(idx) {
+  state.householdProfile.pets.splice(idx, 1);
+  saveData(state); renderSettings();
+}
+function updatePet(idx, field, value) {
+  const p = state.householdProfile.pets[idx];
+  if (!p) return;
+  p[field] = value;
+  saveData(state);
+}
+function updateCars(n) {
+  state.householdProfile.cars = n;
+  saveData(state);
 }
 
 // ─────────────────────────────────────────────────
@@ -3223,8 +3273,7 @@ async function runAIInsights() {
     return { month: mo, income: monthlyTotal(m.income), expenses: monthlyTotal(m.expenses) };
   });
 
-  const profile  = state.householdProfile || { adults: 2, children: 0 };
-  const benchmarks = getBenchmarks(totalIncome, profile.adults, profile.children)
+  const benchmarks = getBenchmarks(totalIncome, profileAdults(), profileChildren())
     .filter(b => byCategory[b.category] !== undefined)
     .map(b => ({
       category: b.category,
@@ -3237,7 +3286,20 @@ async function runAIInsights() {
 
   const budgetSummary = {
     month: monthLabel(selectedBudgetMonth),
-    household: { adults: profile.adults, children: profile.children, totalPeople: profile.adults + profile.children },
+    household: (function() {
+      const hp = state.householdProfile || {};
+      const members = (hp.members||[]);
+      const adults = members.filter(m=>m.role==='adult');
+      const children = members.filter(m=>m.role==='child');
+      return {
+        adults: adults.length || 2,
+        children: children.length,
+        totalPeople: members.length || 2,
+        memberAges: members.map(m=>({ role:m.role, age:m.age })),
+        pets: (hp.pets||[]).map(p=>p.type),
+        cars: hp.cars||0
+      };
+    })(),
     monthlyIncome: totalIncome,
     monthlyExpenses: totalExpenses,
     surplus,
@@ -3450,8 +3512,8 @@ function renderInsights() {
   const exp     = monthlyTotal(md.expenses);
   const surplus = income - exp;
   const rate    = income > 0 ? Math.round(surplus / income * 100) : 0;
-  const adults   = (state.householdProfile || {}).adults   || 2;
-  const children = (state.householdProfile || {}).children || 0;
+  const adults   = profileAdults();
+  const children = profileChildren();
 
   const byCategory = {};
   md.expenses.forEach(e => {
@@ -3705,16 +3767,73 @@ function renderSettings() {
           <div class="section-subtitle">Used to calculate budget benchmarks in the Insights page</div>
         </div>
       </div>
-      <div style="display:flex;gap:24px;padding:4px 0 8px;flex-wrap:wrap">
-        <div class="form-group" style="max-width:160px">
-          <label class="form-label">Number of Adults</label>
-          <input type="number" class="form-input" min="1" max="10" value="${state.householdProfile.adults}"
-            onchange="updateHouseholdProfile('adults', parseInt(this.value)||1)">
+
+      <!-- Members -->
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-weight:600;font-size:13px">Household Members</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('adult')">+ Adult</button>
+            <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('child')">+ Child</button>
+          </div>
         </div>
-        <div class="form-group" style="max-width:160px">
-          <label class="form-label">Number of Children</label>
-          <input type="number" class="form-input" min="0" max="10" value="${state.householdProfile.children}"
-            onchange="updateHouseholdProfile('children', parseInt(this.value)||0)">
+        ${(state.householdProfile.members||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No members added yet.</p>` : ''}
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${(state.householdProfile.members||[]).map((m,i) => `
+          <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px">
+            <span style="font-size:18px">${m.role === 'child' ? '👶' : '🧑'}</span>
+            <select class="form-control" style="width:100px;padding:4px 8px;font-size:13px" onchange="updateMember(${i},'role',this.value)">
+              <option value="adult"${m.role==='adult'?' selected':''}>Adult</option>
+              <option value="child"${m.role==='child'?' selected':''}>Child</option>
+            </select>
+            <input type="number" class="form-control" style="width:80px;padding:4px 8px;font-size:13px" placeholder="Age" min="0" max="120"
+              value="${m.age !== null && m.age !== undefined ? m.age : ''}"
+              onchange="updateMember(${i},'age', this.value===''?null:parseInt(this.value))">
+            <span style="color:var(--text-muted);font-size:12px">yrs</span>
+            <button onclick="removeHouseholdMember(${i})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;line-height:1;padding:0 2px" title="Remove">&times;</button>
+          </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Pets -->
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-weight:600;font-size:13px">Pets</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="addPet('dog')">+ Dog</button>
+            <button class="btn btn-ghost btn-sm" onclick="addPet('cat')">+ Cat</button>
+            <button class="btn btn-ghost btn-sm" onclick="addPet('other')">+ Other</button>
+          </div>
+        </div>
+        ${(state.householdProfile.pets||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No pets added.</p>` : ''}
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${(state.householdProfile.pets||[]).map((p,i) => {
+            const petIcon = p.type==='dog' ? '🐕' : p.type==='cat' ? '🐈' : p.type==='bird' ? '🐦' : '🐾';
+            return `
+          <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px">
+            <span style="font-size:18px">${petIcon}</span>
+            <select class="form-control" style="width:90px;padding:4px 8px;font-size:13px" onchange="updatePet(${i},'type',this.value);renderSettings()">
+              <option value="dog"${p.type==='dog'?' selected':''}>Dog</option>
+              <option value="cat"${p.type==='cat'?' selected':''}>Cat</option>
+              <option value="bird"${p.type==='bird'?' selected':''}>Bird</option>
+              <option value="other"${p.type==='other'?' selected':''}>Other</option>
+            </select>
+            <input type="text" class="form-control" style="flex:1;padding:4px 8px;font-size:13px" placeholder="Name (optional)"
+              value="${(p.name||'').replace(/"/g,'&quot;')}"
+              oninput="updatePet(${i},'name',this.value)">
+            <button onclick="removePet(${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:18px;line-height:1;padding:0 2px" title="Remove">&times;</button>
+          </div>`;}).join('')}
+        </div>
+      </div>
+
+      <!-- Cars -->
+      <div>
+        <span style="font-weight:600;font-size:13px;display:block;margin-bottom:8px">Cars / Vehicles</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">🚗</span>
+          <input type="number" class="form-control" style="width:80px;padding:4px 8px;font-size:13px" min="0" max="20"
+            value="${state.householdProfile.cars||0}" onchange="updateCars(parseInt(this.value)||0)">
+          <span style="color:var(--text-muted);font-size:13px">vehicle(s)</span>
         </div>
       </div>
     </div>
