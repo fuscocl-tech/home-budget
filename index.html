@@ -3150,7 +3150,9 @@ Reply with ONLY the JSON array, no other text.`;
     }
 
     const data = await res.json();
-    const text = data.content[0].text.trim();
+    let text = data.content[0].text.trim();
+    // Strip markdown code fences if present
+    text = text.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/,'').trim();
     const aiInsights = JSON.parse(text);
     renderInsightCards(aiInsights, true);
   } catch(err) {
