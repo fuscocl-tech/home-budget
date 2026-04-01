@@ -1204,6 +1204,9 @@ const DEFAULT_DATA = {
     expenses: [],
     actuals: {},
     months: {}
+  },
+  settings: {
+    autoFillMonths: false
   }
 };
 
@@ -1236,6 +1239,7 @@ function loadData() {
     }
     if (!d.householdProfile.pets)  d.householdProfile.pets = [];
     if (d.householdProfile.cars === undefined) d.householdProfile.cars = 1;
+    if (!d.settings) d.settings = { autoFillMonths: false };
     if (!d.expenseCategories) d.expenseCategories = JSON.parse(JSON.stringify(DEFAULT_DATA.expenseCategories));
     if (!d.incomeCategories)  d.incomeCategories  = JSON.parse(JSON.stringify(DEFAULT_DATA.incomeCategories));
     // migrate dueDay → dueDate
@@ -1289,6 +1293,26 @@ function ensureMonthOverride(monthStr) {
     };
   }
   return state.budget.months[monthStr];
+}
+
+function prevMonthStr(monthStr) {
+  const [y, m] = monthStr.split('-').map(Number);
+  const d = new Date(y, m - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+function copyMonthFromPrevious(toMonth) {
+  const fromMonth = prevMonthStr(toMonth);
+  const fromData  = getMonthData(fromMonth);
+  if (!state.budget.months) state.budget.months = {};
+  state.budget.months[toMonth] = {
+    income:   JSON.parse(JSON.stringify(fromData.income.filter(i => i.recurring !== false))),
+    expenses: JSON.parse(JSON.stringify(fromData.expenses.filter(e => e.recurring !== false)))
+  };
+  logActivity('Auto-filled', `${monthLabel(toMonth)} copied from ${monthLabel(fromMonth)}`);
+  saveData(state);
+  safeRender(renderBudget);
+  safeRender(renderMoneyDashboard);
 }
 
 // ─── Scope confirmation modal ──────────────────────
@@ -1430,6 +1454,10 @@ function nextMonth() {
   const [y, m] = selectedBudgetMonth.split('-').map(Number);
   const d = new Date(y, m, 1);
   selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  if (state.settings && state.settings.autoFillMonths && !isMonthCustomized(selectedBudgetMonth)) {
+    copyMonthFromPrevious(selectedBudgetMonth);
+    return;
+  }
   renderBudget();
 }
 
@@ -3641,6 +3669,12 @@ function nextInsightsMonth() {
   safeRender(renderBudget);
 }
 
+function updateSetting(key, value) {
+  if (!state.settings) state.settings = {};
+  state.settings[key] = value;
+  saveData(state);
+}
+
 function clearActivityLog() {
   if (!confirm('Clear the entire activity log? This cannot be undone.')) return;
   state.activityLog = [];
@@ -3728,6 +3762,26 @@ function renderSettings() {
   }
 
   let html = `
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Budget Preferences</div>
+          <div class="section-subtitle">Controls how month-to-month budget data is managed</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none">
+          <input type="checkbox" id="pref-autofill" ${(state.settings||{}).autoFillMonths ? 'checked' : ''}
+            onchange="updateSetting('autoFillMonths', this.checked)"
+            style="width:16px;height:16px;margin-top:2px;cursor:pointer;flex-shrink:0">
+          <div>
+            <span style="font-size:13px;font-weight:600">Auto-fill new months from previous month</span>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:3px">When you navigate forward to a month with no data, automatically copy all recurring items from the previous month.</p>
+          </div>
+        </label>
+      </div>
+    </div>
+
     <div class="section">
       <div class="section-header">
         <div>
@@ -3995,12 +4049,24 @@ function renderBudget() {
   const customBadge = isMonthCustomized(selectedBudgetMonth)
     ? `<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--primary);color:#fff;margin-left:8px">Custom</span>`
     : '';
+  const prevMo = prevMonthStr(selectedBudgetMonth);
+  const showCopyBanner = !isMonthCustomized(selectedBudgetMonth);
   html += `
     <div class="month-picker">
       <button class="month-btn" onclick="prevMonth()">&#8249;</button>
       <div class="month-picker-label">${monthLabel(selectedBudgetMonth)}${customBadge}</div>
       <button class="month-btn" onclick="nextMonth()">&#8250;</button>
     </div>
+    ${showCopyBanner ? `
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--primary-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+      <div>
+        <span style="font-size:13px;font-weight:600;color:var(--primary)">Using default budget</span>
+        <span style="font-size:13px;color:var(--text-muted);margin-left:6px">— changes in other months won't appear here</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="copyMonthFromPrevious('${selectedBudgetMonth}')">
+        Copy from ${monthLabel(prevMo)}
+      </button>
+    </div>` : ''}
   `;
 
   if (mi.length > 0 || me.length > 0) {
@@ -4031,8 +4097,9 @@ function renderBudget() {
           <tbody>
             ${mi.length === 0 ? `<tr><td colspan="6"><div class="empty"><div class="empty-icon">💵</div>Add your income sources</div></td></tr>` : mi.map(i => {
               const dueLabel = i.dueDate ? (() => { const [y,m,d] = i.dueDate.split('-'); return `${d}/${m}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
+              const incOneTimeBadge = i.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
               return `<tr>
-              <td style="font-weight:500;border-left:4px solid ${colors.income}">${i.name}</td>
+              <td style="font-weight:500;border-left:4px solid ${colors.income}">${i.name}${incOneTimeBadge}</td>
               <td class="amount">${audD(i.amount)}</td>
               <td>${dueLabel}</td>
               <td style="color:var(--text-muted)">${freqDisplayItem(i)}</td>
@@ -4121,8 +4188,9 @@ function renderBudget() {
                   else varianceHtml = `<span class="var-over">▲ ${aud(Math.abs(variance))}</span>`;
                   const dueLabel = e.dueDate ? (() => { const [y,mo,d] = e.dueDate.split('-'); return `${d}/${mo}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
                   const rowColor = colors.expense[e.category || 'Other'] || '#94a3b8';
+                  const oneTimeBadge = e.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
                   return `<tr>
-                    <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}</td>
+                    <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}${oneTimeBadge}</td>
                     <td><span style="display:inline-block;padding:2px 10px;border-radius:99px;background:${rowColor};color:#fff;font-size:11px;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span></td>
                     <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
                     <td>${dueLabel}</td>
@@ -4430,17 +4498,26 @@ function incomeForm(i = {}) {
         <div class="date-picker-popup hidden" id="dp-popup"></div>
       </div>
     </div>
+    <div class="form-group" style="margin-bottom:0">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
+        <input type="checkbox" id="f-inc-recurring" ${i.recurring === false ? '' : 'checked'} style="width:16px;height:16px;cursor:pointer">
+        <span style="font-size:13px;font-weight:500">Recurring — carry forward to future months</span>
+      </label>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:4px;margin-left:24px">Uncheck for one-time income that shouldn't copy forward.</p>
+    </div>
   `;
 }
 
 function incomeFromForm(id) {
   const freq = document.getElementById('f-inc-freq') ? document.getElementById('f-inc-freq').value : 'monthly';
+  const recurringEl = document.getElementById('f-inc-recurring');
   const obj = {
     id,
     name:      document.getElementById('f-inc-name').value.trim(),
     amount:    parseFloat(document.getElementById('f-inc-amount').value) || 0,
     frequency: freq,
     dueDate:   document.getElementById('f-inc-duedate').value || null,
+    recurring: recurringEl ? recurringEl.checked : true,
   };
   if (freq === 'custom') {
     obj.customEvery = parseInt(document.getElementById('f-inc-custom-n').value) || 1;
@@ -4571,11 +4648,19 @@ function expenseForm(e = {}) {
         <div class="date-picker-popup hidden" id="dp-popup"></div>
       </div>
     </div>
+    <div class="form-group" style="margin-bottom:0">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
+        <input type="checkbox" id="f-exp-recurring" ${e.recurring === false ? '' : 'checked'} style="width:16px;height:16px;cursor:pointer">
+        <span style="font-size:13px;font-weight:500">Recurring — carry forward to future months</span>
+      </label>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:4px;margin-left:24px">Uncheck for one-time expenses that shouldn't copy forward.</p>
+    </div>
   `;
 }
 
 function expenseFromForm(id) {
   const freq = document.getElementById('f-exp-freq') ? document.getElementById('f-exp-freq').value : 'monthly';
+  const recurringEl = document.getElementById('f-exp-recurring');
   const obj = {
     id,
     name:      document.getElementById('f-exp-name').value.trim(),
@@ -4583,6 +4668,7 @@ function expenseFromForm(id) {
     amount:    parseFloat(document.getElementById('f-exp-amount').value) || 0,
     frequency: freq,
     dueDate:   document.getElementById('f-exp-duedate').value || null,
+    recurring: recurringEl ? recurringEl.checked : true,
   };
   if (freq === 'custom') {
     obj.customEvery = parseInt(document.getElementById('f-exp-custom-n').value) || 1;
