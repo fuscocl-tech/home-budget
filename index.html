@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Home Finance</title>
+  <title>Toto</title>
   <link rel="manifest" href="/home-budget/manifest.json">
-  <meta name="theme-color" content="#1e293b">
+  <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Home Finance">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Toto">
   <link rel="apple-touch-icon" href="/home-budget/icons/icon.svg">
   <style>
     :root {
@@ -45,63 +45,104 @@
     /* ─── Sidebar ─────────────────────────────── */
     .sidebar {
       width: var(--sidebar-w);
-      background: #1e293b;
-      color: #fff;
+      background: #fff;
+      color: #1e293b;
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
       position: sticky;
       top: 0;
       height: 100vh;
+      overflow: hidden;
+      transition: width 0.22s ease;
     }
+
+    .sidebar.collapsed { width: 60px; }
 
     .sidebar-logo {
-      padding: 24px 20px 20px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      border-bottom: 1px solid #334155;
+      padding: 0 14px;
+      height: 56px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #1e293b;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      flex-shrink: 0;
     }
 
-    .sidebar-logo span { font-size: 22px; }
+    .sidebar-logo-wordmark {
+      white-space: nowrap;
+      overflow: hidden;
+      transition: opacity 0.15s, width 0.22s;
+    }
 
-    .sidebar nav { padding: 12px 10px; flex: 1; }
+    .sidebar.collapsed .sidebar-logo-wordmark { opacity: 0; width: 0; }
+
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748b;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar-toggle:hover { background: #f1f5f9; color: #1e293b; }
+
+    .sidebar nav { padding: 10px 8px; flex: 1; overflow: hidden; }
 
     .nav-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
+      padding: 9px 10px;
       border-radius: 8px;
-      color: #94a3b8;
+      color: #64748b;
       cursor: pointer;
       font-weight: 500;
       transition: all 0.15s;
       margin-bottom: 2px;
       user-select: none;
+      white-space: nowrap;
     }
 
-    .nav-item:hover { background: #334155; color: #fff; }
-    .nav-item.active { background: var(--primary); color: #fff; }
-    .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-item:hover { background: #f1f5f9; color: #1e293b; }
+    .nav-item.active { background: #f1f5f9; color: #1e293b; }
+    .nav-item.active .nav-icon-svg { stroke: #1e293b; }
+    .nav-item .nav-icon-svg {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      stroke: currentColor;
+      transition: stroke 0.15s;
+    }
+
+    .nav-label { overflow: hidden; transition: opacity 0.15s; }
+    .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
 
     .sidebar-actions {
-      padding: 16px 10px;
-      border-top: 1px solid #334155;
+      padding: 12px 8px;
+      border-top: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
+      overflow: hidden;
     }
 
     .sidebar-actions button {
-      background: #334155;
+      background: none;
       border: none;
-      color: #94a3b8;
+      color: #64748b;
       border-radius: 7px;
-      padding: 8px 12px;
+      padding: 8px 10px;
       font-size: 12px;
       cursor: pointer;
       text-align: left;
@@ -109,34 +150,38 @@
       align-items: center;
       gap: 8px;
       transition: all 0.15s;
+      white-space: nowrap;
     }
 
-    .sidebar-actions button:hover { background: #475569; color: #fff; }
+    .sidebar-actions button:hover { background: #f1f5f9; color: #1e293b; }
+    .sidebar.collapsed .sidebar-actions button span { opacity: 0; }
 
     /* ─── Sidebar user ────────────────────────── */
     .sidebar-user {
       display: none; align-items: center; gap: 8px;
-      padding: 10px 12px; border-top: 1px solid #334155;
-      color: #cbd5e1;
+      padding: 10px 12px; border-top: 1px solid var(--border);
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
     }
     .sidebar-user img {
       width: 30px; height: 30px; border-radius: 50%;
-      object-fit: cover; flex-shrink: 0; background: #475569;
+      object-fit: cover; flex-shrink: 0; background: #e2e8f0;
     }
     .sidebar-user-name {
       flex: 1; font-size: 11px; overflow: hidden;
       text-overflow: ellipsis; white-space: nowrap;
     }
     .sidebar-user-out {
-      font-size: 11px; padding: 3px 8px; background: #475569;
-      border: none; color: #cbd5e1; border-radius: 4px;
+      font-size: 11px; padding: 3px 8px; background: #f1f5f9;
+      border: none; color: #64748b; border-radius: 4px;
       cursor: pointer; flex-shrink: 0; transition: background .15s;
     }
-    .sidebar-user-out:hover { background: #ef4444; color: #fff; }
+    .sidebar-user-out:hover { background: #fee2e2; color: #ef4444; }
 
     /* ─── Login overlay ───────────────────────── */
     #login-overlay {
-      position: fixed; inset: 0; background: #1e293b;
+      position: fixed; inset: 0; background: #f8fafc;
       display: flex; align-items: center; justify-content: center;
       flex-direction: column; gap: 18px; z-index: 9999;
     }
@@ -458,7 +503,10 @@
       .budget-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .main { padding: 20px 16px; }
-      .sidebar { display: none; }
+      .sidebar { width: 60px; }
+      .sidebar .sidebar-logo-wordmark { opacity: 0; width: 0; }
+      .sidebar .nav-label { opacity: 0; pointer-events: none; }
+      .sidebar .sidebar-actions button span { opacity: 0; }
     }
 
     .surplus-banner {
@@ -927,54 +975,94 @@
 
 <!-- ─── Login overlay ────────────────────────── -->
 <div id="login-overlay">
-  <div style="font-size:52px">🏠</div>
-  <h1 style="color:#fff;font-size:26px;font-weight:700;margin:0">Home Finance</h1>
-  <p style="color:#94a3b8;font-size:14px;margin:0">Sign in to access your family budget</p>
+  <h1 style="color:#1e293b;font-size:32px;font-weight:800;letter-spacing:0.08em;margin:0">TOTO</h1>
+  <p style="color:#64748b;font-size:14px;margin:0">Sign in to access your family budget</p>
   <button class="google-sign-in-btn" onclick="signInWithGoogle()">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
     Sign in with Google
   </button>
-  <p id="login-error" style="color:#f87171;font-size:13px;margin:0;display:none"></p>
+  <p id="login-error" style="color:#ef4444;font-size:13px;margin:0;display:none"></p>
 </div>
 
 <!-- ─── Sidebar ───────────────────────────────── -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <span>🏠</span> Home Finance
+    <span class="sidebar-logo-wordmark">TOTO</span>
+    <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('collapsed')" title="Toggle menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
   </div>
   <nav>
     <div class="nav-item active" data-tab="dashboard">
-      <span class="nav-icon">📊</span> Dashboard
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <span class="nav-label">Dashboard</span>
     </div>
     <div class="nav-item" data-tab="money">
-      <span class="nav-icon">💵</span> Money
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+      <span class="nav-label">Money</span>
     </div>
     <div class="nav-item" data-tab="build">
-      <span class="nav-icon">🏗️</span> Build Costs
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><path d="M9 20v-5h6v5"/>
+      </svg>
+      <span class="nav-label">Build Costs</span>
     </div>
     <div class="nav-item" data-tab="budget">
-      <span class="nav-icon">💰</span> Monthly Budget
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 3v9l5 3"/>
+      </svg>
+      <span class="nav-label">Monthly Budget</span>
     </div>
     <div class="nav-item" data-tab="calendar">
-      <span class="nav-icon">📅</span> Calendar
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span class="nav-label">Calendar</span>
     </div>
     <div class="nav-item" data-tab="goals">
-      <span class="nav-icon">🎯</span> Goals
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/>
+      </svg>
+      <span class="nav-label">Goals</span>
     </div>
     <div class="nav-item" data-tab="scenarios">
-      <span class="nav-icon">🔬</span> Scenarios
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 3h6l1 8H8z"/><path d="M8 11c-1.5 2-2 4-2 5a6 6 0 0 0 12 0c0-1-.5-3-2-5"/>
+      </svg>
+      <span class="nav-label">Scenarios</span>
     </div>
     <div class="nav-item" data-tab="insights">
-      <span class="nav-icon">🤖</span> Insights
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/>
+      </svg>
+      <span class="nav-label">Insights</span>
     </div>
     <div class="nav-item" data-tab="settings">
-      <span class="nav-icon">⚙️</span> Settings
+      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span class="nav-label">Settings</span>
     </div>
   </nav>
   <div class="sidebar-actions">
-    <button id="install-btn" style="display:none" onclick="installApp()">📱 Add to Home Screen</button>
-    <button onclick="exportData()">⬇️ Export backup</button>
-    <button onclick="document.getElementById('importFile').click()">⬆️ Import backup</button>
+    <button id="install-btn" style="display:none" onclick="installApp()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+      <span>Add to Home Screen</span>
+    </button>
+    <button onclick="exportData()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Export backup</span>
+    </button>
+    <button onclick="document.getElementById('importFile').click()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      <span>Import backup</span>
+    </button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
   <div class="sidebar-user" id="sidebar-user">
