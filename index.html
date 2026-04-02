@@ -907,6 +907,17 @@
     .adj-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
     .adj-item:last-child { border-bottom: none; }
     .adj-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+
+    /* Expense row swipe-up hover */
+    .expense-row {
+      background-size: 100% 200%;
+      background-position: 0 100%;
+      background-image: linear-gradient(to top, color-mix(in srgb, var(--row-color) 12%, transparent) 0%, transparent 50%);
+      transition: background-position .35s ease;
+    }
+    .expense-row:hover {
+      background-position: 0 0;
+    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -4540,7 +4551,7 @@ function renderExpenseGroups(expenses) {
             ? `${aud(eAct)} of ${aud(eMo)} · ${ePct}%${eOver ? ' over!' : ' used'}`
             : `No actuals · ${aud(eMo)} budgeted`;
           return `
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+          <div class="expense-row" style="--row-color:${eColor};display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
             <div style="width:4px;height:36px;border-radius:2px;background:${eColor};flex-shrink:0"></div>
             <div style="flex:1;min-width:0;cursor:pointer" onclick="event.stopPropagation();openEditExpense(${e.id})">
               <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</div>
