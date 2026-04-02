@@ -1100,6 +1100,46 @@
     .reject-btn { background: none; color: #ef4444; border: 1px solid #fca5a5; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
     .reject-btn:hover { background: #fee2e2; }
 
+    /* ─── Net Worth ───────────────────────────── */
+    .nw-hero { text-align: center; padding: 36px 20px 28px; }
+    .nw-hero-label { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #64748b; margin-bottom: 8px; }
+    .nw-hero-amount { font-size: 52px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+    .nw-hero-amount.positive { color: #0d9488; }
+    .nw-hero-amount.negative { color: #ef4444; }
+    .nw-hero-change { font-size: 13px; color: #64748b; margin-top: 8px; }
+    .nw-hero-change .up { color: #10b981; font-weight: 600; }
+    .nw-hero-change .down { color: #ef4444; font-weight: 600; }
+    .nw-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    @media(max-width:640px) { .nw-cols { grid-template-columns: 1fr; } }
+    .nw-col-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .nw-col-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .nw-col-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .nw-col-total { font-size: 15px; font-weight: 700; }
+    .nw-col-card.assets .nw-col-total { color: #0d9488; }
+    .nw-col-card.liabilities .nw-col-total { color: #ef4444; }
+    .nw-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid #f1f5f9; gap: 12px; transition: background 0.12s; }
+    .nw-item:last-child { border-bottom: none; }
+    .nw-item:hover { background: #f8fafc; }
+    .nw-item-name { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; min-width: 0; }
+    .nw-item-cat { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .nw-item-value { font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .nw-col-card.assets .nw-item-value { color: #0d9488; }
+    .nw-col-card.liabilities .nw-item-value { color: #ef4444; }
+    .nw-item-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.12s; }
+    .nw-item:hover .nw-item-actions { opacity: 1; }
+    .nw-add-row { display: flex; align-items: center; justify-content: center; padding: 12px; }
+    .nw-trend-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+    .nw-trend-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+    .nw-trend-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; }
+    .nw-trend-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nw-trend-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s; }
+    .nw-trend-bar.pos { background: linear-gradient(to top, #0d9488, #5eead4); }
+    .nw-trend-bar.neg { background: linear-gradient(to top, #ef4444, #fca5a5); }
+    .nw-trend-label { font-size: 10px; color: #94a3b8; text-align: center; white-space: nowrap; }
+    .nw-snapshot-btn { background: #0d9488; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .nw-snapshot-btn:hover { background: #0f766e; }
+    .nw-empty { text-align: center; padding: 20px; color: #94a3b8; font-size: 13px; }
+
     /* Expense row swipe-up hover */
     .expense-row {
       background-size: 100% 200%;
@@ -1179,6 +1219,9 @@
       <div class="nav-item" data-tab="kids" title="Kids Zone">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-1a6 6 0 0 0-4.73-5.86"/></svg>
       </div>
+      <div class="nav-item" data-tab="networth" title="Net Worth">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><polyline points="2 20 22 20"/></svg>
+      </div>
     </nav>
     <div class="icon-col-actions">
       <button id="install-btn" style="display:none" onclick="installApp()" title="Add to Home Screen">
@@ -1211,6 +1254,7 @@
       <div class="nav-text-item" data-tab="scenarios">Scenarios</div>
       <div class="nav-text-item" data-tab="insights">Insights</div>
       <div class="nav-text-item" data-tab="kids">Kids Zone</div>
+      <div class="nav-text-item" data-tab="networth">Net Worth</div>
     </nav>
     <div class="text-col-actions">
       <button id="install-btn-text" style="display:none" onclick="installApp()">Add to Home Screen</button>
@@ -1300,6 +1344,11 @@
   <!-- KIDS ZONE -->
   <div class="tab-panel" id="tab-kids">
     <div id="kids-content"></div>
+  </div>
+
+  <!-- NET WORTH -->
+  <div class="tab-panel" id="tab-networth">
+    <div id="networth-content"></div>
   </div>
 
   <!-- SETTINGS -->
@@ -1453,6 +1502,7 @@ const DEFAULT_DATA = {
   goals: [],
   scenarios: [],
   kids: { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] },
+  netWorth: { assets: [], liabilities: [], snapshots: [] },
   activityLog: [],
   householdProfile: {
     members: [{ role: 'adult', age: null }, { role: 'adult', age: null }],
@@ -1490,6 +1540,8 @@ function loadData() {
     if (!d.budget.months)  d.budget.months  = {};
     if (!d.goals)      d.goals      = [];
     if (!d.scenarios)  d.scenarios  = [];
+    if (!d.netWorth) d.netWorth = { assets: [], liabilities: [], snapshots: [] };
+    if (!d.netWorth.snapshots) d.netWorth.snapshots = [];
     if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
     if (!d.kids.profiles)    d.kids.profiles    = [];
     if (!d.kids.chores)      d.kids.chores      = [];
@@ -6131,6 +6183,7 @@ function renderAll() {
   safeRender(renderScenarios);
   safeRender(renderSettings);
   safeRender(renderKids);
+  safeRender(renderNetWorth);
 }
 
 // ─────────────────────────────────────────────────
@@ -6750,6 +6803,204 @@ function installApp() {
   if (!_installPrompt) return;
   _installPrompt.prompt();
   _installPrompt.userChoice.then(() => { _installPrompt = null; });
+}
+
+// ─────────────────────────────────────────────────
+// NET WORTH
+// ─────────────────────────────────────────────────
+
+const NW_ASSET_CATS = ['Cash & Savings','Investments','Property','Superannuation','Vehicle','Other'];
+const NW_LIAB_CATS  = ['Mortgage','Car Loan','Credit Card','Personal Loan','HECS/HELP','Other'];
+
+function fmtNW(n) {
+  const abs = Math.abs(n);
+  const s = abs >= 1e6 ? (abs/1e6).toFixed(2)+'M' : abs >= 1e3 ? (abs/1e3).toFixed(1)+'k' : abs.toFixed(0);
+  return (n < 0 ? '-$' : '$') + s;
+}
+
+function renderNetWorth() {
+  const el = document.getElementById('networth-content');
+  if (!el) return;
+  const nw = state.netWorth;
+  const assets = nw.assets || [];
+  const liabs  = nw.liabilities || [];
+  const snaps  = nw.snapshots || [];
+
+  const totalAssets = assets.reduce((s,a) => s + (parseFloat(a.value)||0), 0);
+  const totalLiabs  = liabs.reduce((s,l) => s + (parseFloat(l.value)||0), 0);
+  const netWorth    = totalAssets - totalLiabs;
+
+  // Change vs previous snapshot
+  let changeHtml = '';
+  if (snaps.length >= 2) {
+    const prev = snaps[snaps.length - 2].netWorth;
+    const diff = netWorth - prev;
+    const cls  = diff >= 0 ? 'up' : 'down';
+    const sign = diff >= 0 ? '+' : '';
+    changeHtml = `<span class="${cls}">${sign}${fmtNW(diff)}</span> vs last snapshot`;
+  }
+
+  el.innerHTML = `
+    <div class="nw-hero">
+      <div class="nw-hero-label">Net Worth</div>
+      <div class="nw-hero-amount ${netWorth >= 0 ? 'positive' : 'negative'}">${fmtNW(netWorth)}</div>
+      ${changeHtml ? `<div class="nw-hero-change">${changeHtml}</div>` : ''}
+    </div>
+
+    ${snaps.length > 1 ? renderNWTrend(snaps) : ''}
+
+    <div class="nw-cols">
+      <div class="nw-col-card assets">
+        <div class="nw-col-header">
+          <span class="nw-col-title">Assets</span>
+          <span class="nw-col-total">${fmtNW(totalAssets)}</span>
+        </div>
+        ${assets.length ? assets.map(a => nwItemRow(a,'asset')).join('') : '<div class="nw-empty">No assets yet</div>'}
+        <div class="nw-add-row">
+          <button class="btn-outline" style="font-size:12px;padding:6px 14px" onclick="openNWModal('asset')">+ Add asset</button>
+        </div>
+      </div>
+      <div class="nw-col-card liabilities">
+        <div class="nw-col-header">
+          <span class="nw-col-title">Liabilities</span>
+          <span class="nw-col-total">${fmtNW(totalLiabs)}</span>
+        </div>
+        ${liabs.length ? liabs.map(l => nwItemRow(l,'liability')).join('') : '<div class="nw-empty">No liabilities yet</div>'}
+        <div class="nw-add-row">
+          <button class="btn-outline" style="font-size:12px;padding:6px 14px" onclick="openNWModal('liability')">+ Add liability</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap">
+      <div style="font-size:13px;color:#64748b">
+        ${snaps.length ? `Last snapshot: ${snaps[snaps.length-1].date}` : 'No snapshots yet — save one to track progress.'}
+      </div>
+      <button class="nw-snapshot-btn" onclick="saveNWSnapshot()">Save snapshot</button>
+    </div>
+
+    <div id="nw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <h3 id="nw-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px"></h3>
+        <input type="hidden" id="nw-edit-id">
+        <input type="hidden" id="nw-edit-type">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
+            <input id="nw-name" type="text" placeholder="e.g. Home, Super, Credit card" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Category</label>
+            <select id="nw-cat" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff"></select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Value ($)</label>
+            <input id="nw-value" type="number" min="0" step="100" placeholder="0" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+          <button class="btn-outline" onclick="closeNWModal()">Cancel</button>
+          <button class="btn-primary" onclick="saveNWItem()">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function nwItemRow(item, type) {
+  return `
+    <div class="nw-item">
+      <div style="flex:1;min-width:0">
+        <div class="nw-item-name">${item.name}</div>
+        <div class="nw-item-cat">${item.category || ''}</div>
+      </div>
+      <div class="nw-item-value">${fmtNW(parseFloat(item.value)||0)}</div>
+      <div class="nw-item-actions">
+        <button class="icon-btn" title="Edit" onclick="openNWModal('${type}','${item.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="icon-btn" style="color:#ef4444" title="Delete" onclick="deleteNWItem('${type}','${item.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderNWTrend(snaps) {
+  const recent = snaps.slice(-12);
+  const max    = Math.max(...recent.map(s => Math.abs(s.netWorth)), 1);
+  const bars   = recent.map(s => {
+    const h   = Math.round((Math.abs(s.netWorth) / max) * 70);
+    const cls = s.netWorth >= 0 ? 'pos' : 'neg';
+    const mon = s.date ? s.date.slice(0,7) : '';
+    return `<div class="nw-trend-bar-wrap">
+      <div class="nw-trend-bar ${cls}" style="height:${h}px"></div>
+      <div class="nw-trend-label">${mon}</div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="nw-trend-card">
+      <div class="nw-trend-title">Net Worth over time</div>
+      <div class="nw-trend-chart">${bars}</div>
+    </div>`;
+}
+
+let _nwModalType = 'asset';
+function openNWModal(type, id) {
+  _nwModalType = type;
+  const nw    = state.netWorth;
+  const list  = type === 'asset' ? nw.assets : nw.liabilities;
+  const cats  = type === 'asset' ? NW_ASSET_CATS : NW_LIAB_CATS;
+  const item  = id ? list.find(x => x.id === id) : null;
+  const modal = document.getElementById('nw-modal');
+  if (!modal) return;
+  document.getElementById('nw-modal-title').textContent = (item ? 'Edit' : 'Add') + ' ' + (type === 'asset' ? 'Asset' : 'Liability');
+  document.getElementById('nw-edit-id').value   = id || '';
+  document.getElementById('nw-edit-type').value = type;
+  document.getElementById('nw-name').value  = item ? item.name : '';
+  document.getElementById('nw-value').value = item ? item.value : '';
+  const catSel = document.getElementById('nw-cat');
+  catSel.innerHTML = cats.map(c => `<option value="${c}" ${item && item.category===c?'selected':''}>${c}</option>`).join('');
+  modal.style.display = 'flex';
+}
+function closeNWModal() {
+  const modal = document.getElementById('nw-modal');
+  if (modal) modal.style.display = 'none';
+}
+function saveNWItem() {
+  const name  = document.getElementById('nw-name').value.trim();
+  const value = parseFloat(document.getElementById('nw-value').value);
+  const cat   = document.getElementById('nw-cat').value;
+  const type  = document.getElementById('nw-edit-type').value;
+  const id    = document.getElementById('nw-edit-id').value;
+  if (!name || isNaN(value)) return;
+  const list = type === 'asset' ? state.netWorth.assets : state.netWorth.liabilities;
+  if (id) {
+    const item = list.find(x => x.id === id);
+    if (item) { item.name = name; item.value = value; item.category = cat; }
+  } else {
+    list.push({ id: uid(), name, value, category: cat });
+  }
+  saveData();
+  closeNWModal();
+}
+function deleteNWItem(type, id) {
+  const list = type === 'asset' ? state.netWorth.assets : state.netWorth.liabilities;
+  const idx  = list.findIndex(x => x.id === id);
+  if (idx !== -1) { list.splice(idx, 1); saveData(); }
+}
+function saveNWSnapshot() {
+  const nw    = state.netWorth;
+  const total = (nw.assets||[]).reduce((s,a) => s+(parseFloat(a.value)||0), 0)
+              - (nw.liabilities||[]).reduce((s,l) => s+(parseFloat(l.value)||0), 0);
+  const today = new Date().toISOString().slice(0,10);
+  if (!nw.snapshots) nw.snapshots = [];
+  // Replace if same date
+  const existing = nw.snapshots.findIndex(s => s.date === today);
+  const entry    = { date: today, netWorth: total, assets: (nw.assets||[]).reduce((s,a)=>s+(parseFloat(a.value)||0),0), liabilities: (nw.liabilities||[]).reduce((s,l)=>s+(parseFloat(l.value)||0),0) };
+  if (existing !== -1) nw.snapshots[existing] = entry;
+  else nw.snapshots.push(entry);
+  saveData();
 }
 
 // ─── Service Worker ───────────────────────────────
