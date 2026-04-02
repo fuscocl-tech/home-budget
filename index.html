@@ -1208,7 +1208,16 @@ const DEFAULT_DATA = {
   },
   settings: {
     autoFillMonths: false
-  }
+  },
+  categoryGroups: [
+    { id: 1, name: 'Housing',         icon: '🏠', categories: ['Mortgage / Rent', 'Utilities', 'Insurance'] },
+    { id: 2, name: 'Food & Dining',   icon: '🍽️', categories: ['Groceries', 'Dining Out'] },
+    { id: 3, name: 'Transport',       icon: '🚗', categories: ['Transport'] },
+    { id: 4, name: 'Family & Health', icon: '👨‍👩‍👧', categories: ['Childcare / Education', 'Health', 'Personal Care'] },
+    { id: 5, name: 'Lifestyle',       icon: '🎮', categories: ['Entertainment', 'Subscriptions', 'Clothing'] },
+    { id: 6, name: 'Savings',         icon: '💰', categories: ['Savings / Investment'] },
+    { id: 7, name: 'Other',           icon: '📦', categories: ['Other'] }
+  ]
 };
 
 function loadData() {
@@ -1241,6 +1250,7 @@ function loadData() {
     if (!d.householdProfile.pets)  d.householdProfile.pets = [];
     if (d.householdProfile.cars === undefined) d.householdProfile.cars = 1;
     if (!d.settings) d.settings = { autoFillMonths: false };
+    if (!d.categoryGroups) d.categoryGroups = JSON.parse(JSON.stringify(DEFAULT_DATA.categoryGroups));
     if (!d.buildContract.variations) d.buildContract.variations = [];
     d.buildContract.stages.forEach(s => { if (!s.expectedDate) s.expectedDate = ''; });
     if (!d.expenseCategories) d.expenseCategories = JSON.parse(JSON.stringify(DEFAULT_DATA.expenseCategories));
@@ -1353,6 +1363,7 @@ function doScopeAll() {
 
 let state = loadData();
 let selectedBudgetMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+let budgetViewMode = 'grouped'; // 'grouped' | 'table'
 
 // ─── Mini date picker ─────────────────────────────
 let dpViewYear = new Date().getFullYear();
@@ -3785,6 +3796,66 @@ function nextInsightsMonth() {
   safeRender(renderBudget);
 }
 
+// ─── Category Group management ────────────────────
+
+function openAddCategoryGroup() {
+  openModal('Add Category Group', `
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Icon (emoji)</label>
+        <input class="form-input" id="f-grp-icon" type="text" placeholder="🏠" style="font-size:18px;text-align:center">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Group Name</label>
+        <input class="form-input" id="f-grp-name" type="text" placeholder="e.g. Housing">
+      </div>
+    </div>
+  `, () => {
+    const icon = document.getElementById('f-grp-icon').value.trim() || '📦';
+    const name = document.getElementById('f-grp-name').value.trim();
+    if (!name) return;
+    const id = nextId(state.categoryGroups);
+    state.categoryGroups.push({ id, name, icon, categories: [] });
+    logActivity('Added category group', name);
+    saveData(state); renderSettings();
+  });
+}
+
+function deleteCategoryGroup(id) {
+  const g = state.categoryGroups.find(x => x.id === id);
+  if (!confirm(`Delete group "${g ? g.name : ''}"? Categories will become unassigned.`)) return;
+  state.categoryGroups = state.categoryGroups.filter(x => x.id !== id);
+  logActivity('Deleted category group', g ? g.name : '');
+  saveData(state); renderSettings();
+}
+
+function updateCategoryGroup(id, field, value) {
+  const g = state.categoryGroups.find(x => x.id === id);
+  if (!g) return;
+  g[field] = value;
+  saveData(state);
+}
+
+function addCatToGroup(groupId) {
+  const sel = document.getElementById(`assign-${groupId}`);
+  const cat = sel ? sel.value : '';
+  if (!cat) return;
+  // Remove from any other group first
+  state.categoryGroups.forEach(g => { g.categories = g.categories.filter(c => c !== cat); });
+  const g = state.categoryGroups.find(x => x.id === groupId);
+  if (g) g.categories.push(cat);
+  saveData(state); renderSettings();
+}
+
+function removeCatFromGroup(groupId, cat) {
+  const g = state.categoryGroups.find(x => x.id === groupId);
+  if (!g) return;
+  g.categories = g.categories.filter(c => c !== cat);
+  saveData(state); renderSettings();
+}
+
+// ─────────────────────────────────────────────────
+
 function updateSetting(key, value) {
   if (!state.settings) state.settings = {};
   state.settings[key] = value;
@@ -4073,6 +4144,50 @@ function renderSettings() {
     <div class="section">
       <div class="section-header">
         <div>
+          <div class="section-title">Expense Category Groups</div>
+          <div class="section-subtitle">Group categories together for the grouped budget view. Categories can only belong to one group.</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddCategoryGroup()">+ Group</button>
+      </div>
+      <div class="section-body">
+        ${(state.categoryGroups||[]).map(g => {
+          const allExpCats = expenseCategories();
+          const assignedElsewhere = new Set((state.categoryGroups||[]).filter(x=>x.id!==g.id).flatMap(x=>x.categories));
+          const available = allExpCats.filter(c => !g.categories.includes(c) && !assignedElsewhere.has(c));
+          return `
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+              <input type="text" class="form-input" style="width:52px;text-align:center;font-size:18px;padding:4px" value="${g.icon}"
+                onchange="updateCategoryGroup(${g.id},'icon',this.value)">
+              <input type="text" class="form-input" style="flex:1;font-weight:600" value="${g.name.replace(/"/g,'&quot;')}"
+                onchange="updateCategoryGroup(${g.id},'name',this.value)">
+              <button class="btn btn-danger-ghost btn-sm" onclick="deleteCategoryGroup(${g.id})">Delete</button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+              ${g.categories.map(cat => `
+                <span style="display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;font-size:13px">
+                  ${cat}
+                  <button onclick="removeCatFromGroup(${g.id},'${cat.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:15px;line-height:1;padding:0 2px">&times;</button>
+                </span>`).join('')}
+              ${g.categories.length === 0 ? `<span style="font-size:13px;color:var(--text-muted);font-style:italic">No categories assigned</span>` : ''}
+            </div>
+            ${available.length > 0 ? `
+            <div style="display:flex;gap:8px;max-width:360px">
+              <select class="form-select" id="assign-${g.id}" style="flex:1;font-size:13px">
+                <option value="">— assign a category —</option>
+                ${available.map(c => `<option value="${c.replace(/"/g,'&quot;')}">${c}</option>`).join('')}
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="addCatToGroup(${g.id})">Assign</button>
+            </div>` : `<p style="font-size:12px;color:var(--text-muted);margin:0">All available categories assigned.</p>`}
+          </div>`;
+        }).join('')}
+        ${(state.categoryGroups||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No groups yet. Click "+ Group" to create one.</p>` : ''}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
           <div class="section-title">Monthly Budget — Expense Category Colours</div>
           <div class="section-subtitle">Colour shown as a left-border stripe on each expense row</div>
         </div>
@@ -4143,6 +4258,108 @@ function importData(evt) {
   };
   reader.readAsText(file);
 }
+
+// ─── Category Groups ──────────────────────────────
+
+function toggleGroupExpand(id) {
+  const content = document.getElementById(`grp-body-${id}`);
+  const arrow   = document.getElementById(`grp-arrow-${id}`);
+  if (!content) return;
+  const open = content.style.display !== 'none';
+  content.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.textContent = open ? '▼' : '▲';
+}
+
+function setBudgetView(mode) {
+  budgetViewMode = mode;
+  renderBudget();
+}
+
+function renderExpenseGroups(expenses) {
+  const groups   = state.categoryGroups || DEFAULT_DATA.categoryGroups;
+  const actuals  = state.budget.actuals[selectedBudgetMonth] || {};
+  const colors_e = (state.colors || {}).expense || {};
+
+  // Categories assigned to any group
+  const assignedCats = new Set(groups.flatMap(g => g.categories));
+  // Any on-screen categories not in a group → put in virtual Ungrouped
+  const ungroupedCats = [...new Set(expenses.map(e => e.category || 'Other'))].filter(c => !assignedCats.has(c));
+  const displayGroups = ungroupedCats.length > 0
+    ? [...groups, { id: 'ug', name: 'Ungrouped', icon: '📋', categories: ungroupedCats }]
+    : groups;
+
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:4px">';
+
+  for (const group of displayGroups) {
+    const items = expenses.filter(e => group.categories.includes(e.category || 'Other'));
+    if (items.length === 0) continue;
+
+    const budgeted = items.reduce((s, e) => s + itemMonthly(e), 0);
+    const actual   = items.reduce((s, e) => s + (actuals[e.id] || 0), 0);
+    const pct      = budgeted > 0 ? Math.round(actual / budgeted * 100) : 0;
+    const barPct   = Math.min(100, pct);
+    const barColor = pct >= 100 ? 'var(--danger)' : pct >= 80 ? 'var(--warning)' : 'var(--success)';
+    const hasActual = actual > 0;
+    const over = actual > budgeted && hasActual;
+
+    html += `
+    <div style="background:var(--surface);border:1px solid ${over ? 'var(--danger)' : 'var(--border)'};border-radius:10px;overflow:hidden">
+      <div style="padding:14px 16px;cursor:pointer;user-select:none" onclick="toggleGroupExpand('${group.id}')">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:22px">${group.icon}</span>
+            <div>
+              <div style="font-weight:700;font-size:14px">${group.name}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${items.length} item${items.length !== 1 ? 's' : ''}</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:700;font-size:16px">${aud(budgeted)}<span style="font-size:11px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+            ${hasActual ? `<div style="font-size:12px;font-weight:600;color:${barColor}">${aud(actual)} spent</div>` : `<div style="font-size:12px;color:var(--text-muted)">no actuals</div>`}
+          </div>
+        </div>
+        <div style="background:var(--border);border-radius:99px;height:8px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${barPct}%;background:${barColor};border-radius:99px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+          <span style="color:${over ? 'var(--danger)' : 'var(--text-muted)'}">${hasActual ? `${pct}% of budget${over ? ' — over!' : ''}` : 'Budget only'}</span>
+          <span id="grp-arrow-${group.id}" style="color:var(--text-muted);font-size:10px">▼</span>
+        </div>
+      </div>
+      <div id="grp-body-${group.id}" style="border-top:1px solid var(--border)">
+        ${items.map(e => {
+          const eMo    = itemMonthly(e);
+          const eAct   = actuals[e.id] || 0;
+          const ePct   = eMo > 0 && eAct > 0 ? Math.round(eAct / eMo * 100) : 0;
+          const eColor = colors_e[e.category || 'Other'] || colors.expense[e.category || 'Other'] || '#94a3b8';
+          const eOver  = eAct > eMo && eAct > 0;
+          return `
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+            <div style="width:4px;height:36px;border-radius:2px;background:${eColor};flex-shrink:0"></div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${e.category || 'Other'} · ${freqDisplayItem(e)}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;margin-right:6px">
+              <div style="font-size:13px;font-weight:600">${aud(eMo)}/mo</div>
+              ${eAct > 0
+                ? `<div style="font-size:11px;font-weight:600;color:${eOver ? 'var(--danger)' : ePct >= 80 ? 'var(--warning)' : 'var(--success)'}">${aud(eAct)} actual${eOver ? ' ▲' : ''}</div>`
+                : `<div class="actual-cell" style="font-size:11px;color:var(--text-muted);cursor:pointer" onclick="event.stopPropagation();editActual(${e.id})">+ add actual</div>`}
+            </div>
+            <div style="display:flex;gap:2px;flex-shrink:0">
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditExpense(${e.id})" style="padding:4px 6px">✏️</button>
+              <button class="btn btn-danger-ghost btn-sm" onclick="event.stopPropagation();deleteExpense(${e.id})" style="padding:4px 6px">🗑</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+// ─────────────────────────────────────────────────
 
 function renderBudget() {
   const b = state.budget;
@@ -4234,107 +4451,110 @@ function renderBudget() {
   // Expenses with budget vs actual
   const hasActuals = totalActual > 0;
 
-  // Category filter
+  // Category filter (table view only)
   const allCats = ['all', ...Array.from(new Set(me.map(e => e.category || 'Other'))).sort()];
-  const filteredExpenses = expenseFilterCat === 'all'
-    ? me
-    : me.filter(e => (e.category || 'Other') === expenseFilterCat);
-  const catBudget = filteredExpenses.reduce((s, e) => s + itemMonthly(e), 0);
-  const catActual = filteredExpenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const filteredExpenses = expenseFilterCat === 'all' ? me : me.filter(e => (e.category || 'Other') === expenseFilterCat);
+  const catBudget   = filteredExpenses.reduce((s, e) => s + itemMonthly(e), 0);
+  const catActual   = filteredExpenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
   const catVariance = catBudget - catActual;
-  const isFiltered = expenseFilterCat !== 'all';
+  const isFiltered  = expenseFilterCat !== 'all';
 
   html += `
     <div class="section">
       <div class="section-header">
         <div>
-          <div class="section-title">Expenses${isFiltered ? ` <span style="font-size:12px;color:var(--text-muted);font-weight:400">— ${expenseFilterCat}</span>` : ''}</div>
+          <div class="section-title">Expenses</div>
           <div class="section-subtitle">
-            Budget: ${aud(isFiltered ? catBudget : totalBudgetExpenses)}/mo
-            ${hasActuals || catActual > 0 ? ` · Actual: ${aud(isFiltered ? catActual : totalActual)} · <span class="${(isFiltered ? catVariance : totalVariance) >= 0 ? 'var-under' : 'var-over'}">${(isFiltered ? catVariance : totalVariance) >= 0 ? '▼' : '▲'} ${aud(Math.abs(isFiltered ? catVariance : totalVariance))}</span>` : ''}
+            Budget: ${aud(totalBudgetExpenses)}/mo
+            ${totalActual > 0 ? ` · Actual: ${aud(totalActual)} · <span class="${totalVariance >= 0 ? 'var-under' : 'var-over'}">${totalVariance >= 0 ? '▼' : '▲'} ${aud(Math.abs(totalVariance))}</span>` : ''}
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <select class="form-select" style="width:auto;padding:6px 10px;font-size:12px" onchange="setExpenseFilter(this.value)">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+            <button onclick="setBudgetView('grouped')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:${budgetViewMode==='grouped'?'var(--primary)':'var(--surface)'};color:${budgetViewMode==='grouped'?'#fff':'var(--text-muted)'}">⊞ Groups</button>
+            <button onclick="setBudgetView('table')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;border-left:1px solid var(--border);cursor:pointer;background:${budgetViewMode==='table'?'var(--primary)':'var(--surface)'};color:${budgetViewMode==='table'?'#fff':'var(--text-muted)'}">≡ Table</button>
+          </div>
+          ${budgetViewMode === 'table' ? `<select class="form-select" style="width:auto;padding:6px 10px;font-size:12px" onchange="setExpenseFilter(this.value)">
             ${allCats.map(c => `<option value="${c}" ${expenseFilterCat===c?'selected':''}>${c === 'all' ? 'All categories' : c}</option>`).join('')}
-          </select>
+          </select>` : ''}
           <button class="btn btn-primary btn-sm" onclick="openAddExpense()">+ Expense</button>
         </div>
       </div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              ${thSort('name', 'Item')}
-              ${thSort('category', 'Category')}
-              ${thSort('frequency', 'Frequency')}
-              ${thSort('due', 'Due')}
-              ${thSort('budget', 'Budget/mo')}
-              <th>Actual <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-muted)">(click to edit)</span></th>
-              ${thSort('variance', 'Variance')}
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${filteredExpenses.length === 0
-              ? `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>${me.length === 0 ? 'Add your household expenses' : 'No expenses in this category'}</div></td></tr>`
-              : (() => {
-                  const sorted = [...filteredExpenses].sort((a, b) => {
-                    if (!expenseSortCol) return 0;
-                    let av, bv;
-                    if (expenseSortCol === 'name')      { av = a.name.toLowerCase();                              bv = b.name.toLowerCase(); }
-                    else if (expenseSortCol === 'category')  { av = (a.category||'Other').toLowerCase();          bv = (b.category||'Other').toLowerCase(); }
-                    else if (expenseSortCol === 'frequency') { av = freqDisplayItem(a);                          bv = freqDisplayItem(b); }
-                    else if (expenseSortCol === 'due')       { av = a.dueDate || '\uffff';                        bv = b.dueDate || '\uffff'; }
-                    else if (expenseSortCol === 'budget')    { av = itemMonthly(a);                               bv = itemMonthly(b); }
-                    else if (expenseSortCol === 'actual')    { av = getActual(a.id, selectedBudgetMonth);         bv = getActual(b.id, selectedBudgetMonth); }
-                    else if (expenseSortCol === 'variance')  { av = itemMonthly(a) - getActual(a.id, selectedBudgetMonth); bv = itemMonthly(b) - getActual(b.id, selectedBudgetMonth); }
-                    else return 0;
-                    return av < bv ? (expenseSortDir === 'asc' ? -1 : 1) : av > bv ? (expenseSortDir === 'asc' ? 1 : -1) : 0;
-                  });
-                  return sorted.map(e => {
-                  const budgetMo = itemMonthly(e);
-                  const actual = getActual(e.id, selectedBudgetMonth);
-                  const variance = budgetMo - actual;
-                  const hasActual = actual > 0;
-                  let varianceHtml;
-                  if (!hasActual) varianceHtml = `<span class="var-none">—</span>`;
-                  else if (variance >= 0) varianceHtml = `<span class="var-under">▼ ${aud(variance)}</span>`;
-                  else varianceHtml = `<span class="var-over">▲ ${aud(Math.abs(variance))}</span>`;
-                  const dueLabel = e.dueDate ? (() => { const [y,mo,d] = e.dueDate.split('-'); return `${d}/${mo}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
-                  const rowColor = colors.expense[e.category || 'Other'] || '#94a3b8';
-                  const oneTimeBadge = e.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
-                  return `<tr>
-                    <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}${oneTimeBadge}</td>
-                    <td><span style="display:inline-block;padding:2px 10px;border-radius:99px;background:${rowColor};color:#fff;font-size:11px;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span></td>
-                    <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
-                    <td>${dueLabel}</td>
-                    <td class="amount">${aud(budgetMo)}</td>
-                    <td class="actual-cell amount" id="actual-${e.id}" onclick="editActual(${e.id})">${hasActual ? aud(actual) : '<span style="color:var(--text-muted);font-size:12px">+ add</span>'}</td>
-                    <td>${varianceHtml}</td>
-                    <td class="actions">
-                      <button class="btn btn-ghost btn-sm" onclick="openEditExpense(${e.id})">✏️</button>
-                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteExpense(${e.id})">🗑</button>
-                    </td>
-                  </tr>`;
-                  }).join('');
-                })()
-            }
-          </tbody>
-          ${filteredExpenses.length > 0 ? `
-          <tfoot>
-            <tr style="background:var(--surface2);border-top:2px solid var(--border)">
-              <td colspan="4" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">
-                Total ${isFiltered ? expenseFilterCat : 'all categories'}
-              </td>
-              <td class="amount" style="padding:11px 16px;font-weight:700">${aud(catBudget)}/mo</td>
-              <td class="amount" style="padding:11px 16px;font-weight:700">${catActual > 0 ? aud(catActual) : '—'}</td>
-              <td style="padding:11px 16px;font-weight:700">${catActual > 0 ? `<span class="${catVariance >= 0 ? 'var-under' : 'var-over'}">${catVariance >= 0 ? '▼' : '▲'} ${aud(Math.abs(catVariance))}</span>` : '—'}</td>
-              <td></td>
-            </tr>
-          </tfoot>` : ''}
-        </table>
+      <div style="padding:16px 20px">
+      ${budgetViewMode === 'grouped' ? renderExpenseGroups(me) : `
+        <div class="table-wrap" style="margin:0 -20px">
+          <table>
+            <thead>
+              <tr>
+                ${thSort('name', 'Item')}
+                ${thSort('category', 'Category')}
+                ${thSort('frequency', 'Frequency')}
+                ${thSort('due', 'Due')}
+                ${thSort('budget', 'Budget/mo')}
+                <th>Actual <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-muted)">(click to edit)</span></th>
+                ${thSort('variance', 'Variance')}
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredExpenses.length === 0
+                ? `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>${me.length === 0 ? 'Add your household expenses' : 'No expenses in this category'}</div></td></tr>`
+                : (() => {
+                    const sorted = [...filteredExpenses].sort((a, b) => {
+                      if (!expenseSortCol) return 0;
+                      let av, bv;
+                      if (expenseSortCol === 'name')           { av = a.name.toLowerCase();                                    bv = b.name.toLowerCase(); }
+                      else if (expenseSortCol === 'category')  { av = (a.category||'Other').toLowerCase();                     bv = (b.category||'Other').toLowerCase(); }
+                      else if (expenseSortCol === 'frequency') { av = freqDisplayItem(a);                                      bv = freqDisplayItem(b); }
+                      else if (expenseSortCol === 'due')       { av = a.dueDate || '\uffff';                                   bv = b.dueDate || '\uffff'; }
+                      else if (expenseSortCol === 'budget')    { av = itemMonthly(a);                                          bv = itemMonthly(b); }
+                      else if (expenseSortCol === 'actual')    { av = getActual(a.id, selectedBudgetMonth);                    bv = getActual(b.id, selectedBudgetMonth); }
+                      else if (expenseSortCol === 'variance')  { av = itemMonthly(a)-getActual(a.id,selectedBudgetMonth);      bv = itemMonthly(b)-getActual(b.id,selectedBudgetMonth); }
+                      else return 0;
+                      return av < bv ? (expenseSortDir==='asc'?-1:1) : av > bv ? (expenseSortDir==='asc'?1:-1) : 0;
+                    });
+                    return sorted.map(e => {
+                      const budgetMo = itemMonthly(e);
+                      const actual   = getActual(e.id, selectedBudgetMonth);
+                      const variance = budgetMo - actual;
+                      const hasAct   = actual > 0;
+                      let varianceHtml;
+                      if (!hasAct) varianceHtml = `<span class="var-none">—</span>`;
+                      else if (variance >= 0) varianceHtml = `<span class="var-under">▼ ${aud(variance)}</span>`;
+                      else varianceHtml = `<span class="var-over">▲ ${aud(Math.abs(variance))}</span>`;
+                      const dueLabel = e.dueDate ? (() => { const [y,mo,d] = e.dueDate.split('-'); return `${d}/${mo}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
+                      const rowColor = colors.expense[e.category || 'Other'] || '#94a3b8';
+                      const oneTimeBadge = e.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
+                      return `<tr>
+                        <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}${oneTimeBadge}</td>
+                        <td><span style="display:inline-block;padding:2px 10px;border-radius:99px;background:${rowColor};color:#fff;font-size:11px;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span></td>
+                        <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
+                        <td>${dueLabel}</td>
+                        <td class="amount">${aud(budgetMo)}</td>
+                        <td class="actual-cell amount" id="actual-${e.id}" onclick="editActual(${e.id})">${hasAct ? aud(actual) : '<span style="color:var(--text-muted);font-size:12px">+ add</span>'}</td>
+                        <td>${varianceHtml}</td>
+                        <td class="actions">
+                          <button class="btn btn-ghost btn-sm" onclick="openEditExpense(${e.id})">✏️</button>
+                          <button class="btn btn-danger-ghost btn-sm" onclick="deleteExpense(${e.id})">🗑</button>
+                        </td>
+                      </tr>`;
+                    }).join('');
+                  })()
+              }
+            </tbody>
+            ${filteredExpenses.length > 0 ? `
+            <tfoot>
+              <tr style="background:var(--surface2);border-top:2px solid var(--border)">
+                <td colspan="4" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">Total ${isFiltered ? expenseFilterCat : 'all categories'}</td>
+                <td class="amount" style="padding:11px 16px;font-weight:700">${aud(catBudget)}/mo</td>
+                <td class="amount" style="padding:11px 16px;font-weight:700">${catActual > 0 ? aud(catActual) : '—'}</td>
+                <td style="padding:11px 16px;font-weight:700">${catActual > 0 ? `<span class="${catVariance>=0?'var-under':'var-over'}">${catVariance>=0?'▼':'▲'} ${aud(Math.abs(catVariance))}</span>` : '—'}</td>
+                <td></td>
+              </tr>
+            </tfoot>` : ''}
+          </table>
+        </div>`}
       </div>
     </div>
   `;
