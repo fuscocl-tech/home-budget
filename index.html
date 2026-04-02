@@ -4301,11 +4301,13 @@ function renderExpenseGroups(expenses) {
     const barColor = pct >= 100 ? 'var(--danger)' : pct >= 80 ? 'var(--warning)' : 'var(--success)';
     const hasActual = actual > 0;
     const over = actual > budgeted && hasActual;
+    const firstCat    = items[0] ? (items[0].category || 'Other') : 'Other';
+    const headerColor = colors_e[firstCat] || colors.expense[firstCat] || '#94a3b8';
 
     html += `
     <div style="background:var(--surface);border:1px solid ${over ? 'var(--danger)' : 'var(--border)'};border-radius:10px;overflow:hidden">
       <!-- Always-visible title bar -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;user-select:none" onclick="toggleGroupExpand('${group.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;user-select:none;background:${headerColor}22;border-bottom:3px solid ${headerColor}" onclick="toggleGroupExpand('${group.id}')">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:20px">${group.icon}</span>
           <span style="font-weight:700;font-size:14px">${group.name}</span>
