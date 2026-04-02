@@ -3953,7 +3953,7 @@ function openAddCategoryGroup() {
     const id = nextId(state.categoryGroups);
     state.categoryGroups.push({ id, name, icon, categories: [] });
     logActivity('Added category group', name);
-    saveData(state); renderSettings();
+    saveData(state); closeModal(); renderSettings();
   });
   // Wire up icon picker after modal renders
   document.getElementById('f-grp-icon-btn').addEventListener('click', () => {
