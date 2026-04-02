@@ -3990,15 +3990,66 @@ function updateCategoryGroup(id, field, value) {
   saveData(state);
 }
 
-function addCatToGroup(groupId) {
-  const sel = document.getElementById(`assign-${groupId}`);
-  const cat = sel ? sel.value : '';
+function addCatToGroup(groupId, cat) {
   if (!cat) return;
+  // Add to master list if it's a new category
+  if (!expenseCategories().includes(cat)) {
+    if (!state.expenseCategories) state.expenseCategories = expenseCategories().slice();
+    state.expenseCategories.push(cat);
+  }
   // Remove from any other group first
   state.categoryGroups.forEach(g => { g.categories = g.categories.filter(c => c !== cat); });
   const g = state.categoryGroups.find(x => x.id === groupId);
   if (g) g.categories.push(cat);
   saveData(state); renderSettings();
+}
+
+function openAddCatToGroup(groupId) {
+  const allCats = expenseCategories();
+  const assignedElsewhere = new Set((state.categoryGroups||[]).filter(x=>x.id!==groupId).flatMap(x=>x.categories));
+  const grp = state.categoryGroups.find(x => x.id === groupId);
+  const alreadyIn = new Set(grp ? grp.categories : []);
+  const available = allCats.filter(c => !alreadyIn.has(c) && !assignedElsewhere.has(c));
+
+  openModal('Add Category to Group', `
+    ${available.length > 0 ? `
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">Pick an existing category</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="cat-pick-list">
+        ${available.map(c => `
+          <button type="button" onclick="
+            document.querySelectorAll('#cat-pick-list button').forEach(b=>b.style.background='');
+            this.style.background='var(--primary)22';this.style.borderColor='var(--primary)';
+            document.getElementById('f-cat-new').value='';
+            document.getElementById('f-cat-selected').value=this.dataset.cat
+          " data-cat="${c.replace(/"/g,'&quot;')}" style="padding:5px 12px;border:1px solid var(--border);border-radius:20px;background:var(--surface2);font-size:13px;cursor:pointer">${c}</button>
+        `).join('')}
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:12px;color:var(--text-muted)">or create new</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    ` : `<p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">All existing categories are already assigned. Create a new one below.</p>`}
+    <div class="form-group">
+      <label class="form-label">New category name</label>
+      <input class="form-input" id="f-cat-new" type="text" placeholder="e.g. Pet Care" oninput="
+        if(this.value.trim()){
+          document.querySelectorAll('#cat-pick-list button').forEach(b=>b.style.background='');
+          document.getElementById('f-cat-selected').value='';
+        }
+      ">
+    </div>
+    <input type="hidden" id="f-cat-selected" value="">
+  `, () => {
+    const selected = document.getElementById('f-cat-selected').value;
+    const newName  = document.getElementById('f-cat-new').value.trim();
+    const cat = newName || selected;
+    if (!cat) return;
+    addCatToGroup(groupId, cat);
+    closeModal();
+  });
 }
 
 function removeCatFromGroup(groupId, cat) {
@@ -4324,14 +4375,7 @@ function renderSettings() {
                 </span>`).join('')}
               ${g.categories.length === 0 ? `<span style="font-size:13px;color:var(--text-muted);font-style:italic">No categories assigned</span>` : ''}
             </div>
-            ${available.length > 0 ? `
-            <div style="display:flex;gap:8px;max-width:360px">
-              <select class="form-select" id="assign-${g.id}" style="flex:1;font-size:13px">
-                <option value="">— assign a category —</option>
-                ${available.map(c => `<option value="${c.replace(/"/g,'&quot;')}">${c}</option>`).join('')}
-              </select>
-              <button class="btn btn-ghost btn-sm" onclick="addCatToGroup(${g.id})">Assign</button>
-            </div>` : `<p style="font-size:12px;color:var(--text-muted);margin:0">All available categories assigned.</p>`}
+            <button class="btn btn-ghost btn-sm" onclick="openAddCatToGroup(${g.id})" style="font-size:12px">+ Add Category</button>
           </div>`;
         }).join('')}
         ${(state.categoryGroups||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No groups yet. Click "+ Group" to create one.</p>` : ''}
