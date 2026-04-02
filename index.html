@@ -1696,9 +1696,8 @@ function renderMoneyDashboard() {
   });
   const sortedCats = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
 
-  const actuals   = state.budget.actuals[selectedBudgetMonth] || {};
-  const totalActual = Object.values(actuals).reduce((s, v) => s + v, 0);
-  const hasActuals  = Object.keys(actuals).length > 0;
+  const totalActual = me.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const hasActuals  = totalActual > 0;
 
   // ── Month nav + KPI cards ──────────────────────
   let html = `
@@ -4492,7 +4491,7 @@ function renderExpenseGroups(expenses) {
     if (items.length === 0) continue;
 
     const budgeted = items.reduce((s, e) => s + itemMonthly(e), 0);
-    const actual   = items.reduce((s, e) => s + (actuals[e.id] || 0), 0);
+    const actual   = items.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
     const pct      = budgeted > 0 ? Math.round(actual / budgeted * 100) : 0;
     const barPct   = Math.min(100, pct);
     const barColor = pct >= 100 ? 'var(--danger)' : pct >= 80 ? 'var(--warning)' : 'var(--success)';
@@ -4532,7 +4531,7 @@ function renderExpenseGroups(expenses) {
         <div style="max-height:248px;overflow-y:auto">
         ${items.map(e => {
           const eMo    = itemMonthly(e);
-          const eAct   = actuals[e.id] || 0;
+          const eAct   = getActual(e.id, selectedBudgetMonth);
           const ePct   = eMo > 0 && eAct > 0 ? Math.round(eAct / eMo * 100) : 0;
           const eColor = colors_e[e.category || 'Other'] || colors.expense[e.category || 'Other'] || '#94a3b8';
           const eOver  = eAct > eMo && eAct > 0;
@@ -4577,8 +4576,7 @@ function renderBudget() {
   const surplus = totalIncome - totalBudgetExpenses;
 
   // Actuals for selected month
-  const monthActuals = b.actuals[selectedBudgetMonth] || {};
-  const totalActual = me.reduce((sum, e) => sum + (monthActuals[e.id] || 0), 0);
+  const totalActual = me.reduce((sum, e) => sum + getActual(e.id, selectedBudgetMonth), 0);
   const totalVariance = totalBudgetExpenses - totalActual;
 
   const surplusClass = surplus >= 0 ? 'positive' : 'negative';
