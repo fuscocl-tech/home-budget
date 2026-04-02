@@ -1495,31 +1495,128 @@ function getLast6Months() {
   return months;
 }
 
+function getActualEntries(expenseId, month) {
+  const raw = (state.budget.actuals[month] || {})[expenseId];
+  if (!raw) return [];
+  // Migrate legacy single number
+  if (typeof raw === 'number') return [{ id: 1, amount: raw, date: '', note: '' }];
+  return Array.isArray(raw) ? raw : [];
+}
+
 function getActual(expenseId, month) {
-  return (state.budget.actuals[month] || {})[expenseId] || 0;
+  return getActualEntries(expenseId, month).reduce((s, e) => s + (e.amount || 0), 0);
 }
 
 function setActual(expenseId, month, val) {
+  // Legacy compat — wraps single value as entry array
   if (!state.budget.actuals[month]) state.budget.actuals[month] = {};
-  state.budget.actuals[month][expenseId] = val;
+  const existing = getActualEntries(expenseId, month);
+  if (existing.length === 1 && !existing[0].date && !existing[0].note) {
+    state.budget.actuals[month][expenseId] = [{ ...existing[0], amount: val }];
+  } else {
+    state.budget.actuals[month][expenseId] = [{ id: 1, amount: val, date: '', note: '' }];
+  }
   saveData(state);
 }
 
-function editActual(expenseId) {
-  const cell = document.getElementById(`actual-${expenseId}`);
-  const current = getActual(expenseId, selectedBudgetMonth);
-  cell.innerHTML = `<input type="number" class="actual-input" id="ai-${expenseId}" value="${current || ''}" min="0" placeholder="0">`;
-  const input = document.getElementById(`ai-${expenseId}`);
-  input.focus(); input.select();
-  function save() {
-    setActual(expenseId, selectedBudgetMonth, parseFloat(input.value) || 0);
-    renderBudget();
+function openActualEditor(expenseId) {
+  const md = getMonthData(selectedBudgetMonth);
+  const expense = md.expenses.find(e => e.id === expenseId);
+  if (!expense) return;
+  const budgeted = itemMonthly(expense);
+
+  function entriesHtml() {
+    const entries = getActualEntries(expenseId, selectedBudgetMonth);
+    const total   = entries.reduce((s, e) => s + (e.amount || 0), 0);
+    const pct     = budgeted > 0 ? Math.round(total / budgeted * 100) : 0;
+    const barColor = pct >= 100 ? 'var(--danger)' : pct >= 80 ? 'var(--warning)' : 'var(--success)';
+    return `
+      <div style="background:var(--surface2);border-radius:8px;padding:12px 14px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+          <span style="font-size:13px;color:var(--text-muted)">Budgeted this month</span>
+          <span style="font-weight:700;font-size:15px">${aud(budgeted)}</span>
+        </div>
+        <div style="background:var(--border);border-radius:99px;height:8px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${Math.min(100,pct)}%;background:${barColor};border-radius:99px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="font-weight:600;color:${barColor}">${aud(total)} spent · ${pct}%</span>
+          <span style="color:${pct>=100?'var(--danger)':'var(--text-muted)'}">${pct>=100?'Over by '+aud(total-budgeted):aud(budgeted-total)+' remaining'}</span>
+        </div>
+      </div>
+      ${entries.length > 0 ? `
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px">Entries</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${entries.map((en,i) => `
+          <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 12px">
+            <div style="flex:1">
+              <span style="font-weight:600;font-size:13px">${aud(en.amount)}</span>
+              ${en.date ? `<span style="font-size:12px;color:var(--text-muted);margin-left:8px">${fmtDate(en.date)}</span>` : ''}
+              ${en.note ? `<span style="font-size:12px;color:var(--text-muted);margin-left:8px">— ${en.note}</span>` : ''}
+            </div>
+            <button onclick="removeActualEntry(${expenseId},${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;line-height:1;padding:0 2px">&times;</button>
+          </div>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 12px 0;font-size:13px;font-weight:700;border-top:1px solid var(--border);margin-top:8px">
+          <span>Total</span><span>${aud(total)}</span>
+        </div>
+      </div>` : `<p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">No entries yet for ${monthLabel(selectedBudgetMonth)}.</p>`}
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px">Add Entry</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+        <div style="flex:0 0 110px">
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Amount</label>
+          <input type="number" id="ae-amount" class="form-input" placeholder="0.00" min="0" step="0.01" style="width:100%">
+        </div>
+        <div style="flex:0 0 140px">
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Date (optional)</label>
+          <input type="date" id="ae-date" class="form-input" style="width:100%">
+        </div>
+        <div style="flex:1;min-width:120px">
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Note (optional)</label>
+          <input type="text" id="ae-note" class="form-input" placeholder="e.g. Week 1 fill-up" style="width:100%">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addActualEntry(${expenseId})" style="flex-shrink:0;height:38px">Add</button>
+      </div>
+    `;
   }
-  input.addEventListener('blur', save);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') save();
-    if (e.key === 'Escape') renderBudget();
-  });
+
+  function refreshModal() {
+    document.getElementById('actual-editor-body').innerHTML = entriesHtml();
+  }
+
+  window._actualEditorRefresh = refreshModal;
+
+  document.getElementById('modal-title').textContent = `Actuals — ${expense.name}`;
+  document.getElementById('modal-body').innerHTML = `<div id="actual-editor-body">${entriesHtml()}</div>`;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-primary" onclick="closeModal();renderBudget()">Done</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function addActualEntry(expenseId) {
+  const amount = parseFloat(document.getElementById('ae-amount').value);
+  if (!amount || amount <= 0) return;
+  const date = document.getElementById('ae-date').value || '';
+  const note = document.getElementById('ae-note').value.trim();
+  if (!state.budget.actuals[selectedBudgetMonth]) state.budget.actuals[selectedBudgetMonth] = {};
+  const entries = getActualEntries(expenseId, selectedBudgetMonth);
+  entries.push({ id: (entries.length ? Math.max(...entries.map(e=>e.id))+1 : 1), amount, date, note });
+  state.budget.actuals[selectedBudgetMonth][expenseId] = entries;
+  saveData(state);
+  if (window._actualEditorRefresh) window._actualEditorRefresh();
+}
+
+function removeActualEntry(expenseId, idx) {
+  if (!state.budget.actuals[selectedBudgetMonth]) return;
+  const entries = getActualEntries(expenseId, selectedBudgetMonth);
+  entries.splice(idx, 1);
+  state.budget.actuals[selectedBudgetMonth][expenseId] = entries;
+  saveData(state);
+  if (window._actualEditorRefresh) window._actualEditorRefresh();
+}
+
+function editActual(expenseId) {
+  openActualEditor(expenseId);
 }
 
 function nextId(arr) {
