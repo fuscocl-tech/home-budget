@@ -1139,6 +1139,30 @@
     .nw-snapshot-btn { background: #0d9488; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
     .nw-snapshot-btn:hover { background: #0f766e; }
     .nw-empty { text-align: center; padding: 20px; color: #94a3b8; font-size: 13px; }
+    .nw-target-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+    .nw-target-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .nw-target-title { font-size: 14px; font-weight: 700; }
+    .nw-target-goal { font-size: 22px; font-weight: 800; color: #0d9488; }
+    .nw-target-sub { font-size: 12px; color: #64748b; margin-top: 3px; }
+    .nw-progress-track { height: 10px; background: #f1f5f9; border-radius: 99px; overflow: hidden; margin: 14px 0 10px; }
+    .nw-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(to right, #0d9488, #5eead4); transition: width 0.5s ease; }
+    .nw-progress-fill.over { background: linear-gradient(to right, #10b981, #6ee7b7); }
+    .nw-target-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+    .nw-target-stat { display: flex; flex-direction: column; gap: 2px; }
+    .nw-target-stat-val { font-size: 15px; font-weight: 700; color: var(--text); }
+    .nw-target-stat-lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+    .nw-target-empty { display: flex; align-items: center; gap: 12px; padding: 4px 0; }
+    .nw-debt-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+    .nw-debt-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .nw-debt-headline { font-size: 13px; color: #64748b; }
+    .nw-debt-total { font-size: 24px; font-weight: 800; color: #ef4444; }
+    .nw-debt-per { font-size: 13px; color: #94a3b8; }
+    .nw-debt-row { display: flex; align-items: center; padding: 10px 0; border-top: 1px solid #f1f5f9; gap: 10px; flex-wrap: wrap; }
+    .nw-debt-name { font-size: 13px; font-weight: 600; flex: 1; min-width: 120px; }
+    .nw-debt-rate { font-size: 12px; color: #94a3b8; background: #f8fafc; border-radius: 6px; padding: 2px 7px; white-space: nowrap; }
+    .nw-debt-int { font-size: 13px; font-weight: 700; color: #ef4444; white-space: nowrap; }
+    .nw-debt-payoff { font-size: 11px; color: #64748b; white-space: nowrap; }
+    .nw-debt-payoff.warn { color: #f59e0b; font-weight: 600; }
 
     /* Expense row swipe-up hover */
     .expense-row {
@@ -1502,7 +1526,7 @@ const DEFAULT_DATA = {
   goals: [],
   scenarios: [],
   kids: { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] },
-  netWorth: { assets: [], liabilities: [], snapshots: [] },
+  netWorth: { assets: [], liabilities: [], snapshots: [], target: { amount: 0, byYear: 0 } },
   activityLog: [],
   householdProfile: {
     members: [{ role: 'adult', age: null }, { role: 'adult', age: null }],
@@ -1542,6 +1566,7 @@ function loadData() {
     if (!d.scenarios)  d.scenarios  = [];
     if (!d.netWorth) d.netWorth = { assets: [], liabilities: [], snapshots: [] };
     if (!d.netWorth.snapshots) d.netWorth.snapshots = [];
+    if (!d.netWorth.target) d.netWorth.target = { amount: 0, byYear: 0 };
     if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
     if (!d.kids.profiles)    d.kids.profiles    = [];
     if (!d.kids.chores)      d.kids.chores      = [];
@@ -6847,6 +6872,8 @@ function renderNetWorth() {
       ${changeHtml ? `<div class="nw-hero-change">${changeHtml}</div>` : ''}
     </div>
 
+    ${renderNWTargetCard(netWorth)}
+    ${liabs.some(l => l.rate) ? renderNWDebtCard(liabs) : ''}
     ${snaps.length > 1 ? renderNWTrend(snaps) : ''}
 
     <div class="nw-cols">
@@ -6879,8 +6906,9 @@ function renderNetWorth() {
       <button class="nw-snapshot-btn" onclick="saveNWSnapshot()">Save snapshot</button>
     </div>
 
-    <div id="nw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px">
-      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+    <!-- Item modal -->
+    <div id="nw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
         <h3 id="nw-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px"></h3>
         <input type="hidden" id="nw-edit-id">
         <input type="hidden" id="nw-edit-type">
@@ -6897,6 +6925,19 @@ function renderNetWorth() {
             <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Value ($)</label>
             <input id="nw-value" type="number" min="0" step="100" placeholder="0" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
           </div>
+          <div id="nw-debt-fields" style="display:none;flex-direction:column;gap:14px">
+            <div style="border-top:1px solid var(--border);padding-top:14px;font-size:12px;font-weight:600;color:#64748b;letter-spacing:0.04em;text-transform:uppercase">Debt details (optional)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Interest rate (% p.a.)</label>
+                <input id="nw-rate" type="number" min="0" max="100" step="0.1" placeholder="e.g. 6.5" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Monthly repayment ($)</label>
+                <input id="nw-payment" type="number" min="0" step="50" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+              </div>
+            </div>
+          </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
           <button class="btn-outline" onclick="closeNWModal()">Cancel</button>
@@ -6904,15 +6945,45 @@ function renderNetWorth() {
         </div>
       </div>
     </div>
+
+    <!-- Target modal -->
+    <div id="nw-target-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Set your target</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:20px">What net worth do you want to reach, and by when?</p>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Target net worth ($)</label>
+            <input id="nw-t-amount" type="number" min="0" step="10000" placeholder="e.g. 1000000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">By year</label>
+            <input id="nw-t-year" type="number" min="2025" max="2099" step="1" placeholder="e.g. 2040" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+          <button class="btn-outline" onclick="closeNWTargetModal()">Cancel</button>
+          <button class="btn-primary" onclick="saveNWTarget()">Save target</button>
+        </div>
+      </div>
+    </div>
   `;
 }
 
 function nwItemRow(item, type) {
+  let subLine = item.category || '';
+  if (type === 'liability' && item.rate) {
+    const bal  = parseFloat(item.value) || 0;
+    const rate = parseFloat(item.rate);
+    const monthlyInt = bal * rate / 1200;
+    subLine += subLine ? ` · ` : '';
+    subLine += `${rate}% p.a. · $${Math.round(monthlyInt).toLocaleString()}/mo interest`;
+  }
   return `
     <div class="nw-item">
       <div style="flex:1;min-width:0">
         <div class="nw-item-name">${item.name}</div>
-        <div class="nw-item-cat">${item.category || ''}</div>
+        ${subLine ? `<div class="nw-item-cat">${subLine}</div>` : ''}
       </div>
       <div class="nw-item-value">${fmtNW(parseFloat(item.value)||0)}</div>
       <div class="nw-item-actions">
@@ -6924,6 +6995,160 @@ function nwItemRow(item, type) {
         </button>
       </div>
     </div>`;
+}
+
+function renderNWTargetCard(netWorth) {
+  const t = state.netWorth.target || {};
+  const target = parseFloat(t.amount) || 0;
+  const byYear = parseInt(t.byYear) || 0;
+  const currentYear = new Date().getFullYear();
+
+  if (!target || !byYear) {
+    return `
+      <div class="nw-target-card">
+        <div class="nw-target-header">
+          <span class="nw-target-title">Your target</span>
+          <button class="btn-outline" style="font-size:12px;padding:5px 12px" onclick="openNWTargetModal()">Set target</button>
+        </div>
+        <div class="nw-target-empty">
+          <span style="font-size:28px">🎯</span>
+          <span style="font-size:13px;color:#64748b">Set a net worth goal and track your progress towards it.</span>
+        </div>
+      </div>`;
+  }
+
+  const pct         = Math.min((netWorth / target) * 100, 100);
+  const remaining   = Math.max(target - netWorth, 0);
+  const yearsLeft   = Math.max(byYear - currentYear, 0);
+  const monthsLeft  = yearsLeft * 12;
+  const neededPerMo = monthsLeft > 0 ? Math.ceil(remaining / monthsLeft) : 0;
+  const done        = netWorth >= target;
+
+  // Velocity from snapshots
+  const snaps = state.netWorth.snapshots || [];
+  let velocityHtml = '';
+  if (snaps.length >= 2) {
+    const oldest = snaps[0];
+    const newest = snaps[snaps.length - 1];
+    const months = Math.max((new Date(newest.date) - new Date(oldest.date)) / (1000 * 60 * 60 * 24 * 30.5), 1);
+    const growthPerMo = (newest.netWorth - oldest.netWorth) / months;
+    if (growthPerMo > 0 && remaining > 0) {
+      const projMonths   = Math.ceil(remaining / growthPerMo);
+      const projYear     = currentYear + Math.floor(projMonths / 12);
+      const onTrack      = projYear <= byYear;
+      velocityHtml = `<div class="nw-target-stat">
+        <div class="nw-target-stat-val" style="color:${onTrack?'#10b981':'#f59e0b'}">${onTrack ? '✓ On track' : '⚠ Off track'}</div>
+        <div class="nw-target-stat-lbl">At current pace: ${projYear}</div>
+      </div>`;
+    }
+  }
+
+  return `
+    <div class="nw-target-card">
+      <div class="nw-target-header">
+        <div>
+          <div class="nw-target-title">Your target</div>
+        </div>
+        <button class="btn-outline" style="font-size:12px;padding:5px 12px" onclick="openNWTargetModal()">Edit</button>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+        <div class="nw-target-goal">${fmtNW(target)}</div>
+        <div style="font-size:13px;color:#64748b">by ${byYear}</div>
+      </div>
+      <div class="nw-progress-track">
+        <div class="nw-progress-fill ${done?'over':''}" style="width:${pct.toFixed(1)}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:14px">
+        <span>${pct.toFixed(0)}% there</span>
+        <span>${done ? '🎉 Goal reached!' : fmtNW(remaining) + ' to go'}</span>
+      </div>
+      <div class="nw-target-stats">
+        ${!done && yearsLeft > 0 ? `<div class="nw-target-stat">
+          <div class="nw-target-stat-val">${yearsLeft} yr${yearsLeft!==1?'s':''}</div>
+          <div class="nw-target-stat-lbl">Time remaining</div>
+        </div>` : ''}
+        ${!done && neededPerMo > 0 ? `<div class="nw-target-stat">
+          <div class="nw-target-stat-val">$${neededPerMo.toLocaleString()}/mo</div>
+          <div class="nw-target-stat-lbl">Required growth</div>
+        </div>` : ''}
+        ${velocityHtml}
+      </div>
+    </div>`;
+}
+
+function renderNWDebtCard(liabs) {
+  const withRate = liabs.filter(l => l.rate);
+  if (!withRate.length) return '';
+
+  const totalMonthlyInt = withRate.reduce((s,l) => {
+    return s + (parseFloat(l.value)||0) * (parseFloat(l.rate)||0) / 1200;
+  }, 0);
+
+  const rows = withRate.map(l => {
+    const bal     = parseFloat(l.value) || 0;
+    const rate    = parseFloat(l.rate) || 0;
+    const payment = parseFloat(l.monthlyPayment) || 0;
+    const monthlyInt = bal * rate / 1200;
+    let payoffHtml = '';
+    if (payment > 0) {
+      if (payment <= monthlyInt) {
+        payoffHtml = `<span class="nw-debt-payoff warn">⚠ Paying interest only</span>`;
+      } else {
+        const r = rate / 1200;
+        const n = -Math.log(1 - (r * bal / payment)) / Math.log(1 + r);
+        if (isFinite(n) && n > 0) {
+          const payoffDate = new Date();
+          payoffDate.setMonth(payoffDate.getMonth() + Math.ceil(n));
+          const mo   = payoffDate.toLocaleString('default', { month: 'short' });
+          const yr   = payoffDate.getFullYear();
+          const totalPaid = payment * Math.ceil(n);
+          const totalInt  = totalPaid - bal;
+          payoffHtml = `<span class="nw-debt-payoff" title="${fmtNW(totalInt)} total interest">Paid off ${mo} ${yr}</span>`;
+        }
+      }
+    }
+    return `<div class="nw-debt-row">
+      <span class="nw-debt-name">${l.name}</span>
+      <span class="nw-debt-rate">${rate}% p.a.</span>
+      <span class="nw-debt-int">$${Math.round(monthlyInt).toLocaleString()}/mo interest</span>
+      ${payoffHtml}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="nw-debt-card">
+      <div class="nw-debt-header">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <span class="nw-debt-headline">Your debts cost you</span>
+          <div style="display:flex;align-items:baseline;gap:6px">
+            <span class="nw-debt-total">$${Math.round(totalMonthlyInt).toLocaleString()}</span>
+            <span class="nw-debt-per">per month in interest</span>
+          </div>
+        </div>
+      </div>
+      ${rows}
+      <div style="font-size:11px;color:#94a3b8;margin-top:12px">Add interest rates to your liabilities to see full breakdown.</div>
+    </div>`;
+}
+
+function openNWTargetModal() {
+  const t = state.netWorth.target || {};
+  document.getElementById('nw-t-amount').value = t.amount || '';
+  document.getElementById('nw-t-year').value   = t.byYear || '';
+  document.getElementById('nw-target-modal').style.display = 'flex';
+}
+function closeNWTargetModal() {
+  document.getElementById('nw-target-modal').style.display = 'none';
+}
+function saveNWTarget() {
+  const amount = parseFloat(document.getElementById('nw-t-amount').value);
+  const byYear = parseInt(document.getElementById('nw-t-year').value);
+  if (!amount || !byYear) return;
+  if (!state.netWorth.target) state.netWorth.target = {};
+  state.netWorth.target.amount = amount;
+  state.netWorth.target.byYear = byYear;
+  saveData();
+  closeNWTargetModal();
 }
 
 function renderNWTrend(snaps) {
@@ -6957,10 +7182,14 @@ function openNWModal(type, id) {
   document.getElementById('nw-modal-title').textContent = (item ? 'Edit' : 'Add') + ' ' + (type === 'asset' ? 'Asset' : 'Liability');
   document.getElementById('nw-edit-id').value   = id || '';
   document.getElementById('nw-edit-type').value = type;
-  document.getElementById('nw-name').value  = item ? item.name : '';
-  document.getElementById('nw-value').value = item ? item.value : '';
+  document.getElementById('nw-name').value    = item ? item.name : '';
+  document.getElementById('nw-value').value   = item ? item.value : '';
+  document.getElementById('nw-rate').value    = (item && item.rate) ? item.rate : '';
+  document.getElementById('nw-payment').value = (item && item.monthlyPayment) ? item.monthlyPayment : '';
   const catSel = document.getElementById('nw-cat');
   catSel.innerHTML = cats.map(c => `<option value="${c}" ${item && item.category===c?'selected':''}>${c}</option>`).join('');
+  const debtFields = document.getElementById('nw-debt-fields');
+  if (debtFields) debtFields.style.display = type === 'liability' ? 'flex' : 'none';
   modal.style.display = 'flex';
 }
 function closeNWModal() {
@@ -6968,18 +7197,22 @@ function closeNWModal() {
   if (modal) modal.style.display = 'none';
 }
 function saveNWItem() {
-  const name  = document.getElementById('nw-name').value.trim();
-  const value = parseFloat(document.getElementById('nw-value').value);
-  const cat   = document.getElementById('nw-cat').value;
-  const type  = document.getElementById('nw-edit-type').value;
-  const id    = document.getElementById('nw-edit-id').value;
+  const name    = document.getElementById('nw-name').value.trim();
+  const value   = parseFloat(document.getElementById('nw-value').value);
+  const cat     = document.getElementById('nw-cat').value;
+  const type    = document.getElementById('nw-edit-type').value;
+  const id      = document.getElementById('nw-edit-id').value;
+  const rate    = parseFloat(document.getElementById('nw-rate').value) || 0;
+  const payment = parseFloat(document.getElementById('nw-payment').value) || 0;
   if (!name || isNaN(value)) return;
   const list = type === 'asset' ? state.netWorth.assets : state.netWorth.liabilities;
+  const entry = { name, value, category: cat };
+  if (type === 'liability') { if (rate) entry.rate = rate; if (payment) entry.monthlyPayment = payment; }
   if (id) {
-    const item = list.find(x => x.id === id);
-    if (item) { item.name = name; item.value = value; item.category = cat; }
+    const idx = list.findIndex(x => x.id === id);
+    if (idx !== -1) list[idx] = { ...list[idx], ...entry };
   } else {
-    list.push({ id: uid(), name, value, category: cat });
+    list.push({ id: uid(), ...entry });
   }
   saveData();
   closeNWModal();
