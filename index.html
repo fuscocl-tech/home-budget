@@ -1164,6 +1164,45 @@
     .nw-debt-payoff { font-size: 11px; color: #64748b; white-space: nowrap; }
     .nw-debt-payoff.warn { color: #f59e0b; font-weight: 600; }
 
+    /* ─── Bills ───────────────────────────────── */
+    .bills-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 14px; margin-bottom: 24px; }
+    .bills-stat { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .bills-stat-val { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .bills-stat-val.danger { color: #ef4444; }
+    .bills-stat-val.warn   { color: #f59e0b; }
+    .bills-stat-val.ok     { color: #10b981; }
+    .bills-stat-lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+    .bills-timeline { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+    .bills-timeline-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+    .bills-strip { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+    .bills-day { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 38px; }
+    .bills-day-num { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #64748b; }
+    .bills-day-num.today { background: #0d9488; color: #fff; }
+    .bills-day-num.has-bill { background: #fef2f2; color: #ef4444; border: 1.5px solid #fca5a5; }
+    .bills-day-num.today.has-bill { background: #ef4444; color: #fff; border-color: #ef4444; }
+    .bills-day-label { font-size: 9px; color: #94a3b8; text-transform: uppercase; }
+    .bills-day-dot { width: 5px; height: 5px; border-radius: 50%; background: #ef4444; }
+    .bills-upcoming { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+    .bills-upcoming-group { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #94a3b8; margin: 8px 0 4px; }
+    .bill-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff; border: 1px solid var(--border); border-radius: 10px; transition: box-shadow 0.15s; }
+    .bill-row:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .bill-row.overdue { border-color: #fca5a5; background: #fff5f5; }
+    .bill-row.due-soon { border-color: #fde68a; background: #fffbeb; }
+    .bill-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; background: #f8fafc; }
+    .bill-info { flex: 1; min-width: 0; }
+    .bill-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .bill-meta { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+    .bill-amount { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; }
+    .bill-due-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; white-space: nowrap; }
+    .bill-due-badge.overdue { background: #fee2e2; color: #ef4444; }
+    .bill-due-badge.today   { background: #fef3c7; color: #d97706; }
+    .bill-due-badge.soon    { background: #fffbeb; color: #f59e0b; }
+    .bill-due-badge.ok      { background: #f0fdf4; color: #10b981; }
+    .bill-paid-btn { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+    .bill-paid-btn:hover { border-color: #10b981; color: #10b981; background: #f0fdf4; }
+    .bill-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.12s; }
+    .bill-row:hover .bill-actions { opacity: 1; }
+
     /* Expense row swipe-up hover */
     .expense-row {
       background-size: 100% 200%;
@@ -1246,6 +1285,9 @@
       <div class="nav-item" data-tab="networth" title="Net Worth">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><polyline points="2 20 22 20"/></svg>
       </div>
+      <div class="nav-item" data-tab="bills" title="Bills">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+      </div>
     </nav>
     <div class="icon-col-actions">
       <button id="install-btn" style="display:none" onclick="installApp()" title="Add to Home Screen">
@@ -1279,6 +1321,7 @@
       <div class="nav-text-item" data-tab="insights">Insights</div>
       <div class="nav-text-item" data-tab="kids">Kids Zone</div>
       <div class="nav-text-item" data-tab="networth">Net Worth</div>
+      <div class="nav-text-item" data-tab="bills">Bills</div>
     </nav>
     <div class="text-col-actions">
       <button id="install-btn-text" style="display:none" onclick="installApp()">Add to Home Screen</button>
@@ -1368,6 +1411,11 @@
   <!-- KIDS ZONE -->
   <div class="tab-panel" id="tab-kids">
     <div id="kids-content"></div>
+  </div>
+
+  <!-- BILLS -->
+  <div class="tab-panel" id="tab-bills">
+    <div id="bills-content"></div>
   </div>
 
   <!-- NET WORTH -->
@@ -1527,6 +1575,7 @@ const DEFAULT_DATA = {
   scenarios: [],
   kids: { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] },
   netWorth: { assets: [], liabilities: [], snapshots: [], target: { amount: 0, byYear: 0 } },
+  bills: [],
   activityLog: [],
   householdProfile: {
     members: [{ role: 'adult', age: null }, { role: 'adult', age: null }],
@@ -1567,6 +1616,7 @@ function loadData() {
     if (!d.netWorth) d.netWorth = { assets: [], liabilities: [], snapshots: [] };
     if (!d.netWorth.snapshots) d.netWorth.snapshots = [];
     if (!d.netWorth.target) d.netWorth.target = { amount: 0, byYear: 0 };
+    if (!d.bills) d.bills = [];
     if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
     if (!d.kids.profiles)    d.kids.profiles    = [];
     if (!d.kids.chores)      d.kids.chores      = [];
@@ -6209,6 +6259,7 @@ function renderAll() {
   safeRender(renderSettings);
   safeRender(renderKids);
   safeRender(renderNetWorth);
+  safeRender(renderBills);
 }
 
 // ─────────────────────────────────────────────────
@@ -7233,6 +7284,324 @@ function saveNWSnapshot() {
   const entry    = { date: today, netWorth: total, assets: (nw.assets||[]).reduce((s,a)=>s+(parseFloat(a.value)||0),0), liabilities: (nw.liabilities||[]).reduce((s,l)=>s+(parseFloat(l.value)||0),0) };
   if (existing !== -1) nw.snapshots[existing] = entry;
   else nw.snapshots.push(entry);
+  saveData();
+}
+
+// ─────────────────────────────────────────────────
+// BILLS
+// ─────────────────────────────────────────────────
+
+const BILL_CATS = [
+  { label: 'Mortgage / Rent',  icon: '🏠' },
+  { label: 'Electricity',      icon: '⚡' },
+  { label: 'Gas',              icon: '🔥' },
+  { label: 'Water',            icon: '💧' },
+  { label: 'Internet',         icon: '📡' },
+  { label: 'Phone',            icon: '📱' },
+  { label: 'Insurance',        icon: '🛡️' },
+  { label: 'Car Registration', icon: '🚗' },
+  { label: 'Rates & Taxes',    icon: '🏛️' },
+  { label: 'Loan Repayment',   icon: '💳' },
+  { label: 'Education',        icon: '📚' },
+  { label: 'Subscriptions',    icon: '📺' },
+  { label: 'Health',           icon: '🏥' },
+  { label: 'Other',            icon: '📦' },
+];
+const BILL_FREQS = ['Monthly','Fortnightly','Weekly','Quarterly','Annually'];
+
+function billCatIcon(cat) {
+  const found = BILL_CATS.find(c => c.label === cat);
+  return found ? found.icon : '📦';
+}
+
+// Returns next due date (Date object) for a bill from today
+function billNextDue(bill) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const freq  = bill.frequency || 'Monthly';
+
+  if (freq === 'Monthly') {
+    const day = parseInt(bill.dueDay) || 1;
+    let d = new Date(today.getFullYear(), today.getMonth(), day);
+    if (d < today) d = new Date(today.getFullYear(), today.getMonth() + 1, day);
+    return d;
+  }
+
+  // For other frequencies: use lastPaid or startDate to project forward
+  const base = bill.lastPaid ? new Date(bill.lastPaid) : (bill.startDate ? new Date(bill.startDate) : today);
+  base.setHours(0,0,0,0);
+  const periodDays = { Weekly: 7, Fortnightly: 14, Quarterly: 91, Annually: 365 }[freq] || 30;
+  let next = new Date(base);
+  while (next <= today) next = new Date(next.getTime() + periodDays * 86400000);
+  return next;
+}
+
+function billDaysUntil(bill) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const next  = billNextDue(bill);
+  return Math.round((next - today) / 86400000);
+}
+
+function billDueBadge(days) {
+  if (days < 0)  return `<span class="bill-due-badge overdue">Overdue ${Math.abs(days)}d</span>`;
+  if (days === 0) return `<span class="bill-due-badge today">Due today</span>`;
+  if (days <= 7)  return `<span class="bill-due-badge soon">Due in ${days}d</span>`;
+  const next = new Date(); next.setDate(next.getDate() + days);
+  return `<span class="bill-due-badge ok">${next.toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</span>`;
+}
+
+function billMonthlyEquiv(bill) {
+  const amount = parseFloat(bill.amount) || 0;
+  const map = { Weekly: 52/12, Fortnightly: 26/12, Monthly: 1, Quarterly: 1/3, Annually: 1/12 };
+  return amount * (map[bill.frequency||'Monthly'] || 1);
+}
+
+function renderBills() {
+  const el = document.getElementById('bills-content');
+  if (!el) return;
+  const bills = state.bills || [];
+
+  if (!bills.length) {
+    el.innerHTML = `
+      <div style="text-align:center;padding:80px 20px">
+        <div style="font-size:52px;margin-bottom:16px">📅</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px">No bills yet</div>
+        <div style="font-size:14px;color:#64748b;margin-bottom:24px">Add your recurring bills to stay on top of what's coming up.</div>
+        <button class="btn-primary" onclick="openBillModal()">+ Add first bill</button>
+      </div>
+      ${billsModal()}`;
+    return;
+  }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const sorted = [...bills].sort((a,b) => billDaysUntil(a) - billDaysUntil(b));
+
+  // Summary stats
+  const monthlyTotal  = bills.reduce((s,b) => s + billMonthlyEquiv(b), 0);
+  const overdueCount  = bills.filter(b => billDaysUntil(b) < 0).length;
+  const dueSoonCount  = bills.filter(b => { const d = billDaysUntil(b); return d >= 0 && d <= 7; }).length;
+  const thisMonthTotal = bills.reduce((s,b) => {
+    const d = billDaysUntil(b);
+    return d >= 0 && d <= 31 ? s + (parseFloat(b.amount)||0) : s;
+  }, 0);
+
+  // 14-day strip
+  const stripDays = [];
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(today); d.setDate(d.getDate() + i);
+    const dayBills = bills.filter(b => {
+      const nd = billNextDue(b);
+      return nd.toDateString() === d.toDateString();
+    });
+    stripDays.push({ date: d, bills: dayBills });
+  }
+
+  const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const strip = stripDays.map(({ date, bills: db }) => {
+    const isToday   = date.toDateString() === today.toDateString();
+    const hasBill   = db.length > 0;
+    const cls = [isToday && 'today', hasBill && 'has-bill'].filter(Boolean).join(' ');
+    const tip = db.map(b => b.name).join(', ');
+    return `<div class="bills-day" title="${tip}">
+      <div class="bills-day-label">${DAY_NAMES[date.getDay()]}</div>
+      <div class="bills-day-num ${cls}">${date.getDate()}</div>
+      ${hasBill ? `<div class="bills-day-dot"></div>` : '<div style="height:5px"></div>'}
+    </div>`;
+  }).join('');
+
+  // Grouped upcoming list
+  const overdue   = sorted.filter(b => billDaysUntil(b) < 0);
+  const thisWeek  = sorted.filter(b => { const d = billDaysUntil(b); return d >= 0 && d <= 7; });
+  const thisMonth = sorted.filter(b => { const d = billDaysUntil(b); return d > 7 && d <= 31; });
+  const later     = sorted.filter(b => billDaysUntil(b) > 31);
+
+  function billRows(list) {
+    return list.map(b => {
+      const days  = billDaysUntil(b);
+      const next  = billNextDue(b);
+      const rowCls = days < 0 ? 'overdue' : days <= 7 ? 'due-soon' : '';
+      const freqLabel = (b.frequency||'Monthly') !== 'Monthly' ? ` · ${b.frequency}` : '';
+      return `<div class="bill-row ${rowCls}">
+        <div class="bill-icon">${billCatIcon(b.category)}</div>
+        <div class="bill-info">
+          <div class="bill-name">${b.name}</div>
+          <div class="bill-meta">${b.category||''}${freqLabel}${b.autopay?' · Autopay ✓':''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="bill-amount">$${(parseFloat(b.amount)||0).toLocaleString()}</div>
+          ${billDueBadge(days)}
+        </div>
+        ${days >= 0 ? `<button class="bill-paid-btn" onclick="markBillPaid('${b.id}')">✓ Paid</button>` : ''}
+        <div class="bill-actions">
+          <button class="icon-btn" title="Edit" onclick="openBillModal('${b.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn" style="color:#ef4444" title="Delete" onclick="deleteBill('${b.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+      <div></div>
+      <button class="btn-primary" onclick="openBillModal()">+ Add bill</button>
+    </div>
+
+    <div class="bills-summary">
+      <div class="bills-stat">
+        <div class="bills-stat-val">$${Math.round(monthlyTotal).toLocaleString()}</div>
+        <div class="bills-stat-lbl">Monthly total</div>
+      </div>
+      <div class="bills-stat">
+        <div class="bills-stat-val">$${Math.round(monthlyTotal * 12).toLocaleString()}</div>
+        <div class="bills-stat-lbl">Annual total</div>
+      </div>
+      <div class="bills-stat">
+        <div class="bills-stat-val ${dueSoonCount > 0 ? 'warn' : 'ok'}">${dueSoonCount}</div>
+        <div class="bills-stat-lbl">Due this week</div>
+      </div>
+      <div class="bills-stat">
+        <div class="bills-stat-val ${overdueCount > 0 ? 'danger' : 'ok'}">${overdueCount}</div>
+        <div class="bills-stat-lbl">Overdue</div>
+      </div>
+    </div>
+
+    <div class="bills-timeline">
+      <div class="bills-timeline-title">Next 14 days</div>
+      <div class="bills-strip">${strip}</div>
+    </div>
+
+    <div class="bills-upcoming">
+      ${overdue.length   ? `<div class="bills-upcoming-group">⚠ Overdue</div>${billRows(overdue)}` : ''}
+      ${thisWeek.length  ? `<div class="bills-upcoming-group">This week</div>${billRows(thisWeek)}` : ''}
+      ${thisMonth.length ? `<div class="bills-upcoming-group">This month</div>${billRows(thisMonth)}` : ''}
+      ${later.length     ? `<div class="bills-upcoming-group">Later</div>${billRows(later)}` : ''}
+    </div>
+
+    ${billsModal()}`;
+}
+
+function billsModal(id) {
+  const bill = id ? (state.bills||[]).find(b => b.id === id) : null;
+  const cats = BILL_CATS.map(c => `<option value="${c.label}" ${bill&&bill.category===c.label?'selected':''}>${c.icon} ${c.label}</option>`).join('');
+  const freqs = BILL_FREQS.map(f => `<option value="${f}" ${(bill&&bill.frequency===f)||((!bill||!bill.frequency)&&f==='Monthly')?'selected':''}>${f}</option>`).join('');
+
+  const inputStyle = 'width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none';
+  const labelStyle = 'font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px';
+
+  return `
+    <div id="bill-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto">
+        <h3 id="bill-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px">Add Bill</h3>
+        <input type="hidden" id="bill-edit-id">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="${labelStyle}">Bill name</label>
+            <input id="bill-name" type="text" placeholder="e.g. AGL Electricity" style="${inputStyle}" value="${bill?bill.name:''}">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="${labelStyle}">Category</label>
+              <select id="bill-cat" style="${inputStyle};background:#fff">${cats}</select>
+            </div>
+            <div>
+              <label style="${labelStyle}">Frequency</label>
+              <select id="bill-freq" style="${inputStyle};background:#fff" onchange="toggleBillDayField()">${freqs}</select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="${labelStyle}">Amount ($)</label>
+              <input id="bill-amount" type="number" min="0" step="1" placeholder="0" style="${inputStyle}" value="${bill?bill.amount:''}">
+            </div>
+            <div id="bill-day-wrap">
+              <label style="${labelStyle}">Day of month due</label>
+              <input id="bill-day" type="number" min="1" max="31" placeholder="e.g. 15" style="${inputStyle}" value="${bill&&bill.dueDay?bill.dueDay:''}">
+            </div>
+            <div id="bill-start-wrap" style="display:none">
+              <label style="${labelStyle}">Next due date</label>
+              <input id="bill-start" type="date" style="${inputStyle}" value="${bill&&bill.startDate?bill.startDate:''}">
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <input type="checkbox" id="bill-autopay" style="width:16px;height:16px;cursor:pointer" ${bill&&bill.autopay?'checked':''}>
+            <label for="bill-autopay" style="font-size:13px;font-weight:500;cursor:pointer">Autopay / direct debit</label>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+          <button class="btn-outline" onclick="closeBillModal()">Cancel</button>
+          <button class="btn-primary" onclick="saveBill()">Save</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function openBillModal(id) {
+  const bill = id ? (state.bills||[]).find(b => b.id === id) : null;
+  // Re-render modal section with the bill data
+  renderBills();
+  const modal = document.getElementById('bill-modal');
+  if (!modal) return;
+  document.getElementById('bill-modal-title').textContent = bill ? 'Edit Bill' : 'Add Bill';
+  document.getElementById('bill-edit-id').value = id || '';
+  if (bill) {
+    document.getElementById('bill-name').value   = bill.name || '';
+    document.getElementById('bill-cat').value    = bill.category || BILL_CATS[0].label;
+    document.getElementById('bill-freq').value   = bill.frequency || 'Monthly';
+    document.getElementById('bill-amount').value = bill.amount || '';
+    document.getElementById('bill-day').value    = bill.dueDay || '';
+    document.getElementById('bill-start').value  = bill.startDate || '';
+    document.getElementById('bill-autopay').checked = !!bill.autopay;
+  }
+  toggleBillDayField();
+  modal.style.display = 'flex';
+}
+function closeBillModal() {
+  const modal = document.getElementById('bill-modal');
+  if (modal) modal.style.display = 'none';
+}
+function toggleBillDayField() {
+  const freq      = document.getElementById('bill-freq')?.value;
+  const dayWrap   = document.getElementById('bill-day-wrap');
+  const startWrap = document.getElementById('bill-start-wrap');
+  if (!dayWrap || !startWrap) return;
+  const isMonthly = freq === 'Monthly';
+  dayWrap.style.display   = isMonthly ? 'block' : 'none';
+  startWrap.style.display = isMonthly ? 'none' : 'block';
+}
+function saveBill() {
+  const name    = document.getElementById('bill-name').value.trim();
+  const amount  = parseFloat(document.getElementById('bill-amount').value);
+  const cat     = document.getElementById('bill-cat').value;
+  const freq    = document.getElementById('bill-freq').value;
+  const dueDay  = parseInt(document.getElementById('bill-day').value) || null;
+  const start   = document.getElementById('bill-start').value || null;
+  const autopay = document.getElementById('bill-autopay').checked;
+  const id      = document.getElementById('bill-edit-id').value;
+  if (!name || isNaN(amount)) return;
+  const entry = { name, amount, category: cat, frequency: freq, autopay };
+  if (freq === 'Monthly') entry.dueDay = dueDay;
+  else entry.startDate = start;
+  if (!state.bills) state.bills = [];
+  if (id) {
+    const idx = state.bills.findIndex(b => b.id === id);
+    if (idx !== -1) state.bills[idx] = { ...state.bills[idx], ...entry };
+  } else {
+    state.bills.push({ id: uid(), ...entry });
+  }
+  saveData();
+  closeBillModal();
+}
+function deleteBill(id) {
+  state.bills = (state.bills||[]).filter(b => b.id !== id);
+  saveData();
+}
+function markBillPaid(id) {
+  const bill = (state.bills||[]).find(b => b.id === id);
+  if (!bill) return;
+  bill.lastPaid = new Date().toISOString().slice(0,10);
   saveData();
 }
 
