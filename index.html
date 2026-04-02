@@ -4554,15 +4554,16 @@ function renderExpenseGroups(expenses) {
             </div>
             <div style="position:relative;flex-shrink:0;width:32px;height:32px;cursor:pointer"
                  onclick="event.stopPropagation();editActual(${e.id})"
-                 onmouseenter="this.querySelector('.ring-tip').style.opacity='1';this.querySelector('.ring-tip').style.visibility='visible'"
-                 onmouseleave="this.querySelector('.ring-tip').style.opacity='0';this.querySelector('.ring-tip').style.visibility='hidden'">
-              <svg width="32" height="32" viewBox="0 0 36 36" style="transform:rotate(-90deg)">
+                 onmouseenter="this.querySelector('svg').style.opacity='.25';this.querySelector('.ring-overlay').style.opacity='1'"
+                 onmouseleave="this.querySelector('svg').style.opacity='1';this.querySelector('.ring-overlay').style.opacity='0'">
+              <svg width="32" height="32" viewBox="0 0 36 36" style="transform:rotate(-90deg);transition:opacity .15s">
                 <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--border)" stroke-width="3.5"/>
                 <circle cx="18" cy="18" r="15.9" fill="none" stroke="${ringColor}" stroke-width="3.5"
-                  stroke-dasharray="${ePct} 100" stroke-linecap="round"
-                  style="transition:stroke-dasharray .4s ease"/>
+                  stroke-dasharray="${ePct} 100" stroke-linecap="round"/>
               </svg>
-              <div class="ring-tip" style="position:absolute;bottom:calc(100% + 7px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,.2)">${tipLabel}</div>
+              <div class="ring-overlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .15s">
+                <span style="font-size:9px;font-weight:700;color:${ringColor};line-height:1">${ePct}%</span>
+              </div>
             </div>
           </div>`;
         }).join('')}
