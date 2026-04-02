@@ -74,154 +74,159 @@
 
     /* ─── Sidebar ─────────────────────────────── */
     .sidebar {
-      width: var(--sidebar-w);
-      /* teal rail on left 60px, white panel for text */
-      background: linear-gradient(to right, #0d9488 60px, #ffffff 60px);
-      color: #1e293b;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       flex-shrink: 0;
       position: sticky;
       top: 0;
       height: calc(100vh - 56px);
-      overflow: hidden;
-      transition: width 0.22s ease, box-shadow 0.22s ease;
       z-index: 40;
     }
-
-    /* Collapsed = icon-only rail (60px = only teal shows) */
-    .sidebar.collapsed { width: 60px; }
-
-    /* Hover-expand when collapsed (not pinned) */
-    .sidebar.collapsed:hover {
-      width: var(--sidebar-w);
-      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
-    }
-
-    .sidebar-top {
+    /* ── Icon column (teal, always visible) ───── */
+    .icon-col {
+      width: 60px;
+      background: #0d9488;
       display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 8px 8px 4px;
-      flex-shrink: 0;
-      min-width: 0;
-    }
-
-    /* Toggle button: collapse icon when open, pin icon on hover when collapsed */
-    .sidebar-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #94a3b8;
-      padding: 6px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, color 0.15s, opacity 0.15s;
+      flex-direction: column;
       flex-shrink: 0;
     }
-    .sidebar-toggle:hover { background: #f1f5f9; color: #1e293b; }
 
-    /* Hide toggle when collapsed, show on hover */
-    .sidebar.collapsed .sidebar-toggle { opacity: 0; pointer-events: none; }
-    .sidebar.collapsed:hover .sidebar-toggle { opacity: 1; pointer-events: auto; }
+    .icon-col-top {
+      height: 44px;
+      flex-shrink: 0;
+    }
 
-    /* Chevron icons inside toggle */
-    .icon-collapse { display: block; }
-    .icon-pin      { display: none; }
-    .sidebar.collapsed:hover .icon-collapse { display: none; }
-    .sidebar.collapsed:hover .icon-pin      { display: block; }
-
-    .sidebar nav { padding: 10px 8px; flex: 1; overflow: hidden; }
+    .icon-nav { padding: 6px 0; flex: 1; }
 
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 0;
-      padding: 8px 10px 8px 0; /* no left padding — icon column handles it */
-      border-radius: 8px;
-      color: #64748b;
+      justify-content: center;
+      height: 40px;
       cursor: pointer;
-      font-weight: 500;
-      transition: all 0.15s;
-      margin-bottom: 2px;
+      color: rgba(255,255,255,0.65);
+      transition: background 0.15s, color 0.15s;
       user-select: none;
-      white-space: nowrap;
     }
-
-    /* Two-tone hover/active: teal highlight on icon rail, light grey on text area */
-    .nav-item:hover {
-      background: linear-gradient(to right, rgba(255,255,255,0.15) 60px, #f1f5f9 60px);
-      color: #1e293b;
-    }
-    .nav-item.active {
-      background: linear-gradient(to right, rgba(255,255,255,0.22) 60px, #f1f5f9 60px);
-      color: #1e293b;
-    }
-
-    /* Icons centred inside the 60px teal column: 21 + 18 + 21 = 60 */
+    .nav-item:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .nav-item.active { background: rgba(255,255,255,0.22); color: #fff; }
     .nav-item .nav-icon-svg {
       width: 18px; height: 18px;
-      flex-shrink: 0;
-      margin: 0 21px;
-      stroke: rgba(255,255,255,0.65);
+      stroke: currentColor;
       transition: stroke 0.15s;
+      fill: none;
     }
-    .nav-item:hover .nav-icon-svg,
-    .nav-item.active .nav-icon-svg { stroke: #ffffff; }
 
-    /* Labels hidden when collapsed, shown on hover-expand */
-    .nav-label { overflow: hidden; transition: opacity 0.15s; padding-left: 2px; }
-    .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
-    .sidebar.collapsed:hover .nav-label { opacity: 1; pointer-events: auto; }
-
-    .sidebar-actions {
-      padding: 12px 8px;
+    .icon-col-actions {
+      padding: 8px 0;
       border-top: 1px solid rgba(255,255,255,0.15);
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      overflow: hidden;
+    }
+    .icon-col-actions button {
+      background: none; border: none;
+      display: flex; align-items: center; justify-content: center;
+      height: 36px; cursor: pointer;
+      color: rgba(255,255,255,0.55);
+      transition: background 0.15s, color 0.15s;
+    }
+    .icon-col-actions button:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .icon-col-actions button svg { stroke: currentColor; }
+
+    .icon-col-user {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .icon-col-user img {
+      width: 28px; height: 28px; border-radius: 50%;
+      object-fit: cover; background: rgba(255,255,255,0.2);
     }
 
-    .sidebar-actions button {
-      background: none;
-      border: none;
-      color: #64748b;
-      border-radius: 7px;
-      padding: 7px 10px 7px 0; /* no left padding — icon column handles it */
-      font-size: 12px;
-      cursor: pointer;
-      text-align: left;
+    /* ── Text column (white, slides in/out) ──── */
+    .text-col {
+      width: 170px;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width 0.22s ease, box-shadow 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .sidebar.collapsed .text-col { width: 0; border-right: none; }
+    .sidebar.collapsed:hover .text-col {
+      width: 170px;
+      border-right: 1px solid var(--border);
+      box-shadow: 4px 0 16px rgba(0,0,0,0.08);
+    }
+
+    .text-col-top {
+      height: 44px;
       display: flex;
       align-items: center;
-      gap: 0;
-      transition: all 0.15s;
-      white-space: nowrap;
+      justify-content: flex-end;
+      padding: 0 8px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
     }
 
-    /* Action button icons centred in 60px teal column: 23 + 14 + 23 = 60 */
-    .sidebar-actions button svg { flex-shrink: 0; margin: 0 23px; stroke: rgba(255,255,255,0.65); }
-    .sidebar-actions button:hover svg { stroke: #ffffff; }
-    .sidebar-actions button:hover {
-      background: linear-gradient(to right, rgba(255,255,255,0.15) 60px, #f1f5f9 60px);
-      color: #1e293b;
+    .sidebar-toggle {
+      background: none; border: none; cursor: pointer;
+      color: #94a3b8; padding: 6px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
     }
-    .sidebar.collapsed .sidebar-actions button span { opacity: 0; transition: opacity 0.15s; }
-    .sidebar.collapsed:hover .sidebar-actions button span { opacity: 1; }
+    .sidebar-toggle:hover { background: #f1f5f9; color: #1e293b; }
 
-    /* ─── Sidebar user ────────────────────────── */
+    .icon-collapse { display: block; }
+    .icon-pin      { display: none; }
+    .sidebar.collapsed .icon-collapse { display: none; }
+    .sidebar.collapsed .icon-pin      { display: block; }
+
+    .text-nav { padding: 6px 8px; flex: 1; }
+
+    .nav-text-item {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      padding: 0 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #64748b;
+      font-weight: 500;
+      font-size: 14px;
+      transition: background 0.15s, color 0.15s;
+      user-select: none;
+    }
+    .nav-text-item:hover { background: #f1f5f9; color: #1e293b; }
+    .nav-text-item.active { background: #f1f5f9; color: #1e293b; font-weight: 600; }
+
+    .text-col-actions {
+      padding: 8px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .text-col-actions button {
+      background: none; border: none;
+      color: #64748b; border-radius: 7px;
+      padding: 7px 12px; font-size: 12px;
+      cursor: pointer; text-align: left;
+      display: flex; align-items: center;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .text-col-actions button:hover { background: #f1f5f9; color: #1e293b; }
+
+    /* ─── Sidebar user (text col) ─────────────── */
     .sidebar-user {
       display: none; align-items: center; gap: 8px;
-      padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.15);
-      color: #64748b;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    .sidebar-user img {
-      width: 30px; height: 30px; border-radius: 50%;
-      object-fit: cover; flex-shrink: 0; background: #e2e8f0;
+      padding: 10px 12px; border-top: 1px solid var(--border);
+      color: #64748b; white-space: nowrap; overflow: hidden;
     }
     .sidebar-user-name {
       flex: 1; font-size: 11px; overflow: hidden;
@@ -1046,94 +1051,86 @@
 
 <!-- ─── Sidebar ───────────────────────────────── -->
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-top">
-    <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle menu">
-      <!-- shown when open: collapse left -->
-      <svg class="icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      <!-- shown on hover when collapsed: pin open -->
-      <svg class="icon-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 18 15 12 9 6"/>
-      </svg>
-    </button>
+
+  <!-- Teal icon column — always visible -->
+  <div class="icon-col">
+    <div class="icon-col-top"></div>
+    <nav class="icon-nav">
+      <div class="nav-item active" data-tab="dashboard" title="Dashboard">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+      <div class="nav-item" data-tab="money" title="Money">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </div>
+      <div class="nav-item" data-tab="build" title="Build Costs">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><path d="M9 20v-5h6v5"/></svg>
+      </div>
+      <div class="nav-item" data-tab="budget" title="Monthly Budget">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l5 3"/></svg>
+      </div>
+      <div class="nav-item" data-tab="calendar" title="Calendar">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="nav-item" data-tab="goals" title="Goals">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/></svg>
+      </div>
+      <div class="nav-item" data-tab="scenarios" title="Scenarios">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 8H8z"/><path d="M8 11c-1.5 2-2 4-2 5a6 6 0 0 0 12 0c0-1-.5-3-2-5"/></svg>
+      </div>
+      <div class="nav-item" data-tab="insights" title="Insights">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/></svg>
+      </div>
+      <div class="nav-item" data-tab="settings" title="Settings">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </nav>
+    <div class="icon-col-actions">
+      <button id="install-btn" style="display:none" onclick="installApp()" title="Add to Home Screen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+      </button>
+      <button onclick="exportData()" title="Export backup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button onclick="document.getElementById('importFile').click()" title="Import backup">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </button>
+    </div>
+    <div class="icon-col-user" id="icon-col-user">
+      <img id="user-photo" src="" alt="">
+    </div>
   </div>
-  <nav>
-    <div class="nav-item active" data-tab="dashboard">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
-      </svg>
-      <span class="nav-label">Dashboard</span>
+
+  <!-- White text column — slides in/out -->
+  <div class="text-col" id="text-col">
+    <div class="text-col-top">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle menu">
+        <svg class="icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <svg class="icon-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
-    <div class="nav-item" data-tab="money">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
-      </svg>
-      <span class="nav-label">Money</span>
+    <nav class="text-nav">
+      <div class="nav-text-item active" data-tab="dashboard">Dashboard</div>
+      <div class="nav-text-item" data-tab="money">Money</div>
+      <div class="nav-text-item" data-tab="build">Build Costs</div>
+      <div class="nav-text-item" data-tab="budget">Monthly Budget</div>
+      <div class="nav-text-item" data-tab="calendar">Calendar</div>
+      <div class="nav-text-item" data-tab="goals">Goals</div>
+      <div class="nav-text-item" data-tab="scenarios">Scenarios</div>
+      <div class="nav-text-item" data-tab="insights">Insights</div>
+      <div class="nav-text-item" data-tab="settings">Settings</div>
+    </nav>
+    <div class="text-col-actions">
+      <button id="install-btn-text" style="display:none" onclick="installApp()">Add to Home Screen</button>
+      <button onclick="exportData()">Export backup</button>
+      <button onclick="document.getElementById('importFile').click()">Import backup</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
     </div>
-    <div class="nav-item" data-tab="build">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><path d="M9 20v-5h6v5"/>
-      </svg>
-      <span class="nav-label">Build Costs</span>
+    <div class="sidebar-user" id="sidebar-user">
+      <span class="sidebar-user-name" id="user-name"></span>
+      <button class="sidebar-user-out" onclick="signOutUser()" title="Sign out">↩</button>
     </div>
-    <div class="nav-item" data-tab="budget">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/><path d="M12 3v9l5 3"/>
-      </svg>
-      <span class="nav-label">Monthly Budget</span>
-    </div>
-    <div class="nav-item" data-tab="calendar">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      <span class="nav-label">Calendar</span>
-    </div>
-    <div class="nav-item" data-tab="goals">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/>
-      </svg>
-      <span class="nav-label">Goals</span>
-    </div>
-    <div class="nav-item" data-tab="scenarios">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 3h6l1 8H8z"/><path d="M8 11c-1.5 2-2 4-2 5a6 6 0 0 0 12 0c0-1-.5-3-2-5"/>
-      </svg>
-      <span class="nav-label">Scenarios</span>
-    </div>
-    <div class="nav-item" data-tab="insights">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/>
-      </svg>
-      <span class="nav-label">Insights</span>
-    </div>
-    <div class="nav-item" data-tab="settings">
-      <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-      </svg>
-      <span class="nav-label">Settings</span>
-    </div>
-  </nav>
-  <div class="sidebar-actions">
-    <button id="install-btn" style="display:none" onclick="installApp()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
-      <span>Add to Home Screen</span>
-    </button>
-    <button onclick="exportData()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span>Export backup</span>
-    </button>
-    <button onclick="document.getElementById('importFile').click()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <span>Import backup</span>
-    </button>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
-  <div class="sidebar-user" id="sidebar-user">
-    <img id="user-photo" src="" alt="">
-    <span class="sidebar-user-name" id="user-name"></span>
-    <button class="sidebar-user-out" onclick="signOutUser()" title="Sign out">↩</button>
-  </div>
+
 </aside>
 
 <!-- ─── Main ──────────────────────────────────── -->
@@ -1317,20 +1314,23 @@ function _startFirestoreSync() {
 
 fbAuth.onAuthStateChanged(user => {
   _currentUser = user;
-  const overlay = document.getElementById('login-overlay');
-  const userEl  = document.getElementById('sidebar-user');
-  const photoEl = document.getElementById('user-photo');
-  const nameEl  = document.getElementById('user-name');
+  const overlay     = document.getElementById('login-overlay');
+  const userEl      = document.getElementById('sidebar-user');
+  const iconUserEl  = document.getElementById('icon-col-user');
+  const photoEl     = document.getElementById('user-photo');
+  const nameEl      = document.getElementById('user-name');
 
   if (user) {
-    if (overlay) overlay.classList.add('hidden');
-    if (userEl)  userEl.style.display = 'flex';
-    if (photoEl) photoEl.src = user.photoURL || '';
-    if (nameEl)  nameEl.textContent = user.displayName || user.email || '';
+    if (overlay)     overlay.classList.add('hidden');
+    if (userEl)      userEl.style.display = 'flex';
+    if (iconUserEl)  iconUserEl.style.display = 'flex';
+    if (photoEl)     photoEl.src = user.photoURL || '';
+    if (nameEl)      nameEl.textContent = user.displayName || user.email || '';
     _startFirestoreSync();
   } else {
-    if (overlay) overlay.classList.remove('hidden');
-    if (userEl)  userEl.style.display = 'none';
+    if (overlay)     overlay.classList.remove('hidden');
+    if (userEl)      userEl.style.display = 'none';
+    if (iconUserEl)  iconUserEl.style.display = 'none';
     if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
   }
 });
@@ -1818,14 +1818,17 @@ function isOverdue(dueDate) {
 // NAVIGATION
 // ─────────────────────────────────────────────────
 
-document.querySelectorAll('.nav-item').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('tab-' + el.dataset.tab).classList.add('active');
-    renderAll();
-  });
+function activateTab(tab) {
+  document.querySelectorAll('.nav-item, .nav-text-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(n => n.classList.add('active'));
+  const panel = document.getElementById('tab-' + tab);
+  if (panel) panel.classList.add('active');
+  renderAll();
+}
+
+document.querySelectorAll('.nav-item, .nav-text-item').forEach(el => {
+  el.addEventListener('click', () => activateTab(el.dataset.tab));
 });
 
 // ─────────────────────────────────────────────────
@@ -3897,7 +3900,7 @@ function renderBenchmarksSection(income, adults, children, byCategory) {
           <div class="section-title">Budget Benchmarks</div>
           <div class="section-subtitle">Australian household averages for ${adults} adult${adults!==1?'s':''}${children > 0 ? ` + ${children} child${children!==1?'ren':''}` : ''} · Sources: ABS HES 2022, MoneySmart, ACCC</div>
         </div>
-        <a href="/home-budget/#" onclick="document.querySelector('[data-tab=settings]').click();return false"
+        <a href="/home-budget/#" onclick="activateTab('settings');return false"
            style="font-size:12px;color:var(--primary)">Edit household profile</a>
       </div>
 
