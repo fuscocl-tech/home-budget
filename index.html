@@ -1136,9 +1136,6 @@
       <div class="nav-item" data-tab="insights" title="Insights">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/></svg>
       </div>
-      <div class="nav-item" data-tab="settings" title="Settings">
-        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      </div>
     </nav>
     <div class="icon-col-actions">
       <button id="install-btn" style="display:none" onclick="installApp()" title="Add to Home Screen">
@@ -1150,9 +1147,6 @@
       <button onclick="document.getElementById('importFile').click()" title="Import backup">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       </button>
-    </div>
-    <div class="icon-col-user" id="icon-col-user">
-      <img id="user-photo" src="" alt="">
     </div>
   </div>
 
@@ -1173,17 +1167,12 @@
       <div class="nav-text-item" data-tab="goals">Goals</div>
       <div class="nav-text-item" data-tab="scenarios">Scenarios</div>
       <div class="nav-text-item" data-tab="insights">Insights</div>
-      <div class="nav-text-item" data-tab="settings">Settings</div>
     </nav>
     <div class="text-col-actions">
       <button id="install-btn-text" style="display:none" onclick="installApp()">Add to Home Screen</button>
       <button onclick="exportData()">Export backup</button>
       <button onclick="document.getElementById('importFile').click()">Import backup</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-    </div>
-    <div class="sidebar-user" id="sidebar-user">
-      <span class="sidebar-user-name" id="user-name"></span>
-      <button class="sidebar-user-out" onclick="signOutUser()" title="Sign out">↩</button>
     </div>
   </div>
 
@@ -1371,26 +1360,16 @@ function _startFirestoreSync() {
 fbAuth.onAuthStateChanged(user => {
   _currentUser = user;
   const overlay       = document.getElementById('login-overlay');
-  const userEl        = document.getElementById('sidebar-user');
-  const iconUserEl    = document.getElementById('icon-col-user');
-  const photoEl       = document.getElementById('user-photo');
-  const nameEl        = document.getElementById('user-name');
   const headerAvatar  = document.getElementById('header-avatar');
   const headerSignOut = document.getElementById('header-sign-out');
 
   if (user) {
     if (overlay)       overlay.classList.add('hidden');
-    if (userEl)        userEl.style.display = 'flex';
-    if (iconUserEl)    iconUserEl.style.display = 'flex';
-    if (photoEl)       photoEl.src = user.photoURL || '';
-    if (nameEl)        nameEl.textContent = user.displayName || user.email || '';
     if (headerAvatar)  { headerAvatar.src = user.photoURL || ''; headerAvatar.style.display = 'block'; }
     if (headerSignOut) headerSignOut.style.display = 'block';
     _startFirestoreSync();
   } else {
     if (overlay)       overlay.classList.remove('hidden');
-    if (userEl)        userEl.style.display = 'none';
-    if (iconUserEl)    iconUserEl.style.display = 'none';
     if (headerAvatar)  headerAvatar.style.display = 'none';
     if (headerSignOut) headerSignOut.style.display = 'none';
     if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
