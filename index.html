@@ -1060,6 +1060,46 @@
     .adj-item:last-child { border-bottom: none; }
     .adj-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
 
+    /* ─── Kids Zone ───────────────────────────── */
+    .kids-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px; margin-bottom: 28px; }
+
+    .kid-card {
+      background: #fff; border: 2px solid var(--border); border-radius: 16px;
+      padding: 20px 16px; display: flex; flex-direction: column; align-items: center;
+      gap: 6px; cursor: pointer; transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+      position: relative; text-align: center;
+    }
+    .kid-card:hover { box-shadow: 0 6px 20px rgba(13,148,136,0.12); transform: translateY(-2px); border-color: #0d9488; }
+
+    .kid-avatar { font-size: 36px; width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#f0fdfa,#ccfbf1); display: flex; align-items: center; justify-content: center; }
+    .kid-name { font-size: 15px; font-weight: 700; color: #1e293b; }
+    .kid-points { font-size: 26px; font-weight: 800; color: #0d9488; line-height: 1; }
+    .kid-points-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .chore-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; margin-bottom: 8px; transition: border-color 0.15s; }
+    .chore-item:hover { border-color: #0d9488; }
+    .chore-item.pending-approval { border-color: #f59e0b; background: #fffbeb; }
+    .chore-item.done-today { border-color: #10b981; background: #ecfdf5; }
+
+    .chore-emoji { font-size: 22px; flex-shrink: 0; }
+    .chore-name { font-weight: 600; font-size: 14px; }
+    .chore-meta { font-size: 12px; color: #64748b; margin-top: 1px; }
+    .chore-pts { background: #f0fdfa; color: #0d9488; border: 1px solid #99f6e4; border-radius: 99px; padding: 3px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+
+    .prize-card { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: #fff; margin-bottom: 8px; transition: all 0.15s; }
+    .prize-card:hover { border-color: #0d9488; }
+    .prize-card.can-afford { border-color: #10b981; background: #f0fdf4; }
+    .prize-card.pending-redemption { border-color: #f59e0b; background: #fffbeb; }
+    .prize-icon { font-size: 26px; flex-shrink: 0; }
+    .prize-name { font-weight: 600; font-size: 14px; }
+    .prize-desc { font-size: 12px; color: #64748b; margin-top: 1px; }
+    .prize-cost { font-size: 14px; font-weight: 700; color: #0d9488; white-space: nowrap; flex-shrink: 0; }
+
+    .approve-btn { background: #10b981; color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+    .approve-btn:hover { background: #059669; }
+    .reject-btn { background: none; color: #ef4444; border: 1px solid #fca5a5; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .reject-btn:hover { background: #fee2e2; }
+
     /* Expense row swipe-up hover */
     .expense-row {
       background-size: 100% 200%;
@@ -1136,6 +1176,9 @@
       <div class="nav-item" data-tab="insights" title="Insights">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/></svg>
       </div>
+      <div class="nav-item" data-tab="kids" title="Kids Zone">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-1a6 6 0 0 0-4.73-5.86"/></svg>
+      </div>
     </nav>
     <div class="icon-col-actions">
       <button id="install-btn" style="display:none" onclick="installApp()" title="Add to Home Screen">
@@ -1167,6 +1210,7 @@
       <div class="nav-text-item" data-tab="goals">Goals</div>
       <div class="nav-text-item" data-tab="scenarios">Scenarios</div>
       <div class="nav-text-item" data-tab="insights">Insights</div>
+      <div class="nav-text-item" data-tab="kids">Kids Zone</div>
     </nav>
     <div class="text-col-actions">
       <button id="install-btn-text" style="display:none" onclick="installApp()">Add to Home Screen</button>
@@ -1251,6 +1295,11 @@
       <p>AI-powered analysis of your finances</p>
     </div>
     <div id="insights-content"></div>
+  </div>
+
+  <!-- KIDS ZONE -->
+  <div class="tab-panel" id="tab-kids">
+    <div id="kids-content"></div>
   </div>
 
   <!-- SETTINGS -->
@@ -1403,6 +1452,7 @@ const DEFAULT_DATA = {
   appliances: [],
   goals: [],
   scenarios: [],
+  kids: { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] },
   activityLog: [],
   householdProfile: {
     members: [{ role: 'adult', age: null }, { role: 'adult', age: null }],
@@ -1440,6 +1490,12 @@ function loadData() {
     if (!d.budget.months)  d.budget.months  = {};
     if (!d.goals)      d.goals      = [];
     if (!d.scenarios)  d.scenarios  = [];
+    if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
+    if (!d.kids.profiles)    d.kids.profiles    = [];
+    if (!d.kids.chores)      d.kids.chores      = [];
+    if (!d.kids.prizes)      d.kids.prizes      = [];
+    if (!d.kids.completions) d.kids.completions = [];
+    if (!d.kids.redemptions) d.kids.redemptions = [];
     if (!d.furniture) d.furniture = [];
     if (!d.appliances) d.appliances = [];
     if (!d.activityLog) d.activityLog = [];
@@ -6074,6 +6130,397 @@ function renderAll() {
   safeRender(renderGoals);
   safeRender(renderScenarios);
   safeRender(renderSettings);
+  safeRender(renderKids);
+}
+
+// ─────────────────────────────────────────────────
+// KIDS ZONE
+// ─────────────────────────────────────────────────
+
+let kidsView = 'parent';
+let kidsParentTab = 'overview';
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function renderKids() {
+  const el = document.getElementById('kids-content');
+  if (!el) return;
+  const k = state.kids;
+  if (kidsView === 'parent') {
+    const pendingCount = k.completions.filter(c => c.status === 'pending').length +
+                         k.redemptions.filter(r => r.status === 'pending').length;
+    renderKidsParent(el, k, pendingCount);
+  } else {
+    const kid = k.profiles.find(p => p.id === kidsView);
+    if (kid) renderKidView(el, k, kid);
+    else { kidsView = 'parent'; renderKids(); }
+  }
+}
+
+function kidBalance(k, kidId) {
+  const earned = k.completions.filter(c => c.kidId === kidId && c.status === 'approved')
+    .reduce((s, c) => s + (k.chores.find(ch => ch.id === c.choreId)?.points || 0), 0);
+  const spent = k.redemptions.filter(r => r.kidId === kidId && r.status === 'approved')
+    .reduce((s, r) => s + (k.prizes.find(p => p.id === r.prizeId)?.pointCost || 0), 0);
+  return earned - spent;
+}
+
+function renderKidsParent(el, k, pendingCount) {
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'chores',   label: 'Chores' },
+    { id: 'prizes',   label: 'Prize Shelf' },
+    { id: 'approvals',label: `Approvals${pendingCount ? ` <span style="background:#ef4444;color:#fff;border-radius:99px;padding:1px 7px;font-size:11px;vertical-align:middle;margin-left:4px">${pendingCount}</span>` : ''}` },
+  ];
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div><h1 style="font-size:22px;font-weight:700">Kids Zone</h1><p style="color:#64748b;font-size:13px;margin-top:3px">Chores, prizes and savings for the family</p></div>
+      <button class="btn btn-primary" onclick="openAddKidModal()">+ Add Kid</button>
+    </div>
+    <div style="display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border)">
+      ${tabs.map(t => `<button onclick="kidsParentTab='${t.id}';renderKids()" style="padding:8px 16px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:${kidsParentTab===t.id?'#0d9488':'#64748b'};border-bottom:2px solid ${kidsParentTab===t.id?'#0d9488':'transparent'};margin-bottom:-1px;transition:all 0.15s">${t.label}</button>`).join('')}
+    </div>`;
+
+  if (kidsParentTab === 'overview')   html += renderKidsOverview(k);
+  else if (kidsParentTab === 'chores')  html += renderChoreMgmt(k);
+  else if (kidsParentTab === 'prizes')  html += renderPrizeMgmt(k);
+  else if (kidsParentTab === 'approvals') html += renderApprovals(k);
+  el.innerHTML = html;
+}
+
+function renderKidsOverview(k) {
+  if (!k.profiles.length) return `
+    <div style="text-align:center;padding:60px 20px">
+      <div style="font-size:52px;margin-bottom:12px">👨‍👩‍👧‍👦</div>
+      <p style="font-size:16px;font-weight:600;color:#1e293b;margin-bottom:8px">No kids added yet</p>
+      <p style="color:#64748b;margin-bottom:20px">Add your kids to start assigning chores and prizes</p>
+      <button class="btn btn-primary" onclick="openAddKidModal()">+ Add Kid</button>
+    </div>`;
+
+  let html = `<div class="kids-grid">`;
+  k.profiles.forEach(kid => {
+    const bal = kidBalance(k, kid.id);
+    const myChores = k.chores.filter(c => c.assignedTo === kid.id || c.assignedTo === 'all').length;
+    const pending = k.completions.filter(c => c.kidId === kid.id && c.status === 'pending').length;
+    html += `
+      <div class="kid-card" onclick="kidsView='${kid.id}';renderKids()">
+        <button onclick="event.stopPropagation();openEditKidModal('${kid.id}')" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:14px;padding:2px 5px;border-radius:4px" title="Edit">✏️</button>
+        <div class="kid-avatar">${kid.emoji}</div>
+        <div class="kid-name">${kid.name}</div>
+        <div class="kid-points">${bal}</div>
+        <div class="kid-points-label">⭐ points</div>
+        <div style="display:flex;gap:10px;font-size:12px;color:#64748b;margin-top:4px">
+          <span>📋 ${myChores}</span>
+          ${pending ? `<span style="color:#f59e0b;font-weight:600">⏳ ${pending}</span>` : ''}
+          ${kid.savings ? `<span style="color:#0d9488">💰 $${kid.savings.toFixed(0)}</span>` : ''}
+        </div>
+        <div style="width:100%;margin-top:10px;padding:7px;background:#f0fdfa;border-radius:8px;font-size:12px;color:#0d9488;font-weight:600;text-align:center">Switch to ${kid.name}'s view →</div>
+      </div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function renderChoreMgmt(k) {
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <span style="font-size:15px;font-weight:600">All Chores</span>
+    <button class="btn btn-primary btn-sm" onclick="openChoreModal()">+ Add Chore</button>
+  </div>`;
+  if (!k.chores.length) return html + `<div class="empty"><div class="empty-icon">📋</div><p>No chores yet</p></div>`;
+  k.chores.forEach(ch => {
+    const who = ch.assignedTo === 'all' ? 'All kids' : (k.profiles.find(p => p.id === ch.assignedTo)?.name || '?');
+    html += `<div class="chore-item">
+      <div class="chore-emoji">${ch.emoji}</div>
+      <div style="flex:1"><div class="chore-name">${ch.name}</div><div class="chore-meta">${who} · ${ch.frequency}</div></div>
+      <div class="chore-pts">⭐ ${ch.points}</div>
+      <button onclick="openChoreModal('${ch.id}')" class="btn btn-ghost btn-sm">✏️</button>
+      <button onclick="deleteChore('${ch.id}')" class="btn btn-ghost btn-sm" style="color:#ef4444">🗑</button>
+    </div>`;
+  });
+  return html;
+}
+
+function renderPrizeMgmt(k) {
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <span style="font-size:15px;font-weight:600">Prize Shelf</span>
+    <button class="btn btn-primary btn-sm" onclick="openPrizeModal()">+ Add Prize</button>
+  </div>`;
+  if (!k.prizes.length) return html + `<div class="empty"><div class="empty-icon">🎁</div><p>No prizes yet — add something for the kids to work towards</p></div>`;
+  k.prizes.forEach(pr => {
+    html += `<div class="prize-card">
+      <div class="prize-icon">${pr.emoji}</div>
+      <div style="flex:1"><div class="prize-name">${pr.name}</div><div class="prize-desc">${pr.description || pr.type}</div></div>
+      <div class="prize-cost">⭐ ${pr.pointCost}</div>
+      <button onclick="openPrizeModal('${pr.id}')" class="btn btn-ghost btn-sm">✏️</button>
+      <button onclick="deletePrize('${pr.id}')" class="btn btn-ghost btn-sm" style="color:#ef4444">🗑</button>
+    </div>`;
+  });
+  return html;
+}
+
+function renderApprovals(k) {
+  const pc = k.completions.filter(c => c.status === 'pending');
+  const pr = k.redemptions.filter(r => r.status === 'pending');
+  if (!pc.length && !pr.length) return `<div style="text-align:center;padding:48px 20px"><div style="font-size:40px;margin-bottom:12px">✅</div><p style="font-weight:600;color:#1e293b">All caught up!</p><p style="color:#64748b;font-size:13px">No pending approvals</p></div>`;
+  let html = '';
+  if (pc.length) {
+    html += `<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;margin-bottom:10px">Completed Chores</div>`;
+    pc.forEach(comp => {
+      const kid = k.profiles.find(p => p.id === comp.kidId);
+      const ch  = k.chores.find(c => c.id === comp.choreId);
+      if (!kid || !ch) return;
+      html += `<div class="chore-item pending-approval" style="margin-bottom:10px">
+        <div class="chore-emoji">${ch.emoji}</div>
+        <div style="flex:1"><div class="chore-name">${ch.name}</div><div class="chore-meta">${kid.emoji} ${kid.name} · ${new Date(comp.completedAt).toLocaleDateString()}</div></div>
+        <div class="chore-pts">⭐ ${ch.points}</div>
+        <button class="approve-btn" onclick="approveCompletion('${comp.id}')">Approve</button>
+        <button class="reject-btn" onclick="rejectCompletion('${comp.id}')">Reject</button>
+      </div>`;
+    });
+  }
+  if (pr.length) {
+    html += `<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;margin:20px 0 10px">Prize Redemptions</div>`;
+    pr.forEach(red => {
+      const kid   = k.profiles.find(p => p.id === red.kidId);
+      const prize = k.prizes.find(p => p.id === red.prizeId);
+      if (!kid || !prize) return;
+      html += `<div class="prize-card pending-redemption" style="margin-bottom:10px">
+        <div class="prize-icon">${prize.emoji}</div>
+        <div style="flex:1"><div class="prize-name">${prize.name}</div><div class="prize-desc">${kid.emoji} ${kid.name} wants this</div></div>
+        <div class="prize-cost">⭐ ${prize.pointCost}</div>
+        <button class="approve-btn" onclick="approveRedemption('${red.id}')">Approve</button>
+        <button class="reject-btn" onclick="rejectRedemption('${red.id}')">Reject</button>
+      </div>`;
+    });
+  }
+  return html;
+}
+
+function renderKidView(el, k, kid) {
+  const bal = kidBalance(k, kid.id);
+  const myChores = k.chores.filter(c => c.assignedTo === kid.id || c.assignedTo === 'all');
+  const pendingChoreIds = new Set(k.completions.filter(c => c.kidId === kid.id && c.status === 'pending').map(c => c.choreId));
+  const todayStr = new Date().toDateString();
+  const doneTodayIds = new Set(k.completions.filter(c => c.kidId === kid.id && c.status === 'approved' && new Date(c.completedAt).toDateString() === todayStr).map(c => c.choreId));
+
+  let html = `
+    <button onclick="kidsView='parent';kidsParentTab='overview';renderKids()" class="btn btn-ghost btn-sm" style="margin-bottom:16px">← Parent view</button>
+
+    <div style="background:linear-gradient(135deg,#0d9488,#0f766e);border-radius:16px;padding:24px 28px;color:#fff;margin-bottom:24px;display:flex;align-items:center;gap:20px">
+      <div style="font-size:48px;background:rgba(255,255,255,0.15);border-radius:50%;width:72px;height:72px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${kid.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;opacity:0.75">Hey there,</div>
+        <div style="font-size:24px;font-weight:800">${kid.name}!</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:44px;font-weight:800;line-height:1">${bal}</div>
+        <div style="font-size:13px;opacity:0.75">⭐ points</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:12px">My Chores 📋</div>`;
+
+  if (!myChores.length) {
+    html += `<div style="color:#64748b;font-size:13px;padding:20px;text-align:center;background:#f8fafc;border-radius:10px">No chores assigned yet!</div>`;
+  } else {
+    myChores.forEach(ch => {
+      const isPending  = pendingChoreIds.has(ch.id);
+      const isDoneToday = doneTodayIds.has(ch.id);
+      html += `<div class="chore-item ${isPending ? 'pending-approval' : isDoneToday ? 'done-today' : ''}">
+        <div class="chore-emoji">${ch.emoji}</div>
+        <div style="flex:1"><div class="chore-name">${ch.name}</div><div class="chore-meta">${isPending ? '⏳ Waiting...' : isDoneToday ? '✅ Done!' : ch.frequency}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="chore-pts">⭐ ${ch.points}</div>
+          ${!isPending && !isDoneToday ? `<button class="approve-btn" style="font-size:11px;padding:3px 9px" onclick="markChoreDone('${ch.id}','${kid.id}')">Done! 🙋</button>` : ''}
+        </div>
+      </div>`;
+    });
+  }
+
+  html += `</div><div>
+    <div style="background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border:1px solid #99f6e4;border-radius:12px;padding:16px 18px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#0d9488">💰 Savings Jar</div>
+      <div style="font-size:28px;font-weight:800;color:#0f766e;margin:4px 0">$${(kid.savings||0).toFixed(2)}</div>
+      <button onclick="openSavingsModal('${kid.id}')" style="background:none;border:1px solid #0d9488;color:#0d9488;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600">+ Add</button>
+    </div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:12px">Prize Shelf 🎁</div>`;
+
+  if (!k.prizes.length) {
+    html += `<div style="color:#64748b;font-size:13px;padding:20px;text-align:center;background:#f8fafc;border-radius:10px">No prizes on the shelf yet!</div>`;
+  } else {
+    k.prizes.forEach(pr => {
+      const canAfford = bal >= pr.pointCost;
+      const isPendingRed = k.redemptions.some(r => r.prizeId === pr.id && r.kidId === kid.id && r.status === 'pending');
+      html += `<div class="prize-card ${canAfford && !isPendingRed ? 'can-afford' : ''} ${isPendingRed ? 'pending-redemption' : ''}">
+        <div class="prize-icon">${pr.emoji}</div>
+        <div style="flex:1"><div class="prize-name">${pr.name}</div><div class="prize-desc">${isPendingRed ? '⏳ Pending...' : canAfford ? '✅ You can get this!' : `${pr.pointCost - bal} pts to go`}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="prize-cost">⭐ ${pr.pointCost}</div>
+          ${canAfford && !isPendingRed ? `<button onclick="requestRedemption('${pr.id}','${kid.id}')" style="background:#0d9488;color:#fff;border:none;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-weight:600">Redeem!</button>` : ''}
+        </div>
+      </div>`;
+    });
+  }
+
+  html += `</div></div>`;
+  el.innerHTML = html;
+}
+
+// ── Actions ────────────────────────────────────────
+function markChoreDone(choreId, kidId) {
+  state.kids.completions.push({ id: uid(), choreId, kidId, completedAt: Date.now(), status: 'pending' });
+  saveData(state); renderKids();
+}
+function approveCompletion(id) {
+  const c = state.kids.completions.find(c => c.id === id);
+  if (c) { c.status = 'approved'; c.approvedAt = Date.now(); }
+  saveData(state); renderKids();
+}
+function rejectCompletion(id) {
+  const c = state.kids.completions.find(c => c.id === id);
+  if (c) c.status = 'rejected';
+  saveData(state); renderKids();
+}
+function requestRedemption(prizeId, kidId) {
+  state.kids.redemptions.push({ id: uid(), prizeId, kidId, requestedAt: Date.now(), status: 'pending' });
+  saveData(state); renderKids();
+}
+function approveRedemption(id) {
+  const r = state.kids.redemptions.find(r => r.id === id);
+  if (r) { r.status = 'approved'; r.approvedAt = Date.now(); }
+  saveData(state); renderKids();
+}
+function rejectRedemption(id) {
+  const r = state.kids.redemptions.find(r => r.id === id);
+  if (r) r.status = 'rejected';
+  saveData(state); renderKids();
+}
+function deleteChore(id) { state.kids.chores = state.kids.chores.filter(c => c.id !== id); saveData(state); renderKids(); }
+function deletePrize(id) { state.kids.prizes = state.kids.prizes.filter(p => p.id !== id); saveData(state); renderKids(); }
+
+// ── Emoji pickers ──────────────────────────────────
+const KID_EMOJIS   = ['😊','🦁','🐯','🐻','🦊','🐸','🐧','🦋','🌟','🎈','🚀','⚡'];
+const CHORE_EMOJIS = ['🧹','🍽','🐕','🛏','📚','🌿','🧺','🗑','🧽','🚿','🛒','🪴'];
+const PRIZE_EMOJIS = ['🍦','🎬','🎮','🍕','🎁','💰','🏖','🎡','🎨','👟','📱','🎭'];
+
+function emojiPicker(list, selected) {
+  return `<div style="display:flex;flex-wrap:wrap;gap:6px" id="emoji-pick">
+    ${list.map(e => `<button type="button" onclick="pickEmoji(this)" data-e="${e}" style="font-size:22px;padding:5px 8px;border-radius:7px;border:2px solid ${e===selected?'#0d9488':'var(--border)'};background:${e===selected?'#f0fdfa':'none'};cursor:pointer;transition:all 0.1s">${e}</button>`).join('')}
+  </div>`;
+}
+function pickEmoji(btn) {
+  btn.closest('#emoji-pick').querySelectorAll('button').forEach(b => { b.style.borderColor='var(--border)'; b.style.background='none'; });
+  btn.style.borderColor='#0d9488'; btn.style.background='#f0fdfa';
+}
+function pickedEmoji(fallback) {
+  const btn = document.querySelector('#emoji-pick button[style*="#0d9488"]');
+  return btn ? btn.dataset.e : fallback;
+}
+
+// ── Modals ─────────────────────────────────────────
+function openAddKidModal() { openEditKidModal(null); }
+function openEditKidModal(id) {
+  const kid = id ? state.kids.profiles.find(p => p.id === id) : null;
+  document.getElementById('modal-title').textContent = kid ? 'Edit Kid' : 'Add Kid';
+  document.getElementById('modal-body').innerHTML = `
+    ${id ? `<input type="hidden" id="k-id" value="${id}">` : ''}
+    <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="k-name" value="${kid?.name||''}" placeholder="e.g. Emma" autofocus></div>
+    <div class="form-group"><label class="form-label">Avatar</label>${emojiPicker(KID_EMOJIS, kid?.emoji||'😊')}</div>
+    <div class="form-group"><label class="form-label">Age (optional)</label><input class="form-input" id="k-age" type="number" min="1" max="18" value="${kid?.age||''}" placeholder="e.g. 8"></div>
+    ${id ? `<div style="margin-top:8px"><button class="btn btn-danger btn-sm" onclick="deleteKid('${id}')">Delete ${kid.name}</button></div>` : ''}
+  `;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveKid()">Save</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function saveKid() {
+  const name = document.getElementById('k-name').value.trim(); if (!name) return;
+  const age  = parseInt(document.getElementById('k-age').value) || null;
+  const emoji = pickedEmoji('😊');
+  const id = document.getElementById('k-id')?.value;
+  if (id) { const k = state.kids.profiles.find(p => p.id === id); if (k) Object.assign(k, {name, emoji, age}); }
+  else state.kids.profiles.push({ id: uid(), name, emoji, age, savings: 0 });
+  saveData(state); closeModal(); renderKids();
+}
+function deleteKid(id) {
+  state.kids.profiles = state.kids.profiles.filter(p => p.id !== id);
+  saveData(state); closeModal(); kidsView = 'parent'; renderKids();
+}
+
+function openChoreModal(id) {
+  const ch = id ? state.kids.chores.find(c => c.id === id) : null;
+  const kids = state.kids.profiles;
+  document.getElementById('modal-title').textContent = ch ? 'Edit Chore' : 'Add Chore';
+  document.getElementById('modal-body').innerHTML = `
+    ${id ? `<input type="hidden" id="c-id" value="${id}">` : ''}
+    <div class="form-group"><label class="form-label">Chore Name</label><input class="form-input" id="c-name" value="${ch?.name||''}" placeholder="e.g. Tidy bedroom" autofocus></div>
+    <div class="form-group"><label class="form-label">Emoji</label>${emojiPicker(CHORE_EMOJIS, ch?.emoji||'🧹')}</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Points</label><input class="form-input" id="c-pts" type="number" min="1" value="${ch?.points||10}"></div>
+      <div class="form-group"><label class="form-label">Frequency</label><select class="form-select" id="c-freq"><option value="daily" ${ch?.frequency==='daily'?'selected':''}>Daily</option><option value="weekly" ${ch?.frequency==='weekly'?'selected':''}>Weekly</option><option value="once" ${ch?.frequency==='once'?'selected':''}>One-off</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Assign to</label><select class="form-select" id="c-who"><option value="all">All kids</option>${kids.map(k=>`<option value="${k.id}" ${ch?.assignedTo===k.id?'selected':''}>${k.emoji} ${k.name}</option>`).join('')}</select></div>
+  `;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveChore()">Save Chore</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function saveChore() {
+  const name = document.getElementById('c-name').value.trim(); if (!name) return;
+  const points = parseInt(document.getElementById('c-pts').value)||10;
+  const frequency = document.getElementById('c-freq').value;
+  const assignedTo = document.getElementById('c-who').value;
+  const emoji = pickedEmoji('🧹');
+  const id = document.getElementById('c-id')?.value;
+  if (id) { const c = state.kids.chores.find(c=>c.id===id); if(c) Object.assign(c,{name,emoji,points,frequency,assignedTo}); }
+  else state.kids.chores.push({ id: uid(), name, emoji, points, frequency, assignedTo });
+  saveData(state); closeModal(); renderKids();
+}
+
+function openPrizeModal(id) {
+  const pr = id ? state.kids.prizes.find(p => p.id === id) : null;
+  document.getElementById('modal-title').textContent = pr ? 'Edit Prize' : 'Add Prize';
+  document.getElementById('modal-body').innerHTML = `
+    ${id ? `<input type="hidden" id="p-id" value="${id}">` : ''}
+    <div class="form-group"><label class="form-label">Prize Name</label><input class="form-input" id="p-name" value="${pr?.name||''}" placeholder="e.g. Movie night" autofocus></div>
+    <div class="form-group"><label class="form-label">Emoji</label>${emojiPicker(PRIZE_EMOJIS, pr?.emoji||'🎁')}</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Point Cost</label><input class="form-input" id="p-cost" type="number" min="1" value="${pr?.pointCost||50}"></div>
+      <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="p-type"><option value="outing" ${pr?.type==='outing'?'selected':''}>Outing</option><option value="cash" ${pr?.type==='cash'?'selected':''}>Cash</option><option value="voucher" ${pr?.type==='voucher'?'selected':''}>Voucher</option><option value="custom" ${pr?.type==='custom'?'selected':''}>Custom</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Description (optional)</label><input class="form-input" id="p-desc" value="${pr?.description||''}" placeholder="e.g. Any movie of your choice"></div>
+  `;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="savePrize()">Save Prize</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function savePrize() {
+  const name = document.getElementById('p-name').value.trim(); if (!name) return;
+  const pointCost = parseInt(document.getElementById('p-cost').value)||50;
+  const type = document.getElementById('p-type').value;
+  const description = document.getElementById('p-desc').value.trim();
+  const emoji = pickedEmoji('🎁');
+  const id = document.getElementById('p-id')?.value;
+  if (id) { const p = state.kids.prizes.find(p=>p.id===id); if(p) Object.assign(p,{name,emoji,pointCost,type,description}); }
+  else state.kids.prizes.push({ id: uid(), name, emoji, pointCost, type, description });
+  saveData(state); closeModal(); renderKids();
+}
+
+function openSavingsModal(kidId) {
+  const kid = state.kids.profiles.find(p => p.id === kidId); if (!kid) return;
+  document.getElementById('modal-title').textContent = `${kid.emoji} ${kid.name}'s Savings Jar`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group"><label class="form-label">Current balance: $${(kid.savings||0).toFixed(2)}</label>
+    <input class="form-input" id="s-amount" type="number" step="0.01" placeholder="Amount to add e.g. 5.00" autofocus></div>
+    <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="s-note" placeholder="e.g. Birthday money from Grandma"></div>
+  `;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addSavings('${kidId}')">Add to Jar 💰</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function addSavings(kidId) {
+  const amount = parseFloat(document.getElementById('s-amount').value)||0; if (!amount) return;
+  const kid = state.kids.profiles.find(p => p.id === kidId);
+  if (kid) kid.savings = (kid.savings||0) + amount;
+  saveData(state); closeModal(); renderKids();
 }
 
 // ─────────────────────────────────────────────────
