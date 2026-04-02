@@ -203,7 +203,7 @@
       user-select: none;
     }
     .nav-text-item:hover { background: #f1f5f9; color: #1e293b; }
-    .nav-text-item.active { background: #f1f5f9; color: #1e293b; font-weight: 600; }
+    .nav-text-item.active { background: none; color: #1e293b; font-weight: 600; }
 
     .text-col-actions {
       padding: 8px;
@@ -1869,7 +1869,7 @@ function renderMoneyDashboard() {
   });
   const sortedCats = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
 
-  const totalActual = me.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const totalActual = expenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
   const hasActuals  = totalActual > 0;
 
   // ── Month nav + KPI cards ──────────────────────
