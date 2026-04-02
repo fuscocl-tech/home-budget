@@ -75,9 +75,9 @@
     /* ─── Sidebar ─────────────────────────────── */
     .sidebar {
       width: var(--sidebar-w);
-      background: #fff;
+      /* teal rail on left 60px, white panel for text */
+      background: linear-gradient(to right, #0d9488 60px, #ffffff 60px);
       color: #1e293b;
-      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
@@ -89,13 +89,13 @@
       z-index: 40;
     }
 
-    /* Collapsed = icon-only rail */
+    /* Collapsed = icon-only rail (60px = only teal shows) */
     .sidebar.collapsed { width: 60px; }
 
     /* Hover-expand when collapsed (not pinned) */
     .sidebar.collapsed:hover {
       width: var(--sidebar-w);
-      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
     }
 
     .sidebar-top {
@@ -150,15 +150,25 @@
       white-space: nowrap;
     }
 
-    .nav-item:hover { background: #f1f5f9; color: #1e293b; }
-    .nav-item.active { background: #f1f5f9; color: #1e293b; }
-    .nav-item.active .nav-icon-svg { stroke: #1e293b; }
+    /* Two-tone hover/active: teal highlight on icon rail, light grey on text area */
+    .nav-item:hover {
+      background: linear-gradient(to right, rgba(255,255,255,0.15) 60px, #f1f5f9 60px);
+      color: #1e293b;
+    }
+    .nav-item.active {
+      background: linear-gradient(to right, rgba(255,255,255,0.22) 60px, #f1f5f9 60px);
+      color: #1e293b;
+    }
+
+    /* Icons always white on teal */
     .nav-item .nav-icon-svg {
       width: 18px; height: 18px;
       flex-shrink: 0;
-      stroke: currentColor;
+      stroke: rgba(255,255,255,0.65);
       transition: stroke 0.15s;
     }
+    .nav-item:hover .nav-icon-svg,
+    .nav-item.active .nav-icon-svg { stroke: #ffffff; }
 
     /* Labels hidden when collapsed, shown on hover-expand */
     .nav-label { overflow: hidden; transition: opacity 0.15s; }
@@ -167,7 +177,7 @@
 
     .sidebar-actions {
       padding: 12px 8px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(255,255,255,0.15);
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -190,14 +200,20 @@
       white-space: nowrap;
     }
 
-    .sidebar-actions button:hover { background: #f1f5f9; color: #1e293b; }
+    /* Action button icons on teal = white */
+    .sidebar-actions button svg { stroke: rgba(255,255,255,0.65); }
+    .sidebar-actions button:hover svg { stroke: #ffffff; }
+    .sidebar-actions button:hover {
+      background: linear-gradient(to right, rgba(255,255,255,0.15) 60px, #f1f5f9 60px);
+      color: #1e293b;
+    }
     .sidebar.collapsed .sidebar-actions button span { opacity: 0; transition: opacity 0.15s; }
     .sidebar.collapsed:hover .sidebar-actions button span { opacity: 1; }
 
     /* ─── Sidebar user ────────────────────────── */
     .sidebar-user {
       display: none; align-items: center; gap: 8px;
-      padding: 10px 12px; border-top: 1px solid var(--border);
+      padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.15);
       color: #64748b;
       white-space: nowrap;
       overflow: hidden;
