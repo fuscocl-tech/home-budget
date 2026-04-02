@@ -4532,29 +4532,37 @@ function renderExpenseGroups(expenses) {
         ${items.map(e => {
           const eMo    = itemMonthly(e);
           const eAct   = getActual(e.id, selectedBudgetMonth);
-          const ePct   = eMo > 0 && eAct > 0 ? Math.round(eAct / eMo * 100) : 0;
+          const ePct   = eMo > 0 ? Math.min(100, Math.round(eAct / eMo * 100)) : 0;
           const eColor = colors_e[e.category || 'Other'] || colors.expense[e.category || 'Other'] || '#94a3b8';
           const eOver  = eAct > eMo && eAct > 0;
+          const ringColor = eOver ? 'var(--danger)' : ePct >= 80 ? 'var(--warning)' : eAct > 0 ? eColor : 'var(--border)';
+          const tipLabel = eAct > 0
+            ? `${aud(eAct)} of ${aud(eMo)} · ${ePct}%${eOver ? ' over!' : ' used'}`
+            : `No actuals · ${aud(eMo)} budgeted`;
           return `
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
             <div style="width:4px;height:36px;border-radius:2px;background:${eColor};flex-shrink:0"></div>
-            <div style="flex:1;min-width:0">
+            <div style="flex:1;min-width:0;cursor:pointer" onclick="event.stopPropagation();openEditExpense(${e.id})">
               <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</div>
               <div style="font-size:11px;color:var(--text-muted)">${e.category || 'Other'} · ${freqDisplayItem(e)}</div>
             </div>
-            <div style="text-align:right;flex-shrink:0;margin-right:6px">
+            <div style="text-align:right;flex-shrink:0;margin-right:4px">
               <div style="font-size:13px;font-weight:600">${aud(eMo)}/mo</div>
               ${eAct > 0
                 ? `<div style="font-size:11px;font-weight:600;color:${eOver ? 'var(--danger)' : ePct >= 80 ? 'var(--warning)' : 'var(--success)'}">${aud(eAct)} actual${eOver ? ' ▲' : ''}</div>`
                 : `<div style="font-size:11px;color:var(--text-muted);cursor:pointer" onclick="event.stopPropagation();editActual(${e.id})">+ add actual</div>`}
             </div>
-            <div style="display:flex;gap:2px;flex-shrink:0">
-              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditExpense(${e.id})" style="padding:4px 6px;line-height:0" title="Edit">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              </button>
-              <button class="btn btn-danger-ghost btn-sm" onclick="event.stopPropagation();deleteExpense(${e.id})" style="padding:4px 6px;line-height:0" title="Delete">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-              </button>
+            <div style="position:relative;flex-shrink:0;width:32px;height:32px;cursor:pointer"
+                 onclick="event.stopPropagation();editActual(${e.id})"
+                 onmouseenter="this.querySelector('.ring-tip').style.opacity='1';this.querySelector('.ring-tip').style.visibility='visible'"
+                 onmouseleave="this.querySelector('.ring-tip').style.opacity='0';this.querySelector('.ring-tip').style.visibility='hidden'">
+              <svg width="32" height="32" viewBox="0 0 36 36" style="transform:rotate(-90deg)">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--border)" stroke-width="3.5"/>
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="${ringColor}" stroke-width="3.5"
+                  stroke-dasharray="${ePct} 100" stroke-linecap="round"
+                  style="transition:stroke-dasharray .4s ease"/>
+              </svg>
+              <div class="ring-tip" style="position:absolute;bottom:calc(100% + 7px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-size:11px;font-weight:600;white-space:nowrap;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;box-shadow:0 4px 12px rgba(0,0,0,.2)">${tipLabel}</div>
             </div>
           </div>`;
         }).join('')}
@@ -5368,6 +5376,14 @@ function openEditExpense(id) {
       }
     );
   });
+  // Inject delete button at the start of the footer
+  const delBtn = document.createElement('button');
+  delBtn.className = 'btn btn-danger';
+  delBtn.textContent = 'Delete';
+  delBtn.style.marginRight = 'auto';
+  delBtn.onclick = () => { closeModal(); deleteExpense(id); };
+  const footer = document.getElementById('modal-footer');
+  footer.insertBefore(delBtn, footer.firstChild);
 }
 
 function deleteExpense(id) {
