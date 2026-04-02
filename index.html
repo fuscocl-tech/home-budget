@@ -138,8 +138,8 @@
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 10px;
+      gap: 0;
+      padding: 8px 10px 8px 0; /* no left padding — icon column handles it */
       border-radius: 8px;
       color: #64748b;
       cursor: pointer;
@@ -160,10 +160,11 @@
       color: #1e293b;
     }
 
-    /* Icons always white on teal */
+    /* Icons centred inside the 60px teal column: 21 + 18 + 21 = 60 */
     .nav-item .nav-icon-svg {
       width: 18px; height: 18px;
       flex-shrink: 0;
+      margin: 0 21px;
       stroke: rgba(255,255,255,0.65);
       transition: stroke 0.15s;
     }
@@ -171,7 +172,7 @@
     .nav-item.active .nav-icon-svg { stroke: #ffffff; }
 
     /* Labels hidden when collapsed, shown on hover-expand */
-    .nav-label { overflow: hidden; transition: opacity 0.15s; }
+    .nav-label { overflow: hidden; transition: opacity 0.15s; padding-left: 2px; }
     .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
     .sidebar.collapsed:hover .nav-label { opacity: 1; pointer-events: auto; }
 
@@ -189,19 +190,19 @@
       border: none;
       color: #64748b;
       border-radius: 7px;
-      padding: 8px 10px;
+      padding: 7px 10px 7px 0; /* no left padding — icon column handles it */
       font-size: 12px;
       cursor: pointer;
       text-align: left;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0;
       transition: all 0.15s;
       white-space: nowrap;
     }
 
-    /* Action button icons on teal = white */
-    .sidebar-actions button svg { stroke: rgba(255,255,255,0.65); }
+    /* Action button icons centred in 60px teal column: 23 + 14 + 23 = 60 */
+    .sidebar-actions button svg { flex-shrink: 0; margin: 0 23px; stroke: rgba(255,255,255,0.65); }
     .sidebar-actions button:hover svg { stroke: #ffffff; }
     .sidebar-actions button:hover {
       background: linear-gradient(to right, rgba(255,255,255,0.15) 60px, #f1f5f9 60px);
