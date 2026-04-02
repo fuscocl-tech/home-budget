@@ -157,7 +157,7 @@
     }
     .nav-item:hover { background: rgba(255,255,255,0.15); color: #fff; }
     .nav-item.active { background: rgba(255,255,255,0.22); color: #fff; }
-    .nav-item .nav-icon-svg {
+    .nav-item .nav-icon-svg, .nav-group-btn .nav-icon-svg {
       width: 18px; height: 18px;
       stroke: currentColor;
       transition: stroke 0.15s;
@@ -1291,7 +1291,7 @@
 
       <!-- Budget group -->
       <div class="nav-group-btn" id="icon-group-budget" title="Budget" onclick="toggleNavGroup('budget')">
-        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
       </div>
       <div class="nav-group-children" id="icon-group-budget-children">
         <div class="nav-item" data-tab="money" title="Money">
