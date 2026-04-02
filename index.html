@@ -72,42 +72,6 @@
       position: relative;
     }
 
-    /* ─── Sidebar reveal tab ──────────────────── */
-    .sidebar-reveal {
-      display: none;
-      position: fixed;
-      left: 0;
-      top: 56px;
-      bottom: 0;
-      width: 24px;
-      align-items: center;
-      justify-content: flex-start;
-      z-index: 45;
-      cursor: pointer;
-    }
-
-    .sidebar-reveal:hover .sidebar-reveal-btn {
-      opacity: 1;
-    }
-
-    .sidebar-reveal-btn {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-left: none;
-      border-radius: 0 8px 8px 0;
-      width: 22px;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #64748b;
-      box-shadow: 3px 0 10px rgba(0,0,0,0.08);
-      opacity: 0;
-      transition: opacity 0.2s, color 0.15s;
-    }
-
-    .sidebar-reveal:hover .sidebar-reveal-btn { color: #1e293b; }
-
     /* ─── Sidebar ─────────────────────────────── */
     .sidebar {
       width: var(--sidebar-w);
@@ -121,19 +85,29 @@
       top: 0;
       height: calc(100vh - 56px);
       overflow: hidden;
-      transition: width 0.22s ease;
+      transition: width 0.22s ease, box-shadow 0.22s ease;
+      z-index: 40;
     }
 
-    .sidebar.collapsed { width: 0; border-right: none; }
+    /* Collapsed = icon-only rail */
+    .sidebar.collapsed { width: 60px; }
 
-    .sidebar-close {
+    /* Hover-expand when collapsed (not pinned) */
+    .sidebar.collapsed:hover {
+      width: var(--sidebar-w);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+    }
+
+    .sidebar-top {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding: 10px 10px 4px;
+      padding: 8px 8px 4px;
       flex-shrink: 0;
+      min-width: 0;
     }
 
+    /* Toggle button: collapse icon when open, pin icon on hover when collapsed */
     .sidebar-toggle {
       background: none;
       border: none;
@@ -144,10 +118,20 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, opacity 0.15s;
+      flex-shrink: 0;
     }
-
     .sidebar-toggle:hover { background: #f1f5f9; color: #1e293b; }
+
+    /* Hide toggle when collapsed, show on hover */
+    .sidebar.collapsed .sidebar-toggle { opacity: 0; pointer-events: none; }
+    .sidebar.collapsed:hover .sidebar-toggle { opacity: 1; pointer-events: auto; }
+
+    /* Chevron icons inside toggle */
+    .icon-collapse { display: block; }
+    .icon-pin      { display: none; }
+    .sidebar.collapsed:hover .icon-collapse { display: none; }
+    .sidebar.collapsed:hover .icon-pin      { display: block; }
 
     .sidebar nav { padding: 10px 8px; flex: 1; overflow: hidden; }
 
@@ -176,8 +160,10 @@
       transition: stroke 0.15s;
     }
 
+    /* Labels hidden when collapsed, shown on hover-expand */
     .nav-label { overflow: hidden; transition: opacity 0.15s; }
     .sidebar.collapsed .nav-label { opacity: 0; pointer-events: none; }
+    .sidebar.collapsed:hover .nav-label { opacity: 1; pointer-events: auto; }
 
     .sidebar-actions {
       padding: 12px 8px;
@@ -205,7 +191,8 @@
     }
 
     .sidebar-actions button:hover { background: #f1f5f9; color: #1e293b; }
-    .sidebar.collapsed .sidebar-actions button span { opacity: 0; }
+    .sidebar.collapsed .sidebar-actions button span { opacity: 0; transition: opacity 0.15s; }
+    .sidebar.collapsed:hover .sidebar-actions button span { opacity: 1; }
 
     /* ─── Sidebar user ────────────────────────── */
     .sidebar-user {
@@ -554,8 +541,7 @@
       .budget-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .main { padding: 20px 16px; }
-      .sidebar { width: 0; border-right: none; }
-      .sidebar-reveal { display: flex; }
+      .sidebar { width: 60px; }
     }
 
     .surplus-banner {
@@ -1043,10 +1029,15 @@
 
 <!-- ─── Sidebar ───────────────────────────────── -->
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-close">
-    <button class="sidebar-toggle" onclick="collapseSidebar()" title="Close menu">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <div class="sidebar-top">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle menu">
+      <!-- shown when open: collapse left -->
+      <svg class="icon-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <!-- shown on hover when collapsed: pin open -->
+      <svg class="icon-pin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
       </svg>
     </button>
   </div>
@@ -1127,15 +1118,6 @@
     <button class="sidebar-user-out" onclick="signOutUser()" title="Sign out">↩</button>
   </div>
 </aside>
-
-<!-- ─── Sidebar reveal tab ────────────────────── -->
-<div class="sidebar-reveal" id="sidebar-reveal" onclick="expandSidebar()">
-  <div class="sidebar-reveal-btn">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="9 18 15 12 9 6"/>
-    </svg>
-  </div>
-</div>
 
 <!-- ─── Main ──────────────────────────────────── -->
 <main class="main">
@@ -1239,13 +1221,8 @@
 // ─────────────────────────────────────────────────
 // SIDEBAR
 // ─────────────────────────────────────────────────
-function collapseSidebar() {
-  document.getElementById('sidebar').classList.add('collapsed');
-  document.getElementById('sidebar-reveal').style.display = 'flex';
-}
-function expandSidebar() {
-  document.getElementById('sidebar').classList.remove('collapsed');
-  document.getElementById('sidebar-reveal').style.display = 'none';
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
 }
 
 // ─────────────────────────────────────────────────
