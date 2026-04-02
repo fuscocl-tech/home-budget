@@ -4288,7 +4288,7 @@ function renderExpenseGroups(expenses) {
     ? [...groups, { id: 'ug', name: 'Ungrouped', icon: '📋', categories: ungroupedCats }]
     : groups;
 
-  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:4px">';
+  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:4px;align-items:start">';
 
   for (const group of displayGroups) {
     const items = expenses.filter(e => group.categories.includes(e.category || 'Other'));
@@ -4329,6 +4329,7 @@ function renderExpenseGroups(expenses) {
             <span style="color:var(--text-muted)">${aud(budgeted)} budgeted</span>
           </div>
         </div>
+        <div style="max-height:248px;overflow-y:auto">
         ${items.map(e => {
           const eMo    = itemMonthly(e);
           const eAct   = actuals[e.id] || 0;
@@ -4354,6 +4355,7 @@ function renderExpenseGroups(expenses) {
             </div>
           </div>`;
         }).join('')}
+        </div>
       </div>
     </div>`;
   }
