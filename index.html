@@ -3895,26 +3895,83 @@ function nextInsightsMonth() {
 
 // ─── Category Group management ────────────────────
 
+const GROUP_ICONS = [
+  '🏠','🏡','🏗️','🔑','💡','🔌','🚿','🛋️','🛏️','🪴',
+  '🍽️','🍕','🍔','🛒','🥗','🍷','☕','🍰','🥩','🧃',
+  '🚗','🚙','🚌','✈️','⛽','🚕','🏎️','🚲','🛵','🚂',
+  '👨‍👩‍👧','👶','📚','🏫','💊','🏥','💅','💆','🧴','👕',
+  '🎮','🎬','🎵','🏋️','📺','🎲','🏄','🎯','🎨','🎭',
+  '💰','💳','🏦','📈','💸','🪙','💎','📊','🏆','💼',
+  '📦','🛍️','🎁','🔧','🛠️','📱','💻','🧹','🧺','🖨️',
+  '🐕','🐈','🐠','🌱','☀️','❄️','🎄','🎂','⚽','🧸',
+];
+
+function openEmojiPickerModal(currentIcon, onSelect) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;width:340px;max-width:95vw;box-shadow:0 8px 32px rgba(0,0,0,0.35)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <span style="font-weight:700;font-size:15px">Choose Icon</span>
+        <button id="emoji-picker-close" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-muted);line-height:1">&times;</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;max-height:220px;overflow-y:auto">
+        ${GROUP_ICONS.map(e => `
+          <button data-emoji="${e}" style="font-size:20px;width:100%;aspect-ratio:1;border:2px solid ${e===currentIcon?'var(--primary)':'transparent'};border-radius:6px;cursor:pointer;background:${e===currentIcon?'var(--primary)22':'transparent'};transition:background .1s" title="${e}">${e}</button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#emoji-picker-close').onclick = () => document.body.removeChild(overlay);
+  overlay.querySelectorAll('[data-emoji]').forEach(btn => {
+    btn.onclick = () => {
+      onSelect(btn.dataset.emoji);
+      document.body.removeChild(overlay);
+    };
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) document.body.removeChild(overlay); });
+}
+
 function openAddCategoryGroup() {
   openModal('Add Category Group', `
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Icon (emoji)</label>
-        <input class="form-input" id="f-grp-icon" type="text" placeholder="🏠" style="font-size:18px;text-align:center">
+      <div class="form-group" style="flex:0 0 auto">
+        <label class="form-label">Icon</label>
+        <button type="button" id="f-grp-icon-btn" style="width:56px;height:44px;font-size:24px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);cursor:pointer" title="Choose icon">📦</button>
+        <input type="hidden" id="f-grp-icon" value="📦">
       </div>
-      <div class="form-group">
+      <div class="form-group" style="flex:1">
         <label class="form-label">Group Name</label>
         <input class="form-input" id="f-grp-name" type="text" placeholder="e.g. Housing">
       </div>
     </div>
   `, () => {
-    const icon = document.getElementById('f-grp-icon').value.trim() || '📦';
+    const icon = document.getElementById('f-grp-icon').value || '📦';
     const name = document.getElementById('f-grp-name').value.trim();
     if (!name) return;
     const id = nextId(state.categoryGroups);
     state.categoryGroups.push({ id, name, icon, categories: [] });
     logActivity('Added category group', name);
     saveData(state); renderSettings();
+  });
+  // Wire up icon picker after modal renders
+  document.getElementById('f-grp-icon-btn').addEventListener('click', () => {
+    const current = document.getElementById('f-grp-icon').value;
+    openEmojiPickerModal(current, emoji => {
+      document.getElementById('f-grp-icon').value = emoji;
+      document.getElementById('f-grp-icon-btn').textContent = emoji;
+    });
+  });
+}
+
+function openIconPickerForGroup(groupId) {
+  const g = state.categoryGroups.find(x => x.id === groupId);
+  if (!g) return;
+  openEmojiPickerModal(g.icon, emoji => {
+    updateCategoryGroup(groupId, 'icon', emoji);
+    const btn = document.getElementById(`grp-icon-btn-${groupId}`);
+    if (btn) btn.textContent = emoji;
   });
 }
 
@@ -4254,8 +4311,7 @@ function renderSettings() {
           return `
           <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-              <input type="text" class="form-input" style="width:52px;text-align:center;font-size:18px;padding:4px" value="${g.icon}"
-                onchange="updateCategoryGroup(${g.id},'icon',this.value)">
+              <button id="grp-icon-btn-${g.id}" type="button" onclick="openIconPickerForGroup(${g.id})" style="width:52px;height:40px;font-size:22px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer" title="Choose icon">${g.icon}</button>
               <input type="text" class="form-input" style="flex:1;font-weight:600" value="${g.name.replace(/"/g,'&quot;')}"
                 onchange="updateCategoryGroup(${g.id},'name',this.value)">
               <button class="btn btn-danger-ghost btn-sm" onclick="deleteCategoryGroup(${g.id})">Delete</button>
