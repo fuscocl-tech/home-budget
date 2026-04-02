@@ -4316,19 +4316,20 @@ function renderExpenseGroups(expenses) {
           <span id="grp-arrow-${group.id}" style="color:var(--text-muted);font-size:11px;width:14px;text-align:center">▼</span>
         </div>
       </div>
-      <!-- Collapsible body: progress + items -->
-      <div id="grp-body-${group.id}" style="border-top:1px solid var(--border)">
-        <div style="padding:12px 14px;background:var(--surface2)">
-          <div style="background:var(--border);border-radius:99px;height:8px;overflow:hidden;margin-bottom:6px">
-            <div style="height:100%;width:${barPct}%;background:${barColor};border-radius:99px"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px">
-            <span style="color:${hasActual ? barColor : 'var(--text-muted)'}">
-              ${hasActual ? `${aud(actual)} spent · ${pct}%${over ? ' — over budget!' : ''}` : 'No actuals entered yet'}
-            </span>
-            <span style="color:var(--text-muted)">${aud(budgeted)} budgeted</span>
-          </div>
+      <!-- Always-visible progress bar -->
+      <div style="padding:12px 14px;background:var(--surface2);border-top:1px solid var(--border)">
+        <div style="background:var(--border);border-radius:99px;height:8px;overflow:hidden;margin-bottom:6px">
+          <div style="height:100%;width:${barPct}%;background:${barColor};border-radius:99px"></div>
         </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span style="color:${hasActual ? barColor : 'var(--text-muted)'}">
+            ${hasActual ? `${aud(actual)} spent · ${pct}%${over ? ' — over budget!' : ''}` : 'No actuals entered yet'}
+          </span>
+          <span style="color:var(--text-muted)">${aud(budgeted)} budgeted</span>
+        </div>
+      </div>
+      <!-- Collapsible items only -->
+      <div id="grp-body-${group.id}" style="border-top:1px solid var(--border)">
         <div style="max-height:248px;overflow-y:auto">
         ${items.map(e => {
           const eMo    = itemMonthly(e);
