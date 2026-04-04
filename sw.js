@@ -1,4 +1,4 @@
-const CACHE_NAME = 'home-finance-v1';
+const CACHE_NAME = 'home-finance-v4';
 const APP_SHELL  = ['./', './index.html'];
 
 self.addEventListener('install', e => {
