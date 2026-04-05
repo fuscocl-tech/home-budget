@@ -1397,6 +1397,38 @@
     .planner-chevron { transition:transform .2s; color:var(--text-muted); }
     .planner-chevron.open { transform:rotate(180deg); }
     .planner-body-actions { display:flex; gap:8px; margin-top:12px; }
+
+    /* Planner calendar grid */
+    .planner-cal { padding:0 24px 12px; }
+    .planner-cal-header { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:2px; }
+    .planner-cal-day-hdr { text-align:center; font-size:11px; font-weight:700; color:var(--text-muted); padding:6px 0; text-transform:uppercase; letter-spacing:.5px; }
+    .planner-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+    .planner-cal-cell { min-height:72px; background:#fff; border:1px solid var(--border); border-radius:8px; padding:6px; cursor:pointer; transition:background .1s; }
+    .planner-cal-cell:hover { background:var(--surface2); }
+    .planner-cal-cell.muted { opacity:.35; }
+    .planner-cal-cell.today .planner-cal-cell-num { background:var(--primary); color:#fff; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; margin-bottom:4px; }
+    .planner-cal-cell.selected { border-color:var(--primary); background:var(--primary-light); }
+    .planner-cal-cell-num { font-size:12px; font-weight:600; margin-bottom:3px; }
+    .planner-cal-cell-events { display:flex; flex-direction:column; gap:2px; }
+    .planner-chip { font-size:10px; padding:2px 5px; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; line-height:1.4; }
+    .planner-chip-more { font-size:10px; color:var(--text-muted); padding:1px 4px; }
+    .planner-day-panel { margin:0 24px 24px; border:2px solid var(--primary); border-radius:16px; overflow:hidden; }
+    .planner-day-panel-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--primary-light); border-bottom:1px solid var(--border); }
+    .planner-day-title { font-weight:700; font-size:15px; color:var(--primary); }
+    .planner-day-events { padding:12px 16px; display:flex; flex-direction:column; gap:8px; }
+
+    /* Weekly strip */
+    .ws-strip { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
+    .ws-day { background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px 8px; cursor:pointer; transition:border-color .15s; min-width:0; }
+    .ws-day:hover { border-color:var(--primary); }
+    .ws-today { border-color:var(--primary); background:var(--primary-light); }
+    .ws-day-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); margin-bottom:1px; }
+    .ws-today .ws-day-label { color:var(--primary); }
+    .ws-day-date { font-size:13px; font-weight:700; color:var(--text); margin-bottom:6px; }
+    .ws-day-events { display:flex; flex-direction:column; gap:2px; min-height:20px; }
+    .ws-event-chip { font-size:10px; padding:2px 5px; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; line-height:1.4; }
+    .ws-empty { font-size:12px; color:var(--border); }
+    .ws-cost { font-size:11px; font-weight:700; color:var(--success); margin-top:5px; }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -2690,6 +2722,15 @@ function renderDashboard() {
           <div class="db-stat-lbl">Monthly income</div>
         </div>
       </div>
+    </div>
+
+    <!-- This week strip -->
+    <div class="db-widget" style="margin:0 24px 20px">
+      <div class="db-widget-header">
+        <span class="db-widget-title">This Week</span>
+        <button class="db-widget-link" onclick="activateTab('planner')">Open planner →</button>
+      </div>
+      <div style="padding:12px 16px 14px">${renderWeeklyStrip()}</div>
     </div>
 
     <!-- Two-column widgets -->
@@ -8447,19 +8488,21 @@ function dismissSubResult(key) {
 // PLANNER
 // ─────────────────────────────────────────────────
 
-const PLANNER_EVENT_TYPES = {
-  birthday:    { label: 'Birthday',    emoji: '🎂', color: '#fef9c3', text: '#854d0e' },
-  wedding:     { label: 'Wedding',     emoji: '💍', color: '#fce7f3', text: '#9d174d' },
-  trip:        { label: 'Trip',        emoji: '✈️',  color: '#e0f2fe', text: '#075985' },
-  holiday:     { label: 'Holiday',     emoji: '🌴', color: '#ecfdf5', text: '#065f46' },
-  school:      { label: 'School',      emoji: '🎒', color: '#f0fdf4', text: '#166534' },
-  medical:     { label: 'Medical',     emoji: '🏥', color: '#fef2f2', text: '#991b1b' },
-  anniversary: { label: 'Anniversary', emoji: '❤️',  color: '#fce7f3', text: '#9d174d' },
-  party:       { label: 'Party',       emoji: '🎉', color: '#ede9fe', text: '#5b21b6' },
-  other:       { label: 'Other',       emoji: '📅', color: '#f1f5f9', text: '#475569' },
+const PLANNER_CATS = {
+  work:    { label: 'Work',    emoji: '💼', color: '#dbeafe', text: '#1e40af', financial: false },
+  study:   { label: 'Study',   emoji: '📚', color: '#fef3c7', text: '#92400e', financial: false },
+  social:  { label: 'Social',  emoji: '🎉', color: '#ede9fe', text: '#5b21b6', financial: true  },
+  family:  { label: 'Family',  emoji: '👨‍👩‍👧', color: '#fce7f3', text: '#9d174d', financial: false },
+  travel:  { label: 'Travel',  emoji: '✈️',  color: '#e0f2fe', text: '#075985', financial: true  },
+  health:  { label: 'Health',  emoji: '🏥', color: '#fef2f2', text: '#991b1b', financial: true  },
+  finance: { label: 'Finance', emoji: '💰', color: '#ecfdf5', text: '#065f46', financial: true  },
+  home:    { label: 'Home',    emoji: '🏠', color: '#f0fdf4', text: '#166534', financial: true  },
+  school:  { label: 'School',  emoji: '🏫', color: '#fff7ed', text: '#9a3412', financial: true  },
+  other:   { label: 'Other',   emoji: '📦', color: '#f1f5f9', text: '#475569', financial: false },
 };
 
 let _plannerMonth = new Date().toISOString().slice(0, 7);
+let _plannerSelectedDay = null;
 let _plannerExpanded = new Set();
 
 function renderPlanner() {
@@ -8467,16 +8510,15 @@ function renderPlanner() {
   if (!el) return;
   if (!state.planner) state.planner = { events: [] };
 
-  const events = state.planner.events
+  const [y, m] = _plannerMonth.split('-').map(Number);
+  const monthLabel = new Date(y, m-1, 15).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+  const monthTotal = (state.planner.events || [])
     .filter(e => e.date && e.date.slice(0,7) === _plannerMonth)
-    .sort((a, b) => a.date.localeCompare(b.date));
+    .reduce((sum, ev) => sum + (ev.estimates||[]).filter(e=>e.accepted).reduce((s,e)=>s+(e.amount||0),0), 0);
 
-  const monthTotal = events.reduce((sum, ev) =>
-    sum + (ev.estimates || []).filter(e => e.accepted).reduce((s, e) => s + (e.amount || 0), 0), 0);
+  const defaultDate = _plannerSelectedDay || new Date().toISOString().slice(0,10);
 
-  const monthLabel = new Date(_plannerMonth + '-15').toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
-
-  let html = `
+  el.innerHTML = `
     <div class="planner-header">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div class="planner-month-nav">
@@ -8484,122 +8526,204 @@ function renderPlanner() {
           <h2>${monthLabel}</h2>
           <button onclick="_plannerNextMonth()">›</button>
         </div>
-        ${monthTotal > 0 ? `<span class="planner-month-total">$${monthTotal.toLocaleString('en-AU')} estimated this month</span>` : ''}
+        ${monthTotal > 0 ? `<span class="planner-month-total">$${monthTotal.toLocaleString('en-AU')} estimated</span>` : ''}
       </div>
-      <button class="btn-primary" onclick="openPlannerModal()">+ Add Event</button>
-    </div>`;
+      <button class="btn-primary" onclick="openPlannerModal(null,'${defaultDate}')">+ Add Event</button>
+    </div>
+    ${_renderPlannerCalendar()}
+    ${_plannerSelectedDay ? _renderPlannerDayPanel(_plannerSelectedDay) : ''}`;
+}
 
-  if (events.length === 0) {
-    html += `<div class="planner-empty">
-      <div style="font-size:48px;margin-bottom:12px">📅</div>
-      <p style="font-weight:600;font-size:16px;margin-bottom:6px;color:var(--text)">No events this month</p>
-      <p style="font-size:14px">Add a birthday, trip, or any event and Toto will estimate what it'll cost.</p>
-    </div>`;
-  } else {
-    html += `<div class="planner-events">`;
-    for (const ev of events) html += _renderPlannerCard(ev);
-    html += `</div>`;
+function _renderPlannerCalendar() {
+  const [y, m] = _plannerMonth.split('-').map(Number);
+  const today = new Date().toISOString().slice(0, 10);
+  const firstDow = new Date(y, m-1, 1).getDay(); // 0=Sun
+  const startOffset = firstDow === 0 ? 6 : firstDow - 1; // Mon-based
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const daysInPrev  = new Date(y, m-1, 0).getDate();
+  const events = state.planner.events || [];
+  const byDate = {};
+  events.forEach(ev => { if (!byDate[ev.date]) byDate[ev.date] = []; byDate[ev.date].push(ev); });
+
+  let cells = [];
+  for (let i = startOffset - 1; i >= 0; i--) {
+    const d = daysInPrev - i;
+    const mo = m - 1 || 12;
+    const yr = mo === 12 ? y - 1 : y;
+    cells.push({ dateStr: `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`, day: d, muted: true });
   }
-  el.innerHTML = html;
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ dateStr: `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, day: d, muted: false });
+  }
+  const tail = cells.length % 7 === 0 ? 0 : 7 - (cells.length % 7);
+  for (let d = 1; d <= tail; d++) {
+    const mo = m + 1 > 12 ? 1 : m + 1;
+    const yr = mo === 1 ? y + 1 : y;
+    cells.push({ dateStr: `${yr}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`, day: d, muted: true });
+  }
+
+  const headers = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d =>
+    `<div class="planner-cal-day-hdr">${d}</div>`).join('');
+
+  const grid = cells.map(cell => {
+    const isToday    = cell.dateStr === today;
+    const isSelected = cell.dateStr === _plannerSelectedDay;
+    const dayEvs     = byDate[cell.dateStr] || [];
+    const chips      = dayEvs.slice(0,3).map(ev => {
+      const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
+      return `<div class="planner-chip" style="background:${cat.color};color:${cat.text}" title="${ev.title}">${cat.emoji} ${ev.title}</div>`;
+    }).join('');
+    const more = dayEvs.length > 3 ? `<div class="planner-chip-more">+${dayEvs.length-3}</div>` : '';
+    return `<div class="planner-cal-cell ${cell.muted?'muted':''} ${isToday?'today':''} ${isSelected?'selected':''}"
+                 onclick="_plannerSelectDay('${cell.dateStr}')">
+      <div class="planner-cal-cell-num">${cell.day}</div>
+      <div class="planner-cal-cell-events">${chips}${more}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="planner-cal">
+    <div class="planner-cal-header">${headers}</div>
+    <div class="planner-cal-grid">${grid}</div>
+  </div>`;
 }
 
-function _plannerPrevMonth() {
-  const [y, m] = _plannerMonth.split('-').map(Number);
-  _plannerMonth = new Date(y, m-2, 1).toISOString().slice(0, 7);
-  renderPlanner();
-}
-function _plannerNextMonth() {
-  const [y, m] = _plannerMonth.split('-').map(Number);
-  _plannerMonth = new Date(y, m, 1).toISOString().slice(0, 7);
-  renderPlanner();
+function _renderPlannerDayPanel(dateStr) {
+  const dateLabel = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long' });
+  const events = (state.planner.events || []).filter(e => e.date === dateStr).sort((a,b) => a.title.localeCompare(b.title));
+  let inner = events.length === 0
+    ? `<div style="padding:16px 0;text-align:center;color:var(--text-muted);font-size:13px">Nothing planned. Add an event for this day.</div>`
+    : `<div class="planner-day-events">${events.map(ev => _renderPlannerEventRow(ev)).join('')}</div>`;
+  return `<div class="planner-day-panel">
+    <div class="planner-day-panel-header">
+      <span class="planner-day-title">${dateLabel}</span>
+      <button class="btn-primary btn-sm" onclick="openPlannerModal(null,'${dateStr}')">+ Add</button>
+    </div>
+    ${inner}
+  </div>`;
 }
 
-function _renderPlannerCard(ev) {
-  const type = PLANNER_EVENT_TYPES[ev.type] || PLANNER_EVENT_TYPES.other;
-  const dateLabel = new Date(ev.date + 'T12:00:00').toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short' });
+function _renderPlannerEventRow(ev) {
+  const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
   const isOpen = _plannerExpanded.has(ev.id);
   const estimates = ev.estimates || [];
   const accepted = estimates.filter(e => e.accepted);
-  const acceptedTotal = accepted.reduce((s, e) => s + (e.amount || 0), 0);
-  const allTotal = estimates.reduce((s, e) => s + (e.amount || 0), 0);
+  const acceptedTotal = accepted.reduce((s,e) => s+(e.amount||0), 0);
+  const allTotal = estimates.reduce((s,e) => s+(e.amount||0), 0);
 
-  let sideBadge = '';
-  if (ev.pushed) {
-    sideBadge = `<span class="planner-pushed-badge">✓ In budget</span>`;
-  } else if (estimates.length > 0) {
-    sideBadge = `<span style="font-size:12px;color:var(--text-muted);white-space:nowrap">${accepted.length}/${estimates.length} · $${acceptedTotal.toLocaleString('en-AU')}</span>`;
-  }
+  let sideBadge = ev.pushed
+    ? `<span class="planner-pushed-badge">✓ In budget</span>`
+    : estimates.length > 0
+      ? `<span style="font-size:12px;color:var(--text-muted)">$${acceptedTotal.toLocaleString('en-AU')}</span>`
+      : '';
 
   let body = '';
   if (isOpen) {
     body = `<div class="planner-event-body">`;
     if (ev.notes) body += `<p class="planner-notes">${ev.notes}</p>`;
-
     if (estimates.length > 0) {
       body += estimates.map(est => `
         <div class="planner-estimate-row">
-          <div class="planner-estimate-check ${est.accepted ? 'accepted' : ''}"
-               onclick="togglePlannerEstimate('${ev.id}','${est.id}')">
+          <div class="planner-estimate-check ${est.accepted?'accepted':''}" onclick="togglePlannerEstimate('${ev.id}','${est.id}')">
             ${est.accepted ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
           </div>
-          <div class="planner-estimate-name">
-            <div>${est.name}</div>
-            <div class="planner-estimate-cat">${est.category}</div>
-          </div>
+          <div class="planner-estimate-name"><div>${est.name}</div><div class="planner-estimate-cat">${est.category}</div></div>
           <div class="planner-estimate-amount">$${est.amount.toLocaleString('en-AU')}</div>
         </div>`).join('');
-
       body += `<div class="planner-estimate-footer">
-        <div class="planner-total">All: <strong>$${allTotal.toLocaleString('en-AU')}</strong> &nbsp;·&nbsp; Selected: <strong>$${acceptedTotal.toLocaleString('en-AU')}</strong></div>
+        <div class="planner-total">All: <strong>$${allTotal.toLocaleString('en-AU')}</strong> · Selected: <strong>$${acceptedTotal.toLocaleString('en-AU')}</strong></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          ${!ev.pushed ? `<button class="planner-ai-btn" onclick="estimatePlannerEvent('${ev.id}')" id="ai-btn-${ev.id}">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            Re-estimate
-          </button>` : ''}
+          ${!ev.pushed ? `<button class="planner-ai-btn" id="ai-btn-${ev.id}" onclick="estimatePlannerEvent('${ev.id}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Re-estimate</button>` : ''}
           ${ev.pushed
             ? `<button class="planner-push-btn" style="background:var(--danger)" onclick="unpushEventFromBudget('${ev.id}')">Remove from budget</button>`
-            : `<button class="planner-push-btn" ${accepted.length === 0 ? 'disabled title="Accept at least one item first"' : ''} onclick="pushEventToBudget('${ev.id}')">→ Push to budget</button>`
-          }
+            : `<button class="planner-push-btn" ${accepted.length===0?'disabled':''} onclick="pushEventToBudget('${ev.id}')">→ Push to budget</button>`}
         </div>
       </div>`;
-    } else {
-      body += `<div style="text-align:center;padding:20px 0">
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px">No cost estimates yet — let Toto figure it out.</p>
-        <button class="planner-ai-btn" onclick="estimatePlannerEvent('${ev.id}')" id="ai-btn-${ev.id}">
+    } else if (cat.financial) {
+      body += `<div style="text-align:center;padding:16px 0">
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px">Let Toto estimate the costs.</p>
+        <button class="planner-ai-btn" id="ai-btn-${ev.id}" onclick="estimatePlannerEvent('${ev.id}')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           Estimate costs with AI
         </button>
-        <p style="font-size:11px;color:var(--text-muted);margin-top:8px">Or <a href="#" onclick="event.preventDefault();openPlannerModal('${ev.id}')">edit the event</a> to add notes for better estimates</p>
       </div>`;
     }
     body += `</div>`;
   }
 
-  return `
-    <div class="planner-event-card" id="planner-ev-${ev.id}">
-      <div class="planner-event-header" onclick="togglePlannerCard('${ev.id}')">
-        <div class="planner-event-type-badge" style="background:${type.color};color:${type.text}">${type.emoji}</div>
-        <div class="planner-event-meta">
-          <div class="planner-event-title">${ev.title}</div>
-          <div class="planner-event-date">${dateLabel} · ${type.label}</div>
-        </div>
-        <div class="planner-event-side">
-          ${sideBadge}
-          <button onclick="event.stopPropagation();openPlannerModal('${ev.id}')"
-                  style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:6px;display:flex" title="Edit">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <svg class="planner-chevron ${isOpen ? 'open' : ''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
+  return `<div class="planner-event-card" id="planner-ev-${ev.id}">
+    <div class="planner-event-header" onclick="togglePlannerCard('${ev.id}')">
+      <div class="planner-event-type-badge" style="background:${cat.color};color:${cat.text}">${cat.emoji}</div>
+      <div class="planner-event-meta">
+        <div class="planner-event-title">${ev.title}</div>
+        <div class="planner-event-date">${cat.label}</div>
       </div>
-      ${body}
-    </div>`;
+      <div class="planner-event-side">
+        ${sideBadge}
+        <button onclick="event.stopPropagation();openPlannerModal('${ev.id}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:6px;display:flex" title="Edit">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <svg class="planner-chevron ${isOpen?'open':''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+    ${body}
+  </div>`;
+}
+
+function _plannerPrevMonth() {
+  const [y, m] = _plannerMonth.split('-').map(Number);
+  _plannerMonth = new Date(y, m-2, 1).toISOString().slice(0, 7);
+  _plannerSelectedDay = null;
+  renderPlanner();
+}
+function _plannerNextMonth() {
+  const [y, m] = _plannerMonth.split('-').map(Number);
+  _plannerMonth = new Date(y, m, 1).toISOString().slice(0, 7);
+  _plannerSelectedDay = null;
+  renderPlanner();
+}
+function _plannerSelectDay(dateStr) {
+  _plannerSelectedDay = _plannerSelectedDay === dateStr ? null : dateStr;
+  renderPlanner();
+}
+function goToPlannerDay(dateStr) {
+  _plannerMonth = dateStr.slice(0, 7);
+  _plannerSelectedDay = dateStr;
+  activateTab('planner');
 }
 
 function togglePlannerCard(id) {
   if (_plannerExpanded.has(id)) _plannerExpanded.delete(id);
   else _plannerExpanded.add(id);
   renderPlanner();
+}
+
+// ── Weekly strip ──────────────────────────────────
+function renderWeeklyStrip() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Array.from({length:7}, (_,i) => { const d = new Date(today); d.setDate(today.getDate()+i); return d; });
+  const events = state.planner?.events || [];
+
+  return `<div class="ws-strip">${days.map(d => {
+    const dateStr = d.toISOString().slice(0,10);
+    const isToday = d.getTime() === today.getTime();
+    const dayEvs  = events.filter(e => e.date === dateStr);
+    const finTotal = dayEvs.reduce((sum, ev) => {
+      const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
+      return cat.financial ? sum + (ev.estimates||[]).filter(e=>e.accepted).reduce((s,e)=>s+(e.amount||0),0) : sum;
+    }, 0);
+    const chips = dayEvs.slice(0,2).map(ev => {
+      const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
+      return `<div class="ws-event-chip" style="background:${cat.color};color:${cat.text}">${cat.emoji} ${ev.title}</div>`;
+    }).join('');
+    const more = dayEvs.length > 2 ? `<div class="ws-event-chip" style="background:#f1f5f9;color:#64748b">+${dayEvs.length-2}</div>` : '';
+    return `<div class="ws-day ${isToday?'ws-today':''}" onclick="goToPlannerDay('${dateStr}')">
+      <div class="ws-day-label">${isToday?'Today':d.toLocaleDateString('en-AU',{weekday:'short'})}</div>
+      <div class="ws-day-date">${d.toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</div>
+      <div class="ws-day-events">${chips}${more}${dayEvs.length===0?'<div class="ws-empty">—</div>':''}</div>
+      ${finTotal > 0 ? `<div class="ws-cost">$${finTotal.toLocaleString('en-AU')}</div>` : ''}
+    </div>`;
+  }).join('')}</div>`;
 }
 
 function togglePlannerEstimate(eventId, estId) {
@@ -8682,7 +8806,7 @@ async function estimatePlannerEvent(eventId) {
   const prompt = `You are a family finance assistant for an Australian family. Suggest realistic cost estimates for the following life event.
 
 Event: ${ev.title}
-Type: ${ev.type}
+Category: ${(PLANNER_CATS[ev.category]||PLANNER_CATS.other).label}
 Date: ${eventDate}
 Notes: ${ev.notes || 'none provided'}
 Family size: ${adults} adult(s), ${kids} child(ren)
@@ -8734,36 +8858,31 @@ Rules:
   }
 }
 
-function openPlannerModal(id) {
-  const ev = id ? (state.planner?.events || []).find(e => e.id === id) : null;
-  const today = new Date().toISOString().slice(0, 10);
+function openPlannerModal(id, presetDate) {
+  const ev = id ? (state.planner?.events||[]).find(e => e.id === id) : null;
+  const defaultDate = presetDate || new Date().toISOString().slice(0,10);
   document.getElementById('modal').innerHTML = `
     <div class="modal-header">
       <h3>${ev ? 'Edit Event' : 'Add Event'}</h3>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
-      <label class="form-label">Event Title *</label>
-      <input class="form-input" id="pe-title" placeholder="e.g. Sarah's Birthday, Trip to Melbourne" value="${ev ? ev.title : ''}">
-
-      <label class="form-label" style="margin-top:14px">Type *</label>
-      <select class="form-input" id="pe-type">
-        ${Object.entries(PLANNER_EVENT_TYPES).map(([k,v]) =>
-          `<option value="${k}" ${ev?.type===k?'selected':''}>${v.emoji} ${v.label}</option>`
-        ).join('')}
+      <label class="form-label">Title *</label>
+      <input class="form-input" id="pe-title" placeholder="e.g. Jake's Birthday, Trip to Melbourne, Dentist" value="${ev?ev.title:''}">
+      <label class="form-label" style="margin-top:14px">Category *</label>
+      <select class="form-input" id="pe-cat">
+        ${Object.entries(PLANNER_CATS).map(([k,v])=>`<option value="${k}" ${(ev?.category||'other')===k?'selected':''}>${v.emoji} ${v.label}</option>`).join('')}
       </select>
-
       <label class="form-label" style="margin-top:14px">Date *</label>
-      <input class="form-input" id="pe-date" type="date" value="${ev ? ev.date : today}">
-
-      <label class="form-label" style="margin-top:14px">Notes <span style="font-weight:400;color:var(--text-muted)">(optional — helps AI estimate better)</span></label>
-      <textarea class="form-input" id="pe-notes" rows="3" placeholder="e.g. Flying from Sydney, 5 nights, buying gift ~$80">${ev ? (ev.notes||'') : ''}</textarea>
+      <input class="form-input" id="pe-date" type="date" value="${ev?ev.date:defaultDate}">
+      <label class="form-label" style="margin-top:14px">Notes <span style="font-weight:400;color:var(--text-muted)">(helps AI estimate costs)</span></label>
+      <textarea class="form-input" id="pe-notes" rows="3" placeholder="e.g. Flying from Sydney, 5 nights, gift budget ~$100">${ev?(ev.notes||''):''}</textarea>
     </div>
     <div class="modal-footer" style="justify-content:space-between">
       ${ev ? `<button class="btn-danger" onclick="deletePlannerEvent('${ev.id}')">Delete</button>` : '<span></span>'}
       <div style="display:flex;gap:8px">
         <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-        <button class="btn-primary" onclick="savePlannerEvent(${ev ? `'${ev.id}'` : 'null'})">Save</button>
+        <button class="btn-primary" onclick="savePlannerEvent(${ev?`'${ev.id}'`:'null'})">Save</button>
       </div>
     </div>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
@@ -8771,18 +8890,19 @@ function openPlannerModal(id) {
 
 function savePlannerEvent(id) {
   const title = document.getElementById('pe-title').value.trim();
-  const type  = document.getElementById('pe-type').value;
+  const cat   = document.getElementById('pe-cat').value;
   const date  = document.getElementById('pe-date').value;
   const notes = document.getElementById('pe-notes').value.trim();
   if (!title || !date) { alert('Title and date are required.'); return; }
   if (!state.planner) state.planner = { events: [] };
   if (id) {
     const ev = state.planner.events.find(e => e.id === id);
-    if (ev) { ev.title = title; ev.type = type; ev.date = date; ev.notes = notes; }
+    if (ev) { ev.title = title; ev.category = cat; ev.date = date; ev.notes = notes; }
   } else {
     const newId = 'ev-' + Date.now();
-    state.planner.events.push({ id: newId, title, type, date, notes, estimates: [], pushed: false });
+    state.planner.events.push({ id: newId, title, category: cat, date, notes, estimates: [], pushed: false });
     _plannerExpanded.add(newId);
+    _plannerSelectedDay = date;
     _plannerMonth = date.slice(0, 7);
   }
   saveData(state);
