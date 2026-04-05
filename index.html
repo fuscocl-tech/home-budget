@@ -1468,9 +1468,6 @@
         <div class="nav-item" data-tab="subscriptions" title="Subscriptions">
           <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         </div>
-        <div class="nav-item" data-tab="planner" title="Planner">
-          <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="11" y2="14"/><line x1="8" y1="18" x2="11" y2="18"/><line x1="14" y1="14" x2="17" y2="14"/><line x1="14" y1="18" x2="17" y2="18"/></svg>
-        </div>
       </div>
 
       <div class="nav-item" data-tab="build" title="Build Costs">
@@ -1487,6 +1484,9 @@
       </div>
       <div class="nav-item" data-tab="insights" title="Insights">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 17H9l-.7-2C6.3 13.7 5 11.5 5 9a7 7 0 0 1 7-7z"/></svg>
+      </div>
+      <div class="nav-item" data-tab="planner" title="Planner">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="11" y2="14"/><line x1="8" y1="18" x2="11" y2="18"/><line x1="14" y1="14" x2="17" y2="14"/><line x1="14" y1="18" x2="17" y2="18"/></svg>
       </div>
       <div class="nav-item" data-tab="kids" title="Kids Zone">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-1a6 6 0 0 0-4.73-5.86"/></svg>
@@ -1527,7 +1527,6 @@
         <div class="nav-text-item" data-tab="bills">Bills</div>
         <div class="nav-text-item" data-tab="networth">Net Worth</div>
         <div class="nav-text-item" data-tab="subscriptions">Subscriptions</div>
-        <div class="nav-text-item" data-tab="planner">Planner</div>
       </div>
 
       <div class="nav-text-item" data-tab="build">Build Costs</div>
@@ -1535,6 +1534,7 @@
       <div class="nav-text-item" data-tab="goals">Goals</div>
       <div class="nav-text-item" data-tab="scenarios">Scenarios</div>
       <div class="nav-text-item" data-tab="insights">Insights</div>
+      <div class="nav-text-item" data-tab="planner">Planner</div>
       <div class="nav-text-item" data-tab="kids">Kids Zone</div>
     </nav>
     <div class="text-col-actions">
@@ -1679,7 +1679,7 @@ function toggleSidebar() {
 }
 
 const NAV_GROUPS = {
-  budget: ['money','budget','bills','networth','subscriptions','planner']
+  budget: ['money','budget','bills','networth','subscriptions']
 };
 
 function toggleNavGroup(name) {
