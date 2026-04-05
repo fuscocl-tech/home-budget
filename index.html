@@ -1140,6 +1140,36 @@
     .nw-snapshot-btn:hover { background: #0f766e; }
     .nw-empty { text-align: center; padding: 20px; color: #94a3b8; font-size: 13px; }
 
+    /* ─── Onboarding ─────────────────────────── */
+    .ob-header { background: linear-gradient(135deg,#0d9488,#0f766e); padding: 32px 32px 24px; color: #fff; }
+    .ob-step-dots { display: flex; gap: 6px; margin-bottom: 20px; }
+    .ob-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: background 0.2s; }
+    .ob-dot.active { background: #fff; width: 24px; border-radius: 4px; }
+    .ob-dot.done { background: rgba(255,255,255,0.6); }
+    .ob-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .ob-subtitle { font-size: 14px; opacity: 0.8; }
+    .ob-body { padding: 28px 32px; }
+    .ob-label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: block; }
+    .ob-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .ob-option { padding: 9px 18px; border: 2px solid var(--border); border-radius: 99px; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.15s; background: #fff; }
+    .ob-option:hover { border-color: #0d9488; color: #0d9488; }
+    .ob-option.selected { border-color: #0d9488; background: #f0fdfa; color: #0d9488; }
+    .ob-input-row { display: grid; grid-template-columns: 1fr 140px 130px; gap: 10px; margin-bottom: 12px; align-items: end; }
+    .ob-input-row-2 { display: grid; grid-template-columns: 1fr 160px; gap: 10px; margin-bottom: 12px; align-items: end; }
+    .ob-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none; transition: border-color 0.15s; }
+    .ob-input:focus { border-color: #0d9488; }
+    .ob-input-label { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+    .ob-expense-row { display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    .ob-expense-row:last-child { border-bottom: none; }
+    .ob-expense-name { font-size: 13px; font-weight: 600; }
+    .ob-expense-cat  { font-size: 11px; color: #94a3b8; }
+    .ob-add-link { font-size: 13px; color: #0d9488; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; margin-top: 4px; }
+    .ob-footer { display: flex; align-items: center; justify-content: space-between; padding: 0 32px 28px; }
+    .ob-back { background: none; border: none; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; padding: 0; }
+    .ob-back:hover { color: #64748b; }
+    .ob-next { background: #0d9488; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+    .ob-next:hover { background: #0f766e; }
+
     /* ─── Dashboard upgrade ───────────────────── */
     .db-hero-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     @media(max-width:700px) { .db-hero-row { grid-template-columns: 1fr; } }
@@ -1346,6 +1376,11 @@
     Sign in with Google
   </button>
   <p id="login-error" style="color:#ef4444;font-size:13px;margin:0;display:none"></p>
+</div>
+
+<!-- ─── Onboarding overlay ───────────────────── -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:8000;align-items:center;justify-content:center;padding:20px">
+  <div id="onboarding-card" style="background:#fff;border-radius:24px;width:100%;max-width:520px;box-shadow:0 32px 80px rgba(0,0,0,0.25);overflow:hidden"></div>
 </div>
 
 <!-- ─── App header ────────────────────────────── -->
@@ -1689,10 +1724,14 @@ function _startFirestoreSync() {
       // First user to sign in: push local data up to Firestore
       fbStore.collection('family').doc('shared').set(state);
     }
-    refreshReceiptCounts().then(() => renderAll());
+    refreshReceiptCounts().then(() => {
+      renderAll();
+      if (!state.onboarded) showOnboarding();
+    });
   }, err => {
     console.error('Firestore sync error:', err);
-    renderAll(); // Render with whatever local state we have
+    renderAll();
+    if (!state.onboarded) showOnboarding();
   });
 }
 
@@ -1746,6 +1785,7 @@ const DEFAULT_DATA = {
   netWorth: { assets: [], liabilities: [], snapshots: [], target: { amount: 0, byYear: 0 } },
   bills: [],
   subscriptions: [],
+  onboarded: false,
   activityLog: [],
   householdProfile: {
     members: [{ role: 'adult', age: null }, { role: 'adult', age: null }],
@@ -1788,6 +1828,7 @@ function loadData() {
     if (!d.netWorth.target) d.netWorth.target = { amount: 0, byYear: 0 };
     if (!d.bills) d.bills = [];
     if (!d.subscriptions) d.subscriptions = [];
+    if (d.onboarded === undefined) d.onboarded = true; // existing users skip onboarding
     if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
     if (!d.kids.profiles)    d.kids.profiles    = [];
     if (!d.kids.chores)      d.kids.chores      = [];
@@ -7515,6 +7556,207 @@ function saveNWSnapshot() {
   if (existing !== -1) nw.snapshots[existing] = entry;
   else nw.snapshots.push(entry);
   saveData(state); renderNetWorth();
+}
+
+// ─────────────────────────────────────────────────
+// ONBOARDING
+// ─────────────────────────────────────────────────
+
+const OB_EXPENSE_PRESETS = {
+  building: [
+    { name: 'Mortgage / Rent',  category: 'Mortgage / Rent',  amount: 3000 },
+    { name: 'Groceries',        category: 'Groceries',         amount: 1200 },
+    { name: 'Utilities',        category: 'Utilities',         amount: 400  },
+    { name: 'Transport',        category: 'Transport',         amount: 500  },
+    { name: 'Insurance',        category: 'Insurance',         amount: 350  },
+    { name: 'Entertainment',    category: 'Entertainment',     amount: 200  },
+  ],
+  mortgage: [
+    { name: 'Mortgage',         category: 'Mortgage / Rent',  amount: 3500 },
+    { name: 'Groceries',        category: 'Groceries',         amount: 1200 },
+    { name: 'Utilities',        category: 'Utilities',         amount: 400  },
+    { name: 'Transport',        category: 'Transport',         amount: 500  },
+    { name: 'Insurance',        category: 'Insurance',         amount: 350  },
+    { name: 'Entertainment',    category: 'Entertainment',     amount: 200  },
+  ],
+  renting: [
+    { name: 'Rent',             category: 'Mortgage / Rent',  amount: 2500 },
+    { name: 'Groceries',        category: 'Groceries',         amount: 1200 },
+    { name: 'Utilities',        category: 'Utilities',         amount: 300  },
+    { name: 'Transport',        category: 'Transport',         amount: 500  },
+    { name: 'Insurance',        category: 'Insurance',         amount: 250  },
+    { name: 'Entertainment',    category: 'Entertainment',     amount: 200  },
+  ],
+  own: [
+    { name: 'Groceries',        category: 'Groceries',         amount: 1200 },
+    { name: 'Utilities',        category: 'Utilities',         amount: 400  },
+    { name: 'Transport',        category: 'Transport',         amount: 500  },
+    { name: 'Insurance',        category: 'Insurance',         amount: 400  },
+    { name: 'Health',           category: 'Health',            amount: 300  },
+    { name: 'Entertainment',    category: 'Entertainment',     amount: 300  },
+  ],
+};
+
+let _ob = {
+  step: 1,
+  adults: 2, kids: 0, homeType: 'mortgage',
+  incomes: [{ name: '', amount: '', frequency: 'Monthly' }],
+  expenses: []
+};
+
+function showOnboarding() {
+  _ob = { step: 1, adults: 2, kids: 0, homeType: 'mortgage',
+    incomes: [{ name: '', amount: '', frequency: 'Monthly' }], expenses: [] };
+  const ov = document.getElementById('onboarding-overlay');
+  ov.style.display = 'flex';
+  renderObStep();
+}
+function hideOnboarding() {
+  document.getElementById('onboarding-overlay').style.display = 'none';
+}
+
+function renderObStep() {
+  const card = document.getElementById('onboarding-card');
+  const step = _ob.step;
+  const dots = [1,2,3].map(i =>
+    `<div class="ob-dot ${i < step ? 'done' : i === step ? 'active' : ''}"></div>`).join('');
+
+  const titles = ['', 'Your household', 'Your income', 'Your main expenses'];
+  const subs   = ['', 'Tell us a bit about your family so we can tailor Toto for you.',
+    'What\'s coming in each month?', 'What are your biggest regular costs? Adjust the amounts to match your situation.'];
+
+  let body = '';
+
+  if (step === 1) {
+    const adultOpts = [1,2,3].map(n =>
+      `<button class="ob-option ${_ob.adults===n?'selected':''}" onclick="_ob.adults=${n};renderObStep()">${n} adult${n>1?'s':''}</button>`).join('');
+    const kidOpts = [0,1,2,3,'4+'].map(n => {
+      const val = n === '4+' ? 4 : n;
+      return `<button class="ob-option ${_ob.kids===val?'selected':''}" onclick="_ob.kids=${val};renderObStep()">${n === 0 ? 'No kids' : n + (n===1?' kid':' kids')}</button>`;
+    }).join('');
+    const homeOpts = [
+      { val:'renting',  label:'🏢 Renting' },
+      { val:'mortgage', label:'🏠 Mortgage' },
+      { val:'building', label:'🏗️ Building' },
+      { val:'own',      label:'✅ Own outright' },
+    ].map(o => `<button class="ob-option ${_ob.homeType===o.val?'selected':''}" onclick="_ob.homeType='${o.val}';renderObStep()">${o.label}</button>`).join('');
+
+    body = `
+      <span class="ob-label">Adults in your household</span>
+      <div class="ob-options">${adultOpts}</div>
+      <span class="ob-label">Kids</span>
+      <div class="ob-options">${kidOpts}</div>
+      <span class="ob-label">Home situation</span>
+      <div class="ob-options" style="margin-bottom:0">${homeOpts}</div>`;
+
+  } else if (step === 2) {
+    const freqs = ['Weekly','Fortnightly','Monthly','Annual'];
+    const inputStyle = 'class="ob-input"';
+    const rows = _ob.incomes.map((inc, i) => `
+      <div class="ob-input-row">
+        <div>
+          <div class="ob-input-label">Income source</div>
+          <input ${inputStyle} placeholder="e.g. Chris's salary" value="${inc.name}"
+            oninput="_ob.incomes[${i}].name=this.value">
+        </div>
+        <div>
+          <div class="ob-input-label">Amount ($)</div>
+          <input ${inputStyle} type="number" min="0" placeholder="0" value="${inc.amount}"
+            oninput="_ob.incomes[${i}].amount=this.value">
+        </div>
+        <div>
+          <div class="ob-input-label">Frequency</div>
+          <select class="ob-input" onchange="_ob.incomes[${i}].frequency=this.value">
+            ${freqs.map(f=>`<option value="${f}" ${inc.frequency===f?'selected':''}>${f}</option>`).join('')}
+          </select>
+        </div>
+      </div>`).join('');
+
+    body = `
+      ${rows}
+      ${_ob.incomes.length < 4 ? `<button class="ob-add-link" onclick="_ob.incomes.push({name:'',amount:'',frequency:'Monthly'});renderObStep()">+ Add another income source</button>` : ''}`;
+
+  } else if (step === 3) {
+    if (!_ob.expenses.length) {
+      _ob.expenses = OB_EXPENSE_PRESETS[_ob.homeType].map(e => ({ ...e }));
+    }
+    const rows = _ob.expenses.map((exp, i) => `
+      <div class="ob-expense-row">
+        <div>
+          <div class="ob-expense-name">${exp.name}</div>
+          <div class="ob-expense-cat">${exp.category}</div>
+        </div>
+        <input class="ob-input" type="number" min="0" placeholder="0" value="${exp.amount}"
+          oninput="_ob.expenses[${i}].amount=parseFloat(this.value)||0" style="text-align:right">
+      </div>`).join('');
+
+    body = `
+      <p style="font-size:13px;color:#64748b;margin-bottom:16px">These are monthly amounts — adjust them to match your actual spending.</p>
+      ${rows}`;
+  }
+
+  card.innerHTML = `
+    <div class="ob-header">
+      <div class="ob-step-dots">${dots}</div>
+      <div class="ob-title">${titles[step]}</div>
+      <div class="ob-subtitle">${subs[step]}</div>
+    </div>
+    <div class="ob-body">${body}</div>
+    <div class="ob-footer">
+      ${step > 1
+        ? `<button class="ob-back" onclick="obBack()">← Back</button>`
+        : `<button class="ob-back" onclick="obSkip()">Skip setup</button>`}
+      <button class="ob-next" onclick="obNext()">
+        ${step === 3 ? '🎉 Let\'s go!' : 'Continue →'}
+      </button>
+    </div>`;
+}
+
+function obNext() {
+  if (_ob.step === 3) { obFinish(); return; }
+  _ob.step++;
+  // Pre-load expenses when arriving at step 3
+  if (_ob.step === 3 && !_ob.expenses.length) {
+    _ob.expenses = OB_EXPENSE_PRESETS[_ob.homeType].map(e => ({ ...e }));
+  }
+  renderObStep();
+}
+function obBack() { _ob.step--; renderObStep(); }
+function obSkip() {
+  state.onboarded = true;
+  saveData(state);
+  hideOnboarding();
+}
+
+function obFinish() {
+  // Save household profile
+  state.householdProfile.members = [];
+  for (let i = 0; i < _ob.adults; i++) state.householdProfile.members.push({ role: 'adult', age: null });
+  for (let i = 0; i < _ob.kids; i++) state.householdProfile.members.push({ role: 'child', age: null });
+
+  // Save income to current month budget
+  const mb = ensureMonthOverride(selectedBudgetMonth);
+  _ob.incomes.forEach((inc, i) => {
+    const amount = parseFloat(inc.amount);
+    if (!inc.name || !amount) return;
+    // Convert to monthly
+    const monthly = inc.frequency === 'Weekly' ? amount * 52/12
+                  : inc.frequency === 'Fortnightly' ? amount * 26/12
+                  : inc.frequency === 'Annual' ? amount / 12
+                  : amount;
+    mb.income.push({ id: nextId(mb.income), name: inc.name || `Income ${i+1}`, amount: monthly, frequency: 'monthly', category: 'Salary' });
+  });
+
+  // Save expenses
+  _ob.expenses.forEach(exp => {
+    if (!exp.amount) return;
+    mb.expenses.push({ id: nextId(mb.expenses), name: exp.name, amount: exp.amount, frequency: 'monthly', category: exp.category, recurring: true });
+  });
+
+  state.onboarded = true;
+  saveData(state);
+  hideOnboarding();
+  renderAll();
 }
 
 // ─────────────────────────────────────────────────
