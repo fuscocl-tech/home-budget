@@ -1429,6 +1429,66 @@
     .ws-event-chip { font-size:10px; padding:2px 5px; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; line-height:1.4; }
     .ws-empty { font-size:12px; color:var(--border); }
     .ws-cost { font-size:11px; font-weight:700; color:var(--success); margin-top:5px; }
+
+    /* ─── Diary layout ───────────────────────── */
+    .diary-hero { padding:28px 28px 20px; background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); color:#fff; }
+    .diary-weekday { font-size:13px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; opacity:.6; margin-bottom:4px; }
+    .diary-date-row { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+    .diary-day-num { font-size:52px; font-weight:800; line-height:1; letter-spacing:-2px; }
+    .diary-month-year { font-size:22px; font-weight:300; opacity:.8; }
+    .diary-today-events { margin-top:18px; display:flex; flex-direction:column; gap:6px; }
+    .diary-today-ev { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.1); border-radius:10px; padding:8px 12px; font-size:13px; }
+    .diary-today-ev-badge { font-size:16px; }
+    .diary-nothing { font-size:13px; opacity:.5; font-style:italic; }
+    .diary-add-today { margin-top:10px; background:rgba(255,255,255,.15); color:#fff; border:1px solid rgba(255,255,255,.25); border-radius:10px; padding:8px 16px; font-size:13px; cursor:pointer; font-weight:600; }
+    .diary-add-today:hover { background:rgba(255,255,255,.25); }
+
+    .diary-section { padding:20px 24px 0; }
+    .diary-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin-bottom:12px; }
+
+    .diary-tiles { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; }
+    .diary-tile { background:#fff; border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer; transition:border-color .15s, box-shadow .15s; }
+    .diary-tile:hover { border-color:var(--primary); box-shadow:0 2px 10px rgba(37,99,235,.1); }
+    .diary-tile-icon { font-size:22px; margin-bottom:8px; }
+    .diary-tile-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:4px; }
+    .diary-tile-next { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .diary-tile-meta { font-size:11px; color:var(--text-muted); margin-top:3px; }
+    .diary-tile-cost { font-size:11px; font-weight:700; color:var(--success); margin-top:3px; }
+    .diary-tile-empty { font-size:12px; color:var(--border); font-style:italic; }
+
+    .diary-cal-wrap { padding:20px 24px 28px; }
+
+    /* ─── Toto Assistant ─────────────────────── */
+    .toto-btn { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#0d9488,#0f766e); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; transition:transform .2s, box-shadow .2s; box-shadow:0 2px 8px rgba(13,148,136,.4); }
+    .toto-btn:hover { transform:scale(1.1); box-shadow:0 4px 14px rgba(13,148,136,.5); }
+    .toto-panel { position:fixed; top:0; right:0; width:380px; height:100vh; background:#fff; border-left:1px solid var(--border); z-index:500; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .3s cubic-bezier(.4,0,.2,1); box-shadow:-4px 0 24px rgba(0,0,0,.12); }
+    .toto-panel.open { transform:translateX(0); }
+    .toto-panel-header { padding:18px 18px 14px; background:linear-gradient(135deg,#0f172a,#1e3a5f); color:#fff; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+    .toto-avatar-wrap { width:44px; height:44px; background:rgba(255,255,255,.15); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .toto-panel-name { font-weight:800; font-size:16px; }
+    .toto-panel-sub { font-size:11px; opacity:.6; margin-top:1px; }
+    .toto-panel-close { margin-left:auto; background:rgba(255,255,255,.15); border:none; color:#fff; width:28px; height:28px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .toto-panel-close:hover { background:rgba(255,255,255,.3); }
+    .toto-suggestions { padding:12px 14px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+    .toto-suggestion { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:8px 12px; font-size:12px; cursor:pointer; text-align:left; color:var(--text); line-height:1.4; transition:background .15s; }
+    .toto-suggestion:hover { background:var(--primary-light); border-color:var(--primary); color:var(--primary); }
+    .toto-messages { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; }
+    .toto-msg { display:flex; gap:8px; max-width:100%; }
+    .toto-msg.user { flex-direction:row-reverse; }
+    .toto-msg-bubble { padding:10px 13px; border-radius:14px; font-size:13px; line-height:1.5; max-width:85%; }
+    .toto-msg.toto .toto-msg-bubble { background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:4px 14px 14px 14px; }
+    .toto-msg.user .toto-msg-bubble { background:var(--primary); color:#fff; border-radius:14px 4px 14px 14px; }
+    .toto-msg-avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#0d9488,#0f766e); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; align-self:flex-end; }
+    .toto-input-row { padding:12px 14px; border-top:1px solid var(--border); display:flex; gap:8px; flex-shrink:0; background:#fff; }
+    .toto-input { flex:1; padding:9px 13px; border:1px solid var(--border); border-radius:10px; font-size:13px; outline:none; }
+    .toto-input:focus { border-color:var(--primary); }
+    .toto-send-btn { background:var(--primary); color:#fff; border:none; border-radius:10px; padding:9px 16px; cursor:pointer; font-size:13px; font-weight:600; }
+    .toto-send-btn:disabled { opacity:.5; cursor:not-allowed; }
+    .toto-typing { display:flex; gap:4px; align-items:center; padding:4px 0; }
+    .toto-typing span { width:6px; height:6px; border-radius:50%; background:var(--text-muted); animation:toto-bounce .8s infinite; }
+    .toto-typing span:nth-child(2) { animation-delay:.15s; }
+    .toto-typing span:nth-child(3) { animation-delay:.3s; }
+    @keyframes toto-bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1456,6 +1516,7 @@
 <header class="app-header">
   <span class="app-logo">TOTO</span>
   <div class="header-actions">
+    <button class="toto-btn" onclick="toggleTotoAssistant()" title="Ask Toto">🐕</button>
     <button class="header-icon-btn" onclick="activateTab('settings')" title="Settings">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1504,9 +1565,6 @@
 
       <div class="nav-item" data-tab="build" title="Build Costs">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V8l7-5 7 5v12"/><path d="M9 20v-5h6v5"/></svg>
-      </div>
-      <div class="nav-item" data-tab="calendar" title="Calendar">
-        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       </div>
       <div class="nav-item" data-tab="goals" title="Goals">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21"/><line x1="3" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21" y2="12"/></svg>
@@ -1562,7 +1620,6 @@
       </div>
 
       <div class="nav-text-item" data-tab="build">Build Costs</div>
-      <div class="nav-text-item" data-tab="calendar">Calendar</div>
       <div class="nav-text-item" data-tab="goals">Goals</div>
       <div class="nav-text-item" data-tab="scenarios">Scenarios</div>
       <div class="nav-text-item" data-tab="insights">Insights</div>
@@ -8510,28 +8567,84 @@ function renderPlanner() {
   if (!el) return;
   if (!state.planner) state.planner = { events: [] };
 
-  const [y, m] = _plannerMonth.split('-').map(Number);
-  const monthLabel = new Date(y, m-1, 15).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
-  const monthTotal = (state.planner.events || [])
-    .filter(e => e.date && e.date.slice(0,7) === _plannerMonth)
-    .reduce((sum, ev) => sum + (ev.estimates||[]).filter(e=>e.accepted).reduce((s,e)=>s+(e.amount||0),0), 0);
+  const todayStr = new Date().toISOString().slice(0,10);
+  const now = new Date();
+  const weekday  = now.toLocaleDateString('en-AU', { weekday: 'long' });
+  const dayNum   = now.getDate();
+  const monthYr  = now.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+  const events   = state.planner.events || [];
+  const todayEvs = events.filter(e => e.date === todayStr);
 
-  const defaultDate = _plannerSelectedDay || new Date().toISOString().slice(0,10);
+  // Today hero
+  let todayEvHtml = '';
+  if (todayEvs.length === 0) {
+    todayEvHtml = `<div class="diary-nothing">Nothing planned today</div>`;
+  } else {
+    todayEvHtml = todayEvs.map(ev => {
+      const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
+      return `<div class="diary-today-ev">
+        <span class="diary-today-ev-badge">${cat.emoji}</span>
+        <span>${ev.title}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Category tiles — next event per category + counts for next 30 days
+  const in30 = new Date(); in30.setDate(in30.getDate() + 30);
+  const in30Str = in30.toISOString().slice(0,10);
+  const upcoming = events.filter(e => e.date >= todayStr && e.date <= in30Str).sort((a,b)=>a.date.localeCompare(b.date));
+
+  const tilesHtml = Object.entries(PLANNER_CATS).map(([key, cat]) => {
+    const catEvs = upcoming.filter(e => e.category === key);
+    const next   = catEvs[0];
+    const cost   = catEvs.reduce((s,ev) => s + (ev.estimates||[]).filter(e=>e.accepted).reduce((t,e)=>t+(e.amount||0),0), 0);
+    const nextDate = next ? new Date(next.date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'}) : null;
+    return `<div class="diary-tile" onclick="${next ? `_plannerSelectDay('${next?.date}');_plannerMonth='${next?.date?.slice(0,7)}';document.getElementById('diary-cal-section').scrollIntoView({behavior:'smooth'})` : `openPlannerModal(null,'${todayStr}')`}" data-cat="${key}">
+      <div class="diary-tile-icon">${cat.emoji}</div>
+      <div class="diary-tile-label">${cat.label}</div>
+      ${next
+        ? `<div class="diary-tile-next">${next.title}</div>
+           <div class="diary-tile-meta">${nextDate}${catEvs.length > 1 ? ` · ${catEvs.length} events` : ''}</div>
+           ${cost > 0 ? `<div class="diary-tile-cost">$${cost.toLocaleString('en-AU')} est.</div>` : ''}`
+        : `<div class="diary-tile-empty">Nothing planned</div>`
+      }
+    </div>`;
+  }).join('');
 
   el.innerHTML = `
-    <div class="planner-header">
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div class="diary-hero">
+      <div class="diary-weekday">${weekday}</div>
+      <div class="diary-date-row">
+        <div class="diary-day-num">${dayNum}</div>
+        <div class="diary-month-year">${monthYr}</div>
+      </div>
+      <div class="diary-today-events">${todayEvHtml}</div>
+      <button class="diary-add-today" onclick="openPlannerModal(null,'${todayStr}')">+ Add to today</button>
+    </div>
+
+    <div class="diary-section">
+      <div class="diary-section-title">This Week</div>
+      ${renderWeeklyStrip()}
+    </div>
+
+    <div class="diary-section" style="margin-top:20px">
+      <div class="diary-section-title">Life Areas — next 30 days</div>
+      <div class="diary-tiles">${tilesHtml}</div>
+    </div>
+
+    <div class="diary-cal-wrap" id="diary-cal-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="diary-section-title" style="margin-bottom:0">Calendar</div>
         <div class="planner-month-nav">
           <button onclick="_plannerPrevMonth()">‹</button>
-          <h2>${monthLabel}</h2>
+          <span style="font-size:13px;font-weight:700;min-width:130px;text-align:center">${new Date(_plannerMonth+'-15').toLocaleDateString('en-AU',{month:'long',year:'numeric'})}</span>
           <button onclick="_plannerNextMonth()">›</button>
         </div>
-        ${monthTotal > 0 ? `<span class="planner-month-total">$${monthTotal.toLocaleString('en-AU')} estimated</span>` : ''}
+        <button class="btn-primary btn-sm" onclick="openPlannerModal(null,'${_plannerSelectedDay||todayStr}')">+ Add Event</button>
       </div>
-      <button class="btn-primary" onclick="openPlannerModal(null,'${defaultDate}')">+ Add Event</button>
-    </div>
-    ${_renderPlannerCalendar()}
-    ${_plannerSelectedDay ? _renderPlannerDayPanel(_plannerSelectedDay) : ''}`;
+      ${_renderPlannerCalendar()}
+      ${_plannerSelectedDay ? _renderPlannerDayPanel(_plannerSelectedDay) : ''}
+    </div>`;
 }
 
 function _renderPlannerCalendar() {
@@ -8910,6 +9023,206 @@ function savePlannerEvent(id) {
   renderPlanner();
 }
 
+// ─────────────────────────────────────────────────
+// TOTO ASSISTANT
+// ─────────────────────────────────────────────────
+
+let _totoOpen = false;
+let _totoHistory = []; // { role, content }
+let _totoTyping = false;
+
+const TOTO_SUGGESTIONS = [
+  { icon:'📅', text:'What should I plan for this month?' },
+  { icon:'💸', text:'Any upcoming events I should budget for?' },
+  { icon:'🎒', text:'Help me plan for school holidays' },
+  { icon:'✈️', text:'I have a trip coming up — what do I need to organise?' },
+];
+
+function toggleTotoAssistant() {
+  _totoOpen ? closeTotoAssistant() : openTotoAssistant();
+}
+
+function openTotoAssistant() {
+  _totoOpen = true;
+  document.getElementById('toto-panel').classList.add('open');
+  if (_totoHistory.length === 0) _totoInitPanel();
+}
+
+function closeTotoAssistant() {
+  _totoOpen = false;
+  document.getElementById('toto-panel').classList.remove('open');
+}
+
+function _totoInitPanel() {
+  // Build proactive suggestions based on context
+  const todayStr = new Date().toISOString().slice(0,10);
+  const in7 = new Date(); in7.setDate(in7.getDate()+7);
+  const in7Str = in7.toISOString().slice(0,10);
+  const events = state.planner?.events || [];
+  const soonEvs = events.filter(e => e.date >= todayStr && e.date <= in7Str);
+
+  const contextSuggestions = [];
+  soonEvs.slice(0,2).forEach(ev => {
+    const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
+    const dateLabel = new Date(ev.date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+    if (cat.financial && (!ev.estimates || ev.estimates.length === 0)) {
+      contextSuggestions.push({ icon: cat.emoji, text: `${ev.title} is ${dateLabel} — want me to estimate costs?` });
+    } else if (ev.date === todayStr) {
+      contextSuggestions.push({ icon: cat.emoji, text: `You have "${ev.title}" today — anything to prepare?` });
+    }
+  });
+
+  const allSuggestions = [...contextSuggestions, ...TOTO_SUGGESTIONS].slice(0, 4);
+  const sugEl = document.getElementById('toto-suggestions');
+  sugEl.innerHTML = allSuggestions.map(s =>
+    `<button class="toto-suggestion" onclick="_totoSendSuggestion(this)">${s.icon} ${s.text}</button>`
+  ).join('');
+
+  // Greeting message
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const adults = (state.householdProfile?.members||[]).filter(m=>m.role==='adult').length || 2;
+  const kids   = (state.householdProfile?.members||[]).filter(m=>m.role==='child').length || 0;
+  const familyStr = kids > 0 ? ` and ${kids} kid${kids>1?'s':''}` : '';
+
+  _totoAppendMessage('toto', `${greet}! 👋 I'm Toto, your family planning assistant. You have ${adults} adult${adults>1?'s':''}${familyStr} in your household.\n\nI can help you plan events, estimate costs, and make sure nothing slips through the cracks. What would you like to work on?`);
+}
+
+function _totoSendSuggestion(btn) {
+  const text = btn.textContent.trim();
+  btn.closest('.toto-suggestions').style.display = 'none';
+  _totoSend(text);
+}
+
+async function sendTotoMessage() {
+  const input = document.getElementById('toto-input');
+  const text = input.value.trim();
+  if (!text || _totoTyping) return;
+  input.value = '';
+  document.getElementById('toto-suggestions').style.display = 'none';
+  _totoSend(text);
+}
+
+async function _totoSend(text) {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key) {
+    _totoAppendMessage('toto', "To chat with me, you'll need to add your AI API key in Settings. It only takes a second! ⚙️");
+    return;
+  }
+
+  _totoAppendMessage('user', text);
+  _totoHistory.push({ role: 'user', content: text });
+
+  _totoTyping = true;
+  document.getElementById('toto-send').disabled = true;
+  const typingId = _totoShowTyping();
+
+  try {
+    const system = _buildTotoContext();
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-client-side-key-flag': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        system,
+        messages: _totoHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || "Sorry, I couldn't get a response. Try again?";
+    _totoHistory.push({ role: 'assistant', content: reply });
+    _totoRemoveTyping(typingId);
+    _totoAppendMessage('toto', reply);
+  } catch(err) {
+    _totoRemoveTyping(typingId);
+    _totoAppendMessage('toto', "Oops, something went wrong. Check your internet connection and try again.");
+  } finally {
+    _totoTyping = false;
+    document.getElementById('toto-send').disabled = false;
+    document.getElementById('toto-input').focus();
+  }
+}
+
+function _buildTotoContext() {
+  const todayStr = new Date().toISOString().slice(0,10);
+  const todayFmt = new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const adults = (state.householdProfile?.members||[]).filter(m=>m.role==='adult').length || 2;
+  const kids   = (state.householdProfile?.members||[]).filter(m=>m.role==='child').length || 0;
+
+  const in60 = new Date(); in60.setDate(in60.getDate()+60);
+  const upcomingEvs = (state.planner?.events||[])
+    .filter(e => e.date >= todayStr && e.date <= in60.toISOString().slice(0,10))
+    .sort((a,b)=>a.date.localeCompare(b.date))
+    .slice(0,15)
+    .map(e => {
+      const cat = PLANNER_CATS[e.category]||PLANNER_CATS.other;
+      const d = new Date(e.date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+      const est = (e.estimates||[]).filter(x=>x.accepted).reduce((s,x)=>s+(x.amount||0),0);
+      return `- ${d}: ${e.title} (${cat.label})${est>0?' — $'+est.toLocaleString('en-AU')+' budgeted':''}${e.notes?' — Notes: '+e.notes:''}`;
+    }).join('\n') || 'None';
+
+  const curData = getMonthData(selectedBudgetMonth);
+  const income  = monthlyTotal(curData.income);
+  const expenses = monthlyTotal(curData.expenses);
+  const surplus = income - expenses;
+
+  const goals = (state.goals||[]).filter(g=>g.status!=='achieved').slice(0,4)
+    .map(g=>`${g.name} ($${(g.saved||0).toLocaleString()}/$${(g.target||0).toLocaleString()})`).join(', ') || 'None';
+
+  return `You are Toto, a warm and practical AI assistant for a family finance and life planning app called Toto. You help Australian families plan their lives and stay on top of their money.
+
+Today: ${todayFmt}
+Family: ${adults} adult${adults>1?'s':''}${kids>0?`, ${kids} child${kids>1?'ren':''}`:''}
+Monthly budget: Income $${income.toLocaleString('en-AU')}, Expenses $${expenses.toLocaleString('en-AU')}, ${surplus>=0?'Surplus':'Deficit'} $${Math.abs(surplus).toLocaleString('en-AU')}
+Active goals: ${goals}
+
+Upcoming events (next 60 days):
+${upcomingEvs}
+
+Personality: friendly, warm, concise. Use Australian spelling and context. You can:
+- Help plan upcoming events and what to organise
+- Suggest realistic cost estimates for activities
+- Spot things they might have forgotten (school holidays, gift buying, etc.)
+- Give practical financial advice around upcoming events
+- Keep responses to 3-5 sentences unless a list is genuinely helpful`;
+}
+
+function _totoAppendMessage(role, text) {
+  const el = document.getElementById('toto-messages');
+  const div = document.createElement('div');
+  div.className = `toto-msg ${role}`;
+  const formattedText = text.replace(/\n/g, '<br>');
+  if (role === 'toto') {
+    div.innerHTML = `<div class="toto-msg-avatar">🐕</div><div class="toto-msg-bubble">${formattedText}</div>`;
+  } else {
+    div.innerHTML = `<div class="toto-msg-bubble">${formattedText}</div>`;
+  }
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function _totoShowTyping() {
+  const el = document.getElementById('toto-messages');
+  const id = 'toto-typing-' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'toto-msg toto';
+  div.id = id;
+  div.innerHTML = `<div class="toto-msg-avatar">🐕</div><div class="toto-msg-bubble"><div class="toto-typing"><span></span><span></span><span></span></div></div>`;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  return id;
+}
+
+function _totoRemoveTyping(id) {
+  document.getElementById(id)?.remove();
+}
+
 // ─── Service Worker ───────────────────────────────
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/home-budget/sw.js', { scope: '/home-budget/' })
@@ -8918,6 +9231,24 @@ if ('serviceWorker' in navigator) {
 
 // Init — rendering is triggered by Firestore onSnapshot after auth resolves
 </script>
+
+<!-- ─── Toto Assistant Panel ─────────────────── -->
+<div class="toto-panel" id="toto-panel">
+  <div class="toto-panel-header">
+    <div class="toto-avatar-wrap">🐕</div>
+    <div>
+      <div class="toto-panel-name">Toto</div>
+      <div class="toto-panel-sub">Your family planning assistant</div>
+    </div>
+    <button class="toto-panel-close" onclick="closeTotoAssistant()">✕</button>
+  </div>
+  <div class="toto-suggestions" id="toto-suggestions"></div>
+  <div class="toto-messages" id="toto-messages"></div>
+  <div class="toto-input-row">
+    <input class="toto-input" id="toto-input" placeholder="Ask Toto anything…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendTotoMessage();}">
+    <button class="toto-send-btn" id="toto-send" onclick="sendTotoMessage()">Send</button>
+  </div>
+</div>
 </div><!-- end .app-body -->
 </body>
 </html>
