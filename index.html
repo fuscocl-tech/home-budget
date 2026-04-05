@@ -1614,23 +1614,11 @@ function logActivity(action, detail) {
 
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  fbAuth.signInWithRedirect(provider).catch(err => {
+  fbAuth.signInWithPopup(provider).catch(err => {
     const el = document.getElementById('login-error');
     if (el) { el.textContent = err.message; el.style.display = ''; }
   });
 }
-
-// Handle redirect result on page load
-fbAuth.getRedirectResult().then(result => {
-  if (result && result.user) {
-    // auth state change will handle the rest
-    console.log('Redirect sign-in succeeded:', result.user.email);
-  }
-}).catch(err => {
-  console.error('Redirect sign-in error:', err.code, err.message);
-  const el = document.getElementById('login-error');
-  if (el) { el.textContent = err.message; el.style.display = ''; }
-});
 
 function signOutUser() {
   if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
