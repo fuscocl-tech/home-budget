@@ -1614,11 +1614,19 @@ function logActivity(action, detail) {
 
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
-  fbAuth.signInWithPopup(provider).catch(err => {
+  fbAuth.signInWithRedirect(provider).catch(err => {
     const el = document.getElementById('login-error');
     if (el) { el.textContent = err.message; el.style.display = ''; }
   });
 }
+
+// Handle redirect result on page load
+fbAuth.getRedirectResult().catch(err => {
+  if (err.code !== 'auth/no-current-user') {
+    const el = document.getElementById('login-error');
+    if (el) { el.textContent = err.message; el.style.display = ''; }
+  }
+});
 
 function signOutUser() {
   if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
