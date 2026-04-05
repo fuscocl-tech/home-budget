@@ -1139,6 +1139,48 @@
     .nw-snapshot-btn { background: #0d9488; color: #fff; border: none; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
     .nw-snapshot-btn:hover { background: #0f766e; }
     .nw-empty { text-align: center; padding: 20px; color: #94a3b8; font-size: 13px; }
+
+    /* ─── Dashboard upgrade ───────────────────── */
+    .db-hero-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media(max-width:700px) { .db-hero-row { grid-template-columns: 1fr; } }
+    .db-nw-card { background: linear-gradient(135deg,#0d9488 0%,#0f766e 100%); border-radius: 16px; padding: 24px; color: #fff; display: flex; flex-direction: column; justify-content: space-between; min-height: 130px; }
+    .db-nw-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.75; margin-bottom: 8px; }
+    .db-nw-amount { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+    .db-nw-change { font-size: 13px; opacity: 0.8; margin-top: 8px; }
+    .db-nw-change .up { color: #a7f3d0; font-weight: 700; }
+    .db-nw-change .dn { color: #fca5a5; font-weight: 700; }
+    .db-stats-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .db-stat { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .db-stat-val { font-size: 20px; font-weight: 800; color: var(--text); }
+    .db-stat-val.green { color: #10b981; }
+    .db-stat-val.red   { color: #ef4444; }
+    .db-stat-val.teal  { color: #0d9488; }
+    .db-stat-lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 3px; }
+    .db-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media(max-width:700px) { .db-grid { grid-template-columns: 1fr; } }
+    .db-widget { background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+    .db-widget-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+    .db-widget-title { font-size: 13px; font-weight: 700; }
+    .db-widget-link { font-size: 12px; color: #0d9488; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; }
+    .db-bill-row { display: flex; align-items: center; gap: 10px; padding: 11px 18px; border-bottom: 1px solid #f8fafc; }
+    .db-bill-row:last-child { border-bottom: none; }
+    .db-bill-icon { font-size: 18px; width: 30px; text-align: center; flex-shrink: 0; }
+    .db-bill-name { flex: 1; font-size: 13px; font-weight: 500; min-width: 0; }
+    .db-bill-amount { font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .db-goal-row { padding: 12px 18px; border-bottom: 1px solid #f8fafc; }
+    .db-goal-row:last-child { border-bottom: none; }
+    .db-goal-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .db-goal-name { font-size: 13px; font-weight: 600; }
+    .db-goal-pct  { font-size: 12px; color: #94a3b8; }
+    .db-goal-bar  { height: 6px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+    .db-goal-fill { height: 100%; border-radius: 99px; background: linear-gradient(to right,#0d9488,#5eead4); }
+    .db-budget-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 18px; border-bottom: 1px solid #f8fafc; }
+    .db-budget-row:last-child { border-bottom: none; }
+    .db-budget-label { font-size: 13px; font-weight: 500; color: #64748b; }
+    .db-budget-val { font-size: 14px; font-weight: 700; }
+    .db-build-bar { height: 8px; background: #f1f5f9; border-radius: 99px; overflow: hidden; margin: 12px 18px; }
+    .db-build-fill { height: 100%; border-radius: 99px; background: linear-gradient(to right,#2563eb,#60a5fa); }
+    .db-empty-row { padding: 20px 18px; text-align: center; font-size: 13px; color: #94a3b8; }
     .nw-target-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
     .nw-target-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .nw-target-title { font-size: 14px; font-weight: 700; }
@@ -2444,158 +2486,217 @@ function renderDashboard() {
   const d = state;
   const c = d.buildContract;
 
-  const contractPaid = c.stages.filter(s => s.paid).reduce((sum, s) => sum + s.amount, 0);
-  const approvedVars = (c.variations||[]).filter(v=>v.status==='approved').reduce((s,v)=>s+(v.amount||0),0);
-  const revisedContractTotal = c.total + approvedVars;
-  const contractRemaining = revisedContractTotal - contractPaid;
-  const paidPct = Math.round(contractPaid / revisedContractTotal * 100);
+  // ── Net worth ──
+  const nwAssets = (d.netWorth.assets||[]).reduce((s,a) => s+(parseFloat(a.value)||0), 0);
+  const nwLiabs  = (d.netWorth.liabilities||[]).reduce((s,l) => s+(parseFloat(l.value)||0), 0);
+  const netWorth = nwAssets - nwLiabs;
+  const snaps    = d.netWorth.snapshots||[];
+  let nwChangeHtml = '';
+  if (snaps.length >= 2) {
+    const diff = netWorth - snaps[snaps.length-2].netWorth;
+    const cls  = diff >= 0 ? 'up' : 'dn';
+    nwChangeHtml = `<span class="${cls}">${diff>=0?'+':''}${fmtNW(diff)}</span> vs last snapshot`;
+  }
 
-  const extrasTotalCost = d.extras.reduce((sum, e) => sum + (e.totalAmount || 0), 0);
-  const extrasPaid = d.extras.reduce((sum, e) => sum + (e.amountPaid || 0), 0);
-  const extrasRemaining = extrasTotalCost - extrasPaid;
+  // ── Budget ──
+  const curMonth     = selectedBudgetMonth;
+  const curData      = getMonthData(curMonth);
+  const monthlyIncome    = monthlyTotal(curData.income);
+  const monthlyExpenses  = monthlyTotal(curData.expenses);
+  const surplus          = monthlyIncome - monthlyExpenses;
+  const subMonthly       = (d.subscriptions||[]).reduce((s,sub) => s+subMonthlyAmount(sub), 0);
+  const billsThisMonth   = (d.bills||[]).filter(b => { const days = billDaysUntil(b); return days >= 0 && days <= 31; })
+                            .reduce((s,b) => s+(parseFloat(b.amount)||0), 0);
 
-  const monthlyIncome = monthlyTotal(d.budget.income);
-  const monthlyExpenses = monthlyTotal(d.budget.expenses);
-  const surplus = monthlyIncome - monthlyExpenses;
+  // ── Upcoming bills ──
+  const upcomingBills = [...(d.bills||[])]
+    .filter(b => billDaysUntil(b) >= -1)
+    .sort((a,b) => billDaysUntil(a) - billDaysUntil(b))
+    .slice(0, 5);
 
-  const totalOutstanding = contractRemaining + extrasRemaining;
+  // ── Goals ──
+  const activeGoals = (d.goals||[]).filter(g => g.status !== 'achieved').slice(0, 4);
 
-  const nextStage = c.stages.find(s => !s.paid);
+  // ── Build contract ──
+  const contractPaid    = c.stages.filter(s=>s.paid).reduce((s,st)=>s+st.amount,0);
+  const approvedVars    = (c.variations||[]).filter(v=>v.status==='approved').reduce((s,v)=>s+(v.amount||0),0);
+  const revisedTotal    = c.total + approvedVars;
+  const contractPct     = Math.round(contractPaid / revisedTotal * 100);
+  const nextStage       = c.stages.find(s=>!s.paid);
 
-  let html = `
-    <div class="cards">
-      <div class="card">
-        <div class="card-label">Contract Paid</div>
-        <div class="card-value">${aud(contractPaid)}</div>
-        <div class="card-sub">of ${aud(revisedContractTotal)}${approvedVars !== 0 ? ' revised' : ''} contract</div>
-        <div class="progress-wrap">
-          <div class="progress-bar"><div class="progress-fill" style="width:${paidPct}%"></div></div>
-          <div class="progress-labels"><span>${paidPct}% paid</span><span>${aud(contractRemaining)} remaining</span></div>
+  // ── Kids pending ──
+  const pendingKids = ((d.kids||{}).completions||[]).filter(c=>c.status==='pending').length
+                    + ((d.kids||{}).redemptions||[]).filter(r=>r.status==='pending').length;
+
+  // ── 6-month budget chart ──
+  const last6        = getLast6Months();
+  const totalBudgetMo = monthlyTotal(curData.expenses);
+  const chartData    = last6.map(mo => {
+    const actual = Object.values(state.budget.actuals[mo]||{}).reduce((s,v)=>s+v,0);
+    return { label: monthShortLabel(mo), budget: totalBudgetMo, actual };
+  });
+  const hasChart = totalBudgetMo > 0 || chartData.some(d=>d.actual>0);
+
+  let chartHtml = '';
+  if (hasChart) {
+    const maxVal = Math.max(...chartData.flatMap(d=>[d.budget,d.actual]),1);
+    const W=600,PL=58,PR=10,PT=10,PB=30,chartH=140;
+    const chartW=W-PL-PR, groupW=chartW/chartData.length, barW=groupW*0.28, gap=groupW*0.04;
+    const yLines = [0,0.25,0.5,0.75,1].map(p => {
+      const y=PT+chartH-p*chartH;
+      return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="${PL-5}" y="${y+4}" text-anchor="end" font-size="9" fill="#94a3b8">${aud(p*maxVal)}</text>`;
+    }).join('');
+    const bars = chartData.map((d,i) => {
+      const x=PL+i*groupW+groupW*0.08;
+      const bH=d.budget>0?(d.budget/maxVal)*chartH:0;
+      const aH=d.actual>0?(d.actual/maxVal)*chartH:0;
+      const aColor=d.actual>d.budget?'#ef4444':'#10b981';
+      return `<rect x="${x}" y="${PT+chartH-bH}" width="${barW}" height="${bH}" fill="#2563eb" opacity="0.65" rx="2"/>
+        <rect x="${x+barW+gap}" y="${PT+chartH-aH}" width="${barW}" height="${aH}" fill="${aColor}" opacity="0.8" rx="2"/>
+        <text x="${x+barW+gap/2+barW/2}" y="${PT+chartH+16}" text-anchor="middle" font-size="10" fill="#64748b">${d.label}</text>`;
+    }).join('');
+    chartHtml = `<div class="db-widget">
+      <div class="db-widget-header">
+        <span class="db-widget-title">Budget vs Actual — Last 6 Months</span>
+        <div class="chart-legend" style="font-size:11px">
+          <span><span class="legend-dot" style="background:#2563eb;opacity:0.65"></span>Budget</span>
+          <span><span class="legend-dot" style="background:#10b981"></span>Under</span>
+          <span><span class="legend-dot" style="background:#ef4444"></span>Over</span>
         </div>
       </div>
-      <div class="card">
-        <div class="card-label">Extras Outstanding</div>
-        <div class="card-value ${extrasRemaining > 0 ? 'orange' : 'green'}">${aud(extrasRemaining)}</div>
-        <div class="card-sub">${aud(extrasPaid)} paid of ${aud(extrasTotalCost)} total</div>
+      <div style="padding:12px 16px 8px">
+        <svg viewBox="0 0 ${W} ${PT+chartH+PB}" style="width:100%;height:auto;display:block">${yLines}${bars}</svg>
       </div>
-      <div class="card">
-        <div class="card-label">Total Still to Pay</div>
-        <div class="card-value red">${aud(totalOutstanding)}</div>
-        <div class="card-sub">Contract + extras remaining</div>
+    </div>`;
+  }
+
+  const html = `
+    <!-- Hero row: net worth + 4 stats -->
+    <div class="db-hero-row">
+      <div class="db-nw-card" onclick="activateTab('networth')" style="cursor:pointer">
+        <div>
+          <div class="db-nw-label">Net Worth</div>
+          <div class="db-nw-amount">${fmtNW(netWorth)}</div>
+          ${nwChangeHtml ? `<div class="db-nw-change">${nwChangeHtml}</div>` : ''}
+        </div>
+        <div style="font-size:12px;opacity:0.6;margin-top:12px">${aud(nwAssets)} assets · ${aud(nwLiabs)} liabilities</div>
       </div>
-      <div class="card">
-        <div class="card-label">Monthly ${surplus >= 0 ? 'Surplus' : 'Deficit'}</div>
-        <div class="card-value ${surplus >= 0 ? 'green' : 'red'}">${aud(Math.abs(surplus))}</div>
-        <div class="card-sub">${aud(monthlyIncome)} in · ${aud(monthlyExpenses)} out</div>
+      <div class="db-stats-col">
+        <div class="db-stat">
+          <div class="db-stat-val ${surplus>=0?'green':'red'}">${aud(Math.abs(surplus))}</div>
+          <div class="db-stat-lbl">Monthly ${surplus>=0?'surplus':'deficit'}</div>
+        </div>
+        <div class="db-stat">
+          <div class="db-stat-val teal">$${Math.round(billsThisMonth).toLocaleString()}</div>
+          <div class="db-stat-lbl">Bills this month</div>
+        </div>
+        <div class="db-stat">
+          <div class="db-stat-val">$${Math.round(subMonthly).toLocaleString()}</div>
+          <div class="db-stat-lbl">Subscriptions/mo</div>
+        </div>
+        <div class="db-stat">
+          <div class="db-stat-val">${aud(monthlyIncome)}</div>
+          <div class="db-stat-lbl">Monthly income</div>
+        </div>
       </div>
     </div>
+
+    <!-- Two-column widgets -->
+    <div class="db-grid">
+      <div>
+        <!-- Upcoming bills -->
+        <div class="db-widget">
+          <div class="db-widget-header">
+            <span class="db-widget-title">Upcoming Bills</span>
+            <button class="db-widget-link" onclick="activateTab('bills')">View all →</button>
+          </div>
+          ${upcomingBills.length ? upcomingBills.map(b => {
+            const days = billDaysUntil(b);
+            const badge = days < 0 ? `<span class="bill-due-badge overdue">Overdue</span>`
+                        : days === 0 ? `<span class="bill-due-badge today">Today</span>`
+                        : days <= 7  ? `<span class="bill-due-badge soon">${days}d</span>`
+                        : `<span class="bill-due-badge ok">${billNextDue(b).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</span>`;
+            return `<div class="db-bill-row">
+              <div class="db-bill-icon">${billCatIcon(b.category)}</div>
+              <div class="db-bill-name">${b.name}</div>
+              ${badge}
+              <div class="db-bill-amount">${aud(parseFloat(b.amount)||0)}</div>
+            </div>`;
+          }).join('') : `<div class="db-empty-row">No upcoming bills — <button class="db-widget-link" onclick="activateTab('bills')">add one</button></div>`}
+        </div>
+
+        <!-- Goals -->
+        <div class="db-widget">
+          <div class="db-widget-header">
+            <span class="db-widget-title">Goals</span>
+            <button class="db-widget-link" onclick="activateTab('goals')">View all →</button>
+          </div>
+          ${activeGoals.length ? activeGoals.map(g => {
+            const pct = Math.min(Math.round(((g.saved||0)/(g.target||1))*100),100);
+            return `<div class="db-goal-row">
+              <div class="db-goal-top">
+                <span class="db-goal-name">${g.emoji||'🎯'} ${g.name}</span>
+                <span class="db-goal-pct">${aud(g.saved||0)} of ${aud(g.target||0)} · ${pct}%</span>
+              </div>
+              <div class="db-goal-bar"><div class="db-goal-fill" style="width:${pct}%"></div></div>
+            </div>`;
+          }).join('') : `<div class="db-empty-row">No active goals — <button class="db-widget-link" onclick="activateTab('goals')">add one</button></div>`}
+        </div>
+      </div>
+
+      <div>
+        <!-- Budget this month -->
+        <div class="db-widget">
+          <div class="db-widget-header">
+            <span class="db-widget-title">Budget · ${monthLabel(curMonth)}</span>
+            <button class="db-widget-link" onclick="activateTab('budget')">Edit →</button>
+          </div>
+          <div class="db-budget-row">
+            <span class="db-budget-label">Income</span>
+            <span class="db-budget-val" style="color:#10b981">${aud(monthlyIncome)}</span>
+          </div>
+          <div class="db-budget-row">
+            <span class="db-budget-label">Expenses</span>
+            <span class="db-budget-val" style="color:#ef4444">${aud(monthlyExpenses)}</span>
+          </div>
+          <div class="db-budget-row" style="border-top:2px solid var(--border)">
+            <span class="db-budget-label" style="font-weight:700">${surplus>=0?'Surplus':'Deficit'}</span>
+            <span class="db-budget-val" style="color:${surplus>=0?'#10b981':'#ef4444'}">${aud(Math.abs(surplus))}</span>
+          </div>
+        </div>
+
+        ${pendingKids > 0 ? `
+        <!-- Kids pending approvals -->
+        <div class="db-widget" style="border-color:#fde68a">
+          <div class="db-widget-header" style="background:#fffbeb">
+            <span class="db-widget-title">⭐ Kids Zone — ${pendingKids} pending approval${pendingKids!==1?'s':''}</span>
+            <button class="db-widget-link" onclick="activateTab('kids')">Review →</button>
+          </div>
+        </div>` : ''}
+
+        <!-- Build contract -->
+        <div class="db-widget">
+          <div class="db-widget-header">
+            <span class="db-widget-title">Build Contract</span>
+            <button class="db-widget-link" onclick="activateTab('build')">View →</button>
+          </div>
+          <div style="padding:14px 18px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+              <span style="font-weight:600">${aud(contractPaid)} paid</span>
+              <span style="color:#94a3b8">${contractPct}% of ${aud(revisedTotal)}</span>
+            </div>
+            <div class="db-build-bar" style="margin:0 0 10px">
+              <div class="db-build-fill" style="width:${contractPct}%"></div>
+            </div>
+            ${nextStage ? `<div style="font-size:12px;color:#64748b">Next: <strong>${nextStage.name}</strong> — ${aud(nextStage.amount)}</div>` : '<div style="font-size:12px;color:#10b981;font-weight:600">✓ All stages paid</div>'}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${chartHtml}
   `;
-
-  if (nextStage) {
-    html += `
-      <div class="section" style="margin-bottom:24px">
-        <div class="section-header">
-          <div>
-            <div class="section-title">Next Contract Payment</div>
-            <div class="section-subtitle">Building contract progress</div>
-          </div>
-        </div>
-        <div style="padding:16px 20px">
-          <div class="next-payment">
-            <div class="next-payment-label">Up next</div>
-            <div class="next-payment-name">${nextStage.name}</div>
-            <div class="next-payment-amount">${aud(nextStage.amount)}</div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Upcoming extras
-  const unpaidExtras = d.extras.filter(e => (e.totalAmount || 0) > (e.amountPaid || 0));
-  if (unpaidExtras.length > 0) {
-    html += `
-      <div class="section">
-        <div class="section-header">
-          <div class="section-title">Outstanding Extras</div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Item</th><th>Vendor</th><th>Remaining</th><th>Due</th></tr></thead>
-            <tbody>
-              ${unpaidExtras.map(e => {
-                const rem = (e.totalAmount || 0) - (e.amountPaid || 0);
-                const od = isOverdue(e.dueDate) && rem > 0;
-                return `<tr>
-                  <td>${e.name}</td>
-                  <td>${e.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
-                  <td class="amount">${aud(rem)}</td>
-                  <td>${od ? `<span class="badge overdue">${fmtDate(e.dueDate)}</span>` : fmtDate(e.dueDate)}</td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  }
-
-  // 6-month budget vs actual chart
-  const last6 = getLast6Months();
-  const totalBudgetMo = monthlyTotal(state.budget.expenses);
-  const chartData = last6.map(mo => {
-    const actual = Object.values(state.budget.actuals[mo] || {}).reduce((s, v) => s + v, 0);
-    return { label: monthShortLabel(mo), budget: totalBudgetMo, actual, mo };
-  });
-  const hasAnyActual = chartData.some(d => d.actual > 0);
-
-  if (totalBudgetMo > 0 || hasAnyActual) {
-    const maxVal = Math.max(...chartData.flatMap(d => [d.budget, d.actual]), 1);
-    const W = 600, PL = 58, PR = 10, PT = 10, PB = 30;
-    const chartH = 180 - PT - PB;
-    const chartW = W - PL - PR;
-    const groupW = chartW / chartData.length;
-    const barW = groupW * 0.28;
-    const gap = groupW * 0.04;
-
-    const ySteps = [0, 0.25, 0.5, 0.75, 1];
-    const yLines = ySteps.map(p => {
-      const y = PT + chartH - p * chartH;
-      return `<line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}" stroke="#e2e8f0" stroke-width="1"/>
-        <text x="${PL - 5}" y="${y + 4}" text-anchor="end" font-size="9" fill="#94a3b8">${aud(p * maxVal)}</text>`;
-    }).join('');
-
-    const bars = chartData.map((d, i) => {
-      const x = PL + i * groupW + groupW * 0.08;
-      const bH = d.budget > 0 ? (d.budget / maxVal) * chartH : 0;
-      const aH = d.actual > 0 ? (d.actual / maxVal) * chartH : 0;
-      const aColor = d.actual > d.budget ? '#ef4444' : '#10b981';
-      const lx = x + barW + gap / 2 + barW / 2;
-      return `
-        <rect x="${x}" y="${PT + chartH - bH}" width="${barW}" height="${bH}" fill="#2563eb" opacity="0.65" rx="2"/>
-        <rect x="${x + barW + gap}" y="${PT + chartH - aH}" width="${barW}" height="${aH}" fill="${aColor}" opacity="0.8" rx="2"/>
-        <text x="${lx}" y="${PT + chartH + 16}" text-anchor="middle" font-size="10" fill="#64748b">${d.label}</text>
-      `;
-    }).join('');
-
-    html += `
-      <div class="section">
-        <div class="section-header">
-          <div class="section-title">Budget vs Actual — Last 6 Months</div>
-          <div class="chart-legend">
-            <span><span class="legend-dot" style="background:#2563eb;opacity:0.65"></span>Budget</span>
-            <span><span class="legend-dot" style="background:#10b981;opacity:0.8"></span>Actual (under)</span>
-            <span><span class="legend-dot" style="background:#ef4444;opacity:0.8"></span>Actual (over)</span>
-          </div>
-        </div>
-        <div style="padding:16px 20px 8px">
-          <svg viewBox="0 0 ${W} ${PT + chartH + PB}" style="width:100%;height:auto;display:block">
-            ${yLines}${bars}
-          </svg>
-        </div>
-      </div>
-    `;
-  }
 
   document.getElementById('dashboard-content').innerHTML = html;
 }
