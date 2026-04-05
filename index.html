@@ -1621,11 +1621,15 @@ function signInWithGoogle() {
 }
 
 // Handle redirect result on page load
-fbAuth.getRedirectResult().catch(err => {
-  if (err.code !== 'auth/no-current-user') {
-    const el = document.getElementById('login-error');
-    if (el) { el.textContent = err.message; el.style.display = ''; }
+fbAuth.getRedirectResult().then(result => {
+  if (result && result.user) {
+    // auth state change will handle the rest
+    console.log('Redirect sign-in succeeded:', result.user.email);
   }
+}).catch(err => {
+  console.error('Redirect sign-in error:', err.code, err.message);
+  const el = document.getElementById('login-error');
+  if (el) { el.textContent = err.message; el.style.display = ''; }
 });
 
 function signOutUser() {
