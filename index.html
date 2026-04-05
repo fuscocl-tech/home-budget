@@ -1360,6 +1360,43 @@
     .expense-row:hover {
       background-position: 0 0;
     }
+
+    /* ─── Planner ────────────────────────────── */
+    .planner-header { display:flex; align-items:center; justify-content:space-between; padding:24px 24px 16px; flex-wrap:wrap; gap:12px; }
+    .planner-month-nav { display:flex; align-items:center; gap:8px; }
+    .planner-month-nav button { background:none; border:1px solid var(--border); border-radius:8px; padding:6px 12px; cursor:pointer; color:var(--text); font-size:16px; line-height:1; }
+    .planner-month-nav h2 { font-size:16px; font-weight:700; min-width:160px; text-align:center; }
+    .planner-empty { text-align:center; padding:60px 24px; color:var(--text-muted); }
+    .planner-events { padding:0 24px 24px; display:flex; flex-direction:column; gap:14px; }
+    .planner-event-card { background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .planner-event-header { display:flex; align-items:center; gap:12px; padding:14px 16px; cursor:pointer; user-select:none; }
+    .planner-event-header:hover { background:var(--surface2); }
+    .planner-event-type-badge { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+    .planner-event-meta { flex:1; min-width:0; }
+    .planner-event-title { font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .planner-event-date { font-size:12px; color:var(--text-muted); margin-top:2px; }
+    .planner-event-side { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .planner-event-body { border-top:1px solid var(--border); padding:16px; }
+    .planner-notes { font-size:13px; color:var(--text-muted); margin-bottom:14px; line-height:1.5; }
+    .planner-estimate-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
+    .planner-estimate-row:last-child { border-bottom:none; }
+    .planner-estimate-check { width:22px; height:22px; border-radius:6px; border:2px solid var(--border); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
+    .planner-estimate-check.accepted { background:var(--success); border-color:var(--success); color:#fff; }
+    .planner-estimate-name { flex:1; font-size:14px; }
+    .planner-estimate-cat { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .planner-estimate-amount { font-weight:700; font-size:14px; }
+    .planner-estimate-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+    .planner-total { font-size:13px; color:var(--text-muted); }
+    .planner-total strong { color:var(--text); font-weight:700; }
+    .planner-pushed-badge { background:var(--success-light); color:var(--success); font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; white-space:nowrap; }
+    .planner-ai-btn { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; padding:8px 16px; cursor:pointer; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
+    .planner-ai-btn:disabled { opacity:.6; cursor:not-allowed; }
+    .planner-push-btn { background:var(--success); color:#fff; border:none; border-radius:10px; padding:8px 16px; cursor:pointer; font-size:13px; font-weight:600; }
+    .planner-push-btn:disabled { opacity:.4; cursor:not-allowed; }
+    .planner-month-total { font-size:12px; font-weight:600; background:var(--primary-light); color:var(--primary); padding:4px 12px; border-radius:20px; }
+    .planner-chevron { transition:transform .2s; color:var(--text-muted); }
+    .planner-chevron.open { transform:rotate(180deg); }
+    .planner-body-actions { display:flex; gap:8px; margin-top:12px; }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1431,6 +1468,9 @@
         <div class="nav-item" data-tab="subscriptions" title="Subscriptions">
           <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         </div>
+        <div class="nav-item" data-tab="planner" title="Planner">
+          <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="11" y2="14"/><line x1="8" y1="18" x2="11" y2="18"/><line x1="14" y1="14" x2="17" y2="14"/><line x1="14" y1="18" x2="17" y2="18"/></svg>
+        </div>
       </div>
 
       <div class="nav-item" data-tab="build" title="Build Costs">
@@ -1487,6 +1527,7 @@
         <div class="nav-text-item" data-tab="bills">Bills</div>
         <div class="nav-text-item" data-tab="networth">Net Worth</div>
         <div class="nav-text-item" data-tab="subscriptions">Subscriptions</div>
+        <div class="nav-text-item" data-tab="planner">Planner</div>
       </div>
 
       <div class="nav-text-item" data-tab="build">Build Costs</div>
@@ -1601,6 +1642,11 @@
     <div id="networth-content"></div>
   </div>
 
+  <!-- PLANNER -->
+  <div class="tab-panel" id="tab-planner">
+    <div id="planner-content"></div>
+  </div>
+
   <!-- SETTINGS -->
   <div class="tab-panel" id="tab-settings">
     <div class="page-header">
@@ -1633,7 +1679,7 @@ function toggleSidebar() {
 }
 
 const NAV_GROUPS = {
-  budget: ['money','budget','bills','networth','subscriptions']
+  budget: ['money','budget','bills','networth','subscriptions','planner']
 };
 
 function toggleNavGroup(name) {
@@ -1710,6 +1756,7 @@ function _applyMigrations(d) {
   if (!d.scenarios) d.scenarios = [];
   if (!d.furniture) d.furniture = [];
   if (!d.appliances) d.appliances = [];
+  if (!d.planner) d.planner = { events: [] };
   return d;
 }
 
@@ -1785,6 +1832,7 @@ const DEFAULT_DATA = {
   netWorth: { assets: [], liabilities: [], snapshots: [], target: { amount: 0, byYear: 0 } },
   bills: [],
   subscriptions: [],
+  planner: { events: [] },
   onboarded: false,
   activityLog: [],
   householdProfile: {
@@ -1829,6 +1877,7 @@ function loadData() {
     if (!d.bills) d.bills = [];
     if (!d.subscriptions) d.subscriptions = [];
     if (d.onboarded === undefined) d.onboarded = true; // existing users skip onboarding
+    if (!d.planner) d.planner = { events: [] };
     if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
     if (!d.kids.profiles)    d.kids.profiles    = [];
     if (!d.kids.chores)      d.kids.chores      = [];
@@ -6533,6 +6582,7 @@ function renderAll() {
   safeRender(renderNetWorth);
   safeRender(renderBills);
   safeRender(renderSubscriptions);
+  safeRender(renderPlanner);
 }
 
 // ─────────────────────────────────────────────────
@@ -8391,6 +8441,353 @@ function addSubFromImport(key, dest) {
 function dismissSubResult(key) {
   _subImportDismissed.add(key);
   renderSubscriptions();
+}
+
+// ─────────────────────────────────────────────────
+// PLANNER
+// ─────────────────────────────────────────────────
+
+const PLANNER_EVENT_TYPES = {
+  birthday:    { label: 'Birthday',    emoji: '🎂', color: '#fef9c3', text: '#854d0e' },
+  wedding:     { label: 'Wedding',     emoji: '💍', color: '#fce7f3', text: '#9d174d' },
+  trip:        { label: 'Trip',        emoji: '✈️',  color: '#e0f2fe', text: '#075985' },
+  holiday:     { label: 'Holiday',     emoji: '🌴', color: '#ecfdf5', text: '#065f46' },
+  school:      { label: 'School',      emoji: '🎒', color: '#f0fdf4', text: '#166534' },
+  medical:     { label: 'Medical',     emoji: '🏥', color: '#fef2f2', text: '#991b1b' },
+  anniversary: { label: 'Anniversary', emoji: '❤️',  color: '#fce7f3', text: '#9d174d' },
+  party:       { label: 'Party',       emoji: '🎉', color: '#ede9fe', text: '#5b21b6' },
+  other:       { label: 'Other',       emoji: '📅', color: '#f1f5f9', text: '#475569' },
+};
+
+let _plannerMonth = new Date().toISOString().slice(0, 7);
+let _plannerExpanded = new Set();
+
+function renderPlanner() {
+  const el = document.getElementById('planner-content');
+  if (!el) return;
+  if (!state.planner) state.planner = { events: [] };
+
+  const events = state.planner.events
+    .filter(e => e.date && e.date.slice(0,7) === _plannerMonth)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const monthTotal = events.reduce((sum, ev) =>
+    sum + (ev.estimates || []).filter(e => e.accepted).reduce((s, e) => s + (e.amount || 0), 0), 0);
+
+  const monthLabel = new Date(_plannerMonth + '-15').toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
+
+  let html = `
+    <div class="planner-header">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="planner-month-nav">
+          <button onclick="_plannerPrevMonth()">‹</button>
+          <h2>${monthLabel}</h2>
+          <button onclick="_plannerNextMonth()">›</button>
+        </div>
+        ${monthTotal > 0 ? `<span class="planner-month-total">$${monthTotal.toLocaleString('en-AU')} estimated this month</span>` : ''}
+      </div>
+      <button class="btn-primary" onclick="openPlannerModal()">+ Add Event</button>
+    </div>`;
+
+  if (events.length === 0) {
+    html += `<div class="planner-empty">
+      <div style="font-size:48px;margin-bottom:12px">📅</div>
+      <p style="font-weight:600;font-size:16px;margin-bottom:6px;color:var(--text)">No events this month</p>
+      <p style="font-size:14px">Add a birthday, trip, or any event and Toto will estimate what it'll cost.</p>
+    </div>`;
+  } else {
+    html += `<div class="planner-events">`;
+    for (const ev of events) html += _renderPlannerCard(ev);
+    html += `</div>`;
+  }
+  el.innerHTML = html;
+}
+
+function _plannerPrevMonth() {
+  const [y, m] = _plannerMonth.split('-').map(Number);
+  _plannerMonth = new Date(y, m-2, 1).toISOString().slice(0, 7);
+  renderPlanner();
+}
+function _plannerNextMonth() {
+  const [y, m] = _plannerMonth.split('-').map(Number);
+  _plannerMonth = new Date(y, m, 1).toISOString().slice(0, 7);
+  renderPlanner();
+}
+
+function _renderPlannerCard(ev) {
+  const type = PLANNER_EVENT_TYPES[ev.type] || PLANNER_EVENT_TYPES.other;
+  const dateLabel = new Date(ev.date + 'T12:00:00').toLocaleDateString('en-AU', { weekday:'short', day:'numeric', month:'short' });
+  const isOpen = _plannerExpanded.has(ev.id);
+  const estimates = ev.estimates || [];
+  const accepted = estimates.filter(e => e.accepted);
+  const acceptedTotal = accepted.reduce((s, e) => s + (e.amount || 0), 0);
+  const allTotal = estimates.reduce((s, e) => s + (e.amount || 0), 0);
+
+  let sideBadge = '';
+  if (ev.pushed) {
+    sideBadge = `<span class="planner-pushed-badge">✓ In budget</span>`;
+  } else if (estimates.length > 0) {
+    sideBadge = `<span style="font-size:12px;color:var(--text-muted);white-space:nowrap">${accepted.length}/${estimates.length} · $${acceptedTotal.toLocaleString('en-AU')}</span>`;
+  }
+
+  let body = '';
+  if (isOpen) {
+    body = `<div class="planner-event-body">`;
+    if (ev.notes) body += `<p class="planner-notes">${ev.notes}</p>`;
+
+    if (estimates.length > 0) {
+      body += estimates.map(est => `
+        <div class="planner-estimate-row">
+          <div class="planner-estimate-check ${est.accepted ? 'accepted' : ''}"
+               onclick="togglePlannerEstimate('${ev.id}','${est.id}')">
+            ${est.accepted ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+          </div>
+          <div class="planner-estimate-name">
+            <div>${est.name}</div>
+            <div class="planner-estimate-cat">${est.category}</div>
+          </div>
+          <div class="planner-estimate-amount">$${est.amount.toLocaleString('en-AU')}</div>
+        </div>`).join('');
+
+      body += `<div class="planner-estimate-footer">
+        <div class="planner-total">All: <strong>$${allTotal.toLocaleString('en-AU')}</strong> &nbsp;·&nbsp; Selected: <strong>$${acceptedTotal.toLocaleString('en-AU')}</strong></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${!ev.pushed ? `<button class="planner-ai-btn" onclick="estimatePlannerEvent('${ev.id}')" id="ai-btn-${ev.id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Re-estimate
+          </button>` : ''}
+          ${ev.pushed
+            ? `<button class="planner-push-btn" style="background:var(--danger)" onclick="unpushEventFromBudget('${ev.id}')">Remove from budget</button>`
+            : `<button class="planner-push-btn" ${accepted.length === 0 ? 'disabled title="Accept at least one item first"' : ''} onclick="pushEventToBudget('${ev.id}')">→ Push to budget</button>`
+          }
+        </div>
+      </div>`;
+    } else {
+      body += `<div style="text-align:center;padding:20px 0">
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px">No cost estimates yet — let Toto figure it out.</p>
+        <button class="planner-ai-btn" onclick="estimatePlannerEvent('${ev.id}')" id="ai-btn-${ev.id}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Estimate costs with AI
+        </button>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:8px">Or <a href="#" onclick="event.preventDefault();openPlannerModal('${ev.id}')">edit the event</a> to add notes for better estimates</p>
+      </div>`;
+    }
+    body += `</div>`;
+  }
+
+  return `
+    <div class="planner-event-card" id="planner-ev-${ev.id}">
+      <div class="planner-event-header" onclick="togglePlannerCard('${ev.id}')">
+        <div class="planner-event-type-badge" style="background:${type.color};color:${type.text}">${type.emoji}</div>
+        <div class="planner-event-meta">
+          <div class="planner-event-title">${ev.title}</div>
+          <div class="planner-event-date">${dateLabel} · ${type.label}</div>
+        </div>
+        <div class="planner-event-side">
+          ${sideBadge}
+          <button onclick="event.stopPropagation();openPlannerModal('${ev.id}')"
+                  style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:6px;display:flex" title="Edit">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <svg class="planner-chevron ${isOpen ? 'open' : ''}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      ${body}
+    </div>`;
+}
+
+function togglePlannerCard(id) {
+  if (_plannerExpanded.has(id)) _plannerExpanded.delete(id);
+  else _plannerExpanded.add(id);
+  renderPlanner();
+}
+
+function togglePlannerEstimate(eventId, estId) {
+  const ev = (state.planner?.events || []).find(e => e.id === eventId);
+  if (!ev) return;
+  const est = (ev.estimates || []).find(e => e.id === estId);
+  if (!est) return;
+  est.accepted = !est.accepted;
+  saveData(state);
+  renderPlanner();
+}
+
+function pushEventToBudget(eventId) {
+  const ev = (state.planner?.events || []).find(e => e.id === eventId);
+  if (!ev) return;
+  const accepted = (ev.estimates || []).filter(e => e.accepted);
+  if (!accepted.length) return;
+  const monthStr = ev.date.slice(0, 7);
+  const mb = ensureMonthOverride(monthStr);
+  accepted.forEach(est => {
+    mb.expenses.push({
+      id: nextId(mb.expenses),
+      name: `${est.name} (${ev.title})`,
+      amount: est.amount,
+      frequency: 'monthly',
+      category: est.category,
+      recurring: false,
+      _plannerEventId: ev.id
+    });
+  });
+  ev.pushed = true;
+  saveData(state);
+  _plannerExpanded.add(eventId);
+  renderPlanner();
+  // Switch budget month to match event if different
+  if (typeof selectedBudgetMonth !== 'undefined' && monthStr !== selectedBudgetMonth) {
+    const msg = `$${accepted.reduce((s,e)=>s+e.amount,0).toLocaleString('en-AU')} added to ${new Date(monthStr+'-15').toLocaleDateString('en-AU',{month:'long',year:'numeric'})} budget.`;
+    alert(msg);
+  }
+}
+
+function unpushEventFromBudget(eventId) {
+  const ev = (state.planner?.events || []).find(e => e.id === eventId);
+  if (!ev) return;
+  Object.values(state.budget.months || {}).forEach(mb => {
+    mb.expenses = (mb.expenses || []).filter(e => e._plannerEventId !== eventId);
+  });
+  state.budget.expenses = (state.budget.expenses || []).filter(e => e._plannerEventId !== eventId);
+  ev.pushed = false;
+  saveData(state);
+  renderPlanner();
+}
+
+function deletePlannerEvent(id) {
+  if (!confirm('Delete this event and remove it from the budget?')) return;
+  unpushEventFromBudget(id);
+  state.planner.events = state.planner.events.filter(e => e.id !== id);
+  _plannerExpanded.delete(id);
+  saveData(state);
+  closeModal();
+  renderPlanner();
+}
+
+async function estimatePlannerEvent(eventId) {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key) {
+    alert('Add your AI API key in Settings to use cost estimation.');
+    return;
+  }
+  const ev = (state.planner?.events || []).find(e => e.id === eventId);
+  if (!ev) return;
+
+  const btn = document.getElementById(`ai-btn-${eventId}`);
+  if (btn) { btn.disabled = true; btn.textContent = '✦ Estimating…'; }
+
+  const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult').length || 2;
+  const kids   = (state.householdProfile?.members || []).filter(m => m.role === 'child').length || 0;
+  const eventDate = new Date(ev.date + 'T12:00:00').toLocaleDateString('en-AU', { day:'numeric', month:'long', year:'numeric' });
+
+  const prompt = `You are a family finance assistant for an Australian family. Suggest realistic cost estimates for the following life event.
+
+Event: ${ev.title}
+Type: ${ev.type}
+Date: ${eventDate}
+Notes: ${ev.notes || 'none provided'}
+Family size: ${adults} adult(s), ${kids} child(ren)
+
+Return ONLY a JSON array — no explanation, no markdown fences:
+[{"name":"Item description","amount":150,"category":"Category"}]
+
+Rules:
+- Use realistic 2025 Australian dollar amounts
+- Round to nearest $5 or $10
+- Maximum 6 items
+- Consider family size when relevant
+- Use ONLY these categories: Transport, Accommodation, Food & Dining, Entertainment, Gifts, Clothing, Health, Education, Shopping, Other`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-client-side-key-flag': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 512,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const match = text.match(/\[[\s\S]*?\]/);
+    if (!match) throw new Error('No JSON array in response');
+    const items = JSON.parse(match[0]);
+    ev.estimates = items.map((item, i) => ({
+      id: `est-${Date.now()}-${i}`,
+      name: item.name,
+      amount: Number(item.amount) || 0,
+      category: item.category || 'Other',
+      accepted: true
+    }));
+    _plannerExpanded.add(eventId);
+    saveData(state);
+    renderPlanner();
+  } catch (err) {
+    console.error('Planner estimate error:', err);
+    if (btn) { btn.disabled = false; btn.innerHTML = '✦ Try again'; }
+    alert('Could not estimate costs. Check your AI API key in Settings.');
+  }
+}
+
+function openPlannerModal(id) {
+  const ev = id ? (state.planner?.events || []).find(e => e.id === id) : null;
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('modal').innerHTML = `
+    <div class="modal-header">
+      <h3>${ev ? 'Edit Event' : 'Add Event'}</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label">Event Title *</label>
+      <input class="form-input" id="pe-title" placeholder="e.g. Sarah's Birthday, Trip to Melbourne" value="${ev ? ev.title : ''}">
+
+      <label class="form-label" style="margin-top:14px">Type *</label>
+      <select class="form-input" id="pe-type">
+        ${Object.entries(PLANNER_EVENT_TYPES).map(([k,v]) =>
+          `<option value="${k}" ${ev?.type===k?'selected':''}>${v.emoji} ${v.label}</option>`
+        ).join('')}
+      </select>
+
+      <label class="form-label" style="margin-top:14px">Date *</label>
+      <input class="form-input" id="pe-date" type="date" value="${ev ? ev.date : today}">
+
+      <label class="form-label" style="margin-top:14px">Notes <span style="font-weight:400;color:var(--text-muted)">(optional — helps AI estimate better)</span></label>
+      <textarea class="form-input" id="pe-notes" rows="3" placeholder="e.g. Flying from Sydney, 5 nights, buying gift ~$80">${ev ? (ev.notes||'') : ''}</textarea>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      ${ev ? `<button class="btn-danger" onclick="deletePlannerEvent('${ev.id}')">Delete</button>` : '<span></span>'}
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="savePlannerEvent(${ev ? `'${ev.id}'` : 'null'})">Save</button>
+      </div>
+    </div>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function savePlannerEvent(id) {
+  const title = document.getElementById('pe-title').value.trim();
+  const type  = document.getElementById('pe-type').value;
+  const date  = document.getElementById('pe-date').value;
+  const notes = document.getElementById('pe-notes').value.trim();
+  if (!title || !date) { alert('Title and date are required.'); return; }
+  if (!state.planner) state.planner = { events: [] };
+  if (id) {
+    const ev = state.planner.events.find(e => e.id === id);
+    if (ev) { ev.title = title; ev.type = type; ev.date = date; ev.notes = notes; }
+  } else {
+    const newId = 'ev-' + Date.now();
+    state.planner.events.push({ id: newId, title, type, date, notes, estimates: [], pushed: false });
+    _plannerExpanded.add(newId);
+    _plannerMonth = date.slice(0, 7);
+  }
+  saveData(state);
+  closeModal();
+  renderPlanner();
 }
 
 // ─── Service Worker ───────────────────────────────
