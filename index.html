@@ -1489,6 +1489,35 @@
     .toto-typing span:nth-child(2) { animation-delay:.15s; }
     .toto-typing span:nth-child(3) { animation-delay:.3s; }
     @keyframes toto-bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+    /* ─── Budget forecast widget ─────────────── */
+    .forecast-widget { background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid #6ee7b7; border-radius:14px; margin-bottom:20px; overflow:hidden; }
+    .forecast-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #a7f3d0; flex-wrap:wrap; gap:8px; }
+    .forecast-header-title { font-size:13px; font-weight:700; color:#065f46; display:flex; align-items:center; gap:6px; }
+    .forecast-push-all { background:#10b981; color:#fff; border:none; border-radius:8px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .forecast-row { display:flex; align-items:center; gap:8px; padding:9px 16px; border-bottom:1px solid #d1fae5; }
+    .forecast-row:last-child { border-bottom:none; }
+    .forecast-ev-name { font-size:13px; font-weight:600; flex:1; }
+    .forecast-ev-date { font-size:11px; color:var(--text-muted); }
+    .forecast-ev-cost { font-size:13px; font-weight:700; color:#065f46; }
+    .forecast-pushed { font-size:11px; font-weight:600; color:#10b981; background:#d1fae5; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+    .forecast-unpushed { font-size:11px; font-weight:600; color:#64748b; background:#f1f5f9; padding:2px 8px; border-radius:20px; white-space:nowrap; cursor:pointer; }
+    .forecast-unpushed:hover { background:#0d9488; color:#fff; }
+    .forecast-total { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:rgba(16,185,129,.08); border-top:1px solid #a7f3d0; }
+    .forecast-total-label { font-size:12px; color:#065f46; font-weight:600; }
+
+    /* ─── Seasonal nudges ────────────────────── */
+    .nudge-section { margin:16px 24px 0; }
+    .nudge-row { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; }
+    .nudge-card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:12px 14px; min-width:200px; max-width:220px; flex-shrink:0; cursor:pointer; transition:border-color .15s; }
+    .nudge-card:hover { border-color:var(--primary); }
+    .nudge-card-icon { font-size:20px; margin-bottom:6px; }
+    .nudge-card-title { font-size:12px; font-weight:700; color:var(--text); }
+    .nudge-card-days { font-size:11px; color:var(--primary); font-weight:600; margin-top:2px; }
+    .nudge-card-body { font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.4; }
+
+    /* ─── Recurring badge ────────────────────── */
+    .recurring-badge { font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 7px; border-radius:20px; font-weight:600; white-space:nowrap; }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1861,6 +1890,7 @@ function _startFirestoreSync() {
       fbStore.collection('family').doc('shared').set(state);
     }
     refreshReceiptCounts().then(() => {
+      _autoCreateRecurringEvents();
       renderAll();
       if (!state.onboarded) showOnboarding();
     });
@@ -1967,6 +1997,7 @@ function loadData() {
     if (!d.subscriptions) d.subscriptions = [];
     if (d.onboarded === undefined) d.onboarded = true; // existing users skip onboarding
     if (!d.planner) d.planner = { events: [] };
+    if (d.planner?.events) d.planner.events.forEach(e => { if (!e.recurring) e.recurring = 'none'; });
     if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
     if (!d.kids.profiles)    d.kids.profiles    = [];
     if (!d.kids.chores)      d.kids.chores      = [];
@@ -5445,6 +5476,9 @@ function renderBudget() {
     `;
   }
 
+  // Planned events forecast widget
+  html += renderBudgetForecast(selectedBudgetMonth, surplus);
+
   // Income — full width
   html += `
     <div class="section" style="margin-bottom:20px">
@@ -8627,6 +8661,8 @@ function renderPlanner() {
       ${renderWeeklyStrip()}
     </div>
 
+    ${_renderNudgeSection()}
+
     <div class="diary-section" style="margin-top:20px">
       <div class="diary-section-title">Life Areas — next 30 days</div>
       <div class="diary-tiles">${tilesHtml}</div>
@@ -8728,6 +8764,7 @@ function _renderPlannerEventRow(ev) {
     : estimates.length > 0
       ? `<span style="font-size:12px;color:var(--text-muted)">$${acceptedTotal.toLocaleString('en-AU')}</span>`
       : '';
+  if (ev.recurring === 'yearly') sideBadge = `<span class="recurring-badge">🔄 Yearly</span> ` + sideBadge;
 
   let body = '';
   if (isOpen) {
@@ -8990,6 +9027,11 @@ function openPlannerModal(id, presetDate) {
       <input class="form-input" id="pe-date" type="date" value="${ev?ev.date:defaultDate}">
       <label class="form-label" style="margin-top:14px">Notes <span style="font-weight:400;color:var(--text-muted)">(helps AI estimate costs)</span></label>
       <textarea class="form-input" id="pe-notes" rows="3" placeholder="e.g. Flying from Sydney, 5 nights, gift budget ~$100">${ev?(ev.notes||''):''}</textarea>
+      <label class="form-label" style="margin-top:14px">Repeats</label>
+      <select class="form-input" id="pe-recurring">
+        <option value="none" ${(ev?.recurring||'none')==='none'?'selected':''}>Does not repeat</option>
+        <option value="yearly" ${ev?.recurring==='yearly'?'selected':''}>Every year (e.g. birthdays, anniversaries)</option>
+      </select>
     </div>
     <div class="modal-footer" style="justify-content:space-between">
       ${ev ? `<button class="btn-danger" onclick="deletePlannerEvent('${ev.id}')">Delete</button>` : '<span></span>'}
@@ -9002,18 +9044,19 @@ function openPlannerModal(id, presetDate) {
 }
 
 function savePlannerEvent(id) {
-  const title = document.getElementById('pe-title').value.trim();
-  const cat   = document.getElementById('pe-cat').value;
-  const date  = document.getElementById('pe-date').value;
-  const notes = document.getElementById('pe-notes').value.trim();
+  const title     = document.getElementById('pe-title').value.trim();
+  const cat       = document.getElementById('pe-cat').value;
+  const date      = document.getElementById('pe-date').value;
+  const notes     = document.getElementById('pe-notes').value.trim();
+  const recurring = document.getElementById('pe-recurring').value;
   if (!title || !date) { alert('Title and date are required.'); return; }
   if (!state.planner) state.planner = { events: [] };
   if (id) {
     const ev = state.planner.events.find(e => e.id === id);
-    if (ev) { ev.title = title; ev.category = cat; ev.date = date; ev.notes = notes; }
+    if (ev) { ev.title = title; ev.category = cat; ev.date = date; ev.notes = notes; ev.recurring = recurring; }
   } else {
     const newId = 'ev-' + Date.now();
-    state.planner.events.push({ id: newId, title, category: cat, date, notes, estimates: [], pushed: false });
+    state.planner.events.push({ id: newId, title, category: cat, date, notes, recurring, estimates: [], pushed: false });
     _plannerExpanded.add(newId);
     _plannerSelectedDay = date;
     _plannerMonth = date.slice(0, 7);
@@ -9021,6 +9064,158 @@ function savePlannerEvent(id) {
   saveData(state);
   closeModal();
   renderPlanner();
+}
+
+// ─────────────────────────────────────────────────
+// FORECAST + SEASONAL NUDGES + RECURRING EVENTS
+// ─────────────────────────────────────────────────
+
+// ── Feature 1: Budget forecast widget ────────────
+function renderBudgetForecast(monthStr, regularSurplus) {
+  const plannerEvs = (state.planner?.events || [])
+    .filter(e => e.date?.slice(0,7) === monthStr && (e.estimates||[]).some(x => x.accepted));
+  if (plannerEvs.length === 0) return '';
+
+  const totalEvCost = plannerEvs.reduce((s, ev) =>
+    s + (ev.estimates||[]).filter(e=>e.accepted).reduce((t,e)=>t+(e.amount||0),0), 0);
+  const forecastSurplus = regularSurplus - totalEvCost;
+  const unpushed = plannerEvs.filter(e => !e.pushed);
+
+  const rows = plannerEvs.map(ev => {
+    const cat  = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
+    const cost = (ev.estimates||[]).filter(e=>e.accepted).reduce((s,e)=>s+(e.amount||0),0);
+    const dl   = new Date(ev.date+'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+    return `<div class="forecast-row">
+      <span class="forecast-ev-name">${cat.emoji} ${ev.title}</span>
+      <span class="forecast-ev-date">${dl}</span>
+      <span class="forecast-ev-cost">${aud(cost)}</span>
+      ${ev.pushed
+        ? `<span class="forecast-pushed">✓ In budget</span>`
+        : `<button class="forecast-unpushed" onclick="pushEventToBudget('${ev.id}')">+ Add</button>`}
+    </div>`;
+  }).join('');
+
+  return `<div class="forecast-widget">
+    <div class="forecast-header">
+      <span class="forecast-header-title">📅 Planned Events — ${aud(totalEvCost)} this month</span>
+      ${unpushed.length > 1 ? `<button class="forecast-push-all" onclick="_pushAllEventsToBudget('${monthStr}')">Add all to budget</button>` : ''}
+    </div>
+    ${rows}
+    <div class="forecast-total">
+      <span class="forecast-total-label">Forecast surplus after events</span>
+      <span style="font-weight:800;font-size:15px;color:${forecastSurplus>=0?'#10b981':'#ef4444'}">${aud(Math.abs(forecastSurplus))} ${forecastSurplus>=0?'surplus':'deficit'}</span>
+    </div>
+  </div>`;
+}
+
+function _pushAllEventsToBudget(monthStr) {
+  const unpushed = (state.planner?.events || [])
+    .filter(e => e.date?.slice(0,7) === monthStr && !e.pushed && (e.estimates||[]).some(x=>x.accepted));
+  unpushed.forEach(ev => pushEventToBudget(ev.id));
+  renderBudget();
+}
+
+// ── Feature 2: Seasonal nudges ────────────────────
+function _getNthDayOfMonth(year, month, dow, nth) {
+  // month: 0-based, dow: 0=Sun, nth: 1-based
+  let count = 0;
+  for (let d = 1; d <= 31; d++) {
+    const dt = new Date(year, month, d);
+    if (dt.getMonth() !== month) break;
+    if (dt.getDay() === dow) { count++; if (count === nth) return dt; }
+  }
+}
+
+function getSeasonalNudges() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const y = today.getFullYear();
+  const daysUntil = d => Math.ceil((d - today) / 86400000);
+
+  const candidates = [
+    // Fixed dates
+    { d: new Date(y, 3, 25), emoji:'🌿', title:"Anzac Day",      body:"Public holiday — any plans or travel?" },
+    { d: new Date(y, 5, 30), emoji:'🧾', title:"EOFY",           body:"Tax time — accountant fees, donations, prepayments" },
+    { d: new Date(y, 11,25), emoji:'🎄', title:"Christmas",      body:"Gifts, travel, food — start budgeting early" },
+    { d: new Date(y, 11,26), emoji:'🛍️', title:"Boxing Day",     body:"Sales, travel, family catch-ups" },
+    { d: new Date(y+1,0, 1), emoji:'🎆', title:"New Year's",     body:"Celebrations, travel plans" },
+    // Computed
+    { d: _getNthDayOfMonth(y, 4, 0, 2), emoji:'💐', title:"Mother's Day",  body:"Gift, brunch or dinner for Mum" },
+    { d: _getNthDayOfMonth(y, 8, 0, 1), emoji:'👔', title:"Father's Day",  body:"Gift or outing for Dad" },
+    { d: _getNthDayOfMonth(y,10, 2, 1), emoji:'🏆', title:"Melbourne Cup", body:"Event day — sweepstakes, lunch, outfits" },
+    // School holidays (approximate NSW/VIC — Term breaks)
+    { d: new Date(y, 3, 6),  emoji:'🎒', title:"Term 1 Holidays", body:"2 weeks — activities, childcare, day trips" },
+    { d: new Date(y, 6, 5),  emoji:'🎒', title:"Term 2 Holidays", body:"2 weeks — winter school holidays" },
+    { d: new Date(y, 8,19),  emoji:'🎒', title:"Term 3 Holidays", body:"2 weeks — spring school holidays" },
+    { d: new Date(y,11,18),  emoji:'🎒', title:"Summer Holidays", body:"6 weeks — the big one, plan early" },
+  ].filter(c => c.d); // remove any undefined (e.g. if _getNthDayOfMonth returns undefined)
+
+  return candidates
+    .map(c => ({ ...c, days: daysUntil(c.d) }))
+    .filter(c => c.days >= -3 && c.days <= 45)  // -3 allows "just started"
+    .sort((a,b) => a.days - b.days)
+    .slice(0, 4);
+}
+
+function _renderNudgeSection() {
+  const nudges = getSeasonalNudges();
+  if (nudges.length === 0) return '';
+  const cards = nudges.map(n => {
+    const daysLabel = n.days < 0 ? 'Now!' : n.days === 0 ? 'Today!' : n.days === 1 ? 'Tomorrow' : `In ${n.days} days`;
+    return `<div class="nudge-card" onclick="openTotoAssistant();_totoSend('Help me plan for ${n.title}')">
+      <div class="nudge-card-icon">${n.emoji}</div>
+      <div class="nudge-card-title">${n.title}</div>
+      <div class="nudge-card-days">${daysLabel}</div>
+      <div class="nudge-card-body">${n.body}</div>
+    </div>`;
+  }).join('');
+  return `<div class="nudge-section">
+    <div class="diary-section-title">Heads up from Toto 🐕</div>
+    <div class="nudge-row">${cards}</div>
+  </div>`;
+}
+
+// ── Feature 3: Recurring events ───────────────────
+function _autoCreateRecurringEvents() {
+  if (!state.planner?.events) return;
+  const thisYear = new Date().getFullYear();
+  const nextYear = thisYear + 1;
+  const events   = state.planner.events;
+  let changed    = false;
+
+  events.filter(e => e.recurring === 'yearly').forEach(ev => {
+    const evYear = parseInt(ev.date?.slice(0,4));
+    if (!evYear || evYear >= thisYear) return; // already current or future
+
+    // Check if a copy already exists for this year (same title + category + same month/day)
+    const md = ev.date.slice(5); // "MM-DD"
+    const alreadyExists = events.some(e =>
+      e.id !== ev.id &&
+      e.title === ev.title &&
+      e.category === ev.category &&
+      e.date?.slice(5) === md &&
+      parseInt(e.date?.slice(0,4)) >= thisYear
+    );
+    if (alreadyExists) return;
+
+    // Create copy for this year (or next year if that date has already passed)
+    const candidate = new Date(`${thisYear}-${md}T12:00:00`);
+    const targetYear = candidate < new Date() ? nextYear : thisYear;
+    const newDate = `${targetYear}-${md}`;
+    const newId   = 'ev-' + Date.now() + '-r' + Math.random().toString(36).slice(2,6);
+    events.push({
+      id: newId,
+      title: ev.title,
+      category: ev.category,
+      date: newDate,
+      notes: ev.notes || '',
+      recurring: 'yearly',
+      estimates: (ev.estimates||[]).map(e => ({ ...e, id: 'est-'+Date.now()+Math.random(), accepted: true })),
+      pushed: false,
+    });
+    changed = true;
+  });
+
+  if (changed) saveData(state);
 }
 
 // ─────────────────────────────────────────────────
@@ -9072,7 +9267,10 @@ function _totoInitPanel() {
     }
   });
 
-  const allSuggestions = [...contextSuggestions, ...TOTO_SUGGESTIONS].slice(0, 4);
+  const seasonalNudges = getSeasonalNudges().slice(0, 2).map(n => ({
+    icon: n.emoji, text: `Help me plan for ${n.title} (${n.days <= 0 ? 'now!' : `in ${n.days} days`})`
+  }));
+  const allSuggestions = [...contextSuggestions, ...seasonalNudges, ...TOTO_SUGGESTIONS].slice(0, 4);
   const sugEl = document.getElementById('toto-suggestions');
   sugEl.innerHTML = allSuggestions.map(s =>
     `<button class="toto-suggestion" onclick="_totoSendSuggestion(this)">${s.icon} ${s.text}</button>`
