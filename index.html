@@ -8950,7 +8950,8 @@ function _renderPlannerEventRow(ev) {
     : estimates.length > 0
       ? `<span style="font-size:12px;color:var(--text-muted)">$${acceptedTotal.toLocaleString('en-AU')}</span>`
       : '';
-  if (ev.recurring === 'yearly') sideBadge = `<span class="recurring-badge">🔄 Yearly</span> ` + sideBadge;
+  const _recurringLabels = { weekly:'Weekly', fortnightly:'Fortnightly', monthly:'Monthly', quarterly:'Quarterly', yearly:'Annually' };
+  if (ev.recurring && ev.recurring !== 'none') sideBadge = `<span class="recurring-badge">🔄 ${_recurringLabels[ev.recurring]||ev.recurring}</span> ` + sideBadge;
 
   let body = '';
   if (isOpen) {
@@ -9215,8 +9216,12 @@ function openPlannerModal(id, presetDate) {
       <textarea class="form-input" id="pe-notes" rows="3" placeholder="e.g. Flying from Sydney, 5 nights, gift budget ~$100">${ev?(ev.notes||''):''}</textarea>
       <label class="form-label" style="margin-top:14px">Repeats</label>
       <select class="form-input" id="pe-recurring">
-        <option value="none" ${(ev?.recurring||'none')==='none'?'selected':''}>Does not repeat</option>
-        <option value="yearly" ${ev?.recurring==='yearly'?'selected':''}>Every year (e.g. birthdays, anniversaries)</option>
+        <option value="none"        ${(ev?.recurring||'none')==='none'?'selected':''}>Does not repeat</option>
+        <option value="weekly"      ${ev?.recurring==='weekly'?'selected':''}>Weekly</option>
+        <option value="fortnightly" ${ev?.recurring==='fortnightly'?'selected':''}>Fortnightly</option>
+        <option value="monthly"     ${ev?.recurring==='monthly'?'selected':''}>Monthly</option>
+        <option value="quarterly"   ${ev?.recurring==='quarterly'?'selected':''}>Quarterly</option>
+        <option value="yearly"      ${ev?.recurring==='yearly'?'selected':''}>Annually (e.g. birthdays, anniversaries)</option>
       </select>
     </div>
     <div class="modal-footer" style="justify-content:space-between">
@@ -9361,44 +9366,64 @@ function _renderNudgeSection() {
 }
 
 // ── Feature 3: Recurring events ───────────────────
+function _addRecurrenceToDate(date, recurrence) {
+  const d = new Date(date);
+  switch (recurrence) {
+    case 'weekly':      d.setDate(d.getDate() + 7);    break;
+    case 'fortnightly': d.setDate(d.getDate() + 14);   break;
+    case 'monthly':     d.setMonth(d.getMonth() + 1);  break;
+    case 'quarterly':   d.setMonth(d.getMonth() + 3);  break;
+    case 'yearly':      d.setFullYear(d.getFullYear() + 1); break;
+  }
+  return d;
+}
+
 function _autoCreateRecurringEvents() {
   if (!state.planner?.events) return;
-  const thisYear = new Date().getFullYear();
-  const nextYear = thisYear + 1;
-  const events   = state.planner.events;
-  let changed    = false;
+  const events = state.planner.events;
+  const today  = new Date(); today.setHours(0,0,0,0);
+  let changed  = false;
 
-  events.filter(e => e.recurring === 'yearly').forEach(ev => {
-    const evYear = parseInt(ev.date?.slice(0,4));
-    if (!evYear || evYear >= thisYear) return; // already current or future
+  // Window: how far ahead to pre-create occurrences per frequency
+  const windowMonths = { weekly:3, fortnightly:3, monthly:6, quarterly:12, yearly:24 };
 
-    // Check if a copy already exists for this year (same title + category + same month/day)
-    const md = ev.date.slice(5); // "MM-DD"
-    const alreadyExists = events.some(e =>
-      e.id !== ev.id &&
-      e.title === ev.title &&
-      e.category === ev.category &&
-      e.date?.slice(5) === md &&
-      parseInt(e.date?.slice(0,4)) >= thisYear
-    );
-    if (alreadyExists) return;
+  // Only source events (not auto-generated copies)
+  const sources = events.filter(e => e.recurring && e.recurring !== 'none' && !e._recurringSourceId);
 
-    // Create copy for this year (or next year if that date has already passed)
-    const candidate = new Date(`${thisYear}-${md}T12:00:00`);
-    const targetYear = candidate < new Date() ? nextYear : thisYear;
-    const newDate = `${targetYear}-${md}`;
-    const newId   = 'ev-' + Date.now() + '-r' + Math.random().toString(36).slice(2,6);
-    events.push({
-      id: newId,
-      title: ev.title,
-      category: ev.category,
-      date: newDate,
-      notes: ev.notes || '',
-      recurring: 'yearly',
-      estimates: (ev.estimates||[]).map(e => ({ ...e, id: 'est-'+Date.now()+Math.random(), accepted: true })),
-      pushed: false,
-    });
-    changed = true;
+  sources.forEach(source => {
+    const freq = source.recurring;
+    const winEnd = new Date(today);
+    winEnd.setMonth(winEnd.getMonth() + (windowMonths[freq] || 12));
+
+    // Advance from source date to first occurrence >= today
+    let cur = new Date(source.date + 'T12:00:00');
+    while (cur < today) cur = _addRecurrenceToDate(cur, freq);
+
+    // Walk forward generating expected dates
+    let safety = 0;
+    while (cur <= winEnd && safety++ < 200) {
+      const dateStr = cur.toISOString().slice(0, 10);
+      // Check if this occurrence already exists (source itself or a copy)
+      const exists = events.some(e =>
+        e.date === dateStr &&
+        (e.id === source.id || e._recurringSourceId === source.id)
+      );
+      if (!exists) {
+        events.push({
+          id: 'ev-' + Date.now() + '-r' + Math.random().toString(36).slice(2, 6),
+          title: source.title,
+          category: source.category,
+          date: dateStr,
+          notes: source.notes || '',
+          recurring: freq,
+          _recurringSourceId: source.id,
+          estimates: (source.estimates || []).map(e => ({ ...e, id: 'est-' + Date.now() + Math.random(), accepted: true })),
+          pushed: false,
+        });
+        changed = true;
+      }
+      cur = _addRecurrenceToDate(cur, freq);
+    }
   });
 
   if (changed) saveData(state);
