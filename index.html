@@ -1490,6 +1490,22 @@
     .toto-typing span:nth-child(3) { animation-delay:.3s; }
     @keyframes toto-bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
 
+    /* ─── Budget suggestion inbox ───────────── */
+    .suggestion-inbox { background:#fff; border:2px solid #6366f1; border-radius:14px; margin-bottom:20px; overflow:hidden; }
+    .suggestion-inbox-header { display:flex; align-items:center; gap:10px; padding:13px 16px; background:linear-gradient(135deg,#eef2ff,#ede9fe); border-bottom:1px solid #c7d2fe; }
+    .suggestion-inbox-title { font-size:13px; font-weight:700; color:#3730a3; flex:1; }
+    .suggestion-inbox-count { background:#6366f1; color:#fff; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
+    .suggestion-row { display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px solid #e0e7ff; }
+    .suggestion-row:last-child { border-bottom:none; }
+    .suggestion-event-tag { font-size:11px; color:#6366f1; font-weight:600; background:#eef2ff; padding:2px 7px; border-radius:6px; white-space:nowrap; }
+    .suggestion-name { flex:1; font-size:13px; font-weight:600; }
+    .suggestion-cat { font-size:11px; color:var(--text-muted); margin-top:1px; }
+    .suggestion-amount { font-size:14px; font-weight:700; color:var(--text); margin-right:4px; }
+    .suggestion-approve { background:#10b981; color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
+    .suggestion-approve:hover { background:#059669; }
+    .suggestion-dismiss { background:none; border:1px solid var(--border); color:var(--text-muted); border-radius:8px; padding:6px 10px; font-size:12px; cursor:pointer; }
+    .suggestion-dismiss:hover { border-color:#ef4444; color:#ef4444; }
+
     /* ─── Budget forecast widget ─────────────── */
     .forecast-widget { background:linear-gradient(135deg,#f0fdf4,#ecfdf5); border:1px solid #6ee7b7; border-radius:14px; margin-bottom:20px; overflow:hidden; }
     .forecast-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #a7f3d0; flex-wrap:wrap; gap:8px; }
@@ -1903,6 +1919,7 @@ function _applyMigrations(d) {
   if (!d.budget) d.budget = { income: [], expenses: [], actuals: {}, months: {} };
   if (!d.budget.actuals) d.budget.actuals = {};
   if (!d.budget.months) d.budget.months = {};
+  if (!d.budget.suggestions) d.budget.suggestions = [];
   if (!d.goals) d.goals = [];
   if (!d.scenarios) d.scenarios = [];
   if (!d.furniture) d.furniture = [];
@@ -2021,6 +2038,7 @@ function loadData() {
     const d = JSON.parse(raw);
     if (!d.budget.actuals) d.budget.actuals = {};
     if (!d.budget.months)  d.budget.months  = {};
+    if (!d.budget.suggestions) d.budget.suggestions = [];
     if (!d.goals)      d.goals      = [];
     if (!d.scenarios)  d.scenarios  = [];
     if (!d.netWorth) d.netWorth = { assets: [], liabilities: [], snapshots: [] };
@@ -5665,6 +5683,9 @@ function renderBudget() {
   // Planned events forecast widget
   html += renderBudgetForecast(selectedBudgetMonth, surplus);
 
+  // Suggestion inbox (planner → budget approvals)
+  html += renderBudgetSuggestions(selectedBudgetMonth);
+
   // Income — full width
   html += `
     <div class="section" style="margin-bottom:20px">
@@ -8971,9 +8992,11 @@ function _renderPlannerEventRow(ev) {
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           ${!ev.pushed ? `<button class="planner-ai-btn" id="ai-btn-${ev.id}" onclick="estimatePlannerEvent('${ev.id}')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Re-estimate</button>` : ''}
-          ${ev.pushed
+          ${ev.pushed === true
             ? `<button class="planner-push-btn" style="background:var(--danger)" onclick="unpushEventFromBudget('${ev.id}')">Remove from budget</button>`
-            : `<button class="planner-push-btn" ${accepted.length===0?'disabled':''} onclick="pushEventToBudget('${ev.id}')">→ Push to budget</button>`}
+            : ev.pushed === 'suggested'
+              ? `<button class="planner-push-btn" style="background:#f59e0b;cursor:default" disabled>⏳ Pending approval</button>`
+              : `<button class="planner-push-btn" ${accepted.length===0?'disabled':''} onclick="suggestEventToBudget('${ev.id}')">→ Suggest to budget</button>`}
         </div>
       </div>`;
     } else if (cat.financial) {
@@ -9073,45 +9096,122 @@ function togglePlannerEstimate(eventId, estId) {
   renderPlanner();
 }
 
-function pushEventToBudget(eventId) {
+function suggestEventToBudget(eventId) {
   const ev = (state.planner?.events || []).find(e => e.id === eventId);
   if (!ev) return;
   const accepted = (ev.estimates || []).filter(e => e.accepted);
   if (!accepted.length) return;
   const monthStr = ev.date.slice(0, 7);
-  const mb = ensureMonthOverride(monthStr);
+  if (!state.budget.suggestions) state.budget.suggestions = [];
+  // Remove any previous suggestions from this event
+  state.budget.suggestions = state.budget.suggestions.filter(s => s.eventId !== ev.id);
   accepted.forEach(est => {
-    mb.expenses.push({
-      id: nextId(mb.expenses),
-      name: `${est.name} (${ev.title})`,
+    state.budget.suggestions.push({
+      id: 'sug-' + Date.now() + '-' + Math.random().toString(36).slice(2,5),
+      month: monthStr,
+      eventId: ev.id,
+      eventTitle: ev.title,
+      estId: est.id,
+      name: est.name,
       amount: est.amount,
-      frequency: 'monthly',
       category: est.category,
-      recurring: false,
-      _plannerEventId: ev.id
+      status: 'pending'
     });
   });
-  ev.pushed = true;
+  ev.pushed = 'suggested';
   saveData(state);
   _plannerExpanded.add(eventId);
   renderPlanner();
-  // Switch budget month to match event if different
-  if (typeof selectedBudgetMonth !== 'undefined' && monthStr !== selectedBudgetMonth) {
-    const msg = `$${accepted.reduce((s,e)=>s+e.amount,0).toLocaleString('en-AU')} added to ${new Date(monthStr+'-15').toLocaleDateString('en-AU',{month:'long',year:'numeric'})} budget.`;
-    alert(msg);
+  const monthFmt = new Date(monthStr+'-15').toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+  // If on a different month, offer to navigate
+  if (monthStr !== selectedBudgetMonth) {
+    if (confirm(`${accepted.length} suggestion${accepted.length>1?'s':''} sent to ${monthFmt} budget.\n\nGo to Monthly Budget to approve them?`)) {
+      selectedBudgetMonth = monthStr;
+      activateTab('budget');
+    }
+  } else {
+    safeRender(renderBudget);
   }
+}
+
+function approveSuggestion(sugId) {
+  const sug = (state.budget.suggestions||[]).find(s => s.id === sugId);
+  if (!sug) return;
+  const mb = ensureMonthOverride(sug.month);
+  mb.expenses.push({
+    id: nextId(mb.expenses),
+    name: `${sug.name} (${sug.eventTitle})`,
+    amount: sug.amount,
+    frequency: 'monthly',
+    category: sug.category,
+    recurring: false,
+    _plannerEventId: sug.eventId
+  });
+  sug.status = 'approved';
+  // If all suggestions for this event are resolved, mark event as pushed
+  const ev = (state.planner?.events||[]).find(e => e.id === sug.eventId);
+  if (ev) {
+    const pending = (state.budget.suggestions||[]).filter(s => s.eventId === ev.id && s.status === 'pending');
+    if (pending.length === 0) ev.pushed = true;
+  }
+  saveData(state);
+  safeRender(renderBudget);
+  safeRender(renderPlanner);
+}
+
+function dismissSuggestion(sugId) {
+  const sug = (state.budget.suggestions||[]).find(s => s.id === sugId);
+  if (!sug) return;
+  sug.status = 'dismissed';
+  const ev = (state.planner?.events||[]).find(e => e.id === sug.eventId);
+  if (ev) {
+    const pending = (state.budget.suggestions||[]).filter(s => s.eventId === ev.id && s.status === 'pending');
+    if (pending.length === 0) ev.pushed = ev.pushed === 'suggested' ? false : ev.pushed;
+  }
+  saveData(state);
+  safeRender(renderBudget);
+}
+
+function renderBudgetSuggestions(monthStr) {
+  const pending = (state.budget?.suggestions||[]).filter(s => s.month === monthStr && s.status === 'pending');
+  if (!pending.length) return '';
+  const grouped = {};
+  pending.forEach(s => { if (!grouped[s.eventTitle]) grouped[s.eventTitle] = []; grouped[s.eventTitle].push(s); });
+  const rows = pending.map(s => `
+    <div class="suggestion-row">
+      <span class="suggestion-event-tag">📅 ${s.eventTitle}</span>
+      <div style="flex:1;min-width:0">
+        <div class="suggestion-name">${s.name}</div>
+        <div class="suggestion-cat">${s.category}</div>
+      </div>
+      <span class="suggestion-amount">${aud(s.amount)}</span>
+      <button class="suggestion-approve" onclick="approveSuggestion('${s.id}')">✓ Approve</button>
+      <button class="suggestion-dismiss" onclick="dismissSuggestion('${s.id}')">✕</button>
+    </div>`).join('');
+  return `<div class="suggestion-inbox">
+    <div class="suggestion-inbox-header">
+      <span style="font-size:16px">📥</span>
+      <span class="suggestion-inbox-title">Suggested from Planner</span>
+      <span class="suggestion-inbox-count">${pending.length} pending</span>
+    </div>
+    ${rows}
+  </div>`;
 }
 
 function unpushEventFromBudget(eventId) {
   const ev = (state.planner?.events || []).find(e => e.id === eventId);
   if (!ev) return;
+  // Remove approved budget items
   Object.values(state.budget.months || {}).forEach(mb => {
     mb.expenses = (mb.expenses || []).filter(e => e._plannerEventId !== eventId);
   });
   state.budget.expenses = (state.budget.expenses || []).filter(e => e._plannerEventId !== eventId);
+  // Remove suggestions
+  state.budget.suggestions = (state.budget.suggestions||[]).filter(s => s.eventId !== eventId);
   ev.pushed = false;
   saveData(state);
   renderPlanner();
+  safeRender(renderBudget);
 }
 
 function deletePlannerEvent(id) {
@@ -9282,14 +9382,16 @@ function renderBudgetForecast(monthStr, regularSurplus) {
       <span class="forecast-ev-cost">${aud(cost)}</span>
       ${ev.pushed
         ? `<span class="forecast-pushed">✓ In budget</span>`
-        : `<button class="forecast-unpushed" onclick="pushEventToBudget('${ev.id}')">+ Add</button>`}
+        : ev.pushed === 'suggested'
+          ? `<span class="forecast-pushed" style="color:#f59e0b">⏳ Pending</span>`
+          : `<button class="forecast-unpushed" onclick="suggestEventToBudget('${ev.id}')">+ Suggest</button>`}
     </div>`;
   }).join('');
 
   return `<div class="forecast-widget">
     <div class="forecast-header">
       <span class="forecast-header-title">📅 Planned Events — ${aud(totalEvCost)} this month</span>
-      ${unpushed.length > 1 ? `<button class="forecast-push-all" onclick="_pushAllEventsToBudget('${monthStr}')">Add all to budget</button>` : ''}
+      ${unpushed.length > 1 ? `<button class="forecast-push-all" onclick="_pushAllEventsToBudget('${monthStr}')">Suggest all to budget</button>` : ''}
     </div>
     ${rows}
     <div class="forecast-total">
@@ -9302,7 +9404,7 @@ function renderBudgetForecast(monthStr, regularSurplus) {
 function _pushAllEventsToBudget(monthStr) {
   const unpushed = (state.planner?.events || [])
     .filter(e => e.date?.slice(0,7) === monthStr && !e.pushed && (e.estimates||[]).some(x=>x.accepted));
-  unpushed.forEach(ev => pushEventToBudget(ev.id));
+  unpushed.forEach(ev => suggestEventToBudget(ev.id));
   renderBudget();
 }
 
