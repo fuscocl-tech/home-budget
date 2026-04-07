@@ -5121,8 +5121,37 @@ function saveApiKey() {
   const val = document.getElementById('settings-api-key')?.value.trim();
   if (!val) return;
   localStorage.setItem('toto_ai_key', val);
+  localStorage.setItem('toto_ai_key_meta', JSON.stringify({ addedAt: new Date().toISOString(), prefix: val.slice(0, 10), suffix: val.slice(-4) }));
   const status = document.getElementById('api-key-status');
-  if (status) { status.textContent = '✓ Key saved!'; status.style.color = 'var(--success)'; setTimeout(() => { status.textContent = 'Stored only in your browser — never synced to the cloud. Required for event cost estimation and the Toto assistant.'; status.style.color = ''; }, 2000); }
+  if (status) { status.textContent = '✓ Key saved!'; status.style.color = 'var(--success)'; setTimeout(() => { status.textContent = ''; status.style.color = ''; }, 2000); }
+  // Refresh the summary card
+  const card = document.getElementById('api-key-summary');
+  if (card) card.outerHTML = _renderApiKeySummary();
+}
+
+function removeApiKey() {
+  if (!confirm('Remove saved API key? Toto and cost estimation will stop working.')) return;
+  localStorage.removeItem('toto_ai_key');
+  localStorage.removeItem('toto_ai_key_meta');
+  renderSettings();
+}
+
+function _renderApiKeySummary() {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key) return '<div id="api-key-summary"></div>';
+  const meta = JSON.parse(localStorage.getItem('toto_ai_key_meta') || '{}');
+  const added = meta.addedAt ? new Date(meta.addedAt).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' }) : 'Unknown date';
+  const masked = meta.prefix ? `${meta.prefix}${'•'.repeat(20)}${meta.suffix}` : `${key.slice(0,10)}${'•'.repeat(20)}${key.slice(-4)}`;
+  return `
+    <div id="api-key-summary" style="margin-top:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;max-width:480px">
+      <div style="font-size:24px">🔑</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Active Key</div>
+        <div style="font-size:13px;font-family:monospace;color:var(--text);word-break:break-all">${masked}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Added ${added} · Powers Toto chat, event cost estimation &amp; CSV import</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="removeApiKey()" style="color:var(--danger);flex-shrink:0">Remove</button>
+    </div>`;
 }
 
 function clearActivityLog() {
@@ -5227,7 +5256,8 @@ function renderSettings() {
             value="${localStorage.getItem('toto_ai_key')||''}">
           <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
         </div>
-        <p id="api-key-status" style="font-size:12px;color:var(--text-muted);margin-top:6px">Stored only in your browser — never synced to the cloud. Required for event cost estimation and the Toto assistant.</p>
+        <p id="api-key-status" style="font-size:12px;color:var(--text-muted);margin-top:6px"></p>
+        ${_renderApiKeySummary()}
       </div>
     </div>
 
