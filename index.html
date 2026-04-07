@@ -5117,6 +5117,14 @@ function updateSetting(key, value) {
   saveData(state);
 }
 
+function saveApiKey() {
+  const val = document.getElementById('settings-api-key')?.value.trim();
+  if (!val) return;
+  localStorage.setItem('toto_ai_key', val);
+  const status = document.getElementById('api-key-status');
+  if (status) { status.textContent = '✓ Key saved!'; status.style.color = 'var(--success)'; setTimeout(() => { status.textContent = 'Stored only in your browser — never synced to the cloud. Required for event cost estimation and the Toto assistant.'; status.style.color = ''; }, 2000); }
+}
+
 function clearActivityLog() {
   if (!confirm('Clear the entire activity log? This cannot be undone.')) return;
   state.activityLog = [];
@@ -5213,11 +5221,13 @@ function renderSettings() {
       </div>
       <div class="section-body">
         <div style="margin-bottom:8px;font-size:13px;font-weight:600">Anthropic API Key</div>
-        <input type="password" class="form-input" style="width:100%;max-width:480px"
-          placeholder="sk-ant-api03-..."
-          value="${localStorage.getItem('toto_ai_key')||''}"
-          oninput="localStorage.setItem('toto_ai_key', this.value)">
-        <p style="font-size:12px;color:var(--text-muted);margin-top:6px">Stored only in your browser — never synced to the cloud. Required for event cost estimation and the Toto assistant.</p>
+        <div style="display:flex;gap:8px;align-items:center;max-width:480px">
+          <input type="password" class="form-input" id="settings-api-key" style="flex:1"
+            placeholder="sk-ant-api03-..."
+            value="${localStorage.getItem('toto_ai_key')||''}">
+          <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
+        </div>
+        <p id="api-key-status" style="font-size:12px;color:var(--text-muted);margin-top:6px">Stored only in your browser — never synced to the cloud. Required for event cost estimation and the Toto assistant.</p>
       </div>
     </div>
 
