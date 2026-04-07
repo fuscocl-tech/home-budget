@@ -985,6 +985,30 @@
 
     .dp-clear-btn:hover { color: var(--danger); background: var(--danger-light); }
 
+    /* ─── Settings Accordion ─────────────────── */
+    .sacc-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      background: var(--surface);
+    }
+    .sacc-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+      gap: 12px;
+      transition: background 0.15s;
+    }
+    .sacc-hdr:hover { background: var(--surface2); }
+    .sacc-title { font-size: 14px; font-weight: 700; }
+    .sacc-sub   { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .sacc-chev  { color: var(--text-muted); font-size: 12px; flex-shrink: 0; transition: transform 0.2s; }
+    .sacc-body  { border-top: 1px solid var(--border); }
+
     /* ─── Settings / Color Swatches ──────────── */
     .color-grid {
       display: grid;
@@ -2190,6 +2214,7 @@ function doScopeAll() {
 let state = loadData();
 let selectedBudgetMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
 let budgetViewMode = 'grouped'; // 'grouped' | 'table'
+let _settingsOpen = new Set(['ai']); // accordion open sections
 
 // ─── Mini date picker ─────────────────────────────
 let dpViewYear = new Date().getFullYear();
@@ -5154,6 +5179,16 @@ function _renderApiKeySummary() {
     </div>`;
 }
 
+function toggleSettingsSection(key) {
+  const body = document.getElementById(`sacc-body-${key}`);
+  const chev = document.getElementById(`sacc-chev-${key}`);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.textContent = isOpen ? '▼' : '▲';
+  if (isOpen) _settingsOpen.delete(key); else _settingsOpen.add(key);
+}
+
 function clearActivityLog() {
   if (!confirm('Clear the entire activity log? This cannot be undone.')) return;
   state.activityLog = [];
@@ -5240,14 +5275,30 @@ function renderSettings() {
     return actionColors[word] || '#94a3b8';
   }
 
-  let html = `
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">🤖 AI Assistant (Toto)</div>
-          <div class="section-subtitle">Powers cost estimation, Toto chat, and CSV import analysis</div>
+  function acc(key, title, subtitle, bodyHtml, headerExtra) {
+    const isOpen = _settingsOpen.has(key);
+    return `
+      <div class="sacc-item">
+        <div class="sacc-hdr" onclick="toggleSettingsSection('${key}')">
+          <div style="flex:1;min-width:0">
+            <div class="sacc-title">${title}</div>
+            ${subtitle ? `<div class="sacc-sub">${subtitle}</div>` : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+            ${headerExtra || ''}
+            <span class="sacc-chev" id="sacc-chev-${key}">${isOpen ? '▲' : '▼'}</span>
+          </div>
         </div>
-      </div>
+        <div class="sacc-body" id="sacc-body-${key}" style="display:${isOpen ? 'block' : 'none'}">
+          ${bodyHtml}
+        </div>
+      </div>`;
+  }
+
+  const petIcons = { dog:'🐕', cat:'🐈', bird:'🐦' };
+
+  let html =
+    acc('ai', '🤖 AI Assistant (Toto)', 'Powers cost estimation, Toto chat, and CSV import analysis', `
       <div class="section-body">
         <div style="margin-bottom:8px;font-size:13px;font-weight:600">Anthropic API Key</div>
         <div style="display:flex;gap:8px;align-items:center;max-width:480px">
@@ -5258,16 +5309,9 @@ function renderSettings() {
         </div>
         <p id="api-key-status" style="font-size:12px;color:var(--text-muted);margin-top:6px"></p>
         ${_renderApiKeySummary()}
-      </div>
-    </div>
+      </div>`) +
 
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Budget Preferences</div>
-          <div class="section-subtitle">Controls how month-to-month budget data is managed</div>
-        </div>
-      </div>
+    acc('prefs', 'Budget Preferences', 'Controls how month-to-month budget data is managed', `
       <div class="section-body">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none">
           <input type="checkbox" id="pref-autofill" ${(state.settings||{}).autoFillMonths ? 'checked' : ''}
@@ -5278,20 +5322,12 @@ function renderSettings() {
             <p style="font-size:12px;color:var(--text-muted);margin-top:3px">When you navigate forward to a month with no data, automatically copy all recurring items from the previous month.</p>
           </div>
         </label>
-      </div>
-    </div>
+      </div>`) +
 
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Activity Log</div>
-          <div class="section-subtitle">${log.length} recorded action${log.length !== 1 ? 's' : ''} — synced across all devices</div>
-        </div>
-        ${log.length > 0 ? `<button class="btn btn-ghost btn-sm" onclick="clearActivityLog()" style="color:var(--danger)">Clear log</button>` : ''}
-      </div>
+    acc('log', 'Activity Log', `${log.length} recorded action${log.length !== 1 ? 's' : ''} — synced across all devices`, `
       ${log.length === 0
-        ? `<div style="padding:24px 20px;text-align:center;color:var(--text-muted);font-size:13px">No activity recorded yet. Changes you and your wife make will appear here.</div>`
-        : `<div style="max-height:480px;overflow-y:auto">
+        ? `<div style="padding:24px 20px;text-align:center;color:var(--text-muted);font-size:13px">No activity recorded yet. Changes you and your family make will appear here.</div>`
+        : `<div style="max-height:400px;overflow-y:auto">
             ${log.slice(0, 100).map(entry => `
               <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border)">
                 ${avatarHtml(entry)}
@@ -5303,48 +5339,32 @@ function renderSettings() {
                   </div>
                   <div style="font-size:11px;color:var(--text-muted)">${fmtLogTime(entry.ts)}</div>
                 </div>
-              </div>
-            `).join('')}
-          </div>`}
-    </div>
+              </div>`).join('')}
+          </div>`}`,
+      log.length > 0 ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();clearActivityLog()" style="color:var(--danger)">Clear log</button>` : '') +
 
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Data &amp; Recovery</div>
-          <div class="section-subtitle">${dataStatus}</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
+    acc('data', 'Data &amp; Recovery', dataStatus, `
+      <div class="section-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
           <button class="btn btn-secondary btn-sm" onclick="exportData()">Export JSON backup</button>
           <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">Import JSON backup</button>
           <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
         </div>
-      </div>
-      ${rawData ? `<div class="section-body" style="padding-top:0">
-        <button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">Show raw localStorage data</button>
-        <pre style="display:none;margin-top:8px;background:var(--surface2);padding:12px;border-radius:8px;font-size:11px;overflow:auto;max-height:200px;white-space:pre-wrap;word-break:break-all">${rawData.replace(/</g,'&lt;')}</pre>
-      </div>` : ''}
-    </div>
+        ${rawData ? `<button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">Show raw localStorage data</button>
+          <pre style="display:none;margin-top:8px;background:var(--surface2);padding:12px;border-radius:8px;font-size:11px;overflow:auto;max-height:200px;white-space:pre-wrap;word-break:break-all">${rawData.replace(/</g,'&lt;')}</pre>` : ''}
+      </div>`) +
 
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Household Profile</div>
-          <div class="section-subtitle">Used to calculate budget benchmarks in the Insights page</div>
-        </div>
-      </div>
-
-      <!-- Members -->
+    acc('household', 'Household Profile', 'Used to calculate budget benchmarks in the Insights page', `
       <div class="section-body">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-weight:600;font-size:13px;color:var(--text)">Household Members</span>
+          <span style="font-weight:600;font-size:13px">Household Members</span>
           <div style="display:flex;gap:6px">
             <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('adult')">+ Adult</button>
             <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('child')">+ Child</button>
           </div>
         </div>
         ${(state.householdProfile.members||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No members added yet.</p>` : ''}
-        <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
           ${(state.householdProfile.members||[]).map((m,i) => `
           <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
             <span style="font-size:20px;width:28px;text-align:center">${m.role === 'child' ? '👶' : '🧑'}</span>
@@ -5361,12 +5381,8 @@ function renderSettings() {
             <button onclick="removeHouseholdMember(${i})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--danger);font-size:20px;line-height:1;padding:0 4px;opacity:0.7" title="Remove">&times;</button>
           </div>`).join('')}
         </div>
-      </div>
-
-      <!-- Pets -->
-      <div class="section-body" style="border-top:1px solid var(--border)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-weight:600;font-size:13px;color:var(--text)">Pets</span>
+          <span style="font-weight:600;font-size:13px">Pets</span>
           <div style="display:flex;gap:6px">
             <button class="btn btn-ghost btn-sm" onclick="addPet('dog')">+ Dog</button>
             <button class="btn btn-ghost btn-sm" onclick="addPet('cat')">+ Cat</button>
@@ -5374,9 +5390,9 @@ function renderSettings() {
           </div>
         </div>
         ${(state.householdProfile.pets||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No pets added.</p>` : ''}
-        <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
           ${(state.householdProfile.pets||[]).map((p,i) => {
-            const petIcon = p.type==='dog' ? '🐕' : p.type==='cat' ? '🐈' : p.type==='bird' ? '🐦' : '🐾';
+            const petIcon = petIcons[p.type] || '🐾';
             return `
           <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
             <span style="font-size:20px;width:28px;text-align:center">${petIcon}</span>
@@ -5390,14 +5406,7 @@ function renderSettings() {
               value="${(p.name||'').replace(/"/g,'&quot;')}"
               oninput="updatePet(${i},'name',this.value)">
             <button onclick="removePet(${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:20px;line-height:1;padding:0 4px;opacity:0.7" title="Remove">&times;</button>
-          </div>`;}).join('')}
-        </div>
-      </div>
-
-      <!-- Cars -->
-      <div class="section-body" style="border-top:1px solid var(--border)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-weight:600;font-size:13px;color:var(--text)">Cars / Vehicles</span>
+          </div>`; }).join('')}
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:20px">🚗</span>
@@ -5405,18 +5414,12 @@ function renderSettings() {
             value="${state.householdProfile.cars||0}" onchange="updateCars(parseInt(this.value)||0)">
           <span style="color:var(--text-muted);font-size:13px">vehicle(s) registered to this household</span>
         </div>
-      </div>
-    </div>
+      </div>`) +
 
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Expense Categories</div>
-          <div class="section-subtitle">Manage the categories available in expense dropdowns</div>
-        </div>
-      </div>
+    acc('cats', 'Expense &amp; Income Categories', 'Manage categories available in dropdowns', `
       <div class="section-body">
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px">Expense Categories</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
           ${expenseCategories().map(cat => `
             <span style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 10px 5px 12px;font-size:13px">
               <span style="width:10px;height:10px;border-radius:50%;background:${colors.expense[cat] || '#94a3b8'};flex-shrink:0"></span>
@@ -5424,22 +5427,12 @@ function renderSettings() {
               <button onclick="removeCategory('expense','${cat.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:16px;line-height:1;padding:0 2px" title="Remove">&times;</button>
             </span>`).join('')}
         </div>
-        <div style="display:flex;gap:8px;max-width:420px">
-          <input id="new-cat-expense" type="text" class="form-input" placeholder="New category name…" onkeydown="if(event.key==='Enter')addCategory('expense')" style="flex:1">
+        <div style="display:flex;gap:8px;max-width:420px;margin-bottom:24px">
+          <input id="new-cat-expense" type="text" class="form-input" placeholder="New expense category…" onkeydown="if(event.key==='Enter')addCategory('expense')" style="flex:1">
           <button class="btn btn-primary btn-sm" onclick="addCategory('expense')">Add</button>
         </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Income Categories</div>
-          <div class="section-subtitle">Manage the categories available in income dropdowns</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px">Income Categories</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
           ${incomeCategories().map(cat => `
             <span style="display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 10px 5px 12px;font-size:13px">
               ${cat}
@@ -5447,26 +5440,14 @@ function renderSettings() {
             </span>`).join('')}
         </div>
         <div style="display:flex;gap:8px;max-width:420px">
-          <input id="new-cat-income" type="text" class="form-input" placeholder="New category name…" onkeydown="if(event.key==='Enter')addCategory('income')" style="flex:1">
+          <input id="new-cat-income" type="text" class="form-input" placeholder="New income category…" onkeydown="if(event.key==='Enter')addCategory('income')" style="flex:1">
           <button class="btn btn-primary btn-sm" onclick="addCategory('income')">Add</button>
         </div>
-      </div>
-    </div>
+      </div>`) +
 
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Expense Category Groups</div>
-          <div class="section-subtitle">Group categories together for the grouped budget view. Categories can only belong to one group.</div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="openAddCategoryGroup()">+ Group</button>
-      </div>
+    acc('groups', 'Expense Category Groups', 'Group categories for the grouped budget view', `
       <div class="section-body">
-        ${(state.categoryGroups||[]).map(g => {
-          const allExpCats = expenseCategories();
-          const assignedElsewhere = new Set((state.categoryGroups||[]).filter(x=>x.id!==g.id).flatMap(x=>x.categories));
-          const available = allExpCats.filter(c => !g.categories.includes(c) && !assignedElsewhere.has(c));
-          return `
+        ${(state.categoryGroups||[]).map(g => `
           <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
               <button id="grp-icon-btn-${g.id}" type="button" onclick="openIconPickerForGroup(${g.id})" style="width:52px;height:40px;font-size:22px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer" title="Choose icon">${g.icon}</button>
@@ -5483,57 +5464,30 @@ function renderSettings() {
               ${g.categories.length === 0 ? `<span style="font-size:13px;color:var(--text-muted);font-style:italic">No categories assigned</span>` : ''}
             </div>
             <button class="btn btn-ghost btn-sm" onclick="openAddCatToGroup(${g.id})" style="font-size:12px">+ Add Category</button>
-          </div>`;
-        }).join('')}
-        ${(state.categoryGroups||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No groups yet. Click "+ Group" to create one.</p>` : ''}
-      </div>
-    </div>
+          </div>`).join('')}
+        ${(state.categoryGroups||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No groups yet.</p>` : ''}
+      </div>`,
+      `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAddCategoryGroup()">+ Group</button>`) +
 
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Monthly Budget — Expense Category Colours</div>
-          <div class="section-subtitle">Colour shown as a left-border stripe on each expense row</div>
-        </div>
-      </div>
+    acc('colours', 'Colours', 'Customise category and section colour accents', `
       <div class="section-body">
-        <div class="color-grid">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px">Expense Category Colours</div>
+        <div class="color-grid" style="margin-bottom:24px">
           ${expenseCategories().map(cat => swatch('expense', cat, cat, colors.expense[cat] || DEFAULT_COLORS.expense[cat] || '#94a3b8')).join('')}
         </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Monthly Budget — Income</div>
-          <div class="section-subtitle">Colour applied to all income rows</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div class="color-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 220px))">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px">Income Colour</div>
+        <div class="color-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,220px));margin-bottom:24px">
           ${swatch('income', 'income', 'Income', colors.income)}
         </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Build Costs — Sections</div>
-          <div class="section-subtitle">Colour shown as a left-border accent on each build cost section</div>
-        </div>
-      </div>
-      <div class="section-body">
-        <div class="color-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 220px))">
+        <div style="font-weight:600;font-size:13px;margin-bottom:10px">Build Cost Colours</div>
+        <div class="color-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,220px))">
           ${swatch('build', 'contract',   'Fixed Price Contract',  colors.build.contract)}
           ${swatch('build', 'extras',     'Outside Contract',      colors.build.extras)}
           ${swatch('build', 'furniture',  'Furniture',             colors.build.furniture)}
           ${swatch('build', 'appliances', 'Appliances',            colors.build.appliances)}
         </div>
-      </div>
-    </div>
-  `;
+      </div>`) +
+  '';
 
   document.getElementById('settings-content').innerHTML = html;
 }
