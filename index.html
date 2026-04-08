@@ -1654,14 +1654,11 @@
         <div class="nav-item" data-tab="budget" title="Monthly Budget">
           <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l5 3"/></svg>
         </div>
-        <div class="nav-item" data-tab="bills" title="Bills">
+        <div class="nav-item" data-tab="bills" title="Bills &amp; Subscriptions">
           <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="18"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="16" y1="14" x2="16" y2="18"/></svg>
         </div>
         <div class="nav-item" data-tab="networth" title="Net Worth">
           <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><polyline points="2 20 22 20"/></svg>
-        </div>
-        <div class="nav-item" data-tab="subscriptions" title="Subscriptions">
-          <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         </div>
       </div>
 
@@ -1716,9 +1713,8 @@
       <div class="text-nav-group-children" id="text-group-budget-children">
         <div class="nav-text-item" data-tab="money">Money</div>
         <div class="nav-text-item" data-tab="budget">Monthly Budget</div>
-        <div class="nav-text-item" data-tab="bills">Bills</div>
+        <div class="nav-text-item" data-tab="bills">Bills &amp; Subscriptions</div>
         <div class="nav-text-item" data-tab="networth">Net Worth</div>
-        <div class="nav-text-item" data-tab="subscriptions">Subscriptions</div>
       </div>
 
       <div class="nav-text-item" data-tab="build">Build Costs</div>
@@ -1870,7 +1866,7 @@ function toggleSidebar() {
 }
 
 const NAV_GROUPS = {
-  budget: ['money','budget','bills','networth','subscriptions']
+  budget: ['money','budget','bills','networth']
 };
 
 function toggleNavGroup(name) {
@@ -2215,6 +2211,7 @@ let state = loadData();
 let selectedBudgetMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
 let budgetViewMode = 'grouped'; // 'grouped' | 'table'
 let _settingsOpen = new Set(['ai']); // accordion open sections
+let _billsSubsFilter = 'all'; // 'all' | 'bills' | 'subs'
 
 // ─── Mini date picker ─────────────────────────────
 let dpViewYear = new Date().getFullYear();
@@ -2500,6 +2497,7 @@ function isOverdue(dueDate) {
 // ─────────────────────────────────────────────────
 
 function activateTab(tab) {
+  if (tab === 'subscriptions') tab = 'bills';
   document.querySelectorAll('.nav-item, .nav-text-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll(`[data-tab="${tab}"]`).forEach(n => n.classList.add('active'));
@@ -6947,7 +6945,6 @@ function renderAll() {
   safeRender(renderKids);
   safeRender(renderNetWorth);
   safeRender(renderBills);
-  safeRender(renderSubscriptions);
   safeRender(renderPlanner);
 }
 
@@ -8247,129 +8244,206 @@ function renderBills() {
   const el = document.getElementById('bills-content');
   if (!el) return;
   const bills = state.bills || [];
+  const subs  = state.subscriptions || [];
+  const filter = _billsSubsFilter;
 
-  if (!bills.length) {
-    el.innerHTML = `
-      <div style="text-align:center;padding:80px 20px">
-        <div style="font-size:52px;margin-bottom:16px">📅</div>
-        <div style="font-size:18px;font-weight:700;margin-bottom:8px">No bills yet</div>
-        <div style="font-size:14px;color:#64748b;margin-bottom:24px">Add your recurring bills to stay on top of what's coming up.</div>
-        <button class="btn-primary" onclick="openBillModal()">+ Add first bill</button>
-      </div>
-      ${billsModal()}`;
-    return;
-  }
+  const EDIT_SVG   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+  const DELETE_SVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
 
+  // ── Stats ──────────────────────────────────────
+  const billsMonthly = bills.reduce((s,b) => s + billMonthlyEquiv(b), 0);
+  const subsMonthly  = subs.reduce((s,sub) => s + subMonthlyAmount(sub), 0);
+  const totalMonthly = billsMonthly + subsMonthly;
+  const overdueCount = bills.filter(b => billDaysUntil(b) < 0).length;
+  const dueSoonCount = bills.filter(b => { const d = billDaysUntil(b); return d >= 0 && d <= 7; }).length;
+
+  // ── 14-day strip (bills only) ──────────────────
   const today = new Date(); today.setHours(0,0,0,0);
-  const sorted = [...bills].sort((a,b) => billDaysUntil(a) - billDaysUntil(b));
-
-  // Summary stats
-  const monthlyTotal  = bills.reduce((s,b) => s + billMonthlyEquiv(b), 0);
-  const overdueCount  = bills.filter(b => billDaysUntil(b) < 0).length;
-  const dueSoonCount  = bills.filter(b => { const d = billDaysUntil(b); return d >= 0 && d <= 7; }).length;
-  const thisMonthTotal = bills.reduce((s,b) => {
-    const d = billDaysUntil(b);
-    return d >= 0 && d <= 31 ? s + (parseFloat(b.amount)||0) : s;
-  }, 0);
-
-  // 14-day strip
-  const stripDays = [];
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(today); d.setDate(d.getDate() + i);
-    const dayBills = bills.filter(b => {
-      const nd = billNextDue(b);
-      return nd.toDateString() === d.toDateString();
-    });
-    stripDays.push({ date: d, bills: dayBills });
-  }
-
   const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const strip = stripDays.map(({ date, bills: db }) => {
-    const isToday   = date.toDateString() === today.toDateString();
-    const hasBill   = db.length > 0;
-    const cls = [isToday && 'today', hasBill && 'has-bill'].filter(Boolean).join(' ');
-    const tip = db.map(b => b.name).join(', ');
-    return `<div class="bills-day" title="${tip}">
-      <div class="bills-day-label">${DAY_NAMES[date.getDay()]}</div>
-      <div class="bills-day-num ${cls}">${date.getDate()}</div>
-      ${hasBill ? `<div class="bills-day-dot"></div>` : '<div style="height:5px"></div>'}
+  const strip = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(today); d.setDate(d.getDate() + i);
+    const db = bills.filter(b => billNextDue(b).toDateString() === d.toDateString());
+    const isToday = d.toDateString() === today.toDateString();
+    const cls = [isToday && 'today', db.length && 'has-bill'].filter(Boolean).join(' ');
+    return `<div class="bills-day" title="${db.map(b=>b.name).join(', ')}">
+      <div class="bills-day-label">${DAY_NAMES[d.getDay()]}</div>
+      <div class="bills-day-num ${cls}">${d.getDate()}</div>
+      ${db.length ? `<div class="bills-day-dot"></div>` : '<div style="height:5px"></div>'}
     </div>`;
   }).join('');
 
-  // Grouped upcoming list
+  // ── Bill rows ──────────────────────────────────
+  function billRow(b) {
+    const days = billDaysUntil(b);
+    const rowCls = days < 0 ? 'overdue' : days <= 7 ? 'due-soon' : '';
+    const freqLabel = (b.frequency||'Monthly') !== 'Monthly' ? ` · ${b.frequency}` : '';
+    return `<div class="bill-row ${rowCls}">
+      <div class="bill-icon">${billCatIcon(b.category)}</div>
+      <div class="bill-info">
+        <div class="bill-name">${b.name}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#fef3c7;color:#92400e;margin-left:6px">BILL</span></div>
+        <div class="bill-meta">${b.category||''}${freqLabel}${b.autopay?' · Autopay ✓':''}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="bill-amount">$${(parseFloat(b.amount)||0).toLocaleString()}</div>
+        ${billDueBadge(days)}
+      </div>
+      ${days >= 0 ? `<button class="bill-paid-btn" onclick="markBillPaid('${b.id}')">✓ Paid</button>` : ''}
+      <div class="bill-actions">
+        <button class="icon-btn" title="Edit" onclick="openBillModal('${b.id}')">${EDIT_SVG}</button>
+        <button class="icon-btn" style="color:#ef4444" title="Delete" onclick="deleteBill('${b.id}')">${DELETE_SVG}</button>
+      </div>
+    </div>`;
+  }
+
+  // ── Subscription rows ──────────────────────────
+  function subRow(sub) {
+    const monthly = subMonthlyAmount(sub);
+    const freqAmt = sub.frequency === 'Annual' ? `$${parseFloat(sub.amount).toLocaleString()}/yr`
+                  : sub.frequency === 'Weekly'  ? `$${parseFloat(sub.amount).toFixed(2)}/wk`
+                  :                               `$${parseFloat(sub.amount).toFixed(2)}/mo`;
+    const renewal = sub.renewalDate ? ` · Renews ${sub.renewalDate}` : '';
+    return `<div class="bill-row">
+      <div class="bill-icon">${subCatIcon(sub.category)}</div>
+      <div class="bill-info">
+        <div class="bill-name">${sub.name}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#ede9fe;color:#5b21b6;margin-left:6px">SUB</span></div>
+        <div class="bill-meta">${sub.category||'Other'} · ${freqAmt}${renewal}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="bill-amount">$${monthly.toFixed(2)}<span style="font-size:11px;font-weight:400;color:#94a3b8">/mo</span></div>
+      </div>
+      <div class="bill-actions">
+        <button class="icon-btn" title="Edit" onclick="openSubModal('${sub.id}')">${EDIT_SVG}</button>
+        <button class="icon-btn" style="color:#ef4444" title="Delete" onclick="deleteSub('${sub.id}')">${DELETE_SVG}</button>
+      </div>
+    </div>`;
+  }
+
+  // ── Grouped bill sections ──────────────────────
+  const sorted    = [...bills].sort((a,b) => billDaysUntil(a) - billDaysUntil(b));
   const overdue   = sorted.filter(b => billDaysUntil(b) < 0);
-  const thisWeek  = sorted.filter(b => { const d = billDaysUntil(b); return d >= 0 && d <= 7; });
-  const thisMonth = sorted.filter(b => { const d = billDaysUntil(b); return d > 7 && d <= 31; });
+  const thisWeek  = sorted.filter(b => { const d=billDaysUntil(b); return d>=0&&d<=7; });
+  const thisMonth = sorted.filter(b => { const d=billDaysUntil(b); return d>7&&d<=31; });
   const later     = sorted.filter(b => billDaysUntil(b) > 31);
 
-  function billRows(list) {
-    return list.map(b => {
-      const days  = billDaysUntil(b);
-      const next  = billNextDue(b);
-      const rowCls = days < 0 ? 'overdue' : days <= 7 ? 'due-soon' : '';
-      const freqLabel = (b.frequency||'Monthly') !== 'Monthly' ? ` · ${b.frequency}` : '';
-      return `<div class="bill-row ${rowCls}">
-        <div class="bill-icon">${billCatIcon(b.category)}</div>
-        <div class="bill-info">
-          <div class="bill-name">${b.name}</div>
-          <div class="bill-meta">${b.category||''}${freqLabel}${b.autopay?' · Autopay ✓':''}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <div class="bill-amount">$${(parseFloat(b.amount)||0).toLocaleString()}</div>
-          ${billDueBadge(days)}
-        </div>
-        ${days >= 0 ? `<button class="bill-paid-btn" onclick="markBillPaid('${b.id}')">✓ Paid</button>` : ''}
-        <div class="bill-actions">
-          <button class="icon-btn" title="Edit" onclick="openBillModal('${b.id}')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="icon-btn" style="color:#ef4444" title="Delete" onclick="deleteBill('${b.id}')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
-        </div>
-      </div>`;
-    }).join('');
-  }
+  const showBills = filter === 'all' || filter === 'bills';
+  const showSubs  = filter === 'all' || filter === 'subs';
+
+  const pendingImport = _subImportResults.filter(r => !_subImportDismissed.has(r._key));
 
   el.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-      <div></div>
-      <button class="btn-primary" onclick="openBillModal()">+ Add bill</button>
+      <div style="display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px">
+        <button onclick="setBillsFilter('all')" style="padding:5px 14px;font-size:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;background:${filter==='all'?'var(--primary)':'transparent'};color:${filter==='all'?'#fff':'var(--text-muted)'}">All (${bills.length+subs.length})</button>
+        <button onclick="setBillsFilter('bills')" style="padding:5px 14px;font-size:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;background:${filter==='bills'?'var(--primary)':'transparent'};color:${filter==='bills'?'#fff':'var(--text-muted)'}">Bills (${bills.length})</button>
+        <button onclick="setBillsFilter('subs')" style="padding:5px 14px;font-size:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;background:${filter==='subs'?'var(--primary)':'transparent'};color:${filter==='subs'?'#fff':'var(--text-muted)'}">Subscriptions (${subs.length})</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="openSubModal()">+ Subscription</button>
+        <button class="btn btn-primary btn-sm" onclick="openBillModal()">+ Bill</button>
+      </div>
     </div>
 
     <div class="bills-summary">
       <div class="bills-stat">
-        <div class="bills-stat-val">$${Math.round(monthlyTotal).toLocaleString()}</div>
+        <div class="bills-stat-val">$${Math.round(totalMonthly).toLocaleString()}</div>
         <div class="bills-stat-lbl">Monthly total</div>
       </div>
       <div class="bills-stat">
-        <div class="bills-stat-val">$${Math.round(monthlyTotal * 12).toLocaleString()}</div>
+        <div class="bills-stat-val">$${Math.round(totalMonthly*12).toLocaleString()}</div>
         <div class="bills-stat-lbl">Annual total</div>
       </div>
       <div class="bills-stat">
-        <div class="bills-stat-val ${dueSoonCount > 0 ? 'warn' : 'ok'}">${dueSoonCount}</div>
+        <div class="bills-stat-val ${dueSoonCount>0?'warn':'ok'}">${dueSoonCount}</div>
         <div class="bills-stat-lbl">Due this week</div>
       </div>
       <div class="bills-stat">
-        <div class="bills-stat-val ${overdueCount > 0 ? 'danger' : 'ok'}">${overdueCount}</div>
+        <div class="bills-stat-val ${overdueCount>0?'danger':'ok'}">${overdueCount}</div>
         <div class="bills-stat-lbl">Overdue</div>
       </div>
     </div>
 
+    ${bills.length && showBills ? `
     <div class="bills-timeline">
       <div class="bills-timeline-title">Next 14 days</div>
       <div class="bills-strip">${strip}</div>
-    </div>
+    </div>` : ''}
+
+    ${pendingImport.length ? renderSubImportResults(pendingImport) : ''}
 
     <div class="bills-upcoming">
-      ${overdue.length   ? `<div class="bills-upcoming-group">⚠ Overdue</div>${billRows(overdue)}` : ''}
-      ${thisWeek.length  ? `<div class="bills-upcoming-group">This week</div>${billRows(thisWeek)}` : ''}
-      ${thisMonth.length ? `<div class="bills-upcoming-group">This month</div>${billRows(thisMonth)}` : ''}
-      ${later.length     ? `<div class="bills-upcoming-group">Later</div>${billRows(later)}` : ''}
+      ${showBills ? `
+        ${overdue.length   ? `<div class="bills-upcoming-group">⚠ Overdue</div>${overdue.map(billRow).join('')}` : ''}
+        ${thisWeek.length  ? `<div class="bills-upcoming-group">This week</div>${thisWeek.map(billRow).join('')}` : ''}
+        ${thisMonth.length ? `<div class="bills-upcoming-group">This month</div>${thisMonth.map(billRow).join('')}` : ''}
+        ${later.length     ? `<div class="bills-upcoming-group">Later</div>${later.map(billRow).join('')}` : ''}
+        ${!bills.length    ? `<div style="padding:20px 0;color:var(--text-muted);font-size:13px">No bills yet — click <strong>+ Bill</strong> to add one.</div>` : ''}
+      ` : ''}
+      ${showSubs ? `
+        ${subs.length ? `<div class="bills-upcoming-group">Subscriptions</div>${subs.map(subRow).join('')}` : `<div style="padding:20px 0;color:var(--text-muted);font-size:13px">No subscriptions yet — click <strong>+ Subscription</strong> to add one.</div>`}
+      ` : ''}
     </div>
 
-    ${billsModal()}`;
+    <!-- Smart Import -->
+    <details style="margin-top:24px;background:linear-gradient(135deg,#0f172a,#1e3a5f);border-radius:12px;padding:16px 20px;color:#fff">
+      <summary style="cursor:pointer;font-size:13px;font-weight:700;list-style:none;display:flex;align-items:center;gap:8px">🤖 Smart Import — find subscriptions from bank CSV</summary>
+      <div style="margin-top:14px">
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px">Upload a bank statement CSV and AI will find subscriptions and bills you haven't tracked yet.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="text" class="sub-api-input" id="sub-api-key" placeholder="Anthropic API key"
+            value="${localStorage.getItem('toto_ai_key')||''}"
+            oninput="localStorage.setItem('toto_ai_key', this.value)" style="flex:1;min-width:200px">
+          <label class="sub-upload-btn" for="sub-csv-input">📎 Upload CSV</label>
+          <input type="file" id="sub-csv-input" accept=".csv,.txt" style="display:none" onchange="handleSubCSV(event)">
+        </div>
+        <div id="sub-import-status" style="margin-top:10px;font-size:13px;color:rgba(255,255,255,0.7);display:none"></div>
+      </div>
+    </details>
+
+    ${billsModal()}
+    <div id="sub-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <h3 id="sub-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px">Add Subscription</h3>
+        <input type="hidden" id="sub-edit-id">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
+            <input id="sub-name" type="text" placeholder="e.g. Netflix, Spotify" class="form-input" style="width:100%">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Category</label>
+              <select id="sub-cat" class="form-select" style="width:100%">
+                ${SUB_CATS.map(c => `<option value="${c.label}">${c.icon} ${c.label}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Frequency</label>
+              <select id="sub-freq" class="form-select" style="width:100%">
+                <option>Monthly</option><option>Annual</option><option>Weekly</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Amount ($)</label>
+              <input id="sub-amount" type="number" min="0" step="0.01" placeholder="0.00" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Renewal date</label>
+              <input id="sub-renewal" type="date" class="form-input" style="width:100%">
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+          <button class="btn btn-ghost" onclick="closeSubModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveSub()">Save</button>
+        </div>
+      </div>
+    </div>`;
 }
+
+function setBillsFilter(f) { _billsSubsFilter = f; renderBills(); }
+function renderSubscriptions() { renderBills(); }
 
 function billsModal(id) {
   const bill = id ? (state.bills||[]).find(b => b.id === id) : null;
@@ -8523,134 +8597,6 @@ function subMonthlyAmount(sub) {
 let _subImportResults = [];
 let _subImportDismissed = new Set();
 
-function renderSubscriptions() {
-  const el = document.getElementById('subscriptions-content');
-  if (!el) return;
-  const subs = state.subscriptions || [];
-
-  const totalMonthly = subs.reduce((s, sub) => s + subMonthlyAmount(sub), 0);
-  const totalAnnual  = totalMonthly * 12;
-
-  const grouped = {};
-  subs.forEach(sub => {
-    const cat = sub.category || 'Other';
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(sub);
-  });
-
-  const subRows = Object.entries(grouped).map(([cat, items]) => `
-    <div class="sub-cat-header">${subCatIcon(cat)} ${cat}</div>
-    ${items.map(sub => {
-      const monthly = subMonthlyAmount(sub);
-      const freqLabel = sub.frequency === 'Annual' ? `$${parseFloat(sub.amount).toLocaleString()}/yr` :
-                        sub.frequency === 'Weekly'  ? `$${parseFloat(sub.amount).toFixed(2)}/wk` :
-                                                      `$${parseFloat(sub.amount).toFixed(2)}/mo`;
-      return `<div class="sub-row">
-        <div class="sub-row-icon" style="background:${sub.color||'linear-gradient(135deg,#667eea,#764ba2)'}">${subCatIcon(sub.category)}</div>
-        <div class="sub-row-info">
-          <div class="sub-row-name">${sub.name}</div>
-          <div class="sub-row-meta">${sub.category||'Other'} · ${freqLabel}${sub.renewalDate ? ' · Renews ' + sub.renewalDate : ''}</div>
-        </div>
-        <div class="sub-row-amount">$${monthly.toFixed(2)}<span style="font-size:11px;font-weight:400;color:#94a3b8">/mo</span></div>
-        <div class="sub-row-actions">
-          <button class="icon-btn" title="Edit" onclick="openSubModal('${sub.id}')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="icon-btn" style="color:#ef4444" title="Delete" onclick="deleteSub('${sub.id}')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
-        </div>
-      </div>`;
-    }).join('')}`).join('');
-
-  const pendingResults = _subImportResults.filter(r => !_subImportDismissed.has(r._key));
-
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-      <div></div>
-      <button class="btn-primary" onclick="openSubModal()">+ Add subscription</button>
-    </div>
-
-    <div class="sub-summary">
-      <div class="sub-stat">
-        <div class="sub-stat-val">$${Math.round(totalMonthly).toLocaleString()}</div>
-        <div class="sub-stat-lbl">Monthly total</div>
-      </div>
-      <div class="sub-stat">
-        <div class="sub-stat-val">$${Math.round(totalAnnual).toLocaleString()}</div>
-        <div class="sub-stat-lbl">Annual total</div>
-      </div>
-      <div class="sub-stat">
-        <div class="sub-stat-val">${subs.length}</div>
-        <div class="sub-stat-lbl">Active subscriptions</div>
-      </div>
-    </div>
-
-    <!-- Smart Import -->
-    <div class="sub-import-card">
-      <div class="sub-import-title">🤖 Smart Import</div>
-      <div class="sub-import-desc">Upload a bank statement CSV and AI will find subscriptions and bills you haven't tracked yet.</div>
-      <div class="sub-import-row">
-        <input type="text" class="sub-api-input" id="sub-api-key" placeholder="Anthropic API key (stored locally, never synced)"
-          value="${localStorage.getItem('toto_ai_key')||''}"
-          oninput="localStorage.setItem('toto_ai_key', this.value)">
-        <label class="sub-upload-btn" for="sub-csv-input">📎 Upload CSV</label>
-        <input type="file" id="sub-csv-input" accept=".csv,.txt" style="display:none" onchange="handleSubCSV(event)">
-      </div>
-      <div id="sub-import-status" style="margin-top:12px;font-size:13px;color:rgba(255,255,255,0.7);display:none"></div>
-    </div>
-
-    ${pendingResults.length ? renderSubImportResults(pendingResults) : ''}
-
-    ${subs.length ? `<div class="sub-list">${subRows}</div>` : `
-      <div style="text-align:center;padding:60px 20px">
-        <div style="font-size:48px;margin-bottom:12px">📺</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:8px">No subscriptions tracked yet</div>
-        <div style="font-size:13px;color:#64748b">Add them manually or upload a bank statement above.</div>
-      </div>`}
-
-    <!-- Sub modal -->
-    <div id="sub-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
-      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
-        <h3 id="sub-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px">Add Subscription</h3>
-        <input type="hidden" id="sub-edit-id">
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
-            <input id="sub-name" type="text" placeholder="e.g. Netflix, Spotify" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Category</label>
-              <select id="sub-cat" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
-                ${SUB_CATS.map(c => `<option value="${c.label}">${c.icon} ${c.label}</option>`).join('')}
-              </select>
-            </div>
-            <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Frequency</label>
-              <select id="sub-freq" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff">
-                <option>Monthly</option><option>Annual</option><option>Weekly</option>
-              </select>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Amount ($)</label>
-              <input id="sub-amount" type="number" min="0" step="0.01" placeholder="0.00" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-            </div>
-            <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Renewal date</label>
-              <input id="sub-renewal" type="date" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
-          <button class="btn-outline" onclick="closeSubModal()">Cancel</button>
-          <button class="btn-primary" onclick="saveSub()">Save</button>
-        </div>
-      </div>
-    </div>`;
-}
 
 function renderSubImportResults(results) {
   const rows = results.map(r => `
