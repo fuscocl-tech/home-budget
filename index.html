@@ -5606,7 +5606,7 @@ function renderExpenseGroups(expenses) {
             <div style="width:4px;height:36px;border-radius:2px;background:${eColor};flex-shrink:0"></div>
             <div style="flex:1;min-width:0;cursor:pointer" onclick="event.stopPropagation();openEditExpense(${e.id})">
               <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</div>
-              <div style="font-size:11px;color:var(--text-muted)">${e.category || 'Other'} · ${freqDisplayItem(e)}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${e.category || 'Other'}${e.vendor ? ` · ${e.vendor}` : ''} · ${freqDisplayItem(e)}</div>
             </div>
             <div style="text-align:right;flex-shrink:0;margin-right:4px">
               <div style="font-size:13px;font-weight:600">${aud(eMo)}/mo</div>
@@ -5810,7 +5810,7 @@ function renderBudget() {
                       const rowColor = colors.expense[e.category || 'Other'] || '#94a3b8';
                       const oneTimeBadge = e.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
                       return `<tr>
-                        <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}${oneTimeBadge}</td>
+                        <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}${oneTimeBadge}${e.vendor ? `<br><span style="font-size:11px;font-weight:400;color:var(--text-muted)">${e.vendor}</span>` : ''}</td>
                         <td><span style="display:inline-block;padding:2px 10px;border-radius:99px;background:${rowColor};color:#fff;font-size:11px;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span></td>
                         <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
                         <td>${dueLabel}</td>
@@ -6342,6 +6342,10 @@ function expenseForm(e = {}) {
       </div>
     </div>
     <div class="form-group">
+      <label class="form-label">Vendor <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+      <input class="form-input" id="f-exp-vendor" type="text" value="${e.vendor || ''}" placeholder="e.g. ANZ, Woolworths, Netflix">
+    </div>
+    <div class="form-group">
       <label class="form-label">Amount (AUD)</label>
       <input class="form-input" id="f-exp-amount" type="number" value="${e.amount || ''}" min="0">
     </div>
@@ -6387,6 +6391,7 @@ function expenseFromForm(id) {
     id,
     name:      document.getElementById('f-exp-name').value.trim(),
     category:  document.getElementById('f-exp-cat').value,
+    vendor:    (document.getElementById('f-exp-vendor')?.value || '').trim() || null,
     amount:    parseFloat(document.getElementById('f-exp-amount').value) || 0,
     frequency: freq,
     dueDate:   document.getElementById('f-exp-duedate').value || null,
@@ -6420,6 +6425,11 @@ function openAddExpense() {
       () => {
         item.id = nextId(state.budget.expenses);
         state.budget.expenses.push(item);
+        // Also add to current month's override so it appears immediately
+        if (isMonthCustomized(selectedBudgetMonth)) {
+          const mb = state.budget.months[selectedBudgetMonth];
+          mb.expenses.push({ ...item, id: nextId(mb.expenses) });
+        }
         saveData(state); renderAll();
       }
     );
@@ -6441,6 +6451,12 @@ function openEditExpense(id) {
       () => {
         const item = state.budget.expenses.find(x => x.id === id);
         if (item) Object.assign(item, updated);
+        // Also update current month's override if it exists
+        if (isMonthCustomized(selectedBudgetMonth)) {
+          const mb = state.budget.months[selectedBudgetMonth];
+          const mItem = mb.expenses.find(x => x.id === id);
+          if (mItem) Object.assign(mItem, updated);
+        }
         saveData(state); renderAll();
       }
     );
