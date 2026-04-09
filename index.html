@@ -7508,10 +7508,9 @@ function _renderMealPlan() {
     <p style="font-size:12px;color:var(--text-muted);margin-top:6px">Tap any cell to add or change a meal.</p>`;
 }
 
-let _mealSuggestFilters = { cuisine: 'Any', price: 'Any', dietary: 'Any' };
+let _mealSuggestFilters = { cuisine: 'Any', price: 0, dietary: 'Any' };
 
 const _MEAL_CUISINES = ['Any','Italian','Asian','Mexican','Indian','Mediterranean','Thai','Japanese','Middle Eastern','Australian'];
-const _MEAL_PRICES   = ['Any','Budget','Mid-range','Splurge'];
 const _MEAL_DIETARY  = ['Any','Vegetarian','Vegan','Gluten-free','Quick (<30min)','Family-friendly'];
 
 function openMealEdit(weekKey, dayIdx, slot) {
@@ -7547,20 +7546,26 @@ function openMealEdit(weekKey, dayIdx, slot) {
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div>
-          <div class="form-label" style="margin-bottom:5px">Price</div>
-          <div style="display:flex;flex-wrap:wrap;gap:5px" id="meal-f-price">
-            ${_MEAL_PRICES.map(o => _mealPill('price', o)).join('')}
-          </div>
+      <div style="margin-bottom:12px">
+        <div class="form-label" style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span>Meal budget (per serve)</span>
+          <span id="meal-price-lbl" style="color:#0d9488;font-weight:700">${_mealSuggestFilters.price > 0 ? '$'+_mealSuggestFilters.price : 'Any'}</span>
         </div>
-        <div>
-          <div class="form-label" style="margin-bottom:5px">Dietary / Style</div>
-          <div style="display:flex;flex-wrap:wrap;gap:5px" id="meal-f-dietary">
-            ${_MEAL_DIETARY.map(o => _mealPill('dietary', o)).join('')}
-          </div>
+        <input type="range" min="0" max="200" step="5" value="${_mealSuggestFilters.price}"
+          style="width:100%;accent-color:#0d9488;cursor:pointer"
+          oninput="_mealPriceSlide(+this.value)">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:2px">
+          <span>Any price</span><span>$200</span>
         </div>
       </div>
+
+      <div>
+        <div class="form-label" style="margin-bottom:5px">Dietary / Style</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="meal-f-dietary">
+          ${_MEAL_DIETARY.map(o => _mealPill('dietary', o)).join('')}
+        </div>
+      </div>
+      <div style="margin-bottom:12px"></div>
 
       <button class="btn btn-sm" id="meal-suggest-btn" onclick="_mealGetSuggestions('${slot}')"
         style="width:100%;justify-content:center">Get suggestions</button>
@@ -7604,6 +7609,12 @@ function _mealToggleFilter(type, value) {
   });
 }
 
+function _mealPriceSlide(val) {
+  _mealSuggestFilters.price = val;
+  const lbl = document.getElementById('meal-price-lbl');
+  if (lbl) lbl.textContent = val > 0 ? `$${val}` : 'Any';
+}
+
 async function _mealGetSuggestions(slot) {
   const key = localStorage.getItem('toto_ai_key');
   if (!key) return;
@@ -7614,9 +7625,9 @@ async function _mealGetSuggestions(slot) {
 
   const SLOTS_LBL = { b:'Breakfast', l:'Lunch', d:'Dinner' };
   const filters = [
-    _mealSuggestFilters.cuisine  !== 'Any' ? `Cuisine: ${_mealSuggestFilters.cuisine}` : '',
-    _mealSuggestFilters.price    !== 'Any' ? `Price: ${_mealSuggestFilters.price}` : '',
-    _mealSuggestFilters.dietary  !== 'Any' ? `Style: ${_mealSuggestFilters.dietary}` : '',
+    _mealSuggestFilters.cuisine !== 'Any' ? `Cuisine: ${_mealSuggestFilters.cuisine}` : '',
+    _mealSuggestFilters.price   > 0       ? `Budget: up to $${_mealSuggestFilters.price} per serve` : '',
+    _mealSuggestFilters.dietary !== 'Any' ? `Style: ${_mealSuggestFilters.dietary}` : '',
   ].filter(Boolean).join(', ') || 'No specific filters';
 
   const prompt = `Suggest 8 ${SLOTS_LBL[slot]} meal ideas. Filters: ${filters}.
