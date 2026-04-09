@@ -7508,19 +7508,25 @@ function _renderMealPlan() {
     <p style="font-size:12px;color:var(--text-muted);margin-top:6px">Tap any cell to add or change a meal.</p>`;
 }
 
+let _mealSuggestFilters = { cuisine: 'Any', price: 'Any', dietary: 'Any' };
+
+const _MEAL_CUISINES = ['Any','Italian','Asian','Mexican','Indian','Mediterranean','Thai','Japanese','Middle Eastern','Australian'];
+const _MEAL_PRICES   = ['Any','Budget','Mid-range','Splurge'];
+const _MEAL_DIETARY  = ['Any','Vegetarian','Vegan','Gluten-free','Quick (<30min)','Family-friendly'];
+
 function openMealEdit(weekKey, dayIdx, slot) {
   const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   const SLOTS_LBL = { b:'Breakfast', l:'Lunch', d:'Dinner' };
   const current = ((state.meals.plan[weekKey] || {})[dayIdx] || {})[slot] || '';
+  const hasKey  = !!localStorage.getItem('toto_ai_key');
 
-  // Collect all previously used meals for quick-pick
   const seen = new Set();
   Object.values(state.meals.plan).forEach(week =>
     Object.values(week).forEach(day => {
       if (typeof day === 'object') ['b','l','d'].forEach(s => { if (day[s]) seen.add(day[s]); });
     })
   );
-  const suggestions = [...seen].filter(m => m !== current).slice(0, 16);
+  const prev = [...seen].filter(m => m !== current).slice(0, 16);
 
   document.getElementById('modal-title').textContent = `${DAYS_FULL[dayIdx]} · ${SLOTS_LBL[slot]}`;
   document.getElementById('modal-body').innerHTML = `
@@ -7529,11 +7535,43 @@ function openMealEdit(weekKey, dayIdx, slot) {
       <input class="form-input" id="meal-input" type="text" value="${current.replace(/"/g,'&quot;')}"
         placeholder="e.g. Pasta Bolognese, Chicken stir-fry…" autocomplete="off">
     </div>
-    ${suggestions.length ? `
+
+    ${hasKey ? `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;background:var(--surface2)">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-muted);margin-bottom:12px">✨ AI Suggestions</div>
+
+      <div style="margin-bottom:10px">
+        <div class="form-label" style="margin-bottom:5px">Cuisine</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="meal-f-cuisine">
+          ${_MEAL_CUISINES.map(o => _mealPill('cuisine', o)).join('')}
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <div class="form-label" style="margin-bottom:5px">Price</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px" id="meal-f-price">
+            ${_MEAL_PRICES.map(o => _mealPill('price', o)).join('')}
+          </div>
+        </div>
+        <div>
+          <div class="form-label" style="margin-bottom:5px">Dietary / Style</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px" id="meal-f-dietary">
+            ${_MEAL_DIETARY.map(o => _mealPill('dietary', o)).join('')}
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-sm" id="meal-suggest-btn" onclick="_mealGetSuggestions('${slot}')"
+        style="width:100%;justify-content:center">Get suggestions</button>
+      <div id="meal-suggest-out" style="margin-top:10px"></div>
+    </div>` : ''}
+
+    ${prev.length ? `
     <div>
       <div class="form-label" style="margin-bottom:8px">Previous meals</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${suggestions.map(m => `<button style="padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface2);font-size:12px;cursor:pointer"
+        ${prev.map(m => `<button style="padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer"
           onclick="document.getElementById('meal-input').value='${m.replace(/'/g,"\\'")}'">${m}</button>`).join('')}
       </div>
     </div>` : ''}`;
@@ -7544,6 +7582,65 @@ function openMealEdit(weekKey, dayIdx, slot) {
 
   document.getElementById('modal-overlay').classList.remove('hidden');
   setTimeout(() => { const el = document.getElementById('meal-input'); if (el) { el.focus(); el.select(); } }, 80);
+}
+
+function _mealPill(type, value) {
+  const active = _mealSuggestFilters[type] === value;
+  return `<button data-filter="${type}" data-val="${value}"
+    onclick="_mealToggleFilter('${type}','${value}')"
+    style="padding:4px 10px;border-radius:99px;font-size:12px;cursor:pointer;white-space:nowrap;
+      border:1.5px solid ${active?'#0d9488':'var(--border)'};
+      background:${active?'#f0fdf4':'var(--surface)'};
+      color:${active?'#0d9488':'var(--text)'}">${value}</button>`;
+}
+
+function _mealToggleFilter(type, value) {
+  _mealSuggestFilters[type] = value;
+  document.querySelectorAll(`[data-filter="${type}"]`).forEach(btn => {
+    const active = btn.dataset.val === value;
+    btn.style.borderColor = active ? '#0d9488' : 'var(--border)';
+    btn.style.background  = active ? '#f0fdf4' : 'var(--surface)';
+    btn.style.color       = active ? '#0d9488'  : 'var(--text)';
+  });
+}
+
+async function _mealGetSuggestions(slot) {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key) return;
+  const btn = document.getElementById('meal-suggest-btn');
+  const out = document.getElementById('meal-suggest-out');
+  if (btn) { btn.textContent = '⏳ Thinking…'; btn.disabled = true; }
+  if (out) out.innerHTML = '';
+
+  const SLOTS_LBL = { b:'Breakfast', l:'Lunch', d:'Dinner' };
+  const filters = [
+    _mealSuggestFilters.cuisine  !== 'Any' ? `Cuisine: ${_mealSuggestFilters.cuisine}` : '',
+    _mealSuggestFilters.price    !== 'Any' ? `Price: ${_mealSuggestFilters.price}` : '',
+    _mealSuggestFilters.dietary  !== 'Any' ? `Style: ${_mealSuggestFilters.dietary}` : '',
+  ].filter(Boolean).join(', ') || 'No specific filters';
+
+  const prompt = `Suggest 8 ${SLOTS_LBL[slot]} meal ideas. Filters: ${filters}.
+Return ONLY a JSON array of meal names, no other text: ["Meal 1","Meal 2",...]`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-client-side-key-flag':'true'},
+      body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:256, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    const match = data.content[0].text.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('No JSON');
+    const meals = JSON.parse(match[0]);
+    if (out) out.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${meals.map(m => `<button style="padding:6px 12px;border-radius:99px;border:1px solid #0d9488;background:#f0fdf4;color:#0d9488;font-size:12px;font-weight:500;cursor:pointer"
+        onclick="document.getElementById('meal-input').value='${m.replace(/'/g,"\\'")}'">${m}</button>`).join('')}
+    </div>`;
+  } catch(err) {
+    if (out) out.innerHTML = `<span style="font-size:12px;color:var(--danger)">⚠ ${err.message}</span>`;
+  } finally {
+    if (btn) { btn.textContent = 'Get suggestions'; btn.disabled = false; }
+  }
 }
 
 function saveMealSlot(weekKey, dayIdx, slot, value) {
