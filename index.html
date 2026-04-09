@@ -1773,15 +1773,6 @@
     <div id="budget-content"></div>
   </div>
 
-  <!-- CALENDAR -->
-  <div class="tab-panel" id="tab-calendar">
-    <div class="page-header">
-      <h1>Calendar</h1>
-      <p>Upcoming expense due dates</p>
-    </div>
-    <div id="calendar-content"></div>
-  </div>
-
   <!-- GOALS -->
   <div class="tab-panel" id="tab-goals">
     <div class="page-header">
@@ -3420,61 +3411,6 @@ function itemMonthly(item) {
   return freqToMonthly(item.amount || 0, freq);
 }
 
-function getExpenseOccurrences(e, year, month) {
-  if (!e.dueDate) return [];
-  const [dy, dm, dd] = e.dueDate.split('-').map(Number);
-  const freq = e.frequency || 'monthly';
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  if (freq === 'monthly') {
-    return [Math.min(dd, daysInMonth)];
-  }
-  if (freq === 'annually' || freq === 'annual') {
-    return month === dm ? [Math.min(dd, daysInMonth)] : [];
-  }
-  if (freq === 'quarterly') {
-    const diff = (year * 12 + month - 1) - (dy * 12 + dm - 1);
-    return diff >= 0 && diff % 3 === 0 ? [Math.min(dd, daysInMonth)] : [];
-  }
-  if (freq === 'weekly') {
-    const baseDow = new Date(dy, dm - 1, dd).getDay();
-    const days = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      if (new Date(year, month - 1, d).getDay() === baseDow) days.push(d);
-    }
-    return days;
-  }
-  if (freq === 'fortnightly') {
-    const base = new Date(dy, dm - 1, dd);
-    const days = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      const diff = Math.round((new Date(year, month - 1, d) - base) / 86400000);
-      if (diff >= 0 && diff % 14 === 0) days.push(d);
-    }
-    return days;
-  }
-  if (freq === 'daily') {
-    return Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  }
-  if (freq === 'custom') {
-    const n = e.customEvery || 1;
-    const unit = e.customUnit || 'weeks';
-    if (unit === 'weeks') {
-      const base = new Date(dy, dm - 1, dd);
-      const days = [];
-      for (let d = 1; d <= daysInMonth; d++) {
-        const diff = Math.round((new Date(year, month - 1, d) - base) / 86400000);
-        if (diff >= 0 && diff % (n * 7) === 0) days.push(d);
-      }
-      return days;
-    }
-    if (unit === 'months') {
-      const diff = (year * 12 + month - 1) - (dy * 12 + dm - 1);
-      return diff >= 0 && diff % n === 0 ? [Math.min(dd, daysInMonth)] : [];
-    }
-  }
-  return [];
-}
 
 function expenseCategories() { return state.expenseCategories || DEFAULT_DATA.expenseCategories; }
 function incomeCategories()  { return state.incomeCategories  || DEFAULT_DATA.incomeCategories; }
@@ -6762,8 +6698,6 @@ function deleteAppliance(id) {
 // CALENDAR
 // ─────────────────────────────────────────────────
 
-let calendarMonth = new Date().toISOString().slice(0, 7);
-
 let expenseSortCol = null;
 let expenseSortDir = 'asc';
 let expenseFilterCat = 'all';
@@ -6785,19 +6719,6 @@ function thSort(col, label, extra = '') {
   return `<th class="sortable${active ? ' sort-active' : ''}" onclick="sortExpenses('${col}')">${label}${extra}<span class="sort-icon">${icon}</span></th>`;
 }
 
-function prevCalMonth() {
-  const [y, m] = calendarMonth.split('-').map(Number);
-  const d = new Date(y, m - 2, 1);
-  calendarMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  renderCalendar();
-}
-
-function nextCalMonth() {
-  const [y, m] = calendarMonth.split('-').map(Number);
-  const d = new Date(y, m, 1);
-  calendarMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  renderCalendar();
-}
 
 function ordinal(n) {
   const s = ['th','st','nd','rd'];
@@ -6805,128 +6726,6 @@ function ordinal(n) {
   return n + (s[(v-20)%10] || s[v] || s[0]);
 }
 
-function renderCalendar() {
-  const [year, month] = calendarMonth.split('-').map(Number);
-  const today = new Date();
-  const firstDay = new Date(year, month - 1, 1);
-  const daysInMonth = new Date(year, month, 0).getDate();
-  const startDow = firstDay.getDay(); // 0=Sun
-
-  // Build day-keyed maps for expenses and income
-  const byDay = {};       // expenses
-  const incomeByDay = {}; // income
-  state.budget.expenses.forEach(e => {
-    getExpenseOccurrences(e, year, month).forEach(day => {
-      if (!byDay[day]) byDay[day] = [];
-      byDay[day].push(e);
-    });
-  });
-  state.budget.income.forEach(i => {
-    getExpenseOccurrences(i, year, month).forEach(day => {
-      if (!incomeByDay[day]) incomeByDay[day] = [];
-      incomeByDay[day].push(i);
-    });
-  });
-
-  const monthName = firstDay.toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
-
-  let html = `
-    <div class="month-picker" style="margin-bottom:16px">
-      <button class="month-btn" onclick="prevCalMonth()">&#8249;</button>
-      <div class="month-picker-label">${monthName}</div>
-      <button class="month-btn" onclick="nextCalMonth()">&#8250;</button>
-    </div>
-  `;
-
-  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  html += `<div class="cal-grid">`;
-  DAYS.forEach(d => { html += `<div class="cal-header-cell">${d}</div>`; });
-
-  // Leading blanks
-  for (let i = 0; i < startDow; i++) {
-    html += `<div class="cal-cell other-month"></div>`;
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const isToday = today.getFullYear() === year && today.getMonth() + 1 === month && today.getDate() === day;
-    const events = byDay[day] || [];
-    const incEvents = incomeByDay[day] || [];
-    const allEvents = [...incEvents.map(i => ({...i, _type:'income'})), ...events.map(e => ({...e, _type:'expense'}))];
-    const totalDue = events.reduce((s, e) => s + itemMonthly(e), 0);
-
-    let eventsHtml = '';
-    const maxShow = 3;
-    allEvents.slice(0, maxShow).forEach(ev => {
-      const cls = ev._type === 'income' ? 'cal-event income' : 'cal-event';
-      eventsHtml += `<div class="${cls}" title="${ev.name} — ${audD(ev.amount)}${freqLabelItem(ev)}">${ev.name}</div>`;
-    });
-    if (allEvents.length > maxShow) {
-      eventsHtml += `<div class="cal-more">+${allEvents.length - maxShow} more</div>`;
-    }
-    if (events.length > 0) {
-      eventsHtml += `<div class="cal-day-total">-${aud(totalDue)}</div>`;
-    }
-
-    html += `
-      <div class="cal-cell${isToday ? ' today' : ''}">
-        <div class="cal-day-num">${day}</div>
-        ${eventsHtml}
-      </div>
-    `;
-  }
-
-  // Trailing blanks to complete last row
-  const totalCells = startDow + daysInMonth;
-  const remainder = totalCells % 7;
-  if (remainder > 0) {
-    for (let i = 0; i < 7 - remainder; i++) {
-      html += `<div class="cal-cell other-month"></div>`;
-    }
-  }
-
-  html += `</div>`;
-
-  // Upcoming list below calendar
-  const upcomingExpenses = [], upcomingIncome = [];
-  for (let day = 1; day <= daysInMonth; day++) {
-    (byDay[day] || []).forEach(e => upcomingExpenses.push({ day, e }));
-    (incomeByDay[day] || []).forEach(i => upcomingIncome.push({ day, i }));
-  }
-  const hasAny = upcomingExpenses.length > 0 || upcomingIncome.length > 0;
-
-  if (hasAny) {
-    const allRows = [
-      ...upcomingIncome.map(({day, i}) => ({ day, name: i.name, type: 'income', amount: i.amount, frequency: i.frequency })),
-      ...upcomingExpenses.map(({day, e}) => ({ day, name: e.name, type: 'expense', category: e.category, amount: e.amount, frequency: e.frequency }))
-    ].sort((a, b) => a.day - b.day);
-
-    html += `
-      <div class="section" style="margin-top:24px">
-        <div class="section-header"><div class="section-title">All Due Dates — ${monthName}</div></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Due</th><th>Name</th><th>Type</th><th>Amount</th><th>Repeats</th></tr></thead>
-            <tbody>
-              ${allRows.map(r => `<tr>
-                <td style="font-weight:600;color:var(--primary)">${new Date(year, month-1, r.day).toLocaleDateString('en-AU', {month:'long',day:'numeric'})}</td>
-                <td style="font-weight:500">${r.name}</td>
-                <td>${r.type === 'income'
-                  ? `<span class="badge paid">Income</span>`
-                  : `<span class="badge unpaid">${r.category || 'Expense'}</span>`}</td>
-                <td class="amount" style="color:${r.type==='income'?'var(--success)':'var(--danger)'}">${r.type==='income'?'+':'−'}${audD(r.amount)}${freqLabelItem(r)}</td>
-                <td style="color:var(--text-muted)">${freqDisplayItem(r)}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  } else {
-    html += `<div class="empty" style="margin-top:24px"><div class="empty-icon">📅</div>No due dates set yet. Edit your income and expenses to add dates.</div>`;
-  }
-
-  document.getElementById('calendar-content').innerHTML = html;
-}
 
 function safeRender(fn) {
   try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
@@ -6938,7 +6737,7 @@ function renderAll() {
   safeRender(renderDashboard);
   safeRender(renderBuild);
   safeRender(renderBudget);
-  safeRender(renderCalendar);
+
   safeRender(renderGoals);
   safeRender(renderScenarios);
   safeRender(renderSettings);
