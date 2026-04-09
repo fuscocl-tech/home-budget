@@ -3039,6 +3039,94 @@ function renderMoneyDashboard() {
 }
 
 // ─────────────────────────────────────────────────
+// FINANCIAL HEALTH SCORE
+// ─────────────────────────────────────────────────
+
+function calcFinancialHealth() {
+  const curData = getMonthData(selectedBudgetMonth);
+  const monthlyIncome   = monthlyTotal(curData.income);
+  const monthlyExpenses = monthlyTotal(curData.expenses);
+  const surplus     = monthlyIncome - monthlyExpenses;
+  const savingsRate = monthlyIncome > 0 ? surplus / monthlyIncome : null;
+
+  // 1. Savings Rate (0-20)
+  let savingsScore;
+  if (monthlyIncome === 0)      savingsScore = 10;
+  else if (savingsRate >= 0.20) savingsScore = 20;
+  else if (savingsRate >= 0)    savingsScore = Math.round(savingsRate / 0.20 * 20);
+  else                          savingsScore = 0;
+
+  // 2. Budget Tracking (0-20) — how consistently actuals are recorded + under budget
+  const recentMonths = getLast6Months().slice(3);
+  let trackedCount = 0, underCount = 0;
+  recentMonths.forEach(mo => {
+    const md2 = getMonthData(mo);
+    if (md2.expenses.some(e => getActualEntries(e.id, mo).length > 0)) {
+      trackedCount++;
+      const totalActual = md2.expenses.reduce((s, e) => s + getActual(e.id, mo), 0);
+      if (totalActual <= monthlyTotal(md2.expenses)) underCount++;
+    }
+  });
+  const trackScore = trackedCount === 0 ? 5
+    : Math.round((trackedCount / 3) * 10 + (underCount / trackedCount) * 10);
+
+  // 3. Net Worth (0-20) — debt-to-asset ratio
+  const nwAssets = (state.netWorth.assets||[]).reduce((s,a)=>s+(parseFloat(a.value)||0),0);
+  const nwLiabs  = (state.netWorth.liabilities||[]).reduce((s,l)=>s+(parseFloat(l.value)||0),0);
+  const netWorth = nwAssets - nwLiabs;
+  let nwScore;
+  if (nwAssets === 0 && nwLiabs === 0) nwScore = 10;
+  else if (netWorth <= 0) nwScore = Math.max(0, 3);
+  else {
+    const debtRatio = nwLiabs > 0 ? nwLiabs / nwAssets : 0;
+    nwScore = debtRatio < 0.3 ? 20 : debtRatio < 0.6 ? 15 : debtRatio < 0.8 ? 10 : 6;
+  }
+
+  // 4. Emergency Buffer (0-20) — months of expenses covered by assets
+  let bufScore;
+  if (monthlyExpenses === 0) bufScore = 10;
+  else {
+    const months = nwAssets / monthlyExpenses;
+    bufScore = months >= 6 ? 20 : months >= 3 ? 15 : months >= 1 ? 8 : nwAssets === 0 ? 5 : 3;
+  }
+
+  // 5. Goals (0-20) — having goals + average progress
+  const activeGoals = (state.goals||[]).filter(g => g.status !== 'achieved');
+  let goalScore;
+  if (activeGoals.length === 0) goalScore = 8;
+  else {
+    const avgPct = activeGoals.reduce((s,g) => s + Math.min((g.saved||0) / (g.target||1), 1), 0) / activeGoals.length;
+    goalScore = 10 + Math.round(avgPct * 10);
+  }
+
+  const total = savingsScore + trackScore + nwScore + bufScore + goalScore;
+  const grade = total >= 85 ? 'A' : total >= 70 ? 'B' : total >= 55 ? 'C' : total >= 40 ? 'D' : 'F';
+  const color = total >= 80 ? '#10b981' : total >= 60 ? '#f59e0b' : total >= 40 ? '#f97316' : '#ef4444';
+
+  // Personalised insight — worst dimension
+  const dimTips = [
+    { score: savingsScore, tip: `Boost your savings rate — aim for 20%+ of income (currently ${monthlyIncome > 0 ? Math.round((savingsRate||0)*100) : 0}%)` },
+    { score: trackScore,   tip: 'Log actuals monthly in the Budget tab to stay on track' },
+    { score: nwScore,      tip: 'Reduce liabilities or grow assets to strengthen your net worth' },
+    { score: bufScore,     tip: `Build an emergency fund of 3–6 months expenses (${aud(monthlyExpenses*3)}–${aud(monthlyExpenses*6)})` },
+    { score: goalScore,    tip: 'Set specific savings goals in the Goals tab to stay focused' },
+  ];
+  const worst = [...dimTips].sort((a,b) => a.score - b.score)[0];
+  const insight = worst.score < 12 ? worst.tip : 'Great shape — stay consistent and keep building your financial cushion.';
+
+  return {
+    total, grade, color, insight,
+    dimensions: [
+      { label: 'Savings Rate',     score: savingsScore, max: 20 },
+      { label: 'Budget Tracking',  score: trackScore,   max: 20 },
+      { label: 'Net Worth',        score: nwScore,      max: 20 },
+      { label: 'Emergency Buffer', score: bufScore,     max: 20 },
+      { label: 'Goals',            score: goalScore,    max: 20 },
+    ]
+  };
+}
+
+// ─────────────────────────────────────────────────
 // DASHBOARD
 // ─────────────────────────────────────────────────
 
@@ -3096,6 +3184,46 @@ function renderDashboard() {
     return { label: monthShortLabel(mo), budget: totalBudgetMo, actual };
   });
   const hasChart = totalBudgetMo > 0 || chartData.some(d=>d.actual>0);
+
+  // ── Financial health score ──
+  const health = calcFinancialHealth();
+  const circ = 251.3;
+  const arc  = ((health.total / 100) * circ).toFixed(1);
+  const dimBars = health.dimensions.map(dim => {
+    const pct = Math.round(dim.score / dim.max * 100);
+    const barColor = pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+    return `
+      <div style="display:grid;grid-template-columns:130px 1fr 30px;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--text-muted);white-space:nowrap">${dim.label}</span>
+        <div style="height:6px;background:var(--border);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width 0.4s"></div>
+        </div>
+        <span style="font-size:11px;font-weight:600;color:${barColor};text-align:right">${dim.score}/${dim.max}</span>
+      </div>`;
+  }).join('');
+  const healthHtml = `
+    <div class="db-widget" style="margin:0 24px 20px">
+      <div class="db-widget-header">
+        <span class="db-widget-title">Financial Health Score</span>
+      </div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:20px;align-items:center;padding:16px 20px 12px">
+        <div style="text-align:center">
+          <svg viewBox="0 0 100 100" width="110" height="110" style="display:block;margin:0 auto">
+            <g transform="rotate(-90 50 50)">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="10"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="${health.color}" stroke-width="10"
+                stroke-dasharray="${arc} ${circ}" stroke-linecap="round"/>
+            </g>
+            <text x="50" y="47" text-anchor="middle" font-size="24" font-weight="800" fill="${health.color}">${health.total}</text>
+            <text x="50" y="63" text-anchor="middle" font-size="13" font-weight="600" fill="#94a3b8">Grade ${health.grade}</text>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">${dimBars}</div>
+      </div>
+      <div style="padding:0 20px 14px;font-size:12px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+        💡 ${health.insight}
+      </div>
+    </div>`;
 
   let chartHtml = '';
   if (hasChart) {
@@ -3170,6 +3298,9 @@ function renderDashboard() {
       </div>
       <div style="padding:12px 16px 14px">${renderWeeklyStrip()}</div>
     </div>
+
+    <!-- Financial health score -->
+    ${healthHtml}
 
     <!-- Two-column widgets -->
     <div class="db-grid">
