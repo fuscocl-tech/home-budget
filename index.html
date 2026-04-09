@@ -2458,6 +2458,291 @@ function editActual(expenseId) {
   openActualEditor(expenseId);
 }
 
+// ─────────────────────────────────────────────────
+// BANK CSV IMPORT
+// ─────────────────────────────────────────────────
+let _csvRows   = []; // parsed { date, description, amount }
+let _csvReview = []; // { idx, date, description, amount, expenseId, checked }
+
+function openCsvImport() {
+  document.getElementById('modal-title').textContent = 'Import Bank Transactions';
+  document.getElementById('modal-body').innerHTML = `
+    <div style="padding:4px 0">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+        Upload a CSV exported from your bank. Works with ANZ, CBA, Westpac, NAB and most Australian banks.
+        Transactions will be matched to your <strong>${monthLabel(selectedBudgetMonth)}</strong> budget categories.
+      </p>
+      <label style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+        border:2px dashed var(--border);border-radius:12px;padding:32px 16px;cursor:pointer;
+        gap:8px;background:var(--surface2);transition:border-color 0.15s"
+        onmouseover="this.style.borderColor='var(--primary)'"
+        onmouseout="this.style.borderColor='var(--border)'">
+        <span style="font-size:32px">📄</span>
+        <span style="font-weight:600;font-size:14px">Choose CSV file</span>
+        <span style="font-size:12px;color:var(--text-muted)">or drag and drop</span>
+        <input type="file" accept=".csv,.txt" style="display:none" onchange="handleCsvFile(event)">
+      </label>
+      <div id="csv-parse-status" style="display:none;margin-top:12px;font-size:13px;color:var(--danger)"></div>
+    </div>`;
+  document.getElementById('modal-footer').innerHTML = `<button class="btn" onclick="closeModal()">Cancel</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function parseBankCSV(text) {
+  function parseCSVLine(line) {
+    const fields = []; let cur = '', inQ = false;
+    for (const c of line) {
+      if (c === '"') inQ = !inQ;
+      else if (c === ',' && !inQ) { fields.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    fields.push(cur.trim());
+    return fields.map(f => f.replace(/^"|"$/g, '').trim());
+  }
+
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 2);
+  if (lines.length < 2) return null;
+
+  // Find header row (first row containing "date")
+  let hi = 0;
+  for (let i = 0; i < Math.min(6, lines.length); i++) {
+    if (/date/i.test(lines[i])) { hi = i; break; }
+  }
+  const headers = parseCSVLine(lines[hi]).map(h => h.toLowerCase());
+
+  const dateCol  = headers.findIndex(h => /date/.test(h));
+  const descCol  = headers.findIndex(h => /desc|detail|narrat|payee|merchant|particular/.test(h));
+  const amtCol   = headers.findIndex(h => /^amount$|^amt$/.test(h));
+  const debitCol = headers.findIndex(h => /^debit$|withdrawal|^debit amount/.test(h));
+
+  if (dateCol === -1 || (descCol === -1 && amtCol === -1 && debitCol === -1)) return null;
+
+  const txns = [];
+  for (let i = hi + 1; i < lines.length; i++) {
+    const row = parseCSVLine(lines[i]);
+    if (row.length < 2) continue;
+    const date = (row[dateCol] || '').trim();
+    const description = descCol !== -1 ? (row[descCol] || '').trim() : '';
+    if (!description) continue;
+
+    let amount = 0;
+    if (debitCol !== -1) {
+      const v = parseFloat((row[debitCol] || '').replace(/[^0-9.]/g, ''));
+      if (!isNaN(v) && v > 0) amount = v;
+    } else if (amtCol !== -1) {
+      const v = parseFloat((row[amtCol] || '').replace(/[^0-9.-]/g, ''));
+      if (!isNaN(v) && v < 0) amount = Math.abs(v); // negative = debit
+    }
+
+    if (amount > 0) txns.push({ date, description, amount });
+  }
+  return txns.length ? txns : null;
+}
+
+async function handleCsvFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const txns = parseBankCSV(text);
+  const status = document.getElementById('csv-parse-status');
+  if (!txns) {
+    if (status) { status.textContent = "Couldn't detect transactions. Check it's a bank CSV with a header row containing 'Date'."; status.style.display = ''; }
+    return;
+  }
+  _csvRows = txns;
+  _renderCsvPreview();
+}
+
+function _renderCsvPreview() {
+  const hasKey = !!localStorage.getItem('toto_ai_key');
+  const preview = _csvRows.slice(0, 5);
+  document.getElementById('modal-body').innerHTML = `
+    <div>
+      <div style="background:var(--success-light);border:1px solid #6ee7b7;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#065f46">
+        Found <strong>${_csvRows.length} expense transactions</strong> in your CSV
+      </div>
+      <div class="table-wrap" style="margin-bottom:16px">
+        <table>
+          <thead><tr><th>Date</th><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
+          <tbody>
+            ${preview.map(t => `<tr>
+              <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">${t.date}</td>
+              <td style="font-weight:500">${t.description}</td>
+              <td class="amount">${audD(t.amount)}</td>
+            </tr>`).join('')}
+            ${_csvRows.length > 5 ? `<tr><td colspan="3" style="text-align:center;color:var(--text-muted);font-size:12px;padding:8px">+ ${_csvRows.length - 5} more rows…</td></tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+      ${!hasKey ? `<div style="background:var(--warning-light);border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e">
+        ⚠ No API key — go to Settings › AI Assistant to enable auto-categorisation.
+      </div>` : ''}
+    </div>`;
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    ${hasKey
+      ? `<button class="btn btn-primary" onclick="runCsvCategorise()">Categorise with AI →</button>`
+      : `<button class="btn btn-primary" onclick="_renderCsvReview(null)">Assign Manually →</button>`}`;
+}
+
+async function runCsvCategorise() {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key) { _renderCsvReview(null); return; }
+
+  document.getElementById('modal-body').innerHTML = `
+    <div style="text-align:center;padding:48px 16px">
+      <div style="font-size:32px;margin-bottom:12px">🤖</div>
+      <div style="font-weight:600;margin-bottom:6px">Categorising ${_csvRows.length} transactions…</div>
+      <div style="font-size:12px;color:var(--text-muted)">Matching to your ${monthLabel(selectedBudgetMonth)} budget categories</div>
+    </div>`;
+  document.getElementById('modal-footer').innerHTML = '';
+
+  const expenses = getMonthData(selectedBudgetMonth).expenses;
+  const catList = expenses.map(e => `${e.id}: ${e.name}${e.category ? ' (' + e.category + ')' : ''}`).join('\n');
+  const txList = JSON.stringify(_csvRows.map((t, i) => ({ idx: i, description: t.description, amount: t.amount })));
+
+  const prompt = `Categorise these Australian bank transactions for a family budget app.
+
+Expense categories (id: name):
+${catList}
+
+Transactions:
+${txList}
+
+Return ONLY a JSON array, no other text:
+[{"idx":0,"expenseId":3},{"idx":1,"expenseId":-1}]
+
+Use expenseId -1 if nothing matches.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-client-side-key-flag': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2048,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const data = await res.json();
+    const match = data.content[0].text.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('No JSON in response');
+    const assignments = JSON.parse(match[0]);
+    const map = {};
+    assignments.forEach(a => { map[a.idx] = a.expenseId; });
+    _renderCsvReview(map);
+  } catch(err) {
+    document.getElementById('modal-body').innerHTML = `
+      <div style="padding:8px">
+        <div style="color:var(--danger);margin-bottom:10px">⚠ ${err.message}</div>
+        <p style="font-size:13px;color:var(--text-muted)">You can still assign categories manually below.</p>
+      </div>`;
+    document.getElementById('modal-footer').innerHTML = `
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="_renderCsvReview(null)" style="margin-left:8px">Assign Manually →</button>`;
+  }
+}
+
+function _renderCsvReview(aiMap) {
+  const expenses = getMonthData(selectedBudgetMonth).expenses;
+  _csvReview = _csvRows.map((t, i) => ({
+    idx: i, date: t.date, description: t.description, amount: t.amount,
+    expenseId: aiMap ? (aiMap[i] ?? -1) : -1,
+    checked: aiMap ? (aiMap[i] != null && aiMap[i] !== -1) : false
+  }));
+
+  function expenseOpts(selId) {
+    return `<option value="-1"${selId === -1 ? ' selected' : ''}>— Skip —</option>` +
+      expenses.map(e => `<option value="${e.id}"${e.id === selId ? ' selected' : ''}>${e.name}</option>`).join('');
+  }
+
+  const rows = _csvReview.map((r, i) => `
+    <tr>
+      <td style="width:36px;padding:6px 8px"><input type="checkbox" id="csv-chk-${i}" ${r.checked ? 'checked' : ''} onchange="_csvToggle(${i},this.checked)"></td>
+      <td style="font-size:12px;color:var(--text-muted);white-space:nowrap">${r.date}</td>
+      <td style="font-weight:500;font-size:13px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.description}">${r.description}</td>
+      <td class="amount" style="white-space:nowrap">${audD(r.amount)}</td>
+      <td><select style="font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 6px;background:var(--surface);max-width:150px"
+          onchange="_csvSetExpense(${i},+this.value)">${expenseOpts(r.expenseId)}</select></td>
+    </tr>`).join('');
+
+  const aiNote = aiMap ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">🤖 AI pre-matched categories — review and adjust as needed.</div>` : '';
+  const matched = _csvReview.filter(r => r.checked && r.expenseId !== -1).length;
+
+  document.getElementById('modal-body').innerHTML = `
+    <div>
+      ${aiNote}
+      <div class="table-wrap" style="max-height:320px;overflow-y:auto">
+        <table>
+          <thead><tr>
+            <th style="width:36px"><input type="checkbox" checked onchange="_csvToggleAll(this.checked)"></th>
+            <th>Date</th><th>Description</th><th style="text-align:right">Amount</th><th>Category</th>
+          </tr></thead>
+          <tbody id="csv-review-body">${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" id="csv-apply-btn" onclick="applyCsvImport()">
+      Apply ${matched} transaction${matched !== 1 ? 's' : ''}
+    </button>`;
+}
+
+function _csvToggle(idx, checked) {
+  _csvReview[idx].checked = checked;
+  _csvUpdateApplyBtn();
+}
+
+function _csvToggleAll(checked) {
+  _csvReview.forEach((r, i) => {
+    r.checked = checked && r.expenseId !== -1;
+    const el = document.getElementById(`csv-chk-${i}`);
+    if (el) el.checked = r.checked;
+  });
+  _csvUpdateApplyBtn();
+}
+
+function _csvSetExpense(idx, expenseId) {
+  _csvReview[idx].expenseId = expenseId;
+  if (expenseId !== -1) {
+    _csvReview[idx].checked = true;
+    const chk = document.getElementById(`csv-chk-${idx}`);
+    if (chk) chk.checked = true;
+  }
+  _csvUpdateApplyBtn();
+}
+
+function _csvUpdateApplyBtn() {
+  const count = _csvReview.filter(r => r.checked && r.expenseId !== -1).length;
+  const btn = document.getElementById('csv-apply-btn');
+  if (btn) btn.textContent = `Apply ${count} transaction${count !== 1 ? 's' : ''}`;
+}
+
+function applyCsvImport() {
+  const toApply = _csvReview.filter(r => r.checked && r.expenseId !== -1);
+  if (!toApply.length) { closeModal(); return; }
+
+  if (!state.budget.actuals[selectedBudgetMonth]) state.budget.actuals[selectedBudgetMonth] = {};
+  toApply.forEach(r => {
+    const entries = getActualEntries(r.expenseId, selectedBudgetMonth);
+    const nextId = entries.length ? Math.max(...entries.map(e => e.id)) + 1 : 1;
+    entries.push({ id: nextId, amount: r.amount, date: r.date, note: r.description });
+    state.budget.actuals[selectedBudgetMonth][r.expenseId] = entries;
+  });
+
+  saveData(state);
+  closeModal();
+  renderAll();
+}
+
 function nextId(arr) {
   return arr.length ? Math.max(...arr.map(x => x.id)) + 1 : 1;
 }
@@ -5600,6 +5885,9 @@ function renderBudget() {
       <button class="month-btn" onclick="prevMonth()">&#8249;</button>
       <div class="month-picker-label">${monthLabel(selectedBudgetMonth)}${customBadge}</div>
       <button class="month-btn" onclick="nextMonth()">&#8250;</button>
+    </div>
+    <div style="text-align:right;margin:-4px 0 12px">
+      <button class="btn btn-sm" style="font-size:12px" onclick="openCsvImport()">⬆ Import Transactions</button>
     </div>
     ${showCopyBanner ? `
     <div style="display:flex;align-items:center;justify-content:space-between;background:var(--primary-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;gap:12px;flex-wrap:wrap">
