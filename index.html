@@ -2779,6 +2779,9 @@ async function runCsvCategorise() {
   // Build the items to send to AI — either bank categories or unique descriptions
   let promptItems, mapResultBack;
 
+  // _csvSuggestions maps txIndex → suggested new expense name
+  window._csvSuggestions = {};
+
   if (hasBankCats) {
     // Group by bank category — far fewer items to categorise
     const bankCatGroups = {};
@@ -2793,7 +2796,10 @@ async function runCsvCategorise() {
       const txMap = {};
       assignments.forEach(a => {
         const group = bankCatList[a.idx];
-        if (group) group.indices.forEach(txIdx => { txMap[txIdx] = a.expenseId; });
+        if (group) group.indices.forEach(txIdx => {
+          txMap[txIdx] = a.expenseId;
+          if (a.suggest) _csvSuggestions[txIdx] = a.suggest;
+        });
       });
       return txMap;
     };
@@ -2811,7 +2817,10 @@ async function runCsvCategorise() {
       const txMap = {};
       assignments.forEach(a => {
         const desc = uniqueDescs[a.idx];
-        if (desc) desc.indices.forEach(txIdx => { txMap[txIdx] = a.expenseId; });
+        if (desc) desc.indices.forEach(txIdx => {
+          txMap[txIdx] = a.expenseId;
+          if (a.suggest) _csvSuggestions[txIdx] = a.suggest;
+        });
       });
       return txMap;
     };
@@ -2820,25 +2829,19 @@ async function runCsvCategorise() {
   const itemType = hasBankCats ? 'bank categories' : 'unique transaction descriptions';
   const prompt = `You are categorising Australian bank transactions for a family budget app.
 
-The user's budget expense categories (id: name):
-${catList}
+The user's EXISTING budget expense categories (id: name):
+${catList || '(none yet)'}
 
 Here are ${promptItems.length} ${itemType} from their bank statement (${_csvRows.length} total transactions):
 ${JSON.stringify(promptItems)}
 
-For EACH item, assign the BEST matching budget expense category ID.
-Be liberal — use common sense:
-- Supermarkets (Woolworths, Coles, Aldi, IGA) → Groceries
-- Fuel/petrol stations, Uber, public transport → Transport
-- Restaurants, cafes, takeaway, Uber Eats → Dining Out
-- Streaming services, Spotify, Netflix → Subscriptions/Entertainment
-- Pharmacies, doctors, dentists → Health
-- Bank transfers, deposits, ATM withdrawals → use -1 (skip these)
-
-Only use expenseId -1 for things that genuinely don't fit ANY category (transfers, deposits, fees).
+For EACH item:
+- If it matches an existing expense, use that expenseId
+- If no existing expense fits, use expenseId -1 AND include a "suggest" field with a short category name to create (e.g. "Groceries", "Dining Out", "Transport", "Parking")
+- For bank transfers, deposits, ATM withdrawals, fees → use expenseId -1 with NO suggest (genuinely skip these)
 
 IMPORTANT: Return ONLY raw JSON array, no markdown, no code fences:
-[{"idx":0,"expenseId":3},{"idx":1,"expenseId":-1}]`;
+[{"idx":0,"expenseId":3},{"idx":1,"expenseId":-1,"suggest":"Dining Out"},{"idx":2,"expenseId":-1}]`;
 
   try {
     const res = await fetch(CLAUDE_API, {
@@ -2892,9 +2895,15 @@ function _renderCsvReview(aiMap) {
     groupMap[groupKey].total += tx.amount;
   });
 
+  // Collect unique AI suggestions for new categories
+  const suggestNames = {};  // "Dining Out" → negative ID
+  let nextSuggestId = -100;
+  const suggestions = window._csvSuggestions || {};
+
   _csvReview = Object.values(groupMap).map((g, i) => {
     // Pick best expense ID: majority vote from group's transactions
     let expenseId = -1;
+    let suggest = '';
     if (aiMap) {
       const votes = {};
       g.txns.forEach(tx => {
@@ -2903,10 +2912,26 @@ function _renderCsvReview(aiMap) {
       });
       const best = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
       if (best) expenseId = parseInt(best[0]);
+
+      // If no match, pick the most common suggestion
+      if (expenseId === -1) {
+        const sugVotes = {};
+        g.txns.forEach(tx => {
+          const s = suggestions[tx.idx];
+          if (s) sugVotes[s] = (sugVotes[s] || 0) + 1;
+        });
+        const bestSug = Object.entries(sugVotes).sort((a, b) => b[1] - a[1])[0];
+        if (bestSug) {
+          suggest = bestSug[0];
+          if (!suggestNames[suggest]) suggestNames[suggest] = nextSuggestId--;
+          expenseId = suggestNames[suggest];
+        }
+      }
     }
     return {
       gIdx: i,
       expenseId,
+      suggest,
       total: Math.round(g.total * 100) / 100,
       count: g.txns.length,
       txns: g.txns,
@@ -2916,9 +2941,19 @@ function _renderCsvReview(aiMap) {
     };
   }).sort((a, b) => b.total - a.total);
 
-  function expenseOpts(selId) {
-    return `<option value="-1"${selId === -1 ? ' selected' : ''}>— Skip —</option>` +
-      expenses.map(e => `<option value="${e.id}"${e.id === selId ? ' selected' : ''}>${e.name}</option>`).join('');
+  // Store suggestion name lookup for apply step
+  window._csvSuggestNames = {};
+  Object.entries(suggestNames).forEach(([name, id]) => { window._csvSuggestNames[id] = name; });
+
+  function expenseOpts(selId, suggestName) {
+    let opts = `<option value="-1"${selId === -1 ? ' selected' : ''}>— Skip —</option>`;
+    // Add "Create: X" options for all AI suggestions
+    Object.entries(suggestNames).forEach(([name, id]) => {
+      opts += `<option value="${id}"${selId === id ? ' selected' : ''}>➕ Create: ${name}</option>`;
+    });
+    // Existing expenses
+    opts += expenses.map(e => `<option value="${e.id}"${e.id === selId ? ' selected' : ''}>${e.name}</option>`).join('');
+    return opts;
   }
 
   const rows = _csvReview.map((g, i) => {
@@ -3006,12 +3041,42 @@ function applyCsvImport() {
   if (!toApply.length) { closeModal(); return; }
 
   if (!state.budget.actuals[selectedBudgetMonth]) state.budget.actuals[selectedBudgetMonth] = {};
+  const suggestNames = window._csvSuggestNames || {};
+  const createdExpenses = {}; // suggestId → real expense ID
+
   toApply.forEach(g => {
-    const entries = getActualEntries(g.expenseId, selectedBudgetMonth);
-    const nextId  = entries.length ? Math.max(...entries.map(e => e.id)) + 1 : 1;
+    let eid = g.expenseId;
+
+    // If it's a "Create: X" suggestion (negative ID < -1), create the budget expense
+    if (eid < -1 && suggestNames[eid]) {
+      if (!createdExpenses[eid]) {
+        const newExp = {
+          id: nextId(state.budget.expenses),
+          name: suggestNames[eid],
+          amount: 0,
+          frequency: 'monthly',
+          category: suggestNames[eid],
+          dueDate: '',
+          vendor: null
+        };
+        state.budget.expenses.push(newExp);
+        // Also add to current month override if it exists
+        if (isMonthCustomized(selectedBudgetMonth)) {
+          const mb = state.budget.months[selectedBudgetMonth];
+          mb.expenses.push({ ...newExp, id: nextId(mb.expenses) });
+          createdExpenses[eid] = mb.expenses[mb.expenses.length - 1].id;
+        } else {
+          createdExpenses[eid] = newExp.id;
+        }
+      }
+      eid = createdExpenses[eid];
+    }
+
+    const entries = getActualEntries(eid, selectedBudgetMonth);
+    const nId     = entries.length ? Math.max(...entries.map(e => e.id)) + 1 : 1;
     const note    = g.descs.join(', ') + (g.count > g.descs.length ? ` +${g.count - g.descs.length} more` : '');
-    entries.push({ id: nextId, amount: g.total, date: g.txns[0].date, note: `${g.count} transactions: ${note}` });
-    state.budget.actuals[selectedBudgetMonth][g.expenseId] = entries;
+    entries.push({ id: nId, amount: g.total, date: g.txns[0].date, note: `${g.count} transactions: ${note}` });
+    state.budget.actuals[selectedBudgetMonth][eid] = entries;
   });
 
   saveData(state);
