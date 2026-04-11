@@ -2773,39 +2773,69 @@ async function runCsvCategorise() {
   const expenses = getMonthData(selectedBudgetMonth).expenses;
   const catList = expenses.map(e => `${e.id}: ${e.name}${e.category ? ' (' + e.category + ')' : ''}`).join('\n');
 
-  // Deduplicate: group transactions by description, send unique merchants only
-  const descMap = {}; // description -> [indices]
-  _csvRows.forEach((t, i) => {
-    const key2 = t.description.toUpperCase().replace(/\s+/g,' ').trim();
-    if (!descMap[key2]) descMap[key2] = { desc: t.description, bankCat: t.bankCat || '', indices: [] };
-    descMap[key2].indices.push(i);
-  });
-  const uniqueDescs = Object.values(descMap);
-  const descList = uniqueDescs.map((d, i) => {
-    const obj = { idx: i, description: d.desc };
-    if (d.bankCat) obj.bankHint = d.bankCat;
-    return obj;
-  });
+  // Check if bank categories are available for smarter grouping
+  const hasBankCats = _csvRows.some(t => t.bankCat);
 
+  // Build the items to send to AI — either bank categories or unique descriptions
+  let promptItems, mapResultBack;
+
+  if (hasBankCats) {
+    // Group by bank category — far fewer items to categorise
+    const bankCatGroups = {};
+    _csvRows.forEach((t, i) => {
+      const cat = t.bankCat || 'Other';
+      if (!bankCatGroups[cat]) bankCatGroups[cat] = { bankCat: cat, indices: [], sample: t.description };
+      bankCatGroups[cat].indices.push(i);
+    });
+    const bankCatList = Object.values(bankCatGroups);
+    promptItems = bankCatList.map((g, i) => ({ idx: i, bankCategory: g.bankCat, sample: g.sample }));
+    mapResultBack = (assignments) => {
+      const txMap = {};
+      assignments.forEach(a => {
+        const group = bankCatList[a.idx];
+        if (group) group.indices.forEach(txIdx => { txMap[txIdx] = a.expenseId; });
+      });
+      return txMap;
+    };
+  } else {
+    // Deduplicate by description
+    const descMap = {};
+    _csvRows.forEach((t, i) => {
+      const key2 = t.description.toUpperCase().replace(/\s+/g,' ').trim();
+      if (!descMap[key2]) descMap[key2] = { desc: t.description, indices: [] };
+      descMap[key2].indices.push(i);
+    });
+    const uniqueDescs = Object.values(descMap);
+    promptItems = uniqueDescs.map((d, i) => ({ idx: i, description: d.desc }));
+    mapResultBack = (assignments) => {
+      const txMap = {};
+      assignments.forEach(a => {
+        const desc = uniqueDescs[a.idx];
+        if (desc) desc.indices.forEach(txIdx => { txMap[txIdx] = a.expenseId; });
+      });
+      return txMap;
+    };
+  }
+
+  const itemType = hasBankCats ? 'bank categories' : 'unique transaction descriptions';
   const prompt = `You are categorising Australian bank transactions for a family budget app.
 
 The user's budget expense categories (id: name):
 ${catList}
 
-Here are ${uniqueDescs.length} unique transaction descriptions from their bank statement (${_csvRows.length} total transactions).
-Each has a description and optionally a "bankHint" which is the bank's own category — use it as a strong hint:
-${JSON.stringify(descList)}
+Here are ${promptItems.length} ${itemType} from their bank statement (${_csvRows.length} total transactions):
+${JSON.stringify(promptItems)}
 
-For EACH description, assign the BEST matching expense category ID.
-Be liberal in matching — use common sense and the bank hints:
+For EACH item, assign the BEST matching budget expense category ID.
+Be liberal — use common sense:
 - Supermarkets (Woolworths, Coles, Aldi, IGA) → Groceries
 - Fuel/petrol stations, Uber, public transport → Transport
 - Restaurants, cafes, takeaway, Uber Eats → Dining Out
 - Streaming services, Spotify, Netflix → Subscriptions/Entertainment
 - Pharmacies, doctors, dentists → Health
-- Transfers, ATM withdrawals, pay → use -1 (skip)
+- Bank transfers, deposits, ATM withdrawals → use -1 (skip these)
 
-Only use expenseId -1 if the transaction genuinely doesn't fit ANY category.
+Only use expenseId -1 for things that genuinely don't fit ANY category (transfers, deposits, fees).
 
 IMPORTANT: Return ONLY raw JSON array, no markdown, no code fences:
 [{"idx":0,"expenseId":3},{"idx":1,"expenseId":-1}]`;
@@ -2830,14 +2860,7 @@ IMPORTANT: Return ONLY raw JSON array, no markdown, no code fences:
     const match = raw.match(/\[[\s\S]*\]/);
     if (!match) throw new Error('No JSON in response');
     const assignments = JSON.parse(match[0]);
-
-    // Map unique-desc assignments back to individual transaction indices
-    const txMap = {};
-    assignments.forEach(a => {
-      const expId = a.expenseId;
-      const desc  = uniqueDescs[a.idx];
-      if (desc) desc.indices.forEach(txIdx => { txMap[txIdx] = expId; });
-    });
+    const txMap = mapResultBack(assignments);
     _renderCsvReview(txMap);
   } catch(err) {
     document.getElementById('modal-body').innerHTML = `
@@ -2853,30 +2876,45 @@ IMPORTANT: Return ONLY raw JSON array, no markdown, no code fences:
 
 function _renderCsvReview(aiMap) {
   const expenses = getMonthData(selectedBudgetMonth).expenses;
+  const hasBankCats = _csvRows.some(t => t.bankCat);
 
-  // Assign each transaction to an expense
+  // Assign each transaction
   const txAssign = _csvRows.map((t, i) => ({
     ...t, idx: i, expenseId: aiMap ? (aiMap[i] ?? -1) : -1
   }));
 
-  // Group by expenseId — one row per category
+  // Group by bank category if available, otherwise by expenseId
   const groupMap = {};
   txAssign.forEach(tx => {
-    const eid = tx.expenseId;
-    if (!groupMap[eid]) groupMap[eid] = { expenseId: eid, txns: [], total: 0 };
-    groupMap[eid].txns.push(tx);
-    groupMap[eid].total += tx.amount;
+    const groupKey = hasBankCats ? (tx.bankCat || 'Other') : String(tx.expenseId);
+    if (!groupMap[groupKey]) groupMap[groupKey] = { key: groupKey, txns: [], total: 0 };
+    groupMap[groupKey].txns.push(tx);
+    groupMap[groupKey].total += tx.amount;
   });
 
-  _csvReview = Object.values(groupMap).map((g, i) => ({
-    gIdx: i,
-    expenseId: g.expenseId,
-    total: Math.round(g.total * 100) / 100,
-    count: g.txns.length,
-    txns: g.txns,
-    descs: [...new Set(g.txns.map(t => t.description))].slice(0, 4),
-    checked: g.expenseId !== -1
-  })).sort((a, b) => b.total - a.total);
+  _csvReview = Object.values(groupMap).map((g, i) => {
+    // Pick best expense ID: majority vote from group's transactions
+    let expenseId = -1;
+    if (aiMap) {
+      const votes = {};
+      g.txns.forEach(tx => {
+        const eid = tx.expenseId;
+        if (eid != null && eid !== -1) votes[eid] = (votes[eid] || 0) + 1;
+      });
+      const best = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
+      if (best) expenseId = parseInt(best[0]);
+    }
+    return {
+      gIdx: i,
+      expenseId,
+      total: Math.round(g.total * 100) / 100,
+      count: g.txns.length,
+      txns: g.txns,
+      descs: [...new Set(g.txns.map(t => t.description))].slice(0, 4),
+      label: hasBankCats ? g.key : null,
+      checked: expenseId !== -1
+    };
+  }).sort((a, b) => b.total - a.total);
 
   function expenseOpts(selId) {
     return `<option value="-1"${selId === -1 ? ' selected' : ''}>— Skip —</option>` +
@@ -2885,9 +2923,10 @@ function _renderCsvReview(aiMap) {
 
   const rows = _csvReview.map((g, i) => {
     const descPreview = g.descs.join(', ') + (g.count > g.descs.length ? ` +${g.count - g.descs.length} more` : '');
+    const labelHtml = g.label ? `<div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:2px">${g.label}</div>` : '';
     return `<tr>
       <td style="width:36px;padding:6px 8px"><input type="checkbox" id="csv-chk-${i}" ${g.checked ? 'checked' : ''} onchange="_csvToggle(${i},this.checked)"></td>
-      <td><select style="font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 6px;background:var(--surface);max-width:160px"
+      <td>${labelHtml}<select style="font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 6px;background:var(--surface);max-width:160px"
           onchange="_csvSetExpense(${i},+this.value)">${expenseOpts(g.expenseId)}</select></td>
       <td style="font-size:12px;text-align:center;font-weight:600">${g.count}</td>
       <td style="font-size:11px;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${descPreview}">${descPreview}</td>
