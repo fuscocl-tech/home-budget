@@ -2952,11 +2952,17 @@ function _renderCsvReview(aiMap) {
       </div>
     </div>`;
 
+  const pendingCount = _csvReview.filter(g => g.checked && g.expenseId === -1).length;
   document.getElementById('modal-footer').innerHTML = `
-    <button class="btn" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary" id="csv-apply-btn" onclick="applyCsvImport()">
-      Apply ${checkedCount} group${checkedCount !== 1 ? 's' : ''} (${checkedTxns} txns)
-    </button>`;
+    <div style="display:flex;flex-direction:column;gap:6px;width:100%">
+      <div id="csv-pending-note" style="font-size:12px;color:var(--warning);text-align:right">${pendingCount > 0 ? `${pendingCount} checked group${pendingCount !== 1 ? 's' : ''} still need a category assigned` : ''}</div>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="csv-apply-btn" onclick="applyCsvImport()"${checkedCount === 0 ? ' disabled' : ''}>
+          Apply ${checkedCount} group${checkedCount !== 1 ? 's' : ''} (${checkedTxns} txns)
+        </button>
+      </div>
+    </div>`;
 }
 
 function _csvToggle(idx, checked) {
@@ -2966,29 +2972,33 @@ function _csvToggle(idx, checked) {
 
 function _csvToggleAll(checked) {
   _csvReview.forEach((g, i) => {
-    g.checked = checked && g.expenseId !== -1;
+    g.checked = checked;
     const el = document.getElementById(`csv-chk-${i}`);
-    if (el) el.checked = g.checked;
+    if (el) el.checked = checked;
   });
   _csvUpdateApplyBtn();
 }
 
 function _csvSetExpense(idx, expenseId) {
   _csvReview[idx].expenseId = expenseId;
-  if (expenseId !== -1) {
-    _csvReview[idx].checked = true;
-    const chk = document.getElementById(`csv-chk-${idx}`);
-    if (chk) chk.checked = true;
-  }
+  _csvReview[idx].checked = true;
+  const chk = document.getElementById(`csv-chk-${idx}`);
+  if (chk) chk.checked = true;
   _csvUpdateApplyBtn();
 }
 
 function _csvUpdateApplyBtn() {
-  const checked = _csvReview.filter(g => g.checked && g.expenseId !== -1);
-  const groups = checked.length;
-  const txns   = checked.reduce((s, g) => s + g.count, 0);
-  const btn    = document.getElementById('csv-apply-btn');
-  if (btn) btn.textContent = `Apply ${groups} group${groups !== 1 ? 's' : ''} (${txns} txns)`;
+  const ready   = _csvReview.filter(g => g.checked && g.expenseId !== -1);
+  const pending = _csvReview.filter(g => g.checked && g.expenseId === -1);
+  const groups  = ready.length;
+  const txns    = ready.reduce((s, g) => s + g.count, 0);
+  const btn     = document.getElementById('csv-apply-btn');
+  if (btn) {
+    btn.textContent = `Apply ${groups} group${groups !== 1 ? 's' : ''} (${txns} txns)`;
+    btn.disabled = groups === 0;
+  }
+  const note = document.getElementById('csv-pending-note');
+  if (note) note.textContent = pending.length > 0 ? `${pending.length} checked group${pending.length !== 1 ? 's' : ''} still need a category assigned` : '';
 }
 
 function applyCsvImport() {
