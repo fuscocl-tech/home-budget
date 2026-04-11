@@ -2139,6 +2139,7 @@ fbAuth.onAuthStateChanged(user => {
 // ─────────────────────────────────────────────────
 
 const STORAGE_KEY = 'home_finance_v1';
+const CLAUDE_API  = 'https://wandering-mouse-3925.fuscocl.workers.dev';
 
 const DEFAULT_DATA = {
   buildContract: {
@@ -2772,13 +2773,12 @@ Return ONLY a JSON array, no other text:
 Use expenseId -1 if nothing matches.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(CLAUDE_API, {
       method: 'POST',
       headers: {
         'x-api-key': key,
         'anthropic-version': '2023-06-01',
         'content-type': 'application/json',
-        'anthropic-dangerous-client-side-key-flag': 'true'
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
@@ -7634,9 +7634,9 @@ async function _mealGetSuggestions(slot) {
 Return ONLY a JSON array of meal names, no other text: ["Meal 1","Meal 2",...]`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(CLAUDE_API, {
       method:'POST',
-      headers:{'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-client-side-key-flag':'true'},
+      headers:{'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json'},
       body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:256, messages:[{role:'user',content:prompt}] })
     });
     const data = await res.json();
@@ -7785,9 +7785,9 @@ Categories must be one of: Produce, Meat & Seafood, Dairy & Eggs, Pantry, Bakery
 Combine quantities where sensible. No duplicates. No other text.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(CLAUDE_API, {
       method:'POST',
-      headers:{ 'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-client-side-key-flag':'true' },
+      headers:{ 'x-api-key':key,'anthropic-version':'2023-06-01','content-type':'application/json' },
       body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:1024, messages:[{ role:'user', content:prompt }] })
     });
     const data = await res.json();
@@ -9584,13 +9584,12 @@ Frequency must be one of: Monthly, Annual, Weekly.
 If nothing new found, return [].`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(CLAUDE_API, {
       method: 'POST',
       headers: {
         'x-api-key': key,
         'anthropic-version': '2023-06-01',
         'content-type': 'application/json',
-        'anthropic-dangerous-client-side-key-flag': 'true'
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
@@ -10114,13 +10113,12 @@ Rules:
 - Use ONLY these categories: Transport, Accommodation, Food & Dining, Entertainment, Gifts, Clothing, Health, Education, Shopping, Other`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(CLAUDE_API, {
       method: 'POST',
       headers: {
         'x-api-key': key,
         'anthropic-version': '2023-06-01',
         'content-type': 'application/json',
-        'anthropic-dangerous-client-side-key-flag': 'true'
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
@@ -10485,13 +10483,12 @@ async function _totoSend(text) {
 
   try {
     const system = _buildTotoContext();
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(CLAUDE_API, {
       method: 'POST',
       headers: {
         'x-api-key': key,
         'anthropic-version': '2023-06-01',
         'content-type': 'application/json',
-        'anthropic-dangerous-client-side-key-flag': 'true'
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
