@@ -2672,6 +2672,8 @@ function parseBankCSV(text) {
   const descCol  = headers.findIndex(h => /desc|detail|narrat|payee|merchant|particular/.test(h));
   const amtCol   = headers.findIndex(h => /^amount$|^amt$/.test(h));
   const debitCol = headers.findIndex(h => /^debit$|withdrawal|^debit amount/.test(h));
+  const catCol   = headers.findIndex(h => /^category$/.test(h));
+  const subCatCol = headers.findIndex(h => /^subcategory$/.test(h));
 
   if (dateCol === -1 || (descCol === -1 && amtCol === -1 && debitCol === -1)) return null;
 
@@ -2680,8 +2682,15 @@ function parseBankCSV(text) {
     const row = parseCSVLine(lines[i]);
     if (row.length < 2) continue;
     const date = (row[dateCol] || '').trim();
-    const description = descCol !== -1 ? (row[descCol] || '').trim() : '';
-    if (!description) continue;
+    const rawDesc = descCol !== -1 ? (row[descCol] || '').trim() : '';
+    if (!rawDesc) continue;
+
+    // Clean description: strip transaction type prefix + date code
+    const description = rawDesc
+      .replace(/^(Visa Purchase|Eftpos Debit|Osko Deposit|Internet Deposit|Debit Interest|Direct Debit|Direct Credit)\s+/i, '')
+      .replace(/^\d{2}[A-Za-z]{3}[\d:]*\s+/, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim() || rawDesc;
 
     let amount = 0;
     if (debitCol !== -1) {
@@ -2692,7 +2701,13 @@ function parseBankCSV(text) {
       if (!isNaN(v) && v < 0) amount = Math.abs(v); // negative = debit
     }
 
-    if (amount > 0) txns.push({ date, description, amount });
+    // Pick up bank's own category if available
+    const bankCat = [
+      catCol !== -1 ? (row[catCol] || '').trim() : '',
+      subCatCol !== -1 ? (row[subCatCol] || '').trim() : ''
+    ].filter(Boolean).join(' > ') || '';
+
+    if (amount > 0) txns.push({ date, description, amount, bankCat });
   }
   return txns.length ? txns : null;
 }
@@ -2762,22 +2777,27 @@ async function runCsvCategorise() {
   const descMap = {}; // description -> [indices]
   _csvRows.forEach((t, i) => {
     const key2 = t.description.toUpperCase().replace(/\s+/g,' ').trim();
-    if (!descMap[key2]) descMap[key2] = { desc: t.description, indices: [] };
+    if (!descMap[key2]) descMap[key2] = { desc: t.description, bankCat: t.bankCat || '', indices: [] };
     descMap[key2].indices.push(i);
   });
   const uniqueDescs = Object.values(descMap);
-  const descList = uniqueDescs.map((d, i) => ({ idx: i, description: d.desc }));
+  const descList = uniqueDescs.map((d, i) => {
+    const obj = { idx: i, description: d.desc };
+    if (d.bankCat) obj.bankHint = d.bankCat;
+    return obj;
+  });
 
   const prompt = `You are categorising Australian bank transactions for a family budget app.
 
 The user's budget expense categories (id: name):
 ${catList}
 
-Here are ${uniqueDescs.length} unique transaction descriptions from their bank statement (${_csvRows.length} total transactions):
+Here are ${uniqueDescs.length} unique transaction descriptions from their bank statement (${_csvRows.length} total transactions).
+Each has a description and optionally a "bankHint" which is the bank's own category — use it as a strong hint:
 ${JSON.stringify(descList)}
 
 For EACH description, assign the BEST matching expense category ID.
-Be liberal in matching — use common sense:
+Be liberal in matching — use common sense and the bank hints:
 - Supermarkets (Woolworths, Coles, Aldi, IGA) → Groceries
 - Fuel/petrol stations, Uber, public transport → Transport
 - Restaurants, cafes, takeaway, Uber Eats → Dining Out
