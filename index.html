@@ -3130,6 +3130,7 @@ function renderMoneyDashboard() {
   });
   const sortedCats = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
 
+  const actuals     = state.budget.actuals[selectedBudgetMonth] || {};
   const totalActual = expenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
   const hasActuals  = totalActual > 0;
 
