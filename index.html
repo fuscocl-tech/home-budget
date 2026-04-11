@@ -2757,20 +2757,37 @@ async function runCsvCategorise() {
 
   const expenses = getMonthData(selectedBudgetMonth).expenses;
   const catList = expenses.map(e => `${e.id}: ${e.name}${e.category ? ' (' + e.category + ')' : ''}`).join('\n');
-  const txList = JSON.stringify(_csvRows.map((t, i) => ({ idx: i, description: t.description, amount: t.amount })));
+
+  // Deduplicate: group transactions by description, send unique merchants only
+  const descMap = {}; // description -> [indices]
+  _csvRows.forEach((t, i) => {
+    const key2 = t.description.toUpperCase().replace(/\s+/g,' ').trim();
+    if (!descMap[key2]) descMap[key2] = { desc: t.description, indices: [] };
+    descMap[key2].indices.push(i);
+  });
+  const uniqueDescs = Object.values(descMap);
+  const descList = uniqueDescs.map((d, i) => ({ idx: i, description: d.desc }));
 
   const prompt = `You are categorising Australian bank transactions for a family budget app.
 
-The user's expense categories (id: name):
+The user's budget expense categories (id: name):
 ${catList}
 
-Transactions to categorise:
-${txList}
+Here are ${uniqueDescs.length} unique transaction descriptions from their bank statement (${_csvRows.length} total transactions):
+${JSON.stringify(descList)}
 
-For each transaction, assign the best matching expense category ID.
-Use expenseId -1 if no category matches.
+For EACH description, assign the BEST matching expense category ID.
+Be liberal in matching — use common sense:
+- Supermarkets (Woolworths, Coles, Aldi, IGA) → Groceries
+- Fuel/petrol stations, Uber, public transport → Transport
+- Restaurants, cafes, takeaway, Uber Eats → Dining Out
+- Streaming services, Spotify, Netflix → Subscriptions/Entertainment
+- Pharmacies, doctors, dentists → Health
+- Transfers, ATM withdrawals, pay → use -1 (skip)
 
-IMPORTANT: Return ONLY raw JSON, no markdown, no code fences, no explanation:
+Only use expenseId -1 if the transaction genuinely doesn't fit ANY category.
+
+IMPORTANT: Return ONLY raw JSON array, no markdown, no code fences:
 [{"idx":0,"expenseId":3},{"idx":1,"expenseId":-1}]`;
 
   try {
@@ -2789,14 +2806,19 @@ IMPORTANT: Return ONLY raw JSON, no markdown, no code fences, no explanation:
     });
     if (!res.ok) throw new Error(`API error ${res.status}`);
     const data = await res.json();
-    // Strip markdown fences if present, then find JSON array
     const raw = data.content[0].text.replace(/```[\w]*\n?/g, '').trim();
     const match = raw.match(/\[[\s\S]*\]/);
     if (!match) throw new Error('No JSON in response');
     const assignments = JSON.parse(match[0]);
-    const map = {};
-    assignments.forEach(a => { map[a.idx] = a.expenseId; });
-    _renderCsvReview(map);
+
+    // Map unique-desc assignments back to individual transaction indices
+    const txMap = {};
+    assignments.forEach(a => {
+      const expId = a.expenseId;
+      const desc  = uniqueDescs[a.idx];
+      if (desc) desc.indices.forEach(txIdx => { txMap[txIdx] = expId; });
+    });
+    _renderCsvReview(txMap);
   } catch(err) {
     document.getElementById('modal-body').innerHTML = `
       <div style="padding:8px">
