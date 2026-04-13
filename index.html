@@ -8080,6 +8080,13 @@ function renderVehicles() {
 
     // Stats
     const totalServiceCost = (v.services || []).reduce((s, svc) => s + (svc.cost || 0), 0);
+    // Annual cost: rego + insurance + services in last 12 months
+    const twelveMonthsAgo = new Date(); twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+    const recentServiceCost = (v.services || []).filter(s => s.date && new Date(s.date) >= twelveMonthsAgo).reduce((s, svc) => s + (svc.cost || 0), 0);
+    const regoBill = (state.bills || []).find(b => b._vehicleRef === `vehicle_${v.id}_rego`);
+    const insBill  = (state.bills || []).find(b => b._vehicleRef === `vehicle_${v.id}_insurance`);
+    const annualCost = recentServiceCost + (regoBill ? parseFloat(regoBill.amount) || 0 : 0) + (insBill ? parseFloat(insBill.amount) || 0 : 0);
+    const monthlyCost = Math.round(annualCost / 12);
 
     html += `
       <div class="veh-card">
@@ -8101,7 +8108,9 @@ function renderVehicles() {
           ${v.odometer ? `<div class="veh-stat"><div class="veh-stat-label">Odometer</div><div class="veh-stat-value">${v.odometer.reading.toLocaleString()} km</div></div>` : ''}
           ${v.fuel ? `<div class="veh-stat"><div class="veh-stat-label">Fuel</div><div class="veh-stat-value" style="text-transform:capitalize">${v.fuel}</div></div>` : ''}
           ${v.insurance && v.insurance.provider ? `<div class="veh-stat"><div class="veh-stat-label">Insurer</div><div class="veh-stat-value">${v.insurance.provider}</div></div>` : ''}
-          <div class="veh-stat"><div class="veh-stat-label">Total Service Cost</div><div class="veh-stat-value">${aud(totalServiceCost)}</div></div>
+          <div class="veh-stat"><div class="veh-stat-label">Services (all time)</div><div class="veh-stat-value">${aud(totalServiceCost)}</div></div>
+          ${annualCost > 0 ? `<div class="veh-stat"><div class="veh-stat-label">Annual Cost</div><div class="veh-stat-value">${aud(annualCost)}</div></div>` : ''}
+          ${monthlyCost > 0 ? `<div class="veh-stat"><div class="veh-stat-label">Monthly Cost</div><div class="veh-stat-value">${aud(monthlyCost)}/mo</div></div>` : ''}
         </div>
 
         <!-- Service History -->
@@ -8231,13 +8240,45 @@ function saveVehicle(editId) {
     state.vehicles.push(data);
   }
 
+  // Sync rego & insurance to Bills & Subscriptions
+  if (!state.bills) state.bills = [];
+  _syncVehicleBill(data, 'rego', `Rego - ${data.name}`, data.regoExpiry, 0, 'Insurance');
+  if (data.insurance && data.insurance.renewalDate) {
+    _syncVehicleBill(data, 'insurance', `Insurance - ${data.name}`, data.insurance.renewalDate, 0, 'Insurance');
+  }
+
   saveData(state);
   closeModal();
   renderAll();
 }
 
+function _syncVehicleBill(vehicle, type, name, dueDate, amount, category) {
+  if (!dueDate) return;
+  // Tag format: vehicle bill entries carry a _vehicleRef to link back
+  const tag = `vehicle_${vehicle.id || vehicle.name}_${type}`;
+  const existing = state.bills.find(b => b._vehicleRef === tag);
+  const entry = {
+    name,
+    amount: amount || (existing ? existing.amount : 0),
+    category,
+    frequency: 'Annual',
+    autopay: false,
+    startDate: dueDate,
+    _vehicleRef: tag
+  };
+  if (existing) {
+    Object.assign(existing, entry);
+  } else {
+    entry.id = uid();
+    state.bills.push(entry);
+  }
+}
+
 function deleteVehicle(id) {
   if (!confirm('Delete this vehicle and all its service history?')) return;
+  // Remove linked bills
+  const tag = `vehicle_${id}_`;
+  state.bills = (state.bills || []).filter(b => !(b._vehicleRef && b._vehicleRef.startsWith(tag)));
   state.vehicles = state.vehicles.filter(v => v.id !== id);
   saveData(state);
   renderAll();
@@ -8310,6 +8351,29 @@ function saveService(vehicleId) {
   // Update odometer if service odometer is higher
   if (svc.odometer > (v.odometer?.reading || 0)) {
     v.odometer = { reading: svc.odometer, date: svc.date };
+  }
+
+  // Log cost as budget actual under a Transport/Car expense
+  if (svc.cost > 0 && svc.date) {
+    const mo = svc.date.slice(0, 7); // YYYY-MM
+    const md = getMonthData(mo);
+    // Find a car/transport expense, or create one
+    let carExp = md.expenses.find(e => e.name && e.name.toLowerCase().includes(v.name.toLowerCase()))
+              || md.expenses.find(e => (e.category || '').toLowerCase() === 'transport')
+              || md.expenses.find(e => (e.name || '').toLowerCase().includes('car'));
+    if (!carExp) {
+      carExp = { id: nextId(state.budget.expenses), name: `Car - ${v.name}`, amount: 0, frequency: 'monthly', category: 'Transport', dueDate: '', vendor: null };
+      state.budget.expenses.push(carExp);
+      if (isMonthCustomized(mo)) {
+        const mb = state.budget.months[mo];
+        carExp = { ...carExp, id: nextId(mb.expenses) };
+        mb.expenses.push(carExp);
+      }
+    }
+    if (!state.budget.actuals[mo]) state.budget.actuals[mo] = {};
+    const entries = getActualEntries(carExp.id, mo);
+    entries.push({ id: entries.length ? Math.max(...entries.map(e => e.id)) + 1 : 1, amount: svc.cost, date: svc.date, note: `${v.name}: ${svc.type}${svc.provider ? ' @ ' + svc.provider : ''}` });
+    state.budget.actuals[mo][carExp.id] = entries;
   }
 
   saveData(state);
