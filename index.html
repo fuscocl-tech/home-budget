@@ -1606,6 +1606,22 @@
     .shop-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); }
     .shop-row:last-child { border-bottom:none; }
 
+    /* ─── Vehicles ────────────────────────────── */
+    .veh-card { border:1px solid var(--border); border-radius:14px; padding:20px; background:var(--surface); margin-bottom:16px; }
+    .veh-card-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+    .veh-icon { width:48px; height:48px; border-radius:12px; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+    .veh-name { font-size:16px; font-weight:700; }
+    .veh-plate { font-size:12px; font-weight:600; padding:2px 8px; border-radius:6px; background:#fef9c3; color:#854d0e; border:1px solid #fde047; letter-spacing:0.05em; }
+    .veh-badges { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+    .veh-badge { font-size:12px; font-weight:600; padding:4px 10px; border-radius:99px; display:inline-flex; align-items:center; gap:4px; }
+    .veh-badge.green { background:#ecfdf5; color:#065f46; border:1px solid #6ee7b7; }
+    .veh-badge.amber { background:#fffbeb; color:#92400e; border:1px solid #fde68a; }
+    .veh-badge.red { background:#fef2f2; color:#991b1b; border:1px solid #fca5a5; }
+    .veh-stat-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-bottom:16px; }
+    .veh-stat { background:var(--surface2); border-radius:10px; padding:12px 14px; }
+    .veh-stat-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:4px; }
+    .veh-stat-value { font-size:15px; font-weight:700; }
+
     /* ─── Quick-add FAB ───────────────────────── */
     .qa-fab {
       position: fixed;
@@ -1814,6 +1830,9 @@
       <div class="nav-item" data-tab="meals" title="Meal Planner">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6h4"/><path d="M21 22v-7"/></svg>
       </div>
+      <div class="nav-item" data-tab="vehicles" title="Vehicles">
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17l-1 3h2m12-3l1 3h-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+      </div>
       <div class="nav-item" data-tab="kids" title="Kids Zone">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-1a6 6 0 0 0-4.73-5.86"/></svg>
       </div>
@@ -1860,6 +1879,7 @@
       <div class="nav-text-item" data-tab="insights">Insights</div>
       <div class="nav-text-item" data-tab="planner">Planner</div>
       <div class="nav-text-item" data-tab="meals">Meal Planner</div>
+      <div class="nav-text-item" data-tab="vehicles">Vehicles</div>
       <div class="nav-text-item" data-tab="kids">Kids Zone</div>
     </nav>
     <div class="text-col-actions">
@@ -1965,6 +1985,15 @@
       <p>Plan the week's meals and build your shopping list</p>
     </div>
     <div id="meals-content"></div>
+  </div>
+
+  <!-- VEHICLES -->
+  <div class="tab-panel" id="tab-vehicles">
+    <div class="page-header">
+      <h1>Vehicles</h1>
+      <p>Registration, insurance, service history and reminders</p>
+    </div>
+    <div id="vehicles-content"></div>
   </div>
 
   <!-- PLANNER -->
@@ -2168,6 +2197,7 @@ const DEFAULT_DATA = {
   subscriptions: [],
   planner: { events: [] },
   meals: { plan: {}, shopping: [] },
+  vehicles: [],
   onboarded: false,
   activityLog: [],
   householdProfile: {
@@ -2244,6 +2274,7 @@ function loadData() {
     if (!d.meals) d.meals = { plan: {}, shopping: [] };
     if (!d.meals.plan) d.meals.plan = {};
     if (!d.meals.shopping) d.meals.shopping = [];
+    if (!d.vehicles) d.vehicles = [];
     if (!d.settings) d.settings = { autoFillMonths: false };
     if (!d.categoryGroups) d.categoryGroups = JSON.parse(JSON.stringify(DEFAULT_DATA.categoryGroups));
     if (!d.buildContract.variations) d.buildContract.variations = [];
@@ -7994,6 +8025,306 @@ Combine quantities where sensible. No duplicates. No other text.`;
   }
 }
 
+// ─────────────────────────────────────────────────
+// VEHICLES
+// ─────────────────────────────────────────────────
+
+function renderVehicles() {
+  const vehicles = state.vehicles || [];
+
+  if (vehicles.length === 0) {
+    document.getElementById('vehicles-content').innerHTML = `
+      <div class="empty" style="margin-top:24px">
+        <div class="empty-icon">🚗</div>
+        <p>No vehicles yet. Add your car to track rego, insurance and services.</p>
+        <button class="btn btn-primary" style="margin-top:12px" onclick="openVehicleForm()">+ Add Vehicle</button>
+      </div>`;
+    return;
+  }
+
+  let html = `<div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+    <button class="btn btn-primary btn-sm" onclick="openVehicleForm()">+ Add Vehicle</button>
+  </div>`;
+
+  vehicles.forEach(v => {
+    const today = new Date();
+    const badges = [];
+
+    // Rego badge
+    if (v.regoExpiry) {
+      const regoDays = Math.ceil((new Date(v.regoExpiry) - today) / 86400000);
+      if (regoDays < 0) badges.push({ cls: 'red', text: `Rego expired ${Math.abs(regoDays)}d ago` });
+      else if (regoDays <= 30) badges.push({ cls: 'amber', text: `Rego expires in ${regoDays}d` });
+      else badges.push({ cls: 'green', text: `Rego: ${new Date(v.regoExpiry).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' })}` });
+    }
+
+    // Insurance badge
+    if (v.insurance && v.insurance.renewalDate) {
+      const insDays = Math.ceil((new Date(v.insurance.renewalDate) - today) / 86400000);
+      if (insDays < 0) badges.push({ cls: 'red', text: `Insurance expired ${Math.abs(insDays)}d ago` });
+      else if (insDays <= 30) badges.push({ cls: 'amber', text: `Insurance renews in ${insDays}d` });
+      else badges.push({ cls: 'green', text: `Insured until ${new Date(v.insurance.renewalDate).toLocaleDateString('en-AU', { day:'numeric', month:'short' })}` });
+    }
+
+    // Service badge
+    if (v.serviceInterval && v.odometer && v.services && v.services.length > 0) {
+      const lastService = v.services.sort((a, b) => b.odometer - a.odometer)[0];
+      const kmSince = v.odometer.reading - lastService.odometer;
+      const kmUntil = v.serviceInterval - kmSince;
+      if (kmUntil <= 0) badges.push({ cls: 'red', text: `Service overdue by ${Math.abs(kmUntil).toLocaleString()}km` });
+      else if (kmUntil <= 2000) badges.push({ cls: 'amber', text: `Service due in ${kmUntil.toLocaleString()}km` });
+      else badges.push({ cls: 'green', text: `Next service in ${kmUntil.toLocaleString()}km` });
+    }
+
+    const badgesHtml = badges.map(b => `<span class="veh-badge ${b.cls}">${b.text}</span>`).join('');
+
+    // Stats
+    const totalServiceCost = (v.services || []).reduce((s, svc) => s + (svc.cost || 0), 0);
+
+    html += `
+      <div class="veh-card">
+        <div class="veh-card-header">
+          <div class="veh-icon">${v.fuel === 'ev' ? '⚡' : '🚗'}</div>
+          <div style="flex:1;min-width:0">
+            <div class="veh-name">${v.name}</div>
+            ${v.plate ? `<span class="veh-plate">${v.plate}${v.state ? ' · ' + v.state : ''}</span>` : ''}
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="openVehicleForm(${v.id})">Edit</button>
+            <button class="btn btn-sm" style="color:var(--danger)" onclick="deleteVehicle(${v.id})">Delete</button>
+          </div>
+        </div>
+
+        ${badgesHtml ? `<div class="veh-badges">${badgesHtml}</div>` : ''}
+
+        <div class="veh-stat-grid">
+          ${v.odometer ? `<div class="veh-stat"><div class="veh-stat-label">Odometer</div><div class="veh-stat-value">${v.odometer.reading.toLocaleString()} km</div></div>` : ''}
+          ${v.fuel ? `<div class="veh-stat"><div class="veh-stat-label">Fuel</div><div class="veh-stat-value" style="text-transform:capitalize">${v.fuel}</div></div>` : ''}
+          ${v.insurance && v.insurance.provider ? `<div class="veh-stat"><div class="veh-stat-label">Insurer</div><div class="veh-stat-value">${v.insurance.provider}</div></div>` : ''}
+          <div class="veh-stat"><div class="veh-stat-label">Total Service Cost</div><div class="veh-stat-value">${aud(totalServiceCost)}</div></div>
+        </div>
+
+        <!-- Service History -->
+        <div class="section" style="margin-top:8px">
+          <div class="section-header">
+            <div class="section-title">Service History</div>
+            <button class="btn btn-sm" onclick="openServiceForm(${v.id})">+ Add Service</button>
+          </div>
+          ${(v.services || []).length === 0
+            ? `<div style="padding:16px 20px;color:var(--text-muted);font-size:13px;text-align:center">No service records yet</div>`
+            : `<div class="table-wrap"><table>
+                <thead><tr><th>Date</th><th>Type</th><th>Odometer</th><th>Provider</th><th class="amount">Cost</th><th></th></tr></thead>
+                <tbody>
+                  ${[...v.services].sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => `<tr>
+                    <td style="white-space:nowrap">${s.date ? new Date(s.date).toLocaleDateString('en-AU', {day:'numeric',month:'short',year:'numeric'}) : '—'}</td>
+                    <td style="font-weight:500">${s.type || '—'}</td>
+                    <td>${s.odometer ? s.odometer.toLocaleString() + ' km' : '—'}</td>
+                    <td style="color:var(--text-muted)">${s.provider || '—'}</td>
+                    <td class="amount">${s.cost ? aud(s.cost) : '—'}</td>
+                    <td><button class="btn btn-sm" style="color:var(--danger);font-size:11px" onclick="deleteService(${v.id},${s.id})">×</button></td>
+                  </tr>`).join('')}
+                </tbody>
+              </table></div>`}
+        </div>
+      </div>`;
+  });
+
+  document.getElementById('vehicles-content').innerHTML = html;
+}
+
+function openVehicleForm(editId) {
+  const v = editId ? (state.vehicles || []).find(v => v.id === editId) : null;
+  const isEdit = !!v;
+
+  document.getElementById('modal-title').textContent = isEdit ? `Edit ${v.name}` : 'Add Vehicle';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Vehicle Name</label>
+      <input class="form-input" id="vf-name" type="text" value="${v ? v.name : ''}" placeholder="e.g. Mitsubishi Outlander">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Plate Number</label>
+        <input class="form-input" id="vf-plate" type="text" value="${v ? v.plate || '' : ''}" placeholder="ABC123" style="text-transform:uppercase">
+      </div>
+      <div class="form-group">
+        <label class="form-label">State</label>
+        <select class="form-select" id="vf-state">
+          ${['SA','VIC','NSW','QLD','WA','TAS','NT','ACT'].map(s => `<option value="${s}"${v && v.state === s ? ' selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Fuel Type</label>
+        <select class="form-select" id="vf-fuel">
+          ${['petrol','diesel','hybrid','ev','lpg'].map(f => `<option value="${f}"${v && v.fuel === f ? ' selected' : ''}>${f.charAt(0).toUpperCase() + f.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rego Expiry</label>
+        <input class="form-input" id="vf-rego" type="date" value="${v ? v.regoExpiry || '' : ''}">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Odometer (km)</label>
+        <input class="form-input" id="vf-odo" type="number" value="${v && v.odometer ? v.odometer.reading : ''}" placeholder="42350">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service Interval (km)</label>
+        <input class="form-input" id="vf-interval" type="number" value="${v ? v.serviceInterval || '' : '10000'}" placeholder="10000">
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px">Insurance</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label class="form-label">Provider</label>
+          <input class="form-input" id="vf-ins-provider" type="text" value="${v && v.insurance ? v.insurance.provider || '' : ''}" placeholder="e.g. AAMI">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Policy Number</label>
+          <input class="form-input" id="vf-ins-policy" type="text" value="${v && v.insurance ? v.insurance.policyNo || '' : ''}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Renewal Date</label>
+        <input class="form-input" id="vf-ins-renewal" type="date" value="${v && v.insurance ? v.insurance.renewalDate || '' : ''}">
+      </div>
+    </div>`;
+
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveVehicle(${editId || 'null'})">Save</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function saveVehicle(editId) {
+  const name = document.getElementById('vf-name')?.value.trim();
+  if (!name) return;
+
+  const data = {
+    name,
+    plate: (document.getElementById('vf-plate')?.value || '').trim().toUpperCase(),
+    state: document.getElementById('vf-state')?.value || 'SA',
+    fuel: document.getElementById('vf-fuel')?.value || 'petrol',
+    regoExpiry: document.getElementById('vf-rego')?.value || '',
+    odometer: {
+      reading: parseInt(document.getElementById('vf-odo')?.value) || 0,
+      date: new Date().toISOString().slice(0, 10)
+    },
+    serviceInterval: parseInt(document.getElementById('vf-interval')?.value) || 10000,
+    insurance: {
+      provider: document.getElementById('vf-ins-provider')?.value.trim() || '',
+      policyNo: document.getElementById('vf-ins-policy')?.value.trim() || '',
+      renewalDate: document.getElementById('vf-ins-renewal')?.value || ''
+    }
+  };
+
+  if (editId) {
+    const v = state.vehicles.find(v => v.id === editId);
+    if (v) Object.assign(v, data);
+  } else {
+    data.id = state.vehicles.length ? Math.max(...state.vehicles.map(v => v.id)) + 1 : 1;
+    data.services = [];
+    state.vehicles.push(data);
+  }
+
+  saveData(state);
+  closeModal();
+  renderAll();
+}
+
+function deleteVehicle(id) {
+  if (!confirm('Delete this vehicle and all its service history?')) return;
+  state.vehicles = state.vehicles.filter(v => v.id !== id);
+  saveData(state);
+  renderAll();
+}
+
+function openServiceForm(vehicleId) {
+  document.getElementById('modal-title').textContent = 'Add Service Record';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Service Type</label>
+      <select class="form-select" id="sf-type">
+        <option value="Full service">Full service</option>
+        <option value="Oil change">Oil change</option>
+        <option value="Tyres">Tyres</option>
+        <option value="Brakes">Brakes</option>
+        <option value="Battery">Battery</option>
+        <option value="Inspection">Inspection</option>
+        <option value="Repair">Repair</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="form-input" id="sf-date" type="date" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Odometer (km)</label>
+        <input class="form-input" id="sf-odo" type="number" placeholder="42350">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Provider</label>
+        <input class="form-input" id="sf-provider" type="text" placeholder="e.g. Ultra Tune">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cost ($)</label>
+        <input class="form-input" id="sf-cost" type="number" step="0.01" placeholder="450">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+      <input class="form-input" id="sf-notes" type="text" placeholder="e.g. Replaced timing belt">
+    </div>`;
+
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveService(${vehicleId})">Save</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function saveService(vehicleId) {
+  const v = state.vehicles.find(v => v.id === vehicleId);
+  if (!v) return;
+  if (!v.services) v.services = [];
+
+  const svc = {
+    id: v.services.length ? Math.max(...v.services.map(s => s.id)) + 1 : 1,
+    date: document.getElementById('sf-date')?.value || '',
+    odometer: parseInt(document.getElementById('sf-odo')?.value) || 0,
+    type: document.getElementById('sf-type')?.value || 'Full service',
+    provider: document.getElementById('sf-provider')?.value.trim() || '',
+    cost: parseFloat(document.getElementById('sf-cost')?.value) || 0,
+    notes: document.getElementById('sf-notes')?.value.trim() || ''
+  };
+
+  v.services.push(svc);
+
+  // Update odometer if service odometer is higher
+  if (svc.odometer > (v.odometer?.reading || 0)) {
+    v.odometer = { reading: svc.odometer, date: svc.date };
+  }
+
+  saveData(state);
+  closeModal();
+  renderAll();
+}
+
+function deleteService(vehicleId, serviceId) {
+  const v = state.vehicles.find(v => v.id === vehicleId);
+  if (!v) return;
+  v.services = (v.services || []).filter(s => s.id !== serviceId);
+  saveData(state);
+  renderAll();
+}
+
 function safeRender(fn) {
   try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
 }
@@ -8013,6 +8344,7 @@ function renderAll() {
   safeRender(renderBills);
   safeRender(renderPlanner);
   safeRender(renderMeals);
+  safeRender(renderVehicles);
 }
 
 // ─────────────────────────────────────────────────
