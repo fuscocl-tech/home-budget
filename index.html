@@ -320,14 +320,16 @@
 
     .page-header h1 {
       font-size: 22px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--text);
+      letter-spacing: -0.02em;
     }
 
     .page-header p {
       color: var(--text-muted);
       margin-top: 4px;
       font-size: 13px;
+      line-height: 1.5;
     }
 
     /* ─── Cards ───────────────────────────────── */
@@ -491,19 +493,21 @@
     /* ─── Buttons ─────────────────────────────── */
     .btn {
       border: none;
-      border-radius: 7px;
-      padding: 8px 14px;
+      border-radius: 8px;
+      padding: 8px 16px;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
+    .btn:active { transform:scale(0.97); }
 
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary { background: #0d9488; color: #fff; border:none; }
+    .btn-primary:hover { background: #0f766e; }
     .btn-ghost { background: transparent; color: var(--text-muted); padding: 6px 8px; }
     .btn-ghost:hover { background: var(--bg); color: var(--text); }
     .btn-danger-ghost { background: transparent; color: var(--danger); padding: 6px 8px; }
@@ -530,12 +534,12 @@
 
     .modal {
       background: var(--surface);
-      border-radius: var(--radius);
+      border-radius: 16px;
       width: 100%;
       max-width: 500px;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18);
     }
 
     .modal-header {
@@ -577,14 +581,15 @@
     .form-input, .form-select {
       width: 100%;
       border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 9px 12px;
+      border-radius: 8px;
+      padding: 10px 14px;
       font-size: 13px;
       color: var(--text);
       background: var(--surface);
       transition: border-color 0.15s;
       outline: none;
     }
+    .form-input:focus, .form-select:focus { border-color:#0d9488; }
 
     .form-input:focus, .form-select:focus { border-color: var(--primary); }
 
@@ -1654,41 +1659,46 @@
     .maint-starter-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
 
     /* ─── Today Screen ─────────────────────── */
-    .today-briefing { background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%); color:#fff; border-radius:16px; padding:24px; margin-bottom:20px; }
-    .today-briefing h2 { font-size:18px; font-weight:700; margin-bottom:6px; }
-    .today-briefing p { font-size:14px; opacity:0.9; line-height:1.5; }
-    .today-actions-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
-    .today-section-card { border:1px solid var(--border); border-radius:14px; padding:20px 22px; background:var(--surface); cursor:pointer; transition:box-shadow 0.15s,transform 0.15s; }
-    .today-section-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); transform:translateY(-2px); }
+    .today-briefing { background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%); color:#fff; border-radius:var(--radius); padding:24px 28px; margin-bottom:24px; }
+    .today-briefing h2 { font-size:20px; font-weight:800; margin-bottom:8px; letter-spacing:-0.02em; }
+    .today-briefing p { font-size:14px; opacity:0.88; line-height:1.6; }
+    .today-actions-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+    @media(max-width:640px) { .today-actions-grid { grid-template-columns:1fr; } }
+    .today-section-card { border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; background:var(--surface); cursor:pointer; transition:box-shadow 0.2s,transform 0.2s; }
+    .today-section-card:hover { box-shadow:0 6px 20px rgba(0,0,0,0.07); transform:translateY(-2px); }
+    .today-section-card:active { transform:translateY(0); }
     .today-section-label { font-size:17px; font-weight:800; color:#0d9488; margin-bottom:6px; letter-spacing:-0.01em; }
-    .today-section-sub { font-size:12px; color:var(--text-muted); line-height:1.4; }
-    .today-action-cards { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
-    .today-acard { border-radius:10px; padding:11px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:background 0.1s; }
-    .today-acard:hover { filter:brightness(0.97); }
+    .today-section-sub { font-size:12px; color:var(--text-muted); line-height:1.5; }
+    .today-action-cards { display:flex; flex-direction:column; gap:6px; margin-bottom:24px; }
+    .today-acard { border-radius:var(--radius); padding:12px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:filter 0.15s; }
+    .today-acard:hover { filter:brightness(0.96); }
+    .today-acard:active { filter:brightness(0.93); }
     .today-acard.red { background:#fef2f2; border-left:3px solid #ef4444; }
     .today-acard.amber { background:#fffbeb; border-left:3px solid #f59e0b; }
     .today-acard.green { background:#f0fdf4; border-left:3px solid #10b981; }
     .today-acard.blue { background:#eff6ff; border-left:3px solid #3b82f6; }
     .today-acard-body { flex:1; min-width:0; }
-    .today-acard-title { font-size:13px; font-weight:600; }
-    .today-acard-sub { font-size:11px; color:var(--text-muted); margin-top:1px; }
-    .today-acard-action { font-size:12px; font-weight:600; color:var(--primary); flex-shrink:0; white-space:nowrap; }
+    .today-acard-title { font-size:13px; font-weight:600; line-height:1.4; }
+    .today-acard-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .today-acard-action { font-size:12px; font-weight:600; color:#0d9488; flex-shrink:0; white-space:nowrap; }
 
-    .today-ticker-wrap { overflow:hidden; border-radius:10px; background:var(--surface2); border:1px solid var(--border); margin-bottom:16px; padding:10px 0; }
-    .today-ticker { display:flex; gap:32px; animation:tickerScroll 30s linear infinite; white-space:nowrap; }
+    .today-ticker-wrap { overflow:hidden; border-radius:var(--radius); background:var(--surface2); border:1px solid var(--border); margin-bottom:20px; padding:10px 0; }
+    .today-ticker { display:flex; gap:36px; animation:tickerScroll 35s linear infinite; white-space:nowrap; padding:0 16px; }
     .today-ticker:hover { animation-play-state:paused; }
     .today-ticker-item { font-size:12px; color:var(--text-muted); display:inline-flex; align-items:center; gap:6px; flex-shrink:0; }
-    .today-ticker-item strong { color:var(--text); }
+    .today-ticker-item strong { color:var(--text); font-weight:600; }
     @keyframes tickerScroll { 0% { transform:translateX(0); } 100% { transform:translateX(-50%); } }
 
-    .today-quick-bar { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; padding:8px 0; }
-    .today-quick-btn { padding:10px 18px; border-radius:99px; border:1.5px solid var(--border); background:var(--surface); font-size:13px; font-weight:600; cursor:pointer; transition:border-color 0.15s,background 0.15s; display:inline-flex; align-items:center; gap:6px; }
+    .today-quick-bar { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; padding:12px 0 8px; }
+    .today-quick-btn { padding:10px 20px; border-radius:99px; border:1.5px solid var(--border); background:var(--surface); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
     .today-quick-btn:hover { border-color:#0d9488; background:#f0fdf4; color:#0d9488; }
+    .today-quick-btn:active { transform:scale(0.97); }
 
     /* ─── Section Pills ────────────────────── */
-    .section-pills { display:flex; gap:6px; overflow-x:auto; padding:0 0 16px; margin-top:-8px; scrollbar-width:none; }
+    .section-pills { display:flex; gap:8px; overflow-x:auto; padding:4px 0 20px; scrollbar-width:none; }
     .section-pills::-webkit-scrollbar { display:none; }
-    .section-pill { padding:7px 16px; border-radius:99px; font-size:13px; font-weight:500; border:1.5px solid var(--border); background:var(--surface); cursor:pointer; white-space:nowrap; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
+    .section-pill { padding:8px 18px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid var(--border); background:var(--surface); cursor:pointer; white-space:nowrap; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
+    .section-pill:hover { border-color:#94a3b8; }
     .section-pill.active { background:#0d9488; color:#fff; border-color:#0d9488; }
 
     /* ─── Quick-add FAB ───────────────────────── */
@@ -3816,7 +3826,7 @@ function renderToday() {
   // ── Greeting ──
   const hour = today.getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  const name = (state.householdProfile?.members?.[0]?.name) || '';
+  const name = (_currentUser?.displayName?.split(' ')[0]) || '';
   const redCount = cards.filter(c => c.cls === 'red').length;
   const amberCount = cards.filter(c => c.cls === 'amber').length;
   const attentionText = redCount + amberCount > 0
@@ -3839,10 +3849,12 @@ function renderToday() {
     </div>`;
   }).join('');
 
+  const fallbackBrief = `${attentionText} You have ${aud(Math.abs(surplus))} ${surplus >= 0 ? 'left' : 'over'} in your budget with ${daysLeft} days to go.`;
+
   document.getElementById('today-content').innerHTML = `
     <div class="today-briefing">
       <h2>${greeting}${name ? ', ' + name : ''}</h2>
-      <p>${attentionText} You have ${aud(Math.abs(surplus))} ${surplus >= 0 ? 'left' : 'over'} in your budget with ${daysLeft} days to go.</p>
+      <p id="today-briefing-text">${fallbackBrief}</p>
     </div>
 
     ${cardsHtml ? `<div class="today-action-cards">${cardsHtml}</div>` : ''}
@@ -3869,6 +3881,64 @@ function renderToday() {
       <button class="today-quick-btn" onclick="activateTab('meals')">Plan dinner</button>
       <button class="today-quick-btn" onclick="activateTab('maintenance')">Mark task done</button>
     </div>`;
+
+  // Async AI briefing — replaces the template text if API key available
+  _fetchAIBriefing(cards, surplus, daysLeft, todayMeals, health);
+}
+
+let _lastBriefingDate = '';
+let _cachedBriefing = '';
+
+async function _fetchAIBriefing(cards, surplus, daysLeft, todayMeals, health) {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key) return;
+
+  // Cache: only call AI once per day
+  const todayStr = new Date().toISOString().slice(0, 10);
+  if (_lastBriefingDate === todayStr && _cachedBriefing) {
+    const el = document.getElementById('today-briefing-text');
+    if (el) el.textContent = _cachedBriefing;
+    return;
+  }
+
+  const redItems = cards.filter(c => c.cls === 'red').map(c => c.title);
+  const amberItems = cards.filter(c => c.cls === 'amber').map(c => c.title);
+
+  const context = [
+    `Budget: ${aud(Math.abs(surplus))} ${surplus >= 0 ? 'surplus' : 'over budget'}, ${daysLeft} days left in the month`,
+    `Health score: ${health.total}/100 (${health.grade})`,
+    redItems.length ? `Urgent: ${redItems.join(', ')}` : '',
+    amberItems.length ? `Coming up: ${amberItems.join(', ')}` : '',
+    todayMeals.d ? `Dinner tonight: ${todayMeals.d}` : 'No dinner planned',
+    `${(state.goals||[]).filter(g=>g.status!=='achieved').length} active goals`,
+  ].filter(Boolean).join('. ');
+
+  const prompt = `You are Toto, a friendly family personal assistant app. Write a 2-sentence daily briefing for the user based on this context:
+
+${context}
+
+Rules:
+- Warm, conversational, like a helpful friend
+- Lead with the most important thing
+- Mention dinner if planned
+- Keep it under 40 words
+- No emojis, no bullet points, just flowing text
+- Don't start with "Here's" or "Today"`;
+
+  try {
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 100, messages: [{ role: 'user', content: prompt }] })
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const text = data.content[0].text.trim().replace(/^["']|["']$/g, '');
+    _cachedBriefing = text;
+    _lastBriefingDate = todayStr;
+    const el = document.getElementById('today-briefing-text');
+    if (el) el.textContent = text;
+  } catch(e) { /* silent fail — keep template */ }
 }
 
 function renderDashboard() {
@@ -9168,25 +9238,39 @@ function safeRender(fn) {
   try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
 }
 
-function renderAll() {
-  safeRender(renderToday);
-  safeRender(renderInsights);
-  safeRender(renderMoneyDashboard);
-  safeRender(renderDashboard);
-  safeRender(renderBuild);
-  safeRender(renderBudget);
+const _TAB_RENDERERS = {
+  today:       [renderToday],
+  money:       [renderMoneyDashboard],
+  dashboard:   [renderDashboard],
+  budget:      [renderBudget],
+  bills:       [renderBills],
+  networth:    [renderNetWorth],
+  goals:       [renderGoals],
+  scenarios:   [renderScenarios],
+  insights:    [renderInsights],
+  build:       [renderBuild],
+  settings:    [renderSettings],
+  kids:        [renderKids],
+  planner:     [renderPlanner],
+  meals:       [renderMeals],
+  vehicles:    [renderVehicles],
+  documents:   [renderDocuments],
+  maintenance: [renderMaintenance],
+};
 
-  safeRender(renderGoals);
-  safeRender(renderScenarios);
-  safeRender(renderSettings);
-  safeRender(renderKids);
-  safeRender(renderNetWorth);
-  safeRender(renderBills);
-  safeRender(renderPlanner);
-  safeRender(renderMeals);
-  safeRender(renderVehicles);
-  safeRender(renderDocuments);
-  safeRender(renderMaintenance);
+function _activeTab() {
+  const el = document.querySelector('.tab-panel.active');
+  return el ? el.id.replace('tab-', '') : 'today';
+}
+
+function renderAll() {
+  // Always render the Today screen (needs fresh data from all sources)
+  safeRender(renderToday);
+
+  // Only render the active tab
+  const active = _activeTab();
+  const fns = _TAB_RENDERERS[active];
+  if (fns) fns.forEach(fn => safeRender(fn));
 }
 
 // ─────────────────────────────────────────────────
