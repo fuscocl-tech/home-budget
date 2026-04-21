@@ -3,485 +3,615 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Toto — Brand &amp; UI Mockups</title>
+  <title>Toto — Brand &amp; UI Direction</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fb; color: #1e293b; font-size: 15px; line-height: 1.7; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a1a; color: #fff; font-size: 15px; line-height: 1.7; }
 
-    .page-hero { background: #1e293b; color: #fff; padding: 80px 24px 60px; text-align: center; }
-    .page-hero h1 { font-size: 42px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 12px; }
-    .page-hero p { font-size: 18px; opacity: 0.7; max-width: 500px; margin: 0 auto; }
+    /* ─── Hero ─── */
+    .hero { position: relative; overflow: hidden; padding: 100px 24px 80px; text-align: center; background: linear-gradient(160deg, #0c0c2e 0%, #1a103d 40%, #0f2942 100%); }
+    .hero::before { content:''; position:absolute; top:-120px; right:-80px; width:400px; height:400px; background:radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%); }
+    .hero::after { content:''; position:absolute; bottom:-100px; left:-60px; width:350px; height:350px; background:radial-gradient(circle, rgba(8,145,178,0.2) 0%, transparent 70%); }
+    .hero h1 { font-size: 52px; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 12px; position: relative; z-index: 1; background: linear-gradient(135deg, #06b6d4, #a78bfa, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero p { font-size: 18px; opacity: 0.5; max-width: 480px; margin: 0 auto; position: relative; z-index: 1; }
+    .hero .badge { display: inline-block; margin-top: 24px; padding: 6px 18px; border-radius: 99px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); position: relative; z-index: 1; }
 
-    .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
-    section { padding: 60px 0; }
-    section + section { border-top: 1px solid #e2e8f0; }
-    h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
-    h3 { font-size: 18px; font-weight: 700; margin-top: 28px; margin-bottom: 10px; }
-    .sub { font-size: 14px; color: #64748b; margin-bottom: 32px; }
-    p { margin-bottom: 16px; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 80px 0; }
+    section + section { border-top: 1px solid rgba(255,255,255,0.06); }
+    h2 { font-size: 32px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 8px; }
+    h3 { font-size: 18px; font-weight: 700; margin-top: 32px; margin-bottom: 12px; color: rgba(255,255,255,0.7); }
+    .sub { font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 40px; }
+    p { margin-bottom: 16px; color: rgba(255,255,255,0.6); }
 
-    /* ─── Direction Cards ─── */
-    .direction { border: 2px solid #e2e8f0; border-radius: 20px; overflow: hidden; margin-bottom: 32px; }
-    .direction.recommended { border-color: #0d9488; }
-    .direction-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 16px; text-align: center; }
-    .direction.recommended .direction-label { background: #0d9488; color: #fff; }
-    .direction:not(.recommended) .direction-label { background: #f1f5f9; color: #64748b; }
-    .direction-body { padding: 32px; }
-    .direction-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-    .direction-desc { font-size: 14px; color: #64748b; margin-bottom: 24px; }
-
-    /* ─── Colour Swatches ─── */
-    .swatches { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .swatch { width: 64px; height: 64px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 4px; }
-    .swatch-label { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.8); }
-    .swatch.light .swatch-label { color: rgba(0,0,0,0.5); }
+    /* ─── Colour Palette ─── */
+    .palette { display: flex; gap: 4px; border-radius: 16px; overflow: hidden; margin: 24px 0; height: 80px; }
+    .pal-swatch { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding: 8px 4px; min-width: 60px; }
+    .pal-swatch span { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.7); }
+    .pal-swatch.light span { color: rgba(0,0,0,0.4); }
 
     /* ─── Phone Mockups ─── */
-    .phone-row { display: flex; gap: 20px; overflow-x: auto; padding: 8px 0 16px; }
-    .phone { width: 280px; flex-shrink: 0; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.12); border: 1px solid #e2e8f0; }
-    .phone-status { height: 28px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
-    .phone-content { min-height: 480px; }
+    .phone-grid { display: flex; gap: 24px; overflow-x: auto; padding: 24px 0 32px; scroll-snap-type: x mandatory; }
+    .phone-wrap { flex-shrink: 0; scroll-snap-align: start; }
+    .phone-label { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 0.06em; }
+    .phone { width: 300px; border-radius: 32px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08); position: relative; }
+    .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 24px; background: #000; border-radius: 0 0 16px 16px; z-index: 2; }
+    .phone-content { min-height: 540px; padding-top: 24px; }
 
-    /* ─── Mockup Internals ─── */
-    .m-greeting { padding: 20px 20px 16px; }
-    .m-greeting h2 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
-    .m-greeting p { font-size: 13px; margin-bottom: 0; }
-    .m-cards { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 6px; }
-    .m-card { border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
-    .m-card-body { flex: 1; }
-    .m-card-title { font-size: 13px; font-weight: 600; }
-    .m-card-sub { font-size: 11px; opacity: 0.6; margin-top: 1px; }
-    .m-card-action { font-size: 11px; font-weight: 700; flex-shrink: 0; }
-    .m-sections { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; padding: 0 16px 16px; }
-    .m-section { border-radius: 12px; padding: 16px 14px; text-align: center; }
-    .m-section-label { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
-    .m-section-sub { font-size: 10px; opacity: 0.6; }
-    .m-pills { display: flex; gap: 6px; padding: 0 16px 12px; overflow: hidden; }
-    .m-pill { padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-    .m-ticker { padding: 8px 16px; font-size: 11px; overflow: hidden; white-space: nowrap; }
-    .m-quick { display: flex; gap: 8px; padding: 8px 16px 16px; justify-content: center; }
-    .m-quick-btn { padding: 8px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; border: 1.5px solid; }
+    /* ─── Mockup Components ─── */
+    .mk-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px 0; }
+    .mk-logo { font-size: 16px; font-weight: 900; letter-spacing: 0.06em; }
+    .mk-avatar { width: 28px; height: 28px; border-radius: 50%; }
 
-    /* ─── Brand Guidelines Section ─── */
-    .type-sample { margin-bottom: 16px; }
-    .type-sample .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 4px; }
+    .mk-greeting { padding: 20px; }
+    .mk-greeting h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .mk-greeting p { font-size: 13px; margin-bottom: 0; line-height: 1.5; }
 
-    .tone-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 12px; }
-    .tone-card .do { color: #065f46; font-weight: 600; }
-    .tone-card .dont { color: #991b1b; font-weight: 600; }
+    .mk-card { border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; margin: 0 16px 8px; }
+    .mk-card-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .mk-card-body { flex: 1; }
+    .mk-card-title { font-size: 13px; font-weight: 700; }
+    .mk-card-sub { font-size: 11px; opacity: 0.5; margin-top: 1px; }
+    .mk-card-action { font-size: 11px; font-weight: 700; }
 
-    .logo-concepts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0; }
-    .logo-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px 24px; text-align: center; }
-    .logo-card .logo { font-size: 32px; font-weight: 900; letter-spacing: 0.05em; margin-bottom: 8px; }
-    .logo-card .logo-sub { font-size: 11px; color: #64748b; }
+    .mk-sections { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; padding: 4px 16px 12px; }
+    .mk-section { border-radius: 16px; padding: 18px 14px; text-align: center; position: relative; overflow: hidden; }
+    .mk-section::before { content: ''; position: absolute; top: -20px; right: -20px; width: 60px; height: 60px; border-radius: 50%; opacity: 0.15; }
+    .mk-section-icon { margin-bottom: 6px; }
+    .mk-section-label { font-size: 14px; font-weight: 800; }
+    .mk-section-sub { font-size: 10px; opacity: 0.5; margin-top: 2px; }
 
-    .footer { text-align: center; padding: 40px 24px; color: #94a3b8; font-size: 13px; }
+    .mk-pills { display: flex; gap: 6px; padding: 0 16px 10px; }
+    .mk-pill { padding: 6px 14px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+
+    .mk-stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px 10px; }
+    .mk-stat { border-radius: 14px; padding: 16px; }
+    .mk-stat-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.5; margin-bottom: 4px; }
+    .mk-stat-val { font-size: 22px; font-weight: 900; }
+
+    .mk-list-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+    .mk-list-icon { width: 32px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .mk-list-body { flex: 1; }
+    .mk-list-title { font-size: 13px; font-weight: 600; }
+    .mk-list-sub { font-size: 11px; opacity: 0.4; }
+    .mk-list-badge { padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+
+    .mk-meal-grid { display: grid; grid-template-columns: 60px repeat(5,1fr); gap: 2px; padding: 0 12px 12px; font-size: 9px; }
+    .mk-meal-header { padding: 4px; text-align: center; font-weight: 700; border-radius: 4px; }
+    .mk-meal-cell { padding: 6px 4px; border-radius: 6px; text-align: center; font-size: 8px; font-weight: 500; line-height: 1.3; }
+
+    .mk-ticker { margin: 0 16px 10px; border-radius: 10px; padding: 8px 12px; font-size: 10px; font-weight: 500; overflow: hidden; white-space: nowrap; }
+
+    .mk-quick { display: flex; gap: 6px; padding: 4px 16px 16px; justify-content: center; }
+    .mk-quick-btn { padding: 8px 14px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+
+    .mk-fab { position: absolute; bottom: 20px; right: 20px; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 300; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+
+    /* ─── Brand sections ─── */
+    .tone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    @media(max-width:640px) { .tone-grid { grid-template-columns: 1fr; } }
+    .tone-card { border-radius: 14px; padding: 20px 24px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+    .tone-do { color: #34d399; font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+    .tone-dont { color: #fb7185; font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+    .tone-note { font-size: 12px; color: rgba(255,255,255,0.35); }
+
+    .logo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0; }
+    .logo-card { border-radius: 16px; padding: 40px 24px 32px; text-align: center; }
+    .logo-text { font-size: 36px; font-weight: 900; letter-spacing: 0.04em; }
+    .logo-sub { font-size: 11px; margin-top: 8px; opacity: 0.5; }
+
+    .tagline-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 24px 0; }
+    .tagline { border-radius: 14px; padding: 24px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); text-align: center; }
+    .tagline q { font-size: 18px; font-weight: 800; color: #fff; }
+    .tagline .note { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; }
+
+    .spec-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .spec-table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
+    .spec-table td:first-child { font-weight: 700; color: rgba(255,255,255,0.7); width: 160px; }
+    .spec-table td:last-child { color: rgba(255,255,255,0.4); }
+
+    .footer { text-align: center; padding: 60px 24px; color: rgba(255,255,255,0.2); font-size: 12px; }
   </style>
 </head>
 <body>
 
-<div class="page-hero">
-  <h1>Toto Brand &amp; UI</h1>
-  <p>Design directions, brand guidelines, and screen mockups</p>
+<!-- ═══════════════════════════════════════════ -->
+<div class="hero">
+  <h1>toto.</h1>
+  <p>Brand direction, UI mockups, and design system for the family life assistant</p>
+  <div class="badge">Bold Colour Direction — April 2026</div>
 </div>
 
 <div class="container">
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- DESIGN DIRECTIONS                          -->
+<section>
+  <h2>Colour System</h2>
+  <p class="sub">Rich, energetic palette that feels warm and alive</p>
+
+  <div class="palette">
+    <div class="pal-swatch" style="background:linear-gradient(180deg,#0891b2,#06b6d4)"><span>Cyan</span></div>
+    <div class="pal-swatch" style="background:linear-gradient(180deg,#7c3aed,#8b5cf6)"><span>Purple</span></div>
+    <div class="pal-swatch" style="background:linear-gradient(180deg,#f97316,#fb923c)"><span>Orange</span></div>
+    <div class="pal-swatch" style="background:linear-gradient(180deg,#10b981,#34d399)"><span>Emerald</span></div>
+    <div class="pal-swatch" style="background:linear-gradient(180deg,#ef4444,#f87171)"><span>Red</span></div>
+    <div class="pal-swatch" style="background:linear-gradient(180deg,#f59e0b,#fbbf24)"><span>Amber</span></div>
+    <div class="pal-swatch" style="background:#1e293b"><span>Slate</span></div>
+    <div class="pal-swatch light" style="background:#f0f9ff"><span>Ice BG</span></div>
+    <div class="pal-swatch light" style="background:#ffffff"><span>White</span></div>
+  </div>
+
+  <p>Primary actions use the <strong style="color:#06b6d4">cyan-to-purple gradient</strong>. Each section has its own accent colour: Wallet = emerald, Plan = cyan, Home = purple. Red/amber/green for status (same as current).</p>
+</section>
+
 <!-- ═══════════════════════════════════════════ -->
 <section>
-  <h2>Three Design Directions</h2>
-  <p class="sub">Pick the one that feels right. Everything else follows from this choice.</p>
+  <h2>Screen Mockups</h2>
+  <p class="sub">Scroll through the key screens — Today, Wallet, Plan, Home, Meals</p>
 
-  <!-- DIRECTION A — RECOMMENDED -->
-  <div class="direction recommended">
-    <div class="direction-label">Recommended</div>
-    <div class="direction-body">
-      <div class="direction-title">A. Warm Modern</div>
-      <div class="direction-desc">Soft cream background, warm shadows, teal accents. Feels like a well-designed home — not a fintech app. Approachable but not childish.</div>
+  <div class="phone-grid">
 
-      <h3>Colours</h3>
-      <div class="swatches">
-        <div class="swatch" style="background:#0d9488"><span class="swatch-label">Teal</span></div>
-        <div class="swatch" style="background:#0f766e"><span class="swatch-label">Teal Dark</span></div>
-        <div class="swatch" style="background:#1e293b"><span class="swatch-label">Text</span></div>
-        <div class="swatch" style="background:#64748b"><span class="swatch-label">Muted</span></div>
-        <div class="swatch light" style="background:#faf8f5;border:1px solid #e8e4de"><span class="swatch-label">Cream BG</span></div>
-        <div class="swatch light" style="background:#ffffff;border:1px solid #e8e4de"><span class="swatch-label">Surface</span></div>
-        <div class="swatch light" style="background:#f3f0eb;border:1px solid #e8e4de"><span class="swatch-label">Surface 2</span></div>
-        <div class="swatch" style="background:#ef4444"><span class="swatch-label">Danger</span></div>
-        <div class="swatch" style="background:#f59e0b"><span class="swatch-label">Warning</span></div>
-        <div class="swatch" style="background:#10b981"><span class="swatch-label">Success</span></div>
+    <!-- TODAY SCREEN -->
+    <div class="phone-wrap">
+      <div class="phone-label">Today</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-content" style="background:#f0f9ff">
+          <div class="mk-header">
+            <div class="mk-logo" style="background:linear-gradient(135deg,#06b6d4,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent">TOTO</div>
+            <div class="mk-avatar" style="background:linear-gradient(135deg,#06b6d4,#7c3aed)"></div>
+          </div>
+
+          <div class="mk-greeting" style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff;margin:12px 16px;border-radius:20px;padding:22px 20px">
+            <svg viewBox="0 0 200 60" style="width:100%;height:auto;margin-bottom:8px;opacity:0.1">
+              <circle cx="30" cy="30" r="25" fill="#fff"/>
+              <circle cx="70" cy="25" r="18" fill="#fff"/>
+              <circle cx="100" cy="35" r="15" fill="#fff"/>
+              <rect x="130" y="15" width="30" height="40" rx="4" fill="#fff"/>
+              <rect x="170" y="25" width="25" height="30" rx="4" fill="#fff"/>
+            </svg>
+            <h2 style="color:#fff">Good morning, Chris</h2>
+            <p style="color:rgba(255,255,255,0.85)">Solid week ahead. $1,240 buffer, pasta tonight, and one task overdue.</p>
+          </div>
+
+          <div class="mk-card" style="background:#fff;border-left:3px solid #ef4444">
+            <div class="mk-card-icon" style="background:#fef2f2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <div class="mk-card-body"><div class="mk-card-title" style="color:#1e293b">Pest control overdue</div><div class="mk-card-sub" style="color:#64748b">3 days · Jim's Pest Control</div></div>
+            <div class="mk-card-action" style="color:#0891b2">Done</div>
+          </div>
+          <div class="mk-card" style="background:#fff;border-left:3px solid #f59e0b">
+            <div class="mk-card-icon" style="background:#fffbeb">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>
+            </div>
+            <div class="mk-card-body"><div class="mk-card-title" style="color:#1e293b">Rego expires in 18 days</div><div class="mk-card-sub" style="color:#64748b">Outlander · ABC123</div></div>
+            <div class="mk-card-action" style="color:#0891b2">View</div>
+          </div>
+          <div class="mk-card" style="background:#fff;border-left:3px solid #10b981">
+            <div class="mk-card-icon" style="background:#f0fdf4">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            </div>
+            <div class="mk-card-body"><div class="mk-card-title" style="color:#1e293b">$1,240 left in budget</div><div class="mk-card-sub" style="color:#64748b">16 days remaining</div></div>
+            <div class="mk-card-action" style="color:#0891b2">Budget</div>
+          </div>
+
+          <div class="mk-sections" style="margin-top:6px">
+            <div class="mk-section" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5)">
+              <div class="mk-section-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+              <div class="mk-section-label" style="color:#065f46">Wallet</div>
+              <div class="mk-section-sub" style="color:#059669">$1,240 surplus</div>
+            </div>
+            <div class="mk-section" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)">
+              <div class="mk-section-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+              <div class="mk-section-label" style="color:#075985">Plan</div>
+              <div class="mk-section-sub" style="color:#0284c7">Pasta tonight</div>
+            </div>
+            <div class="mk-section" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe)">
+              <div class="mk-section-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+              <div class="mk-section-label" style="color:#5b21b6">Home</div>
+              <div class="mk-section-sub" style="color:#7c3aed">1 task due</div>
+            </div>
+          </div>
+
+          <div class="mk-ticker" style="background:#e0f2fe;color:#0369a1">
+            $340 spent this month &nbsp; &bull; &nbsp; 3 bills due &nbsp; &bull; &nbsp; Health: 72/B &nbsp; &bull; &nbsp; Dinner: Pasta
+          </div>
+
+          <div class="mk-quick">
+            <div class="mk-quick-btn" style="background:#fff;border:1.5px solid #e2e8f0;color:#1e293b">Log spend</div>
+            <div class="mk-quick-btn" style="background:#fff;border:1.5px solid #e2e8f0;color:#1e293b">Plan dinner</div>
+            <div class="mk-quick-btn" style="background:#fff;border:1.5px solid #e2e8f0;color:#1e293b">Mark done</div>
+          </div>
+
+          <div class="mk-fab" style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff">+</div>
+        </div>
       </div>
+    </div>
 
-      <h3>Today Screen Mockup</h3>
-      <div class="phone-row">
-        <div class="phone">
-          <div class="phone-status" style="background:#0d9488;color:#fff">9:41</div>
-          <div class="phone-content" style="background:#faf8f5">
-            <div class="m-greeting" style="background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border-radius:0 0 20px 20px;padding:24px 20px 20px">
-              <h2>Good morning, Chris</h2>
-              <p style="opacity:0.88;font-size:13px;line-height:1.5">You're on track this month with a healthy buffer. Pest control is due Friday and there's pasta planned tonight.</p>
+    <!-- WALLET SCREEN -->
+    <div class="phone-wrap">
+      <div class="phone-label">Wallet</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-content" style="background:#f0f9ff">
+          <div style="padding:32px 16px 0">
+            <div style="font-size:11px;color:#64748b;margin-bottom:8px">Today &rsaquo; <strong style="color:#059669">Wallet</strong></div>
+            <div class="mk-pills">
+              <div class="mk-pill" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff">Overview</div>
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Budget</div>
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Bills</div>
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Net Worth</div>
             </div>
-            <div class="m-cards" style="margin-top:12px">
-              <div class="m-card" style="background:#fff;border-left:3px solid #ef4444">
-                <div class="m-card-body"><div class="m-card-title" style="color:#1e293b">Pest control overdue by 3 days</div><div class="m-card-sub" style="color:#64748b">Jim's Pest Control</div></div>
-                <div class="m-card-action" style="color:#0d9488">Done ✓</div>
-              </div>
-              <div class="m-card" style="background:#fff;border-left:3px solid #f59e0b">
-                <div class="m-card-body"><div class="m-card-title" style="color:#1e293b">Car rego expires in 18 days</div><div class="m-card-sub" style="color:#64748b">Outlander · ABC123</div></div>
-                <div class="m-card-action" style="color:#0d9488">View →</div>
-              </div>
-              <div class="m-card" style="background:#fff;border-left:3px solid #10b981">
-                <div class="m-card-body"><div class="m-card-title" style="color:#1e293b">$1,240 left in budget</div><div class="m-card-sub" style="color:#64748b">16 days remaining</div></div>
-                <div class="m-card-action" style="color:#0d9488">Budget →</div>
-              </div>
+            <div style="border-bottom:1px solid #e2e8f0;margin:0 0 16px"></div>
+          </div>
+
+          <!-- Illustration banner -->
+          <div style="margin:0 16px 16px;border-radius:16px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);padding:20px;position:relative;overflow:hidden">
+            <svg viewBox="0 0 200 50" style="position:absolute;right:10px;top:10px;width:80px;opacity:0.15">
+              <rect x="10" y="5" width="40" height="40" rx="4" fill="#059669"/>
+              <rect x="60" y="15" width="30" height="30" rx="4" fill="#059669"/>
+              <circle cx="130" cy="25" r="20" fill="#059669"/>
+              <rect x="160" y="10" width="30" height="35" rx="4" fill="#059669"/>
+            </svg>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#059669;letter-spacing:0.05em;margin-bottom:4px">April 2026</div>
+            <div style="font-size:28px;font-weight:900;color:#065f46">$1,240</div>
+            <div style="font-size:12px;color:#059669;margin-top:2px">surplus this month</div>
+          </div>
+
+          <div class="mk-stat-row">
+            <div class="mk-stat" style="background:#fff;border:1px solid #e2e8f0">
+              <div class="mk-stat-label" style="color:#64748b">Income</div>
+              <div class="mk-stat-val" style="color:#10b981">$6,200</div>
             </div>
-            <div class="m-sections">
-              <div class="m-section" style="background:#fff;border:1px solid #e8e4de">
-                <div class="m-section-label" style="color:#0d9488">Wallet</div>
-                <div class="m-section-sub" style="color:#64748b">$1,240 surplus</div>
-              </div>
-              <div class="m-section" style="background:#fff;border:1px solid #e8e4de">
-                <div class="m-section-label" style="color:#0d9488">Plan</div>
-                <div class="m-section-sub" style="color:#64748b">Pasta tonight</div>
-              </div>
-              <div class="m-section" style="background:#fff;border:1px solid #e8e4de">
-                <div class="m-section-label" style="color:#0d9488">Home</div>
-                <div class="m-section-sub" style="color:#64748b">1 task due</div>
-              </div>
-            </div>
-            <div class="m-ticker" style="background:#f3f0eb;border-radius:8px;margin:0 16px 12px;color:#64748b;padding:8px 12px">
-              $340 spent · 3 bills due · Dinner: Pasta · Health: 72/B
-            </div>
-            <div class="m-quick">
-              <div class="m-quick-btn" style="background:#fff;border-color:#e8e4de;color:#1e293b">Log spend</div>
-              <div class="m-quick-btn" style="background:#fff;border-color:#e8e4de;color:#1e293b">Plan dinner</div>
-              <div class="m-quick-btn" style="background:#fff;border-color:#e8e4de;color:#1e293b">Mark done</div>
+            <div class="mk-stat" style="background:#fff;border:1px solid #e2e8f0">
+              <div class="mk-stat-label" style="color:#64748b">Expenses</div>
+              <div class="mk-stat-val" style="color:#ef4444">$4,960</div>
             </div>
           </div>
-        </div>
 
-        <div class="phone">
-          <div class="phone-status" style="background:#faf8f5;color:#64748b">9:41</div>
-          <div class="phone-content" style="background:#faf8f5">
-            <div style="padding:12px 16px 0">
-              <div style="font-size:11px;color:#64748b;margin-bottom:6px">Today > <span style="color:#0d9488;font-weight:700">Wallet</span></div>
-              <div class="m-pills">
-                <div class="m-pill" style="background:#0d9488;color:#fff">Overview</div>
-                <div class="m-pill" style="background:transparent;color:#64748b">Budget</div>
-                <div class="m-pill" style="background:transparent;color:#64748b">Bills</div>
-                <div class="m-pill" style="background:transparent;color:#64748b">Net Worth</div>
-                <div class="m-pill" style="background:transparent;color:#64748b">Goals</div>
-              </div>
-              <div style="border-bottom:1px solid #e8e4de;margin-bottom:16px"></div>
+          <div style="padding:0 16px;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:10px">Top Categories</div>
+            <div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#1e293b"><span style="font-weight:500">Mortgage</span><span style="font-weight:700">$2,100</span></div>
+              <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:42%;background:linear-gradient(90deg,#0891b2,#06b6d4);border-radius:4px"></div></div>
             </div>
-            <div style="padding:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e8e4de">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:4px">Income</div>
-                <div style="font-size:20px;font-weight:800;color:#10b981">$6,200</div>
-              </div>
-              <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e8e4de">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:4px">Expenses</div>
-                <div style="font-size:20px;font-weight:800;color:#ef4444">$4,960</div>
-              </div>
-              <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e8e4de">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:4px">Surplus</div>
-                <div style="font-size:20px;font-weight:800;color:#10b981">$1,240</div>
-              </div>
-              <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e8e4de">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:4px">Savings Rate</div>
-                <div style="font-size:20px;font-weight:800;color:#0d9488">20%</div>
-              </div>
+            <div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#1e293b"><span style="font-weight:500">Groceries</span><span style="font-weight:700">$850</span></div>
+              <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:17%;background:linear-gradient(90deg,#f97316,#fb923c);border-radius:4px"></div></div>
             </div>
-            <div style="padding:0 16px">
-              <div style="font-size:13px;font-weight:700;margin-bottom:10px">Expenses by Category</div>
-              <div style="margin-bottom:12px">
-                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:500">Mortgage</span><span style="font-weight:600">$2,100</span></div>
-                <div style="height:6px;background:#f3f0eb;border-radius:4px;overflow:hidden"><div style="height:100%;width:42%;background:#0d9488;border-radius:4px"></div></div>
-              </div>
-              <div style="margin-bottom:12px">
-                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:500">Groceries</span><span style="font-weight:600">$850</span></div>
-                <div style="height:6px;background:#f3f0eb;border-radius:4px;overflow:hidden"><div style="height:100%;width:17%;background:#f59e0b;border-radius:4px"></div></div>
-              </div>
-              <div style="margin-bottom:12px">
-                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:500">Transport</span><span style="font-weight:600">$420</span></div>
-                <div style="height:6px;background:#f3f0eb;border-radius:4px;overflow:hidden"><div style="height:100%;width:8%;background:#3b82f6;border-radius:4px"></div></div>
-              </div>
+            <div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#1e293b"><span style="font-weight:500">Transport</span><span style="font-weight:700">$420</span></div>
+              <div style="height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:8%;background:linear-gradient(90deg,#7c3aed,#a78bfa);border-radius:4px"></div></div>
             </div>
           </div>
-        </div>
 
-        <div class="phone">
-          <div class="phone-status" style="background:#faf8f5;color:#64748b">9:41</div>
-          <div class="phone-content" style="background:#faf8f5">
-            <div style="padding:12px 16px 0">
-              <div style="font-size:11px;color:#64748b;margin-bottom:6px">Today > <span style="color:#0d9488;font-weight:700">Home</span></div>
-              <div class="m-pills">
-                <div class="m-pill" style="background:#0d9488;color:#fff">Documents</div>
-                <div class="m-pill" style="background:transparent;color:#64748b">Vehicles</div>
-                <div class="m-pill" style="background:transparent;color:#64748b">Maintenance</div>
-                <div class="m-pill" style="background:transparent;color:#64748b">Kids</div>
-              </div>
-              <div style="border-bottom:1px solid #e8e4de;margin-bottom:16px"></div>
+          <!-- Health score mini -->
+          <div style="margin:0 16px 16px;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-radius:14px;padding:16px;display:flex;align-items:center;gap:16px">
+            <div style="position:relative;width:52px;height:52px">
+              <svg viewBox="0 0 52 52" width="52" height="52"><circle cx="26" cy="26" r="20" fill="none" stroke="#e2e8f0" stroke-width="5"/><circle cx="26" cy="26" r="20" fill="none" stroke="#0891b2" stroke-width="5" stroke-dasharray="90.5 125.6" stroke-linecap="round" transform="rotate(-90 26 26)"/><text x="26" y="30" text-anchor="middle" font-size="14" font-weight="900" fill="#0891b2">72</text></svg>
             </div>
-            <div style="padding:0 16px;font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.05em;margin-bottom:8px">Insurance (2)</div>
-            <div style="padding:0 16px 8px">
-              <div style="background:#fff;border:1px solid #e8e4de;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                <div style="width:36px;height:36px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:18px">🛡</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:600">Home &amp; Contents</div><div style="font-size:11px;color:#64748b">AAMI · POL-12345</div></div>
-                <div style="padding:3px 8px;border-radius:99px;background:#f0fdf4;color:#065f46;font-size:10px;font-weight:700;border:1px solid #bbf7d0">15 Nov 2026</div>
-              </div>
-              <div style="background:#fff;border:1px solid #e8e4de;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                <div style="width:36px;height:36px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:18px">🛡</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:600">Car Insurance</div><div style="font-size:11px;color:#64748b">AAMI · Outlander</div></div>
-                <div style="padding:3px 8px;border-radius:99px;background:#fffbeb;color:#92400e;font-size:10px;font-weight:700;border:1px solid #fde68a">12 days</div>
-              </div>
+            <div><div style="font-size:13px;font-weight:700;color:#1e293b">Health Score: B</div><div style="font-size:11px;color:#64748b">Savings rate improving</div></div>
+          </div>
+
+          <div class="mk-fab" style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff">+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAN SCREEN — MEALS -->
+    <div class="phone-wrap">
+      <div class="phone-label">Plan &rsaquo; Meals</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-content" style="background:#f0f9ff">
+          <div style="padding:32px 16px 0">
+            <div style="font-size:11px;color:#64748b;margin-bottom:8px">Today &rsaquo; Plan &rsaquo; <strong style="color:#0284c7">Meals</strong></div>
+            <div class="mk-pills">
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Planner</div>
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Forecast</div>
+              <div class="mk-pill" style="background:linear-gradient(135deg,#0284c7,#0891b2);color:#fff">Meals</div>
             </div>
-            <div style="padding:0 16px;font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.05em;margin-bottom:8px">Identity (2)</div>
-            <div style="padding:0 16px 8px">
-              <div style="background:#fff;border:1px solid #e8e4de;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                <div style="width:36px;height:36px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:18px">🪪</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:600">Passport — Chris</div><div style="font-size:11px;color:#64748b">Filing cabinet</div></div>
-                <div style="padding:3px 8px;border-radius:99px;background:#f0fdf4;color:#065f46;font-size:10px;font-weight:700;border:1px solid #bbf7d0">Mar 2031</div>
-              </div>
+            <div style="border-bottom:1px solid #e2e8f0;margin:0 0 16px"></div>
+          </div>
+
+          <!-- Week nav -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px 12px">
+            <div style="width:28px;height:28px;border-radius:8px;background:#fff;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#64748b">&lsaquo;</div>
+            <div style="font-size:14px;font-weight:700;color:#1e293b">This Week</div>
+            <div style="width:28px;height:28px;border-radius:8px;background:#fff;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#64748b">&rsaquo;</div>
+          </div>
+
+          <!-- Meal grid -->
+          <div class="mk-meal-grid">
+            <div class="mk-meal-header" style="background:transparent"></div>
+            <div class="mk-meal-header" style="background:#e0f2fe;color:#0369a1">Mon</div>
+            <div class="mk-meal-header" style="background:#e0f2fe;color:#0369a1">Tue</div>
+            <div class="mk-meal-header" style="background:#0891b2;color:#fff">Wed</div>
+            <div class="mk-meal-header" style="background:#e0f2fe;color:#0369a1">Thu</div>
+            <div class="mk-meal-header" style="background:#e0f2fe;color:#0369a1">Fri</div>
+
+            <div class="mk-meal-header" style="background:transparent;color:#94a3b8;font-size:8px">Brekkie</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Oats</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Toast</div>
+            <div class="mk-meal-cell" style="background:#f0fdfa;color:#0d9488;border:1px solid #99f6e4">Eggs</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Oats</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#94a3b8">+</div>
+
+            <div class="mk-meal-header" style="background:transparent;color:#94a3b8;font-size:8px">Lunch</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Wrap</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Salad</div>
+            <div class="mk-meal-cell" style="background:#f0fdfa;color:#0d9488;border:1px solid #99f6e4">Leftovers</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#94a3b8">+</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Soup</div>
+
+            <div class="mk-meal-header" style="background:transparent;color:#94a3b8;font-size:8px">Dinner</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Bolognese</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Stir-fry</div>
+            <div class="mk-meal-cell" style="background:#f0fdfa;color:#0d9488;font-weight:700;border:1px solid #99f6e4">Pasta</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Tacos</div>
+            <div class="mk-meal-cell" style="background:#fff;color:#1e293b">Fish</div>
+          </div>
+
+          <!-- Shopping list preview -->
+          <div style="margin:8px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:700;color:#1e293b">Shopping List</div>
+              <div style="font-size:11px;font-weight:600;color:#0891b2">12 items</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <span style="padding:4px 10px;border-radius:99px;background:#f0fdf4;color:#065f46;font-size:10px;font-weight:600;border:1px solid #bbf7d0">Chicken 500g</span>
+              <span style="padding:4px 10px;border-radius:99px;background:#fffbeb;color:#92400e;font-size:10px;font-weight:600;border:1px solid #fde68a">Pasta 400g</span>
+              <span style="padding:4px 10px;border-radius:99px;background:#f0f9ff;color:#0369a1;font-size:10px;font-weight:600;border:1px solid #bae6fd">Broccoli</span>
+              <span style="padding:4px 10px;border-radius:99px;background:#faf5ff;color:#6d28d9;font-size:10px;font-weight:600;border:1px solid #c4b5fd">+9 more</span>
+            </div>
+          </div>
+
+          <div style="padding:12px 16px">
+            <div style="width:100%;padding:12px;border-radius:12px;background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff;font-size:13px;font-weight:700;text-align:center">Generate shopping list from meals</div>
+          </div>
+
+          <div class="mk-fab" style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff">+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOME SCREEN -->
+    <div class="phone-wrap">
+      <div class="phone-label">Home</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-content" style="background:#f0f9ff">
+          <div style="padding:32px 16px 0">
+            <div style="font-size:11px;color:#64748b;margin-bottom:8px">Today &rsaquo; <strong style="color:#7c3aed">Home</strong></div>
+            <div class="mk-pills">
+              <div class="mk-pill" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff">Documents</div>
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Vehicles</div>
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Maintenance</div>
+              <div class="mk-pill" style="background:transparent;color:#64748b;border:1.5px solid #e2e8f0">Kids</div>
+            </div>
+            <div style="border-bottom:1px solid #e2e8f0;margin:0 0 16px"></div>
+          </div>
+
+          <!-- Search -->
+          <div style="padding:0 16px 12px">
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:13px;color:#94a3b8">Search documents...</div>
+          </div>
+
+          <div style="padding:0 16px;font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.05em;margin-bottom:6px">Insurance (2)</div>
+
+          <div class="mk-list-item">
+            <div class="mk-list-icon" style="background:#eff6ff">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="mk-list-body">
+              <div class="mk-list-title" style="color:#1e293b">Home &amp; Contents</div>
+              <div class="mk-list-sub" style="color:#64748b">AAMI &middot; POL-12345</div>
+            </div>
+            <div class="mk-list-badge" style="background:#f0fdf4;color:#065f46;border:1px solid #bbf7d0">15 Nov</div>
+          </div>
+
+          <div class="mk-list-item">
+            <div class="mk-list-icon" style="background:#eff6ff">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="mk-list-body">
+              <div class="mk-list-title" style="color:#1e293b">Car Insurance</div>
+              <div class="mk-list-sub" style="color:#64748b">AAMI &middot; Outlander</div>
+            </div>
+            <div class="mk-list-badge" style="background:#fffbeb;color:#92400e;border:1px solid #fde68a">12 days</div>
+          </div>
+
+          <div style="padding:0 16px;font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.05em;margin:12px 0 6px">Identity (2)</div>
+
+          <div class="mk-list-item">
+            <div class="mk-list-icon" style="background:#f0fdf4">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <div class="mk-list-body">
+              <div class="mk-list-title" style="color:#1e293b">Passport &mdash; Chris</div>
+              <div class="mk-list-sub" style="color:#64748b">Filing cabinet</div>
+            </div>
+            <div class="mk-list-badge" style="background:#f0fdf4;color:#065f46;border:1px solid #bbf7d0">2031</div>
+          </div>
+
+          <div class="mk-list-item">
+            <div class="mk-list-icon" style="background:#f0fdf4">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <div class="mk-list-body">
+              <div class="mk-list-title" style="color:#1e293b">Medicare Card</div>
+              <div class="mk-list-sub" style="color:#64748b">Google Drive</div>
+            </div>
+          </div>
+
+          <div style="padding:0 16px;font-size:10px;font-weight:700;text-transform:uppercase;color:#64748b;letter-spacing:0.05em;margin:12px 0 6px">Warranty (1)</div>
+
+          <div class="mk-list-item">
+            <div class="mk-list-icon" style="background:#fffbeb">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <div class="mk-list-body">
+              <div class="mk-list-title" style="color:#1e293b">Dishwasher</div>
+              <div class="mk-list-sub" style="color:#64748b">Bosch &middot; Appliances Online</div>
+            </div>
+            <div class="mk-list-badge" style="background:#fef2f2;color:#991b1b;border:1px solid #fca5a5">Exp 3mo</div>
+          </div>
+
+          <div class="mk-fab" style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff">+</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ADD BOTTOM SHEET -->
+    <div class="phone-wrap">
+      <div class="phone-label">Quick Add Spend</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-content" style="background:rgba(0,0,0,0.4)">
+          <div style="height:140px"></div>
+          <!-- Bottom sheet -->
+          <div style="background:#fff;border-radius:22px 22px 0 0;padding:12px 0 0;min-height:400px">
+            <div style="width:36px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 16px"></div>
+            <div style="display:flex;justify-content:space-between;padding:0 20px 8px">
+              <span style="font-size:16px;font-weight:800;color:#1e293b">Log Spend</span>
+              <span style="font-size:20px;color:#94a3b8">&times;</span>
+            </div>
+            <div style="text-align:center;padding:16px 0 8px">
+              <span style="font-size:48px;font-weight:900;color:#1e293b;letter-spacing:-2px">$45</span>
+            </div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:0.05em;padding:0 20px 6px">Category</div>
+            <div style="display:flex;gap:6px;padding:0 16px 14px;overflow:hidden">
+              <span style="padding:6px 14px;border-radius:99px;border:2px solid #0891b2;background:#f0fdfa;color:#0891b2;font-size:12px;font-weight:600">Groceries</span>
+              <span style="padding:6px 14px;border-radius:99px;border:2px solid #e2e8f0;color:#64748b;font-size:12px;font-weight:500">Dining</span>
+              <span style="padding:6px 14px;border-radius:99px;border:2px solid #e2e8f0;color:#64748b;font-size:12px;font-weight:500">Transport</span>
+              <span style="padding:6px 14px;border-radius:99px;border:2px solid #e2e8f0;color:#64748b;font-size:12px;font-weight:500">Health</span>
+            </div>
+            <!-- Numpad -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:0 16px 12px">
+              <div style="background:#f8fafc;border-radius:12px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#1e293b">1</div>
+              <div style="background:#f8fafc;border-radius:12px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#1e293b">2</div>
+              <div style="background:#f8fafc;border-radius:12px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#1e293b">3</div>
+              <div style="background:#f8fafc;border-radius:12px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#1e293b">4</div>
+              <div style="background:#f8fafc;border-radius:12px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#1e293b">5</div>
+              <div style="background:#f8fafc;border-radius:12px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:#1e293b">6</div>
+            </div>
+            <div style="padding:0 16px 24px">
+              <div style="width:100%;padding:14px;border-radius:14px;background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff;font-size:15px;font-weight:700;text-align:center">Save Spend</div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
   </div>
+</section>
 
-  <!-- DIRECTION B -->
-  <div class="direction">
-    <div class="direction-label">Option B</div>
-    <div class="direction-body">
-      <div class="direction-title">B. Bold Colour</div>
-      <div class="direction-desc">Richer colours, gradient cards, more personality. Feels energetic and fun — like an app a family would enjoy using, not just tolerate. Good for standing out in the App Store.</div>
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <h2>Logo Concepts</h2>
+  <p class="sub">Four directions for the wordmark</p>
 
-      <h3>Colours</h3>
-      <div class="swatches">
-        <div class="swatch" style="background:#0891b2"><span class="swatch-label">Cyan</span></div>
-        <div class="swatch" style="background:#7c3aed"><span class="swatch-label">Purple</span></div>
-        <div class="swatch" style="background:#f97316"><span class="swatch-label">Orange</span></div>
-        <div class="swatch" style="background:#1e293b"><span class="swatch-label">Text</span></div>
-        <div class="swatch light" style="background:#f0f9ff;border:1px solid #e0f2fe"><span class="swatch-label">BG</span></div>
-        <div class="swatch light" style="background:#ffffff;border:1px solid #e2e8f0"><span class="swatch-label">Surface</span></div>
-        <div class="swatch" style="background:#ef4444"><span class="swatch-label">Danger</span></div>
-        <div class="swatch" style="background:#10b981"><span class="swatch-label">Success</span></div>
-      </div>
-
-      <h3>Today Screen Mockup</h3>
-      <div class="phone-row">
-        <div class="phone">
-          <div class="phone-status" style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff">9:41</div>
-          <div class="phone-content" style="background:#f0f9ff">
-            <div class="m-greeting" style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff;border-radius:0 0 24px 24px;padding:24px 20px 20px">
-              <h2>Good morning, Chris</h2>
-              <p style="opacity:0.88;font-size:13px;line-height:1.5">Solid week ahead. $1,240 buffer, pasta tonight, and just one task overdue.</p>
-            </div>
-            <div class="m-cards" style="margin-top:12px">
-              <div class="m-card" style="background:linear-gradient(135deg,#fef2f2,#fff5f5);border-left:3px solid #ef4444;border-radius:12px">
-                <div class="m-card-body"><div class="m-card-title" style="color:#991b1b">Pest control overdue</div><div class="m-card-sub" style="color:#b91c1c">3 days late</div></div>
-                <div class="m-card-action" style="color:#0891b2">Done ✓</div>
-              </div>
-              <div class="m-card" style="background:#fff;border-left:3px solid #f97316;border-radius:12px">
-                <div class="m-card-body"><div class="m-card-title">Rego expires in 18d</div><div class="m-card-sub" style="color:#64748b">Outlander</div></div>
-                <div class="m-card-action" style="color:#0891b2">View →</div>
-              </div>
-            </div>
-            <div class="m-sections">
-              <div class="m-section" style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #bbf7d0;border-radius:14px">
-                <div class="m-section-label" style="color:#065f46">Wallet</div>
-                <div class="m-section-sub" style="color:#059669">$1,240</div>
-              </div>
-              <div class="m-section" style="background:linear-gradient(135deg,#eff6ff,#e0f2fe);border:1px solid #93c5fd;border-radius:14px">
-                <div class="m-section-label" style="color:#1e40af">Plan</div>
-                <div class="m-section-sub" style="color:#3b82f6">Pasta</div>
-              </div>
-              <div class="m-section" style="background:linear-gradient(135deg,#faf5ff,#f5f3ff);border:1px solid #c4b5fd;border-radius:14px">
-                <div class="m-section-label" style="color:#5b21b6">Home</div>
-                <div class="m-section-sub" style="color:#7c3aed">1 due</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="logo-grid">
+    <div class="logo-card" style="background:linear-gradient(135deg,#0891b2,#7c3aed)">
+      <div class="logo-text" style="color:#fff">TOTO</div>
+      <div class="logo-sub" style="color:rgba(255,255,255,0.6)">Gradient wordmark — hero use</div>
     </div>
-  </div>
-
-  <!-- DIRECTION C -->
-  <div class="direction">
-    <div class="direction-label">Option C</div>
-    <div class="direction-body">
-      <div class="direction-title">C. Clean Minimal</div>
-      <div class="direction-desc">Stark white, thin borders, maximum whitespace. Feels premium and calm. Like a luxury notepad. Risk: could feel cold or empty without enough data.</div>
-
-      <h3>Colours</h3>
-      <div class="swatches">
-        <div class="swatch" style="background:#18181b"><span class="swatch-label">Black</span></div>
-        <div class="swatch" style="background:#71717a"><span class="swatch-label">Zinc</span></div>
-        <div class="swatch light" style="background:#ffffff;border:1px solid #e4e4e7"><span class="swatch-label">White</span></div>
-        <div class="swatch light" style="background:#fafafa;border:1px solid #e4e4e7"><span class="swatch-label">BG</span></div>
-        <div class="swatch" style="background:#0d9488"><span class="swatch-label">Accent</span></div>
-        <div class="swatch" style="background:#ef4444"><span class="swatch-label">Alert</span></div>
+    <div class="logo-card" style="background:#fff">
+      <div class="logo-text" style="background:linear-gradient(135deg,#0891b2,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent">toto.</div>
+      <div class="logo-sub" style="color:#64748b">Lowercase + dot — modern feel</div>
+    </div>
+    <div class="logo-card" style="background:#1e293b">
+      <div class="logo-text" style="color:#fff">toto</div>
+      <div class="logo-sub" style="color:rgba(255,255,255,0.4)">Clean on dark — app header</div>
+    </div>
+    <div class="logo-card" style="background:#f0f9ff;border:1px solid rgba(255,255,255,0.06)">
+      <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#0891b2,#7c3aed);margin:0 auto 8px;display:flex;align-items:center;justify-content:center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </div>
-
-      <h3>Today Screen Mockup</h3>
-      <div class="phone-row">
-        <div class="phone" style="border-color:#e4e4e7">
-          <div class="phone-status" style="background:#fff;color:#71717a">9:41</div>
-          <div class="phone-content" style="background:#fff">
-            <div class="m-greeting" style="padding:32px 20px 24px;border-bottom:1px solid #f4f4f5">
-              <h2 style="font-size:24px;font-weight:900;color:#18181b;letter-spacing:-0.03em">Good morning</h2>
-              <p style="color:#71717a;font-size:14px;margin-top:8px;line-height:1.5">2 items need attention. $1,240 buffer. Pasta tonight.</p>
-            </div>
-            <div class="m-cards" style="padding:16px">
-              <div class="m-card" style="background:#fff;border:1px solid #fca5a5;border-radius:8px;padding:14px 16px">
-                <div class="m-card-body"><div class="m-card-title" style="color:#18181b;font-size:14px">Pest control</div><div class="m-card-sub" style="color:#ef4444;font-weight:600">3 days overdue</div></div>
-                <div class="m-card-action" style="color:#18181b;font-size:12px">Mark done →</div>
-              </div>
-              <div class="m-card" style="background:#fff;border:1px solid #e4e4e7;border-radius:8px;padding:14px 16px;margin-top:8px">
-                <div class="m-card-body"><div class="m-card-title" style="color:#18181b;font-size:14px">Car rego</div><div class="m-card-sub" style="color:#71717a">Expires in 18 days</div></div>
-                <div class="m-card-action" style="color:#18181b;font-size:12px">View →</div>
-              </div>
-            </div>
-            <div style="padding:8px 16px">
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#e4e4e7;border-radius:10px;overflow:hidden">
-                <div style="background:#fff;padding:18px 14px;text-align:center">
-                  <div style="font-size:11px;color:#71717a;font-weight:600;margin-bottom:4px">WALLET</div>
-                  <div style="font-size:16px;font-weight:800;color:#18181b">$1,240</div>
-                </div>
-                <div style="background:#fff;padding:18px 14px;text-align:center">
-                  <div style="font-size:11px;color:#71717a;font-weight:600;margin-bottom:4px">PLAN</div>
-                  <div style="font-size:16px;font-weight:800;color:#18181b">Pasta</div>
-                </div>
-                <div style="background:#fff;padding:18px 14px;text-align:center">
-                  <div style="font-size:11px;color:#71717a;font-weight:600;margin-bottom:4px">HOME</div>
-                  <div style="font-size:16px;font-weight:800;color:#18181b">1 due</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="logo-text" style="font-size:24px;color:#1e293b">toto</div>
+      <div class="logo-sub" style="color:#64748b">App icon + wordmark</div>
     </div>
   </div>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- BRAND GUIDELINES                           -->
+<section>
+  <h2>Tone of Voice</h2>
+  <p class="sub">Warm, practical, never naggy</p>
+
+  <div class="tone-grid">
+    <div class="tone-card">
+      <div class="tone-do">"You're on track this month with a healthy buffer."</div>
+      <div class="tone-dont">"Budget surplus calculated: $1,240.00 remaining."</div>
+      <div class="tone-note">Like a friend who's good with money. Not a bank statement.</div>
+    </div>
+    <div class="tone-card">
+      <div class="tone-do">"Pest control is due — want to mark it done?"</div>
+      <div class="tone-dont">"WARNING: Maintenance item overdue."</div>
+      <div class="tone-note">Gentle nudge, not an alarm. The app helps, it doesn't nag.</div>
+    </div>
+    <div class="tone-card">
+      <div class="tone-do">"Chicken stir-fry tonight. Missing 2 items."</div>
+      <div class="tone-dont">"2/3 ingredients unavailable in shopping list."</div>
+      <div class="tone-note">Practical and specific. What to do, not what's wrong.</div>
+    </div>
+    <div class="tone-card">
+      <div class="tone-do">"Your rego expires Thursday — one less thing to forget."</div>
+      <div class="tone-dont">"Vehicle registration expiry approaching. Action required."</div>
+      <div class="tone-note">Human language. The app is on your team.</div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════════════════════════════════ -->
 <section>
-  <h2>Brand Guidelines</h2>
-  <p class="sub">Based on Direction A (Warm Modern) — adjust if you pick a different direction</p>
+  <h2>Design System</h2>
+  <p class="sub">Spacing, radius, shadows, typography</p>
 
-  <h3>Logo Concepts</h3>
-  <div class="logo-concepts">
-    <div class="logo-card">
-      <div class="logo" style="color:#0d9488">TOTO</div>
-      <div class="logo-sub">Clean wordmark — current</div>
-    </div>
-    <div class="logo-card" style="background:#0d9488">
-      <div class="logo" style="color:#fff">TOTO</div>
-      <div class="logo-sub" style="color:rgba(255,255,255,0.6)">Inverted — for dark backgrounds</div>
-    </div>
-    <div class="logo-card">
-      <div class="logo" style="color:#1e293b">toto<span style="color:#0d9488">.</span></div>
-      <div class="logo-sub">Lowercase with accent dot</div>
-    </div>
-    <div class="logo-card">
-      <div style="font-size:32px;margin-bottom:4px">🏠</div>
-      <div class="logo" style="color:#1e293b;font-size:24px">toto</div>
-      <div class="logo-sub">Icon + wordmark</div>
-    </div>
+  <h3>Typography Scale</h3>
+  <div style="margin-bottom:24px">
+    <div style="font-size:28px;font-weight:900;letter-spacing:-0.03em;margin-bottom:8px">Page Title — 28px / 900</div>
+    <div style="font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;color:rgba(255,255,255,0.8)">Greeting — 20px / 800</div>
+    <div style="font-size:17px;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#06b6d4,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block">Section Label — 17px / 800 / gradient</div><br>
+    <div style="font-size:14px;font-weight:600;margin-bottom:8px;color:rgba(255,255,255,0.7)">Card Title — 14px / 600</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:8px">Body text — 13px / 400</div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:rgba(255,255,255,0.3)">Label — 11px / 700 / uppercase</div>
   </div>
 
-  <h3>Typography</h3>
-  <div class="type-sample">
-    <div class="label">Display / Page Titles</div>
-    <div style="font-size:28px;font-weight:800;letter-spacing:-0.02em">Good morning, Chris</div>
-  </div>
-  <div class="type-sample">
-    <div class="label">Section Headers</div>
-    <div style="font-size:17px;font-weight:800;color:#0d9488">Wallet</div>
-  </div>
-  <div class="type-sample">
-    <div class="label">Card Titles</div>
-    <div style="font-size:14px;font-weight:600">Pest control overdue by 3 days</div>
-  </div>
-  <div class="type-sample">
-    <div class="label">Body / Descriptions</div>
-    <div style="font-size:13px;color:#64748b">You're on track this month with a healthy buffer.</div>
-  </div>
-  <div class="type-sample">
-    <div class="label">Labels / Meta</div>
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8">Monthly Income</div>
-  </div>
-
-  <h3>Tone of Voice</h3>
-  <div class="tone-card">
-    <div class="do">Do: "You're on track this month with a healthy buffer."</div>
-    <div class="dont">Don't: "Budget surplus calculated: $1,240.00 remaining."</div>
-    <p style="font-size:13px;color:#64748b;margin:8px 0 0">Warm, conversational, like a friend who's good with money. Not a bank statement.</p>
-  </div>
-  <div class="tone-card">
-    <div class="do">Do: "Pest control is due — want to mark it done?"</div>
-    <div class="dont">Don't: "WARNING: Maintenance item overdue. Action required."</div>
-    <p style="font-size:13px;color:#64748b;margin:8px 0 0">Gentle nudges, not alarms. The app helps, it doesn't nag.</p>
-  </div>
-  <div class="tone-card">
-    <div class="do">Do: "Chicken stir-fry tonight. Missing 2 items."</div>
-    <div class="dont">Don't: "Meal plan: 2/3 ingredients unavailable in shopping list."</div>
-    <p style="font-size:13px;color:#64748b;margin:8px 0 0">Practical and specific. Tell them what to do, not what's wrong.</p>
-  </div>
-
-  <h3>Spacing &amp; Radius</h3>
-  <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Border radius</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">Cards: 12px · Pills: 99px · Modals: 16px · Inputs: 8px</td></tr>
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Spacing scale</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">4px · 8px · 12px · 16px · 20px · 24px · 32px</td></tr>
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Card padding</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">16-24px depending on density</td></tr>
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Section gaps</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">20-24px between major sections</td></tr>
-    <tr><td style="padding:8px 12px;font-weight:700">Shadows</td><td style="padding:8px 12px">Cards: 0 2px 8px rgba(0,0,0,0.04) · Modals: 0 24px 64px rgba(0,0,0,0.15) · Hover: 0 6px 20px rgba(0,0,0,0.07)</td></tr>
-  </table>
-
-  <h3>Iconography</h3>
-  <p>No emojis in the core UI (action cards, buttons, navigation). Emojis allowed in user-facing content labels (meal plan categories, document categories, maintenance presets) where they add warmth. Use Lucide-style stroke icons (1.8px weight) for navigation and actions.</p>
-
-  <h3>Colour Usage Rules</h3>
-  <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px">
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Teal (#0d9488)</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">Primary actions, active states, section labels, links, FAB</td></tr>
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Red (#ef4444)</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">Overdue items, over budget, danger actions, expired badges</td></tr>
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Amber (#f59e0b)</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">Due soon, warnings, approaching limits</td></tr>
-    <tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;font-weight:700">Green (#10b981)</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0">On track, income, surplus, completed, healthy</td></tr>
-    <tr><td style="padding:8px 12px;font-weight:700">Cream (#faf8f5)</td><td style="padding:8px 12px">Page background — warmer than pure white, easier on the eyes</td></tr>
+  <h3>Specifications</h3>
+  <table class="spec-table">
+    <tr><td>Border radius</td><td>Cards: 14px &middot; Pills: 99px &middot; Modals: 20px &middot; Inputs: 10px &middot; FAB: 50%</td></tr>
+    <tr><td>Spacing</td><td>4 &middot; 8 &middot; 12 &middot; 16 &middot; 20 &middot; 24 &middot; 32px</td></tr>
+    <tr><td>Shadows</td><td>Cards: 0 2px 8px rgba(0,0,0,0.04) &middot; Hover: 0 6px 20px rgba(0,0,0,0.07) &middot; FAB: 0 4px 16px rgba(0,0,0,0.2)</td></tr>
+    <tr><td>Gradients</td><td>Primary: #0891b2 &rarr; #7c3aed &middot; Wallet: #059669 &rarr; #10b981 &middot; Plan: #0284c7 &rarr; #0891b2 &middot; Home: #7c3aed &rarr; #8b5cf6</td></tr>
+    <tr><td>Background</td><td>#f0f9ff (ice blue) — warmer than white, cooler than cream</td></tr>
+    <tr><td>Status colours</td><td>Red #ef4444 (overdue) &middot; Amber #f59e0b (due soon) &middot; Green #10b981 (on track)</td></tr>
+    <tr><td>Icons</td><td>Lucide-style stroke, 2px weight. No emojis in core UI. Emojis in content labels only.</td></tr>
   </table>
 </section>
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- TAGLINE OPTIONS                            -->
-<!-- ═══════════════════════════════════════════ -->
 <section>
-  <h2>Tagline Options</h2>
-  <p class="sub">For the App Store, landing page, and marketing</p>
+  <h2>Taglines</h2>
+  <p class="sub">For App Store, landing page, social</p>
 
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;text-align:center">
-      <div style="font-size:18px;font-weight:800;margin-bottom:4px">"The app that runs your household."</div>
-      <div style="font-size:12px;color:#64748b">Broad, confident, memorable</div>
+  <div class="tagline-grid">
+    <div class="tagline">
+      <q>The app that runs your household.</q>
+      <div class="note">Broad, confident, memorable</div>
     </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;text-align:center">
-      <div style="font-size:18px;font-weight:800;margin-bottom:4px">"One app. Whole life. Sorted."</div>
-      <div style="font-size:12px;color:#64748b">Punchy, Australian tone</div>
+    <div class="tagline">
+      <q>One app. Whole life. Sorted.</q>
+      <div class="note">Punchy, Australian tone</div>
     </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;text-align:center">
-      <div style="font-size:18px;font-weight:800;margin-bottom:4px">"Money, meals, home — all in one place."</div>
-      <div style="font-size:12px;color:#64748b">Descriptive, clear value prop</div>
+    <div class="tagline">
+      <q>Money, meals, home — all in one place.</q>
+      <div class="note">Descriptive, clear value prop</div>
     </div>
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;text-align:center">
-      <div style="font-size:18px;font-weight:800;margin-bottom:4px">"Your family's personal assistant."</div>
-      <div style="font-size:12px;color:#64748b">Aspirational, premium feel</div>
+    <div class="tagline">
+      <q>Your family's personal assistant.</q>
+      <div class="note">Aspirational, premium feel</div>
     </div>
   </div>
 </section>
@@ -489,7 +619,7 @@
 </div>
 
 <div class="footer">
-  Toto Brand &amp; UI Mockups — Confidential — April 2026
+  Toto Brand Direction — Bold Colour — Confidential — April 2026
 </div>
 
 </body>
