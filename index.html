@@ -2220,6 +2220,38 @@ fbAuth.onAuthStateChanged(user => {
 // ─────────────────────────────────────────────────
 
 const STORAGE_KEY = 'home_finance_v1';
+
+// ── Security: HTML escaping for user-generated content ──
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Escape for use inside onclick="..." attributes (single-quote safe)
+function escAttr(str) {
+  return escHtml(str).replace(/\\/g, '\\\\');
+}
+function sanitiseState(data) {
+  const MAX_STR = 500;
+  function walk(obj) {
+    if (!obj || typeof obj !== 'object') return;
+    for (const key of Object.keys(obj)) {
+      if (typeof obj[key] === 'string' && obj[key].length > MAX_STR) {
+        obj[key] = obj[key].slice(0, MAX_STR);
+      } else if (Array.isArray(obj[key])) {
+        obj[key].forEach(item => walk(item));
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+        walk(obj[key]);
+      }
+    }
+  }
+  walk(data);
+}
 const CLAUDE_API  = 'https://wandering-mouse-3925.fuscocl.workers.dev';
 
 const DEFAULT_DATA = {
@@ -2355,6 +2387,7 @@ function loadData() {
 }
 
 function saveData(data) {
+  sanitiseState(data);
   if (_pendingLogEntry) {
     if (!data.activityLog) data.activityLog = [];
     data.activityLog.unshift(_pendingLogEntry);
@@ -2637,7 +2670,7 @@ function openActualEditor(expenseId) {
             <div style="flex:1">
               <span style="font-weight:600;font-size:13px">${aud(en.amount)}</span>
               ${en.date ? `<span style="font-size:12px;color:var(--text-muted);margin-left:8px">${fmtDate(en.date)}</span>` : ''}
-              ${en.note ? `<span style="font-size:12px;color:var(--text-muted);margin-left:8px">— ${en.note}</span>` : ''}
+              ${en.note ? `<span style="font-size:12px;color:var(--text-muted);margin-left:8px">— ${escHtml(en.note)}</span>` : ''}
             </div>
             <button onclick="removeActualEntry(${expenseId},${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;line-height:1;padding:0 2px">&times;</button>
           </div>`).join('')}
@@ -2650,7 +2683,7 @@ function openActualEditor(expenseId) {
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
         <div style="flex:0 0 110px">
           <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Amount</label>
-          <input type="number" id="ae-amount" class="form-input" placeholder="0.00" min="0" step="0.01" style="width:100%">
+          <input type="number" max="99999999" id="ae-amount" class="form-input" placeholder="0.00" min="0" step="0.01" style="width:100%">
         </div>
         <div style="flex:0 0 140px">
           <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Date (optional)</label>
@@ -2658,7 +2691,7 @@ function openActualEditor(expenseId) {
         </div>
         <div style="flex:1;min-width:120px">
           <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Note (optional)</label>
-          <input type="text" id="ae-note" class="form-input" placeholder="e.g. Week 1 fill-up" style="width:100%">
+          <input type="text" maxlength="200" id="ae-note" class="form-input" placeholder="e.g. Week 1 fill-up" style="width:100%">
         </div>
         <button class="btn btn-primary btn-sm" onclick="addActualEntry(${expenseId})" style="flex-shrink:0;height:38px">Add</button>
       </div>
@@ -2827,7 +2860,7 @@ function _renderCsvPreview() {
           <tbody>
             ${preview.map(t => `<tr>
               <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">${t.date}</td>
-              <td style="font-weight:500">${t.description}</td>
+              <td style="font-weight:500">${escHtml(t.description)}</td>
               <td class="amount">${audD(t.amount)}</td>
             </tr>`).join('')}
             ${_csvRows.length > 5 ? `<tr><td colspan="3" style="text-align:center;color:var(--text-muted);font-size:12px;padding:8px">+ ${_csvRows.length - 5} more rows…</td></tr>` : ''}
@@ -3036,22 +3069,22 @@ function _renderCsvReview(aiMap) {
     let opts = `<option value="-1"${selId === -1 ? ' selected' : ''}>— Skip —</option>`;
     // Add "Create: X" options for all AI suggestions
     Object.entries(suggestNames).forEach(([name, id]) => {
-      opts += `<option value="${id}"${selId === id ? ' selected' : ''}>➕ Create: ${name}</option>`;
+      opts += `<option value="${id}"${selId === id ? ' selected' : ''}>➕ Create: ${escHtml(name)}</option>`;
     });
     // Existing expenses
-    opts += expenses.map(e => `<option value="${e.id}"${e.id === selId ? ' selected' : ''}>${e.name}</option>`).join('');
+    opts += expenses.map(e => `<option value="${e.id}"${e.id === selId ? ' selected' : ''}>${escHtml(e.name)}</option>`).join('');
     return opts;
   }
 
   const rows = _csvReview.map((g, i) => {
     const descPreview = g.descs.join(', ') + (g.count > g.descs.length ? ` +${g.count - g.descs.length} more` : '');
-    const labelHtml = g.label ? `<div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:2px">${g.label}</div>` : '';
+    const labelHtml = g.label ? `<div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:2px">${escHtml(g.label)}</div>` : '';
     return `<tr>
       <td style="width:36px;padding:6px 8px"><input type="checkbox" id="csv-chk-${i}" ${g.checked ? 'checked' : ''} onchange="_csvToggle(${i},this.checked)"></td>
       <td>${labelHtml}<select style="font-size:12px;border:1px solid var(--border);border-radius:6px;padding:3px 6px;background:var(--surface);max-width:160px"
           onchange="_csvSetExpense(${i},+this.value)">${expenseOpts(g.expenseId)}</select></td>
       <td style="font-size:12px;text-align:center;font-weight:600">${g.count}</td>
-      <td style="font-size:11px;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${descPreview}">${descPreview}</td>
+      <td style="font-size:11px;color:var(--text-muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escAttr(descPreview)}">${escHtml(descPreview)}</td>
       <td class="amount" style="white-space:nowrap;font-weight:600">${audD(g.total)}</td>
     </tr>`;
   }).join('');
@@ -3198,7 +3231,7 @@ function _renderQASheet(expensesArg) {
   const isZero   = !_qaAmount;
 
   const catPills = expenses.length
-    ? expenses.map(e => `<button class="qa-cat${e.id === _qaExpenseId ? ' selected' : ''}" onclick="_qaSelectCat(${e.id})">${e.name}</button>`).join('')
+    ? expenses.map(e => `<button class="qa-cat${e.id === _qaExpenseId ? ' selected' : ''}" onclick="_qaSelectCat(${e.id})">${escHtml(e.name)}</button>`).join('')
     : `<span style="color:var(--text-muted);font-size:13px;padding:6px 4px">Add budget expenses first</span>`;
 
   const numKeys = ['1','2','3','4','5','6','7','8','9','.','0','⌫'];
@@ -3220,7 +3253,7 @@ function _renderQASheet(expensesArg) {
     </div>
 
     <div style="padding:0 16px 12px;display:flex;flex-direction:column;gap:10px">
-      <input class="form-input" type="text" id="qa-note" placeholder="Note (optional)"
+      <input class="form-input" type="text" maxlength="200" id="qa-note" placeholder="Note (optional)"
         style="border-radius:12px" autocomplete="off">
       <button class="btn btn-primary" onclick="saveQuickAdd()"
         style="height:54px;font-size:16px;font-weight:700;border-radius:14px;background:#0d9488;border-color:#0d9488">
@@ -3489,7 +3522,7 @@ function renderMoneyDashboard() {
               : income.map(item => {
                   const pct = totalIncome > 0 ? Math.round(itemMonthly(item) / totalIncome * 100) : 0;
                   return `<tr>
-                    <td style="font-weight:500;border-left:4px solid #10b981">${item.name}</td>
+                    <td style="font-weight:500;border-left:4px solid #10b981">${escHtml(item.name)}</td>
                     <td style="color:var(--text-muted);font-size:12px">${freqDisplayItem(item)}</td>
                     <td class="amount">${aud(itemMonthly(item))} <span style="color:var(--text-muted);font-size:11px">${pct}%</span></td>
                   </tr>`;
@@ -3570,7 +3603,7 @@ function renderMoneyDashboard() {
                   const diff  = bud - act;
                   const color = colors.expense[e.category || 'Other'] || '#94a3b8';
                   return `<tr>
-                    <td style="font-weight:500;border-left:4px solid ${color}">${e.name}</td>
+                    <td style="font-weight:500;border-left:4px solid ${color}">${escHtml(e.name)}</td>
                     <td><span style="display:inline-block;padding:2px 9px;border-radius:99px;background:${color};color:#fff;font-size:11px;font-weight:600">${e.category || 'Other'}</span></td>
                     <td class="amount">${aud(bud)}</td>
                     <td class="amount">${aud(act)}</td>
@@ -3753,26 +3786,26 @@ function renderToday() {
   // Bills due soon
   (state.bills || []).forEach(b => {
     const days = billDaysUntil(b);
-    if (days >= 0 && days <= 7) cards.push({ cls: days <= 1 ? 'red' : 'amber', icon: '💳', title: `${b.name} due${days === 0 ? ' today' : days === 1 ? ' tomorrow' : ` in ${days}d`}`, sub: aud(parseFloat(b.amount) || 0), action: 'View bills →', tab: 'bills', priority: days });
+    if (days >= 0 && days <= 7) cards.push({ cls: days <= 1 ? 'red' : 'amber', icon: '💳', title: `${escHtml(b.name)} due${days === 0 ? ' today' : days === 1 ? ' tomorrow' : ` in ${days}d`}`, sub: aud(parseFloat(b.amount) || 0), action: 'View bills →', tab: 'bills', priority: days });
   });
 
   // Maintenance overdue / due soon
   (state.maintenance || []).forEach(m => {
     const days = _maintDaysUntil(m);
-    if (days !== null && days < 0) cards.push({ cls: 'red', icon: '🔧', title: `${m.name} overdue by ${Math.abs(days)}d`, sub: m.provider || '', action: 'Mark done ✓', onclick: `markMaintDone(${m.id})`, priority: days });
-    else if (days !== null && days <= 14) cards.push({ cls: 'amber', icon: '🔧', title: `${m.name} due in ${days}d`, sub: m.provider || '', action: 'View →', tab: 'maintenance', priority: days + 100 });
+    if (days !== null && days < 0) cards.push({ cls: 'red', icon: '🔧', title: `${escHtml(m.name)} overdue by ${Math.abs(days)}d`, sub: escHtml(m.provider || ''), action: 'Mark done ✓', onclick: `markMaintDone(${m.id})`, priority: days });
+    else if (days !== null && days <= 14) cards.push({ cls: 'amber', icon: '🔧', title: `${escHtml(m.name)} due in ${days}d`, sub: escHtml(m.provider || ''), action: 'View →', tab: 'maintenance', priority: days + 100 });
   });
 
   // Vehicle rego / insurance expiring
   (state.vehicles || []).forEach(v => {
     if (v.regoExpiry) {
       const days = Math.ceil((new Date(v.regoExpiry) - today) / 86400000);
-      if (days < 0) cards.push({ cls: 'red', icon: '🚗', title: `${v.name} rego expired ${Math.abs(days)}d ago`, sub: v.plate || '', action: 'View →', tab: 'vehicles', priority: days });
-      else if (days <= 30) cards.push({ cls: 'amber', icon: '🚗', title: `${v.name} rego expires in ${days}d`, sub: v.plate || '', action: 'View →', tab: 'vehicles', priority: days + 50 });
+      if (days < 0) cards.push({ cls: 'red', icon: '🚗', title: `${escHtml(v.name)} rego expired ${Math.abs(days)}d ago`, sub: escHtml(v.plate || ''), action: 'View →', tab: 'vehicles', priority: days });
+      else if (days <= 30) cards.push({ cls: 'amber', icon: '🚗', title: `${escHtml(v.name)} rego expires in ${days}d`, sub: escHtml(v.plate || ''), action: 'View →', tab: 'vehicles', priority: days + 50 });
     }
     if (v.insurance?.renewalDate) {
       const days = Math.ceil((new Date(v.insurance.renewalDate) - today) / 86400000);
-      if (days >= 0 && days <= 30) cards.push({ cls: 'amber', icon: '🛡️', title: `${v.name} insurance renews in ${days}d`, sub: v.insurance.provider || '', action: 'View →', tab: 'vehicles', priority: days + 50 });
+      if (days >= 0 && days <= 30) cards.push({ cls: 'amber', icon: '🛡️', title: `${escHtml(v.name)} insurance renews in ${days}d`, sub: escHtml(v.insurance.provider || ''), action: 'View →', tab: 'vehicles', priority: days + 50 });
     }
   });
 
@@ -3780,8 +3813,8 @@ function renderToday() {
   (state.documents || []).forEach(d => {
     if (!d.expiryDate) return;
     const days = Math.ceil((new Date(d.expiryDate) - today) / 86400000);
-    if (days < 0) cards.push({ cls: 'red', icon: '📄', title: `${d.name} expired ${Math.abs(days)}d ago`, sub: d.provider || '', action: 'View →', tab: 'documents', priority: days });
-    else if (days <= 30) cards.push({ cls: 'amber', icon: '📄', title: `${d.name} expires in ${days}d`, sub: d.provider || '', action: 'View →', tab: 'documents', priority: days + 50 });
+    if (days < 0) cards.push({ cls: 'red', icon: '📄', title: `${escHtml(d.name)} expired ${Math.abs(days)}d ago`, sub: escHtml(d.provider || ''), action: 'View →', tab: 'documents', priority: days });
+    else if (days <= 30) cards.push({ cls: 'amber', icon: '📄', title: `${escHtml(d.name)} expires in ${days}d`, sub: escHtml(d.provider || ''), action: 'View →', tab: 'documents', priority: days + 50 });
   });
 
   // Budget status
@@ -4140,7 +4173,7 @@ function renderDashboard() {
                         : `<span class="bill-due-badge ok">${billNextDue(b).toLocaleDateString('en-AU',{day:'numeric',month:'short'})}</span>`;
             return `<div class="db-bill-row">
               <div class="db-bill-icon">${billCatIcon(b.category)}</div>
-              <div class="db-bill-name">${b.name}</div>
+              <div class="db-bill-name">${escHtml(b.name)}</div>
               ${badge}
               <div class="db-bill-amount">${aud(parseFloat(b.amount)||0)}</div>
             </div>`;
@@ -4157,7 +4190,7 @@ function renderDashboard() {
             const pct = Math.min(Math.round(((g.saved||0)/(g.target||1))*100),100);
             return `<div class="db-goal-row">
               <div class="db-goal-top">
-                <span class="db-goal-name">${g.emoji||'🎯'} ${g.name}</span>
+                <span class="db-goal-name">${g.emoji||'🎯'} ${escHtml(g.name)}</span>
                 <span class="db-goal-pct">${aud(g.saved||0)} of ${aud(g.target||0)} · ${pct}%</span>
               </div>
               <div class="db-goal-bar"><div class="db-goal-fill" style="width:${pct}%"></div></div>
@@ -4210,7 +4243,7 @@ function renderDashboard() {
             <div class="db-build-bar" style="margin:0 0 10px">
               <div class="db-build-fill" style="width:${contractPct}%"></div>
             </div>
-            ${nextStage ? `<div style="font-size:12px;color:#64748b">Next: <strong>${nextStage.name}</strong> — ${aud(nextStage.amount)}</div>` : '<div style="font-size:12px;color:#10b981;font-weight:600">✓ All stages paid</div>'}
+            ${nextStage ? `<div style="font-size:12px;color:#64748b">Next: <strong>${escHtml(nextStage.name)}</strong> — ${aud(nextStage.amount)}</div>` : '<div style="font-size:12px;color:#10b981;font-weight:600">✓ All stages paid</div>'}
           </div>
         </div>
       </div>
@@ -4295,12 +4328,12 @@ function renderBuild() {
             const dateLabel = s.paid && s.paidDate ? fmtDate(s.paidDate) : (s.expectedDate ? 'Exp. '+fmtDate(s.expectedDate) : '');
             const overdue = !s.paid && s.expectedDate && isOverdue(s.expectedDate);
             return `
-            <div style="flex:1;min-width:0;border:1px solid ${overdue ? 'var(--danger)' : border};border-radius:8px;padding:10px 10px 8px;margin-right:${idx < c.stages.length-1 ? '6px' : '0'};background:${overdue ? '#fef2f2' : bg};cursor:pointer;position:relative" onclick="openEditStage(${s.id})" title="Edit ${s.name}">
+            <div style="flex:1;min-width:0;border:1px solid ${overdue ? 'var(--danger)' : border};border-radius:8px;padding:10px 10px 8px;margin-right:${idx < c.stages.length-1 ? '6px' : '0'};background:${overdue ? '#fef2f2' : bg};cursor:pointer;position:relative" onclick="openEditStage(${s.id})" title="Edit ${escAttr(s.name)}">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
                 <span style="font-size:11px;font-weight:700;color:${overdue ? 'var(--danger)' : textColor};width:20px;height:20px;border-radius:50%;background:${s.paid ? '#16a34a' : isNext ? 'var(--primary)' : '#94a3b8'};color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">${icon}</span>
                 <span style="font-size:11px;color:${overdue ? 'var(--danger)' : 'var(--text-muted)'};font-weight:600">${pct}%</span>
               </div>
-              <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px">${s.name}</div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px">${escHtml(s.name)}</div>
               <div style="font-size:12px;font-weight:700;color:${s.paid ? '#15803d' : 'var(--text)'}">${aud(s.amount)}</div>
               ${dateLabel ? `<div style="font-size:10px;color:${overdue ? 'var(--danger)' : 'var(--text-muted)'};margin-top:2px">${overdue ? '⚠ ' : ''}${dateLabel}</div>` : ''}
             </div>`;
@@ -4324,16 +4357,16 @@ function renderBuild() {
                   ? `<span class="badge overdue">Overdue</span>`
                   : `<span class="badge unpaid">Upcoming</span>`;
               return `<tr>
-                <td style="font-weight:500">${s.name}</td>
+                <td style="font-weight:500">${escHtml(s.name)}</td>
                 <td class="amount">${aud(s.amount)}</td>
                 <td style="color:var(--text-muted)">${pct}%</td>
                 <td>${badge}</td>
                 <td>${fundingBadge(s.funding || 'loan')}</td>
                 <td>${s.expectedDate ? fmtDate(s.expectedDate) : '<span style="color:var(--text-muted)">—</span>'}</td>
                 <td>${fmtDate(s.paidDate)}</td>
-                <td style="color:var(--text-muted)">${s.invoiceRef || '—'}</td>
+                <td style="color:var(--text-muted)">${escHtml(s.invoiceRef || '—')}</td>
                 <td class="actions">
-                  ${attachBtn(`stage-${s.id}`, s.name)}
+                  ${attachBtn(`stage-${s.id}`, escAttr(s.name))}
                   <button class="btn btn-ghost btn-sm" onclick="openEditStage(${s.id})">✏️</button>
                   <button class="btn btn-danger-ghost btn-sm" onclick="deleteStage(${s.id})">🗑</button>
                 </td>
@@ -4371,14 +4404,14 @@ function renderBuild() {
               <thead><tr><th>Ref</th><th>Description</th><th>Amount</th><th>Status</th><th>Funding</th><th>Raised</th><th>Approved</th><th>Notes</th><th></th></tr></thead>
               <tbody>
                 ${variations.map(v => `<tr>
-                  <td style="font-weight:600;color:var(--primary);white-space:nowrap">${v.ref || '—'}</td>
-                  <td style="font-weight:500">${v.name}</td>
+                  <td style="font-weight:600;color:var(--primary);white-space:nowrap">${escHtml(v.ref || '—')}</td>
+                  <td style="font-weight:500">${escHtml(v.name)}</td>
                   <td class="amount" style="color:${(v.amount||0) < 0 ? 'var(--success)' : 'var(--danger)'};font-weight:600">${v.amount > 0 ? '+' : ''}${aud(v.amount)}</td>
                   <td>${varStatusBadge[v.status] || varStatusBadge['pending']}</td>
                   <td>${fundingBadge(v.funding || 'loan')}</td>
                   <td>${fmtDate(v.dateRaised)}</td>
                   <td>${fmtDate(v.dateApproved)}</td>
-                  <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.notes || '—'}</td>
+                  <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(v.notes || '—')}</td>
                   <td class="actions">
                     <button class="btn btn-ghost btn-sm" onclick="openEditVariation(${v.id})">✏️</button>
                     <button class="btn btn-danger-ghost btn-sm" onclick="deleteVariation(${v.id})">🗑</button>
@@ -4430,8 +4463,8 @@ function renderBuild() {
               const od = e.dueDate && isOverdue(e.dueDate) && e.status !== 'paid';
               const badge = statusBadge[e.status || 'not-quoted'] + (od ? ` <span class="badge overdue">Overdue</span>` : '');
               return `<tr>
-                <td style="font-weight:500">${e.name}</td>
-                <td>${e.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
+                <td style="font-weight:500">${escHtml(e.name)}</td>
+                <td>${e.vendor ? escHtml(e.vendor) : '<span style="color:var(--text-muted)">—</span>'}</td>
                 <td class="amount">${e.totalAmount ? aud(e.totalAmount) : '<span class="amount muted">TBC</span>'}</td>
                 <td class="amount">${aud(e.amountPaid)}</td>
                 <td class="amount ${rem > 0 ? '' : 'muted'}">${rem > 0 ? aud(rem) : '—'}</td>
@@ -4439,7 +4472,7 @@ function renderBuild() {
                 <td>${badge}</td>
                 <td>${fundingBadge(e.funding || 'loan')}</td>
                 <td class="actions">
-                  ${attachBtn(`extra-${e.id}`, e.name)}
+                  ${attachBtn(`extra-${e.id}`, escAttr(e.name))}
                   <button class="btn btn-ghost btn-sm" onclick="openEditExtra(${e.id})">✏️</button>
                   <button class="btn btn-danger-ghost btn-sm" onclick="deleteExtra(${e.id})">🗑</button>
                 </td>
@@ -4492,16 +4525,16 @@ function renderBuild() {
                   };
                   const delivOd = f.deliveryDate && f.status !== 'delivered' && isOverdue(f.deliveryDate);
                   return `<tr>
-                    <td style="font-weight:500">${f.name}</td>
-                    <td style="color:var(--text-muted)">${f.room || '—'}</td>
-                    <td>${f.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
+                    <td style="font-weight:500">${escHtml(f.name)}</td>
+                    <td style="color:var(--text-muted)">${escHtml(f.room || '—')}</td>
+                    <td>${f.vendor ? escHtml(f.vendor) : '<span style="color:var(--text-muted)">—</span>'}</td>
                     <td class="amount">${f.price ? aud(f.price) : '<span class="amount muted">TBC</span>'}</td>
                     <td>${statusMap[f.status] || statusMap['to-purchase']}</td>
                     <td>${fundingBadge(f.funding || 'own-funds')}</td>
                     <td>${f.deliveryDate ? (delivOd ? `<span class="badge overdue">${fmtDate(f.deliveryDate)}</span>` : fmtDate(f.deliveryDate)) : '<span style="color:var(--text-muted)">—</span>'}</td>
-                    <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.notes || '—'}</td>
+                    <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(f.notes || '—')}</td>
                     <td class="actions">
-                      ${attachBtn(`furniture-${f.id}`, f.name)}
+                      ${attachBtn(`furniture-${f.id}`, escAttr(f.name))}
                       <button class="btn btn-ghost btn-sm" onclick="openEditFurniture(${f.id})">✏️</button>
                       <button class="btn btn-danger-ghost btn-sm" onclick="deleteFurniture(${f.id})">🗑</button>
                     </td>
@@ -4562,16 +4595,16 @@ function renderBuild() {
                   };
                   const delivOd = a.deliveryDate && a.status !== 'delivered' && isOverdue(a.deliveryDate);
                   return `<tr>
-                    <td style="font-weight:500">${a.name}</td>
-                    <td style="color:var(--text-muted)">${a.room || '—'}</td>
-                    <td>${a.vendor || '<span style="color:var(--text-muted)">—</span>'}</td>
+                    <td style="font-weight:500">${escHtml(a.name)}</td>
+                    <td style="color:var(--text-muted)">${escHtml(a.room || '—')}</td>
+                    <td>${a.vendor ? escHtml(a.vendor) : '<span style="color:var(--text-muted)">—</span>'}</td>
                     <td class="amount">${a.price ? aud(a.price) : '<span class="amount muted">TBC</span>'}</td>
                     <td>${statusMap[a.status] || statusMap['to-purchase']}</td>
                     <td>${fundingBadge(a.funding || 'own-funds')}</td>
                     <td>${a.deliveryDate ? (delivOd ? `<span class="badge overdue">${fmtDate(a.deliveryDate)}</span>` : fmtDate(a.deliveryDate)) : '<span style="color:var(--text-muted)">—</span>'}</td>
-                    <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.notes || '—'}</td>
+                    <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(a.notes || '—')}</td>
                     <td class="actions">
-                      ${attachBtn(`appliance-${a.id}`, a.name)}
+                      ${attachBtn(`appliance-${a.id}`, escAttr(a.name))}
                       <button class="btn btn-ghost btn-sm" onclick="openEditAppliance(${a.id})">✏️</button>
                       <button class="btn btn-danger-ghost btn-sm" onclick="deleteAppliance(${a.id})">🗑</button>
                     </td>
@@ -4779,7 +4812,7 @@ function renderGoals() {
         <div class="goal-card" style="opacity:${g.status==='abandoned'?'0.6':'1'}">
           <div class="goal-card-header">
             <div>
-              <div class="goal-card-title">${typeInfo.icon} ${g.name}</div>
+              <div class="goal-card-title">${typeInfo.icon} ${escHtml(g.name)}</div>
               <div class="goal-card-meta">
                 ${typeInfo.label}${g.category ? ` · ${g.category}` : ''} · Target date: ${deadline}
               </div>
@@ -4792,7 +4825,7 @@ function renderGoals() {
             </div>
           </div>
           ${progressHtml}
-          ${g.notes ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">${g.notes}</div>` : ''}
+          ${g.notes ? `<div style="font-size:12px;color:var(--text-muted);margin-top:8px">${escHtml(g.notes)}</div>` : ''}
         </div>`;
     });
   }
@@ -4805,7 +4838,7 @@ function goalForm(g = {}) {
   return `
     <div class="form-group">
       <label class="form-label">Goal Name</label>
-      <input class="form-input" id="f-goal-name" type="text" value="${g.name || ''}" placeholder="e.g. Cut dining out">
+      <input class="form-input" id="f-goal-name" type="text" maxlength="200" value="${escAttr(g.name || '')}" placeholder="e.g. Cut dining out">
     </div>
     <div class="form-group">
       <label class="form-label">Type</label>
@@ -4823,7 +4856,7 @@ function goalForm(g = {}) {
         </div>
         <div class="form-group">
           <label class="form-label">Monthly Limit (AUD)</label>
-          <input class="form-input" id="f-goal-target-monthly" type="number" min="0" value="${g.targetMonthly||''}" placeholder="e.g. 300">
+          <input class="form-input" id="f-goal-target-monthly" type="number" max="99999999" min="0" value="${g.targetMonthly||''}" placeholder="e.g. 300">
         </div>
       </div>
     </div>
@@ -4831,18 +4864,18 @@ function goalForm(g = {}) {
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Target Amount (AUD)</label>
-          <input class="form-input" id="f-goal-target-total" type="number" min="0" value="${g.targetTotal||''}" placeholder="e.g. 50000">
+          <input class="form-input" id="f-goal-target-total" type="number" max="99999999" min="0" value="${g.targetTotal||''}" placeholder="e.g. 50000">
         </div>
         <div class="form-group">
           <label class="form-label">Currently Saved (AUD)</label>
-          <input class="form-input" id="f-goal-current-saved" type="number" min="0" value="${g.currentSaved||''}" placeholder="0">
+          <input class="form-input" id="f-goal-current-saved" type="number" max="99999999" min="0" value="${g.currentSaved||''}" placeholder="0">
         </div>
       </div>
     </div>
     <div id="goal-income-fields" style="display:${type==='income'?'':'none'}">
       <div class="form-group">
         <label class="form-label">Target Monthly Income (AUD)</label>
-        <input class="form-input" id="f-goal-target-monthly-inc" type="number" min="0" value="${g.targetMonthly||''}" placeholder="e.g. 8000">
+        <input class="form-input" id="f-goal-target-monthly-inc" type="number" max="99999999" min="0" value="${g.targetMonthly||''}" placeholder="e.g. 8000">
       </div>
     </div>
     <div class="form-row">
@@ -4861,7 +4894,7 @@ function goalForm(g = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <input class="form-input" id="f-goal-notes" type="text" value="${g.notes||''}" placeholder="Optional notes">
+      <input class="form-input" id="f-goal-notes" type="text" maxlength="200" value="${escAttr(g.notes||'')}" placeholder="Optional notes">
     </div>
   `;
 }
@@ -5007,8 +5040,8 @@ function renderScenarios() {
         <div class="scenario-card">
           <div class="scenario-card-header" onclick="toggleScenario(${sc.id})">
             <div style="flex:1">
-              <div style="font-weight:600;font-size:14px">${sc.name}</div>
-              ${sc.description ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${sc.description}</div>` : ''}
+              <div style="font-weight:600;font-size:14px">${escHtml(sc.name)}</div>
+              ${sc.description ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${escHtml(sc.description)}</div>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
               <div style="text-align:right">
@@ -5034,11 +5067,11 @@ function renderScenarios() {
                     const at = ADJ_TYPES.find(t => t.value === adj.type) || ADJ_TYPES[0];
                     let detail = '';
                     if (adj.type === 'add-income' || adj.type === 'add-expense') {
-                      detail = `${adj.name} · ${aud(adj.amount||0)}/${adj.frequency||'mo'}${adj.category?' · '+adj.category:''}`;
+                      detail = `${escHtml(adj.name)} · ${aud(adj.amount||0)}/${adj.frequency||'mo'}${adj.category?' · '+adj.category:''}`;
                     } else if (adj.type === 'remove-income' || adj.type === 'remove-expense') {
-                      detail = adj.itemName || '—';
+                      detail = escHtml(adj.itemName || '—');
                     } else if (adj.type === 'reduce-income' || adj.type === 'reduce-expense') {
-                      detail = `${adj.itemName} · reduce by ${adj.changeType==='percent'?adj.changeAmount+'%':aud(adj.changeAmount||0)}`;
+                      detail = `${escHtml(adj.itemName)} · reduce by ${adj.changeType==='percent'?adj.changeAmount+'%':aud(adj.changeAmount||0)}`;
                     }
                     return `<div class="adj-item">
                       <span class="adj-icon">${at.icon}</span>
@@ -5060,7 +5093,7 @@ function renderScenarios() {
                 <div class="compare-row"><span style="color:var(--text-muted);font-size:12px">Annual surplus</span><span style="color:var(--text-muted);font-size:12px">${aud(baseSurplus*12)}</span></div>
               </div>
               <div class="compare-col" style="border:2px solid var(--primary)">
-                <div class="compare-col-title" style="color:var(--primary)">Scenario: ${sc.name}</div>
+                <div class="compare-col-title" style="color:var(--primary)">Scenario: ${escHtml(sc.name)}</div>
                 <div class="compare-row">
                   <span>Monthly Income</span>
                   <span class="amount" style="color:var(--success)">${aud(result.totalIncome)} ${incomeDiff!==0?`<small style="color:${incomeDiff>0?'var(--success)':'var(--danger)'}">(${incomeDiff>0?'+':''}${aud(incomeDiff)})</small>`:''}</span>
@@ -5096,11 +5129,11 @@ function scenarioForm(sc = {}) {
   return `
     <div class="form-group">
       <label class="form-label">Scenario Name</label>
-      <input class="form-input" id="f-sc-name" type="text" value="${sc.name||''}" placeholder="e.g. Pick up second job">
+      <input class="form-input" id="f-sc-name" type="text" maxlength="200" value="${escAttr(sc.name||'')}" placeholder="e.g. Pick up second job">
     </div>
     <div class="form-group">
       <label class="form-label">Description</label>
-      <input class="form-input" id="f-sc-desc" type="text" value="${sc.description||''}" placeholder="Brief description of what you're testing">
+      <input class="form-input" id="f-sc-desc" type="text" maxlength="200" value="${escAttr(sc.description||'')}" placeholder="Brief description of what you're testing">
     </div>
   `;
 }
@@ -5141,8 +5174,8 @@ function deleteScenario(id) {
 
 function adjForm(sc) {
   const base = getMonthData(selectedBudgetMonth);
-  const incomeOpts = base.income.map(i => `<option value="${i.id}">${i.name} (${aud(itemMonthly(i))}/mo)</option>`).join('');
-  const expenseOpts = base.expenses.map(e => `<option value="${e.id}">${e.name} (${aud(itemMonthly(e))}/mo)</option>`).join('');
+  const incomeOpts = base.income.map(i => `<option value="${i.id}">${escHtml(i.name)} (${aud(itemMonthly(i))}/mo)</option>`).join('');
+  const expenseOpts = base.expenses.map(e => `<option value="${e.id}">${escHtml(e.name)} (${aud(itemMonthly(e))}/mo)</option>`).join('');
   return `
     <div class="form-group">
       <label class="form-label">Adjustment Type</label>
@@ -5154,11 +5187,11 @@ function adjForm(sc) {
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Description</label>
-          <input class="form-input" id="f-adj-name" type="text" placeholder="e.g. Weekend job">
+          <input class="form-input" id="f-adj-name" type="text" maxlength="200" placeholder="e.g. Weekend job">
         </div>
         <div class="form-group">
           <label class="form-label">Amount (AUD)</label>
-          <input class="form-input" id="f-adj-amount" type="number" min="0" placeholder="e.g. 800">
+          <input class="form-input" id="f-adj-amount" type="number" max="99999999" min="0" placeholder="e.g. 800">
         </div>
       </div>
       <div class="form-row" id="adj-add-income-extra">
@@ -5193,7 +5226,7 @@ function adjForm(sc) {
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Reduce by</label>
-          <input class="form-input" id="f-adj-change-amount" type="number" min="0" placeholder="Amount">
+          <input class="form-input" id="f-adj-change-amount" type="number" max="99999999" min="0" placeholder="Amount">
         </div>
         <div class="form-group">
           <label class="form-label">Type</label>
@@ -5218,7 +5251,7 @@ function adjForm(sc) {
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Reduce by</label>
-          <input class="form-input" id="f-adj-change-amount-exp" type="number" min="0" placeholder="Amount">
+          <input class="form-input" id="f-adj-change-amount-exp" type="number" max="99999999" min="0" placeholder="Amount">
         </div>
         <div class="form-group">
           <label class="form-label">Type</label>
@@ -5647,8 +5680,8 @@ function renderSpendingPatterns() {
         return `<div class="spi-pattern-card" style="background:${s.bg};border:1.5px solid ${s.border}">
           <div class="spi-pattern-icon">${p.icon}</div>
           <div>
-            <div class="spi-pattern-title" style="color:${s.title}">${p.title}</div>
-            <div class="spi-pattern-body">${p.body}</div>
+            <div class="spi-pattern-title" style="color:${s.title}">${escHtml(p.title)}</div>
+            <div class="spi-pattern-body">${escHtml(p.body)}</div>
             <div class="spi-sparkline">${sparkBars}</div>
           </div>
         </div>`;
@@ -5892,9 +5925,9 @@ function renderInsightCards(insights, isAI) {
       <div style="background:${s.bg};border:1.5px solid ${s.border};border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start">
         <div style="width:38px;height:38px;border-radius:10px;background:${s.icon_bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${ins.icon}</div>
         <div style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:14px;color:${s.text};margin-bottom:4px">${ins.title}</div>
-          <div style="font-size:13px;color:var(--text);line-height:1.5">${ins.body}</div>
-          ${ins.action ? `<div style="margin-top:8px;font-size:12px;font-weight:600;color:${s.text}">→ ${ins.action}</div>` : ''}
+          <div style="font-weight:700;font-size:14px;color:${s.text};margin-bottom:4px">${escHtml(ins.title)}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.5">${escHtml(ins.body)}</div>
+          ${ins.action ? `<div style="margin-top:8px;font-size:12px;font-weight:600;color:${s.text}">→ ${escHtml(ins.action)}</div>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -6114,8 +6147,8 @@ function generateSmartInsightsHTML(insights) {
       <div style="background:${s.bg};border:1.5px solid ${s.border};border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
         <span style="font-size:20px;flex-shrink:0;line-height:1.3">${ins.icon}</span>
         <div>
-          <div style="font-weight:700;font-size:13px;color:${s.text};margin-bottom:3px">${ins.title}</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.5">${ins.body}</div>
+          <div style="font-weight:700;font-size:13px;color:${s.text};margin-bottom:3px">${escHtml(ins.title)}</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.5">${escHtml(ins.body)}</div>
         </div>
       </div>`;
   }).join('');
@@ -6189,7 +6222,7 @@ function openAddCategoryGroup() {
       </div>
       <div class="form-group" style="flex:1">
         <label class="form-label">Group Name</label>
-        <input class="form-input" id="f-grp-name" type="text" placeholder="e.g. Housing">
+        <input class="form-input" id="f-grp-name" type="text" maxlength="200" placeholder="e.g. Housing">
       </div>
     </div>
   `, () => {
@@ -6280,7 +6313,7 @@ function openAddCatToGroup(groupId) {
     ` : `<p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">All existing categories are already assigned. Create a new one below.</p>`}
     <div class="form-group">
       <label class="form-label">New category name</label>
-      <input class="form-input" id="f-cat-new" type="text" placeholder="e.g. Pet Care" oninput="
+      <input class="form-input" id="f-cat-new" type="text" maxlength="200" placeholder="e.g. Pet Care" oninput="
         if(this.value.trim()){
           document.querySelectorAll('#cat-pick-list button').forEach(b=>b.style.background='');
           document.getElementById('f-cat-selected').value='';
@@ -6504,9 +6537,9 @@ function renderSettings() {
                 ${avatarHtml(entry)}
                 <div style="flex:1;min-width:0">
                   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
-                    <span style="font-weight:600;font-size:13px">${entry.name}</span>
-                    <span style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:${actionBadgeColor(entry.action)}">${entry.action}</span>
-                    ${entry.detail ? `<span style="font-size:13px;color:var(--text)">${entry.detail}</span>` : ''}
+                    <span style="font-weight:600;font-size:13px">${escHtml(entry.name)}</span>
+                    <span style="display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:600;color:#fff;background:${actionBadgeColor(entry.action)}">${escHtml(entry.action)}</span>
+                    ${entry.detail ? `<span style="font-size:13px;color:var(--text)">${escHtml(entry.detail)}</span>` : ''}
                   </div>
                   <div style="font-size:11px;color:var(--text-muted)">${fmtLogTime(entry.ts)}</div>
                 </div>
@@ -6573,7 +6606,7 @@ function renderSettings() {
               <option value="bird"${p.type==='bird'?' selected':''}>Bird</option>
               <option value="other"${p.type==='other'?' selected':''}>Other</option>
             </select>
-            <input type="text" class="form-input" style="flex:1;min-width:120px" placeholder="Name (optional)"
+            <input type="text" maxlength="200" class="form-input" style="flex:1;min-width:120px" placeholder="Name (optional)"
               value="${(p.name||'').replace(/"/g,'&quot;')}"
               oninput="updatePet(${i},'name',this.value)">
             <button onclick="removePet(${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:20px;line-height:1;padding:0 4px;opacity:0.7" title="Remove">&times;</button>
@@ -6599,7 +6632,7 @@ function renderSettings() {
             </span>`).join('')}
         </div>
         <div style="display:flex;gap:8px;max-width:420px;margin-bottom:24px">
-          <input id="new-cat-expense" type="text" class="form-input" placeholder="New expense category…" onkeydown="if(event.key==='Enter')addCategory('expense')" style="flex:1">
+          <input id="new-cat-expense" type="text" maxlength="200" class="form-input" placeholder="New expense category…" onkeydown="if(event.key==='Enter')addCategory('expense')" style="flex:1">
           <button class="btn btn-primary btn-sm" onclick="addCategory('expense')">Add</button>
         </div>
         <div style="font-weight:600;font-size:13px;margin-bottom:10px">Income Categories</div>
@@ -6611,7 +6644,7 @@ function renderSettings() {
             </span>`).join('')}
         </div>
         <div style="display:flex;gap:8px;max-width:420px">
-          <input id="new-cat-income" type="text" class="form-input" placeholder="New income category…" onkeydown="if(event.key==='Enter')addCategory('income')" style="flex:1">
+          <input id="new-cat-income" type="text" maxlength="200" class="form-input" placeholder="New income category…" onkeydown="if(event.key==='Enter')addCategory('income')" style="flex:1">
           <button class="btn btn-primary btn-sm" onclick="addCategory('income')">Add</button>
         </div>
       </div>`) +
@@ -6622,7 +6655,7 @@ function renderSettings() {
           <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
               <button id="grp-icon-btn-${g.id}" type="button" onclick="openIconPickerForGroup(${g.id})" style="width:52px;height:40px;font-size:22px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer" title="Choose icon">${g.icon}</button>
-              <input type="text" class="form-input" style="flex:1;font-weight:600" value="${g.name.replace(/"/g,'&quot;')}"
+              <input type="text" maxlength="200" class="form-input" style="flex:1;font-weight:600" value="${g.name.replace(/"/g,'&quot;')}"
                 onchange="updateCategoryGroup(${g.id},'name',this.value)">
               <button class="btn btn-danger-ghost btn-sm" onclick="deleteCategoryGroup(${g.id})">Delete</button>
             </div>
@@ -6739,7 +6772,7 @@ function renderExpenseGroups(expenses) {
       <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;user-select:none;background:${headerColor}22;border-bottom:3px solid ${headerColor}" onclick="toggleGroupExpand('${group.id}')">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:20px">${group.icon}</span>
-          <span style="font-weight:700;font-size:14px">${group.name}</span>
+          <span style="font-weight:700;font-size:14px">${escHtml(group.name)}</span>
           <span style="font-size:11px;color:var(--text-muted)">${items.length} item${items.length !== 1 ? 's' : ''}</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
@@ -6776,8 +6809,8 @@ function renderExpenseGroups(expenses) {
           <div class="expense-row" style="--row-color:${eColor};display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
             <div style="width:4px;height:36px;border-radius:2px;background:${eColor};flex-shrink:0"></div>
             <div style="flex:1;min-width:0;cursor:pointer" onclick="event.stopPropagation();openEditExpense(${e.id})">
-              <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.name}</div>
-              <div style="font-size:11px;color:var(--text-muted)">${e.category || 'Other'}${e.vendor ? ` · ${e.vendor}` : ''} · ${freqDisplayItem(e)}</div>
+              <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(e.name)}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${e.category || 'Other'}${e.vendor ? ` · ${escHtml(e.vendor)}` : ''} · ${freqDisplayItem(e)}</div>
             </div>
             <div style="text-align:right;flex-shrink:0;margin-right:4px">
               <div style="font-size:13px;font-weight:600">${aud(eMo)}/mo</div>
@@ -6889,7 +6922,7 @@ function renderBudget() {
               const dueLabel = i.dueDate ? (() => { const [y,m,d] = i.dueDate.split('-'); return `${d}/${m}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
               const incOneTimeBadge = i.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
               return `<tr>
-              <td style="font-weight:500;border-left:4px solid ${colors.income}">${i.name}${incOneTimeBadge}</td>
+              <td style="font-weight:500;border-left:4px solid ${colors.income}">${escHtml(i.name)}${incOneTimeBadge}</td>
               <td class="amount">${audD(i.amount)}</td>
               <td>${dueLabel}</td>
               <td style="color:var(--text-muted)">${freqDisplayItem(i)}</td>
@@ -6984,7 +7017,7 @@ function renderBudget() {
                       const rowColor = colors.expense[e.category || 'Other'] || '#94a3b8';
                       const oneTimeBadge = e.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
                       return `<tr>
-                        <td style="font-weight:500;border-left:4px solid ${rowColor}">${e.name}${oneTimeBadge}${e.vendor ? `<br><span style="font-size:11px;font-weight:400;color:var(--text-muted)">${e.vendor}</span>` : ''}</td>
+                        <td style="font-weight:500;border-left:4px solid ${rowColor}">${escHtml(e.name)}${oneTimeBadge}${e.vendor ? `<br><span style="font-size:11px;font-weight:400;color:var(--text-muted)">${escHtml(e.vendor)}</span>` : ''}</td>
                         <td><span style="display:inline-block;padding:2px 10px;border-radius:99px;background:${rowColor};color:#fff;font-size:11px;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span></td>
                         <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
                         <td>${dueLabel}</td>
@@ -7036,6 +7069,11 @@ function openModal(title, bodyHtml, onSave) {
 
 function closeModal() {
   _pendingLogEntry = null;
+  window._actualEditorRefresh = null;
+  window._csvSuggestions = null;
+  window._csvSuggestNames = null;
+  document.getElementById('modal-body').innerHTML = '';
+  document.getElementById('modal-footer').innerHTML = '';
   document.getElementById('modal-overlay').classList.add('hidden');
 }
 
@@ -7049,7 +7087,7 @@ function openEditContractTotal() {
   openModal('Edit Contract Total', `
     <div class="form-group">
       <label class="form-label">Fixed Price Contract Total (AUD)</label>
-      <input class="form-input" id="f-contract-total" type="number" value="${state.buildContract.total}" min="0">
+      <input class="form-input" id="f-contract-total" type="number" max="99999999" value="${state.buildContract.total}" min="0">
     </div>
   `, () => {
     const v = parseFloat(document.getElementById('f-contract-total').value);
@@ -7070,11 +7108,11 @@ function stageForm(s = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Stage Name</label>
-        <input class="form-input" id="f-stage-name" type="text" value="${s.name || ''}" placeholder="e.g. Base / Slab">
+        <input class="form-input" id="f-stage-name" type="text" maxlength="200" value="${escAttr(s.name || '')}" placeholder="e.g. Base / Slab">
       </div>
       <div class="form-group">
         <label class="form-label">Amount (AUD)</label>
-        <input class="form-input" id="f-stage-amount" type="number" value="${s.amount || ''}" min="0">
+        <input class="form-input" id="f-stage-amount" type="number" max="99999999" value="${s.amount || ''}" min="0">
       </div>
     </div>
     <div class="form-row">
@@ -7090,7 +7128,7 @@ function stageForm(s = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Invoice / Ref</label>
-        <input class="form-input" id="f-stage-ref" type="text" value="${s.invoiceRef || ''}" placeholder="Optional">
+        <input class="form-input" id="f-stage-ref" type="text" maxlength="200" value="${escAttr(s.invoiceRef || '')}" placeholder="Optional">
       </div>
     </div>
     <div class="form-row">
@@ -7108,7 +7146,7 @@ function stageForm(s = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <input class="form-input" id="f-stage-notes" type="text" value="${s.notes || ''}" placeholder="Optional">
+      <input class="form-input" id="f-stage-notes" type="text" maxlength="200" value="${s.notes || ''}" placeholder="Optional">
     </div>
   `;
 }
@@ -7162,7 +7200,7 @@ function variationForm(v = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Variation Ref</label>
-        <input class="form-input" id="f-var-ref" type="text" value="${v.ref || ''}" placeholder="e.g. V001">
+        <input class="form-input" id="f-var-ref" type="text" maxlength="200" value="${escAttr(v.ref || '')}" placeholder="e.g. V001">
       </div>
       <div class="form-group">
         <label class="form-label">Status</label>
@@ -7175,12 +7213,12 @@ function variationForm(v = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Description</label>
-      <input class="form-input" id="f-var-name" type="text" value="${v.name || ''}" placeholder="e.g. Tile upgrade — master bathroom">
+      <input class="form-input" id="f-var-name" type="text" maxlength="200" value="${escAttr(v.name || '')}" placeholder="e.g. Tile upgrade — master bathroom">
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Amount (AUD)</label>
-        <input class="form-input" id="f-var-amount" type="number" value="${v.amount !== undefined ? v.amount : ''}" placeholder="Use negative for credits">
+        <input class="form-input" id="f-var-amount" type="number" max="99999999" value="${v.amount !== undefined ? v.amount : ''}" placeholder="Use negative for credits">
       </div>
       <div class="form-group">
         <label class="form-label">Funding</label>
@@ -7202,7 +7240,7 @@ function variationForm(v = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <input class="form-input" id="f-var-notes" type="text" value="${(v.notes||'').replace(/"/g,'&quot;')}" placeholder="Optional">
+      <input class="form-input" id="f-var-notes" type="text" maxlength="200" value="${escAttr(v.notes||'')}" placeholder="Optional">
     </div>
   `;
 }
@@ -7267,11 +7305,11 @@ function extraForm(e = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Item Name</label>
-        <input class="form-input" id="f-extra-name" type="text" value="${e.name || ''}" placeholder="e.g. Solar">
+        <input class="form-input" id="f-extra-name" type="text" maxlength="200" value="${escAttr(e.name || '')}" placeholder="e.g. Solar">
       </div>
       <div class="form-group">
         <label class="form-label">Vendor / Contractor</label>
-        <input class="form-input" id="f-extra-vendor" type="text" value="${e.vendor || ''}" placeholder="Company name">
+        <input class="form-input" id="f-extra-vendor" type="text" maxlength="200" value="${escAttr(e.vendor || '')}" placeholder="Company name">
       </div>
     </div>
     <div class="form-row">
@@ -7289,11 +7327,11 @@ function extraForm(e = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Total Cost (AUD)</label>
-        <input class="form-input" id="f-extra-total" type="number" value="${e.totalAmount || ''}" min="0" placeholder="Leave blank if TBC">
+        <input class="form-input" id="f-extra-total" type="number" max="99999999" value="${e.totalAmount || ''}" min="0" placeholder="Leave blank if TBC">
       </div>
       <div class="form-group">
         <label class="form-label">Amount Paid (AUD)</label>
-        <input class="form-input" id="f-extra-paid" type="number" value="${e.amountPaid || ''}" min="0">
+        <input class="form-input" id="f-extra-paid" type="number" max="99999999" value="${e.amountPaid || ''}" min="0">
       </div>
     </div>
     <div class="form-row">
@@ -7306,7 +7344,7 @@ function extraForm(e = {}) {
       </div>
       <div class="form-group">
         <label class="form-label">Notes</label>
-        <input class="form-input" id="f-extra-notes" type="text" value="${e.notes || ''}" placeholder="Optional">
+        <input class="form-input" id="f-extra-notes" type="text" maxlength="200" value="${escAttr(e.notes || '')}" placeholder="Optional">
       </div>
     </div>
   `;
@@ -7363,11 +7401,11 @@ function incomeForm(i = {}) {
   return `
     <div class="form-group">
       <label class="form-label">Source / Description</label>
-      <input class="form-input" id="f-inc-name" type="text" value="${i.name || ''}" placeholder="e.g. Salary — Chris">
+      <input class="form-input" id="f-inc-name" type="text" maxlength="200" value="${escAttr(i.name || '')}" placeholder="e.g. Salary — Chris">
     </div>
     <div class="form-group">
       <label class="form-label">Amount (AUD)</label>
-      <input class="form-input" id="f-inc-amount" type="number" value="${i.amount || ''}" min="0">
+      <input class="form-input" id="f-inc-amount" type="number" max="99999999" value="${i.amount || ''}" min="0">
     </div>
     <div class="form-group">
       <label class="form-label">Frequency</label>
@@ -7376,7 +7414,7 @@ function incomeForm(i = {}) {
       </select>
       <div id="f-inc-custom-wrap" style="display:${isCustom ? 'flex' : 'none'};align-items:center;gap:8px;margin-top:8px">
         <span style="font-size:13px;color:var(--text-muted);white-space:nowrap">Every</span>
-        <input class="form-input" id="f-inc-custom-n" type="number" min="1" value="${i.customEvery || ''}" style="width:70px" placeholder="e.g. 10">
+        <input class="form-input" id="f-inc-custom-n" type="number" max="99999999" min="1" value="${i.customEvery || ''}" style="width:70px" placeholder="e.g. 10">
         <select class="form-select" id="f-inc-custom-unit" style="flex:1">
           <option value="weeks" ${(i.customUnit||'weeks')==='weeks'?'selected':''}>weeks</option>
           <option value="months" ${i.customUnit==='months'?'selected':''}>months</option>
@@ -7506,7 +7544,7 @@ function expenseForm(e = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Description</label>
-        <input class="form-input" id="f-exp-name" type="text" value="${e.name || ''}" placeholder="e.g. Mortgage">
+        <input class="form-input" id="f-exp-name" type="text" maxlength="200" value="${escAttr(e.name || '')}" placeholder="e.g. Mortgage">
       </div>
       <div class="form-group">
         <label class="form-label">Category</label>
@@ -7517,11 +7555,11 @@ function expenseForm(e = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Vendor <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-      <input class="form-input" id="f-exp-vendor" type="text" value="${e.vendor || ''}" placeholder="e.g. ANZ, Woolworths, Netflix">
+      <input class="form-input" id="f-exp-vendor" type="text" maxlength="200" value="${escAttr(e.vendor || '')}" placeholder="e.g. ANZ, Woolworths, Netflix">
     </div>
     <div class="form-group">
       <label class="form-label">Amount (AUD)</label>
-      <input class="form-input" id="f-exp-amount" type="number" value="${e.amount || ''}" min="0">
+      <input class="form-input" id="f-exp-amount" type="number" max="99999999" value="${e.amount || ''}" min="0">
     </div>
     <div class="form-group">
       <label class="form-label">Frequency</label>
@@ -7530,7 +7568,7 @@ function expenseForm(e = {}) {
       </select>
       <div id="f-exp-custom-wrap" style="display:${isCustom ? 'flex' : 'none'};align-items:center;gap:8px;margin-top:8px">
         <span style="font-size:13px;color:var(--text-muted);white-space:nowrap">Every</span>
-        <input class="form-input" id="f-exp-custom-n" type="number" min="1" value="${e.customEvery || ''}" style="width:70px" placeholder="e.g. 10">
+        <input class="form-input" id="f-exp-custom-n" type="number" max="99999999" min="1" value="${e.customEvery || ''}" style="width:70px" placeholder="e.g. 10">
         <select class="form-select" id="f-exp-custom-unit" style="flex:1">
           <option value="weeks" ${(e.customUnit||'weeks')==='weeks'?'selected':''}>weeks</option>
           <option value="months" ${e.customUnit==='months'?'selected':''}>months</option>
@@ -7730,7 +7768,7 @@ function furnitureForm(f = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Item Name</label>
-        <input class="form-input" id="f-furn-name" type="text" value="${f.name || ''}" placeholder="e.g. 3-seater sofa">
+        <input class="form-input" id="f-furn-name" type="text" maxlength="200" value="${escAttr(f.name || '')}" placeholder="e.g. 3-seater sofa">
       </div>
       <div class="form-group">
         <label class="form-label">Room</label>
@@ -7743,11 +7781,11 @@ function furnitureForm(f = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Store / Vendor</label>
-        <input class="form-input" id="f-furn-vendor" type="text" value="${f.vendor || ''}" placeholder="e.g. Nick Scali">
+        <input class="form-input" id="f-furn-vendor" type="text" maxlength="200" value="${escAttr(f.vendor || '')}" placeholder="e.g. Nick Scali">
       </div>
       <div class="form-group">
         <label class="form-label">Price (AUD)</label>
-        <input class="form-input" id="f-furn-price" type="number" value="${f.price || ''}" min="0" placeholder="Leave blank if TBC">
+        <input class="form-input" id="f-furn-price" type="number" max="99999999" value="${f.price || ''}" min="0" placeholder="Leave blank if TBC">
       </div>
     </div>
     <div class="form-row" style="align-items:flex-start">
@@ -7773,7 +7811,7 @@ function furnitureForm(f = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <input class="form-input" id="f-furn-notes" type="text" value="${f.notes || ''}" placeholder="Optional — colour, dimensions, order number...">
+      <input class="form-input" id="f-furn-notes" type="text" maxlength="200" value="${escAttr(f.notes || '')}" placeholder="Optional — colour, dimensions, order number...">
     </div>
     <div class="form-group">
       <label class="form-label">Funding</label>
@@ -7837,7 +7875,7 @@ function applianceForm(a = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Item Name</label>
-        <input class="form-input" id="f-appl-name" type="text" value="${a.name || ''}" placeholder="e.g. Dishwasher">
+        <input class="form-input" id="f-appl-name" type="text" maxlength="200" value="${escAttr(a.name || '')}" placeholder="e.g. Dishwasher">
       </div>
       <div class="form-group">
         <label class="form-label">Room</label>
@@ -7850,11 +7888,11 @@ function applianceForm(a = {}) {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Store / Vendor</label>
-        <input class="form-input" id="f-appl-vendor" type="text" value="${a.vendor || ''}" placeholder="e.g. Harvey Norman">
+        <input class="form-input" id="f-appl-vendor" type="text" maxlength="200" value="${escAttr(a.vendor || '')}" placeholder="e.g. Harvey Norman">
       </div>
       <div class="form-group">
         <label class="form-label">Price (AUD)</label>
-        <input class="form-input" id="f-appl-price" type="number" value="${a.price || ''}" min="0" placeholder="Leave blank if TBC">
+        <input class="form-input" id="f-appl-price" type="number" max="99999999" value="${a.price || ''}" min="0" placeholder="Leave blank if TBC">
       </div>
     </div>
     <div class="form-row" style="align-items:flex-start">
@@ -7880,7 +7918,7 @@ function applianceForm(a = {}) {
     </div>
     <div class="form-group">
       <label class="form-label">Notes</label>
-      <input class="form-input" id="f-appl-notes" type="text" value="${a.notes || ''}" placeholder="Optional — model number, colour, order reference...">
+      <input class="form-input" id="f-appl-notes" type="text" maxlength="200" value="${escAttr(a.notes || '')}" placeholder="Optional — model number, colour, order reference...">
     </div>
     <div class="form-group">
       <label class="form-label">Funding</label>
@@ -8075,7 +8113,7 @@ function openMealEdit(weekKey, dayIdx, slot) {
   document.getElementById('modal-body').innerHTML = `
     <div class="form-group">
       <label class="form-label">Meal</label>
-      <input class="form-input" id="meal-input" type="text" value="${current.replace(/"/g,'&quot;')}"
+      <input class="form-input" id="meal-input" type="text" maxlength="200" value="${current.replace(/"/g,'&quot;')}"
         placeholder="e.g. Pasta Bolognese, Chicken stir-fry…" autocomplete="off">
     </div>
 
@@ -8229,7 +8267,7 @@ function _renderShoppingList() {
           <div class="shop-row">
             <input type="checkbox" ${item.checked?'checked':''} onchange="toggleShopItem(${item.id},this.checked)"
               style="width:18px;height:18px;cursor:pointer;accent-color:#0d9488;flex-shrink:0">
-            <span style="flex:1;font-size:14px;${item.checked?'text-decoration:line-through;color:var(--text-muted)':''}">${item.name}</span>
+            <span style="flex:1;font-size:14px;${item.checked?'text-decoration:line-through;color:var(--text-muted)':''}">${escHtml(item.name)}</span>
             ${item.qty ? `<span style="font-size:12px;color:var(--text-muted);white-space:nowrap">${item.qty}</span>` : ''}
             <button onclick="removeShopItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;padding:2px 4px">×</button>
           </div>`).join('')}
@@ -8251,12 +8289,12 @@ function _renderShoppingList() {
       <div style="padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
         <div style="flex:2;min-width:140px">
           <div class="form-label">Item</div>
-          <input class="form-input" id="shop-name" type="text" placeholder="e.g. Chicken breast" autocomplete="off"
+          <input class="form-input" id="shop-name" type="text" maxlength="200" placeholder="e.g. Chicken breast" autocomplete="off"
             onkeydown="if(event.key==='Enter')addShopItem()">
         </div>
         <div style="flex:1;min-width:80px">
           <div class="form-label">Qty</div>
-          <input class="form-input" id="shop-qty" type="text" placeholder="500g" autocomplete="off">
+          <input class="form-input" id="shop-qty" type="text" maxlength="200" placeholder="500g" autocomplete="off">
         </div>
         <div style="flex:1;min-width:120px">
           <div class="form-label">Category</div>
@@ -8421,8 +8459,8 @@ function renderVehicles() {
         <div class="veh-card-header">
           <div class="veh-icon">${v.fuel === 'ev' ? '⚡' : '🚗'}</div>
           <div style="flex:1;min-width:0">
-            <div class="veh-name">${v.name}</div>
-            ${v.plate ? `<span class="veh-plate">${v.plate}${v.state ? ' · ' + v.state : ''}</span>` : ''}
+            <div class="veh-name">${escHtml(v.name)}</div>
+            ${v.plate ? `<span class="veh-plate">${escHtml(v.plate)}${v.state ? ' · ' + v.state : ''}</span>` : ''}
           </div>
           <div style="display:flex;gap:6px">
             <button class="btn btn-sm" onclick="openVehicleForm(${v.id})">Edit</button>
@@ -8435,7 +8473,7 @@ function renderVehicles() {
         <div class="veh-stat-grid">
           ${v.odometer ? `<div class="veh-stat"><div class="veh-stat-label">Odometer</div><div class="veh-stat-value">${v.odometer.reading.toLocaleString()} km</div></div>` : ''}
           ${v.fuel ? `<div class="veh-stat"><div class="veh-stat-label">Fuel</div><div class="veh-stat-value" style="text-transform:capitalize">${v.fuel}</div></div>` : ''}
-          ${v.insurance && v.insurance.provider ? `<div class="veh-stat"><div class="veh-stat-label">Insurer</div><div class="veh-stat-value">${v.insurance.provider}</div></div>` : ''}
+          ${v.insurance && v.insurance.provider ? `<div class="veh-stat"><div class="veh-stat-label">Insurer</div><div class="veh-stat-value">${escHtml(v.insurance.provider)}</div></div>` : ''}
           <div class="veh-stat"><div class="veh-stat-label">Services (all time)</div><div class="veh-stat-value">${aud(totalServiceCost)}</div></div>
           ${annualCost > 0 ? `<div class="veh-stat"><div class="veh-stat-label">Annual Cost</div><div class="veh-stat-value">${aud(annualCost)}</div></div>` : ''}
           ${monthlyCost > 0 ? `<div class="veh-stat"><div class="veh-stat-label">Monthly Cost</div><div class="veh-stat-value">${aud(monthlyCost)}/mo</div></div>` : ''}
@@ -8454,9 +8492,9 @@ function renderVehicles() {
                 <tbody>
                   ${[...v.services].sort((a,b) => new Date(b.date) - new Date(a.date)).map(s => `<tr>
                     <td style="white-space:nowrap">${s.date ? new Date(s.date).toLocaleDateString('en-AU', {day:'numeric',month:'short',year:'numeric'}) : '—'}</td>
-                    <td style="font-weight:500">${s.type || '—'}</td>
+                    <td style="font-weight:500">${escHtml(s.type || '—')}</td>
                     <td>${s.odometer ? s.odometer.toLocaleString() + ' km' : '—'}</td>
-                    <td style="color:var(--text-muted)">${s.provider || '—'}</td>
+                    <td style="color:var(--text-muted)">${escHtml(s.provider || '—')}</td>
                     <td class="amount">${s.cost ? aud(s.cost) : '—'}</td>
                     <td><button class="btn btn-sm" style="color:var(--danger);font-size:11px" onclick="deleteService(${v.id},${s.id})">×</button></td>
                   </tr>`).join('')}
@@ -8477,12 +8515,12 @@ function openVehicleForm(editId) {
   document.getElementById('modal-body').innerHTML = `
     <div class="form-group">
       <label class="form-label">Vehicle Name</label>
-      <input class="form-input" id="vf-name" type="text" value="${v ? v.name : ''}" placeholder="e.g. Mitsubishi Outlander">
+      <input class="form-input" id="vf-name" type="text" maxlength="200" value="${v ? escAttr(v.name) : ''}" placeholder="e.g. Mitsubishi Outlander">
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Plate Number</label>
-        <input class="form-input" id="vf-plate" type="text" value="${v ? v.plate || '' : ''}" placeholder="ABC123" style="text-transform:uppercase">
+        <input class="form-input" id="vf-plate" type="text" maxlength="200" value="${v ? escAttr(v.plate || '') : ''}" placeholder="ABC123" style="text-transform:uppercase">
       </div>
       <div class="form-group">
         <label class="form-label">State</label>
@@ -8506,11 +8544,11 @@ function openVehicleForm(editId) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Odometer (km)</label>
-        <input class="form-input" id="vf-odo" type="number" value="${v && v.odometer ? v.odometer.reading : ''}" placeholder="42350">
+        <input class="form-input" id="vf-odo" type="number" max="99999999" value="${v && v.odometer ? v.odometer.reading : ''}" placeholder="42350">
       </div>
       <div class="form-group">
         <label class="form-label">Service Interval (km)</label>
-        <input class="form-input" id="vf-interval" type="number" value="${v ? v.serviceInterval || '' : '10000'}" placeholder="10000">
+        <input class="form-input" id="vf-interval" type="number" max="99999999" value="${v ? v.serviceInterval || '' : '10000'}" placeholder="10000">
       </div>
     </div>
     <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px">
@@ -8518,11 +8556,11 @@ function openVehicleForm(editId) {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="form-group">
           <label class="form-label">Provider</label>
-          <input class="form-input" id="vf-ins-provider" type="text" value="${v && v.insurance ? v.insurance.provider || '' : ''}" placeholder="e.g. AAMI">
+          <input class="form-input" id="vf-ins-provider" type="text" maxlength="200" value="${v && v.insurance ? escAttr(v.insurance.provider || '') : ''}" placeholder="e.g. AAMI">
         </div>
         <div class="form-group">
           <label class="form-label">Policy Number</label>
-          <input class="form-input" id="vf-ins-policy" type="text" value="${v && v.insurance ? v.insurance.policyNo || '' : ''}">
+          <input class="form-input" id="vf-ins-policy" type="text" maxlength="200" value="${v && v.insurance ? escAttr(v.insurance.policyNo || '') : ''}">
         </div>
       </div>
       <div class="form-group">
@@ -8635,22 +8673,22 @@ function openServiceForm(vehicleId) {
       </div>
       <div class="form-group">
         <label class="form-label">Odometer (km)</label>
-        <input class="form-input" id="sf-odo" type="number" placeholder="42350">
+        <input class="form-input" id="sf-odo" type="number" max="99999999" placeholder="42350">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Provider</label>
-        <input class="form-input" id="sf-provider" type="text" placeholder="e.g. Ultra Tune">
+        <input class="form-input" id="sf-provider" type="text" maxlength="200" placeholder="e.g. Ultra Tune">
       </div>
       <div class="form-group">
         <label class="form-label">Cost ($)</label>
-        <input class="form-input" id="sf-cost" type="number" step="0.01" placeholder="450">
+        <input class="form-input" id="sf-cost" type="number" max="99999999" step="0.01" placeholder="450">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Notes <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-      <input class="form-input" id="sf-notes" type="text" placeholder="e.g. Replaced timing belt">
+      <input class="form-input" id="sf-notes" type="text" maxlength="200" placeholder="e.g. Replaced timing belt">
     </div>`;
 
   document.getElementById('modal-footer').innerHTML = `
@@ -8782,7 +8820,7 @@ function renderDocuments() {
       </div>
       <button class="btn btn-primary btn-sm" onclick="openDocForm()">+ Add Document</button>
     </div>
-    <input class="doc-search" type="text" placeholder="Search documents…" value="${_docSearch}" oninput="_docSearch=this.value;renderDocuments()">`;
+    <input class="doc-search" type="text" maxlength="200" placeholder="Search documents…" value="${_docSearch}" oninput="_docSearch=this.value;renderDocuments()">`;
 
   // Group by category
   const byCategory = {};
@@ -8813,13 +8851,13 @@ function renderDocuments() {
         else badge = `<span class="veh-badge green" style="font-size:11px">${new Date(d.expiryDate).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' })}</span>`;
       }
 
-      const subParts = [d.provider, d.reference, d.storedAt ? `📍 ${d.storedAt}` : ''].filter(Boolean);
+      const subParts = [d.provider ? escHtml(d.provider) : '', d.reference ? escHtml(d.reference) : '', d.storedAt ? `📍 ${escHtml(d.storedAt)}` : ''].filter(Boolean);
 
       html += `
         <div class="doc-card" onclick="openDocForm(${d.id})">
           <div class="doc-cat-icon" style="background:${catDef.bg}">${catDef.icon}</div>
           <div class="doc-card-body">
-            <div class="doc-card-name">${d.name}</div>
+            <div class="doc-card-name">${escHtml(d.name)}</div>
             ${subParts.length ? `<div class="doc-card-sub">${subParts.join(' · ')}</div>` : ''}
           </div>
           ${badge}
@@ -8830,7 +8868,7 @@ function renderDocuments() {
   });
 
   if (filtered.length === 0 && q) {
-    html += `<div style="text-align:center;padding:24px;color:var(--text-muted)">No documents matching "${q}"</div>`;
+    html += `<div style="text-align:center;padding:24px;color:var(--text-muted)">No documents matching "${escHtml(q)}"</div>`;
   }
 
   document.getElementById('documents-content').innerHTML = html;
@@ -8844,7 +8882,7 @@ function openDocForm(editId) {
   document.getElementById('modal-body').innerHTML = `
     <div class="form-group">
       <label class="form-label">Document Name</label>
-      <input class="form-input" id="df-name" type="text" value="${d ? d.name : ''}" placeholder="e.g. Home & Contents Insurance">
+      <input class="form-input" id="df-name" type="text" maxlength="200" value="${d ? escAttr(d.name) : ''}" placeholder="e.g. Home & Contents Insurance">
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
@@ -8855,13 +8893,13 @@ function openDocForm(editId) {
       </div>
       <div class="form-group">
         <label class="form-label">Provider / Issuer</label>
-        <input class="form-input" id="df-provider" type="text" value="${d ? d.provider || '' : ''}" placeholder="e.g. AAMI, Medicare">
+        <input class="form-input" id="df-provider" type="text" maxlength="200" value="${d ? escAttr(d.provider || '') : ''}" placeholder="e.g. AAMI, Medicare">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Reference / Policy No.</label>
-        <input class="form-input" id="df-ref" type="text" value="${d ? d.reference || '' : ''}" placeholder="POL-12345">
+        <input class="form-input" id="df-ref" type="text" maxlength="200" value="${d ? escAttr(d.reference || '') : ''}" placeholder="POL-12345">
       </div>
       <div class="form-group">
         <label class="form-label">Expiry Date</label>
@@ -8871,16 +8909,16 @@ function openDocForm(editId) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Renewal Cost <span style="font-weight:400;color:var(--text-muted)">($, optional)</span></label>
-        <input class="form-input" id="df-cost" type="number" step="0.01" value="${d ? d.renewalCost || '' : ''}" placeholder="1850">
+        <input class="form-input" id="df-cost" type="number" max="99999999" step="0.01" value="${d ? d.renewalCost || '' : ''}" placeholder="1850">
       </div>
       <div class="form-group">
         <label class="form-label">Stored At</label>
-        <input class="form-input" id="df-stored" type="text" value="${d ? d.storedAt || '' : ''}" placeholder="e.g. Filing cabinet, Google Drive, Email">
+        <input class="form-input" id="df-stored" type="text" maxlength="200" value="${d ? escAttr(d.storedAt || '') : ''}" placeholder="e.g. Filing cabinet, Google Drive, Email">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Notes <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-      <input class="form-input" id="df-notes" type="text" value="${d ? d.notes || '' : ''}" placeholder="e.g. $1000 excess, covers building + contents">
+      <input class="form-input" id="df-notes" type="text" maxlength="200" value="${d ? escAttr(d.notes || '') : ''}" placeholder="e.g. $1000 excess, covers building + contents">
     </div>`;
 
   document.getElementById('modal-footer').innerHTML = `
@@ -9014,7 +9052,7 @@ function renderMaintenance() {
         <div class="maint-starter">
           ${starters.map((s, i) => `
             <button class="maint-starter-btn" onclick="quickAddMaint(${i})">
-              <div class="maint-starter-name">${s.icon} ${s.name}</div>
+              <div class="maint-starter-name">${s.icon} ${escHtml(s.name)}</div>
               <div class="maint-starter-sub">Every ${s.intervalNum} ${s.intervalUnit}</div>
             </button>`).join('')}
         </div>
@@ -9070,8 +9108,8 @@ function renderMaintenance() {
         <div class="maint-row">
           <div class="maint-icon">${catMeta.icon}</div>
           <div class="maint-body">
-            <div class="maint-name">${item.name}</div>
-            <div class="maint-sub">${[statusText, interval, item.provider ? item.provider : ''].filter(Boolean).join(' · ')}</div>
+            <div class="maint-name">${escHtml(item.name)}</div>
+            <div class="maint-sub">${[statusText, interval, item.provider ? escHtml(item.provider) : ''].filter(Boolean).join(' · ')}</div>
           </div>
           <div class="maint-actions">
             <button class="maint-done-btn" onclick="event.stopPropagation();markMaintDone(${item.id})">✓ Done</button>
@@ -9092,7 +9130,7 @@ function renderMaintenance() {
         <div class="maint-starter">
           ${starters.slice(0, 6).map((s, i) => `
             <button class="maint-starter-btn" onclick="quickAddMaint(${i})">
-              <div class="maint-starter-name">${s.icon} ${s.name}</div>
+              <div class="maint-starter-name">${s.icon} ${escHtml(s.name)}</div>
               <div class="maint-starter-sub">Every ${s.intervalNum} ${s.intervalUnit}</div>
             </button>`).join('')}
         </div>
@@ -9111,7 +9149,7 @@ function openMaintForm(editId) {
   document.getElementById('modal-body').innerHTML = `
     <div class="form-group">
       <label class="form-label">Item Name</label>
-      <input class="form-input" id="mf-name" type="text" value="${m ? m.name : ''}" placeholder="e.g. Gutters Cleaned, Pest Control">
+      <input class="form-input" id="mf-name" type="text" maxlength="200" value="${m ? escAttr(m.name) : ''}" placeholder="e.g. Gutters Cleaned, Pest Control">
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
@@ -9122,14 +9160,14 @@ function openMaintForm(editId) {
       </div>
       <div class="form-group">
         <label class="form-label">Provider</label>
-        <input class="form-input" id="mf-provider" type="text" value="${m ? m.provider || '' : ''}" placeholder="e.g. Jim's Mowing, DIY">
+        <input class="form-input" id="mf-provider" type="text" maxlength="200" value="${m ? escAttr(m.provider || '') : ''}" placeholder="e.g. Jim's Mowing, DIY">
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Repeat Every</label>
         <div style="display:flex;gap:8px">
-          <input class="form-input" id="mf-interval-num" type="number" min="1" value="${m ? m.intervalNum || 1 : 1}" style="width:70px">
+          <input class="form-input" id="mf-interval-num" type="number" max="99999999" min="1" value="${m ? m.intervalNum || 1 : 1}" style="width:70px">
           <select class="form-select" id="mf-interval-unit" style="flex:1">
             ${['days','weeks','months','years'].map(u => `<option value="${u}"${m && m.intervalUnit === u ? ' selected' : ''}>${u}</option>`).join('')}
           </select>
@@ -9143,11 +9181,11 @@ function openMaintForm(editId) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group">
         <label class="form-label">Last Cost ($) <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-        <input class="form-input" id="mf-cost" type="number" step="0.01" value="${m ? m.lastCost || '' : ''}">
+        <input class="form-input" id="mf-cost" type="number" max="99999999" step="0.01" value="${m ? m.lastCost || '' : ''}">
       </div>
       <div class="form-group">
         <label class="form-label">Notes <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
-        <input class="form-input" id="mf-notes" type="text" value="${m ? m.notes || '' : ''}">
+        <input class="form-input" id="mf-notes" type="text" maxlength="200" value="${m ? escAttr(m.notes || '') : ''}">
       </div>
     </div>`;
 
@@ -9357,7 +9395,7 @@ function renderKidsOverview(k) {
       <div class="kid-card" onclick="kidsView='${kid.id}';renderKids()">
         <button onclick="event.stopPropagation();openEditKidModal('${kid.id}')" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:14px;padding:2px 5px;border-radius:4px" title="Edit">✏️</button>
         <div class="kid-avatar">${kid.emoji}</div>
-        <div class="kid-name">${kid.name}</div>
+        <div class="kid-name">${escHtml(kid.name)}</div>
         <div class="kid-points">${bal}</div>
         <div class="kid-points-label">⭐ points</div>
         <div style="display:flex;gap:10px;font-size:12px;color:#64748b;margin-top:4px">
@@ -9365,7 +9403,7 @@ function renderKidsOverview(k) {
           ${pending ? `<span style="color:#f59e0b;font-weight:600">⏳ ${pending}</span>` : ''}
           ${kid.savings ? `<span style="color:#0d9488">💰 $${kid.savings.toFixed(0)}</span>` : ''}
         </div>
-        <div style="width:100%;margin-top:10px;padding:7px;background:#f0fdfa;border-radius:8px;font-size:12px;color:#0d9488;font-weight:600;text-align:center">Switch to ${kid.name}'s view →</div>
+        <div style="width:100%;margin-top:10px;padding:7px;background:#f0fdfa;border-radius:8px;font-size:12px;color:#0d9488;font-weight:600;text-align:center">Switch to ${escHtml(kid.name)}'s view →</div>
       </div>`;
   });
   html += `</div>`;
@@ -9382,7 +9420,7 @@ function renderChoreMgmt(k) {
     const who = ch.assignedTo === 'all' ? 'All kids' : (k.profiles.find(p => p.id === ch.assignedTo)?.name || '?');
     html += `<div class="chore-item">
       <div class="chore-emoji">${ch.emoji}</div>
-      <div style="flex:1"><div class="chore-name">${ch.name}</div><div class="chore-meta">${who} · ${ch.frequency}</div></div>
+      <div style="flex:1"><div class="chore-name">${escHtml(ch.name)}</div><div class="chore-meta">${escHtml(who)} · ${ch.frequency}</div></div>
       <div class="chore-pts">⭐ ${ch.points}</div>
       <button onclick="openChoreModal('${ch.id}')" class="btn btn-ghost btn-sm">✏️</button>
       <button onclick="deleteChore('${ch.id}')" class="btn btn-ghost btn-sm" style="color:#ef4444">🗑</button>
@@ -9400,7 +9438,7 @@ function renderPrizeMgmt(k) {
   k.prizes.forEach(pr => {
     html += `<div class="prize-card">
       <div class="prize-icon">${pr.emoji}</div>
-      <div style="flex:1"><div class="prize-name">${pr.name}</div><div class="prize-desc">${pr.description || pr.type}</div></div>
+      <div style="flex:1"><div class="prize-name">${escHtml(pr.name)}</div><div class="prize-desc">${escHtml(pr.description || pr.type)}</div></div>
       <div class="prize-cost">⭐ ${pr.pointCost}</div>
       <button onclick="openPrizeModal('${pr.id}')" class="btn btn-ghost btn-sm">✏️</button>
       <button onclick="deletePrize('${pr.id}')" class="btn btn-ghost btn-sm" style="color:#ef4444">🗑</button>
@@ -9422,7 +9460,7 @@ function renderApprovals(k) {
       if (!kid || !ch) return;
       html += `<div class="chore-item pending-approval" style="margin-bottom:10px">
         <div class="chore-emoji">${ch.emoji}</div>
-        <div style="flex:1"><div class="chore-name">${ch.name}</div><div class="chore-meta">${kid.emoji} ${kid.name} · ${new Date(comp.completedAt).toLocaleDateString()}</div></div>
+        <div style="flex:1"><div class="chore-name">${escHtml(ch.name)}</div><div class="chore-meta">${kid.emoji} ${escHtml(kid.name)} · ${new Date(comp.completedAt).toLocaleDateString()}</div></div>
         <div class="chore-pts">⭐ ${ch.points}</div>
         <button class="approve-btn" onclick="approveCompletion('${comp.id}')">Approve</button>
         <button class="reject-btn" onclick="rejectCompletion('${comp.id}')">Reject</button>
@@ -9437,7 +9475,7 @@ function renderApprovals(k) {
       if (!kid || !prize) return;
       html += `<div class="prize-card pending-redemption" style="margin-bottom:10px">
         <div class="prize-icon">${prize.emoji}</div>
-        <div style="flex:1"><div class="prize-name">${prize.name}</div><div class="prize-desc">${kid.emoji} ${kid.name} wants this</div></div>
+        <div style="flex:1"><div class="prize-name">${escHtml(prize.name)}</div><div class="prize-desc">${kid.emoji} ${escHtml(kid.name)} wants this</div></div>
         <div class="prize-cost">⭐ ${prize.pointCost}</div>
         <button class="approve-btn" onclick="approveRedemption('${red.id}')">Approve</button>
         <button class="reject-btn" onclick="rejectRedemption('${red.id}')">Reject</button>
@@ -9461,7 +9499,7 @@ function renderKidView(el, k, kid) {
       <div style="font-size:48px;background:rgba(255,255,255,0.15);border-radius:50%;width:72px;height:72px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${kid.emoji}</div>
       <div style="flex:1">
         <div style="font-size:13px;opacity:0.75">Hey there,</div>
-        <div style="font-size:24px;font-weight:800">${kid.name}!</div>
+        <div style="font-size:24px;font-weight:800">${escHtml(kid.name)}!</div>
       </div>
       <div style="text-align:right">
         <div style="font-size:44px;font-weight:800;line-height:1">${bal}</div>
@@ -9481,7 +9519,7 @@ function renderKidView(el, k, kid) {
       const isDoneToday = doneTodayIds.has(ch.id);
       html += `<div class="chore-item ${isPending ? 'pending-approval' : isDoneToday ? 'done-today' : ''}">
         <div class="chore-emoji">${ch.emoji}</div>
-        <div style="flex:1"><div class="chore-name">${ch.name}</div><div class="chore-meta">${isPending ? '⏳ Waiting...' : isDoneToday ? '✅ Done!' : ch.frequency}</div></div>
+        <div style="flex:1"><div class="chore-name">${escHtml(ch.name)}</div><div class="chore-meta">${isPending ? '⏳ Waiting...' : isDoneToday ? '✅ Done!' : ch.frequency}</div></div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <div class="chore-pts">⭐ ${ch.points}</div>
           ${!isPending && !isDoneToday ? `<button class="approve-btn" style="font-size:11px;padding:3px 9px" onclick="markChoreDone('${ch.id}','${kid.id}')">Done! 🙋</button>` : ''}
@@ -9506,7 +9544,7 @@ function renderKidView(el, k, kid) {
       const isPendingRed = k.redemptions.some(r => r.prizeId === pr.id && r.kidId === kid.id && r.status === 'pending');
       html += `<div class="prize-card ${canAfford && !isPendingRed ? 'can-afford' : ''} ${isPendingRed ? 'pending-redemption' : ''}">
         <div class="prize-icon">${pr.emoji}</div>
-        <div style="flex:1"><div class="prize-name">${pr.name}</div><div class="prize-desc">${isPendingRed ? '⏳ Pending...' : canAfford ? '✅ You can get this!' : `${pr.pointCost - bal} pts to go`}</div></div>
+        <div style="flex:1"><div class="prize-name">${escHtml(pr.name)}</div><div class="prize-desc">${isPendingRed ? '⏳ Pending...' : canAfford ? '✅ You can get this!' : `${pr.pointCost - bal} pts to go`}</div></div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
           <div class="prize-cost">⭐ ${pr.pointCost}</div>
           ${canAfford && !isPendingRed ? `<button onclick="requestRedemption('${pr.id}','${kid.id}')" style="background:#0d9488;color:#fff;border:none;border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-weight:600">Redeem!</button>` : ''}
@@ -9577,10 +9615,10 @@ function openEditKidModal(id) {
   document.getElementById('modal-title').textContent = kid ? 'Edit Kid' : 'Add Kid';
   document.getElementById('modal-body').innerHTML = `
     ${id ? `<input type="hidden" id="k-id" value="${id}">` : ''}
-    <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="k-name" value="${kid?.name||''}" placeholder="e.g. Emma" autofocus></div>
+    <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="k-name" value="${escAttr(kid?.name||'')}" placeholder="e.g. Emma" autofocus></div>
     <div class="form-group"><label class="form-label">Avatar</label>${emojiPicker(KID_EMOJIS, kid?.emoji||'😊')}</div>
     <div class="form-group"><label class="form-label">Age (optional)</label><input class="form-input" id="k-age" type="number" min="1" max="18" value="${kid?.age||''}" placeholder="e.g. 8"></div>
-    ${id ? `<div style="margin-top:8px"><button class="btn btn-danger btn-sm" onclick="deleteKid('${id}')">Delete ${kid.name}</button></div>` : ''}
+    ${id ? `<div style="margin-top:8px"><button class="btn btn-danger btn-sm" onclick="deleteKid('${id}')">Delete ${escHtml(kid.name)}</button></div>` : ''}
   `;
   document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveKid()">Save</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
@@ -9605,13 +9643,13 @@ function openChoreModal(id) {
   document.getElementById('modal-title').textContent = ch ? 'Edit Chore' : 'Add Chore';
   document.getElementById('modal-body').innerHTML = `
     ${id ? `<input type="hidden" id="c-id" value="${id}">` : ''}
-    <div class="form-group"><label class="form-label">Chore Name</label><input class="form-input" id="c-name" value="${ch?.name||''}" placeholder="e.g. Tidy bedroom" autofocus></div>
+    <div class="form-group"><label class="form-label">Chore Name</label><input class="form-input" id="c-name" value="${escAttr(ch?.name||'')}" placeholder="e.g. Tidy bedroom" autofocus></div>
     <div class="form-group"><label class="form-label">Emoji</label>${emojiPicker(CHORE_EMOJIS, ch?.emoji||'🧹')}</div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Points</label><input class="form-input" id="c-pts" type="number" min="1" value="${ch?.points||10}"></div>
+      <div class="form-group"><label class="form-label">Points</label><input class="form-input" id="c-pts" type="number" max="99999999" min="1" value="${ch?.points||10}"></div>
       <div class="form-group"><label class="form-label">Frequency</label><select class="form-select" id="c-freq"><option value="daily" ${ch?.frequency==='daily'?'selected':''}>Daily</option><option value="weekly" ${ch?.frequency==='weekly'?'selected':''}>Weekly</option><option value="once" ${ch?.frequency==='once'?'selected':''}>One-off</option></select></div>
     </div>
-    <div class="form-group"><label class="form-label">Assign to</label><select class="form-select" id="c-who"><option value="all">All kids</option>${kids.map(k=>`<option value="${k.id}" ${ch?.assignedTo===k.id?'selected':''}>${k.emoji} ${k.name}</option>`).join('')}</select></div>
+    <div class="form-group"><label class="form-label">Assign to</label><select class="form-select" id="c-who"><option value="all">All kids</option>${kids.map(k=>`<option value="${k.id}" ${ch?.assignedTo===k.id?'selected':''}>${k.emoji} ${escHtml(k.name)}</option>`).join('')}</select></div>
   `;
   document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveChore()">Save Chore</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
@@ -9633,13 +9671,13 @@ function openPrizeModal(id) {
   document.getElementById('modal-title').textContent = pr ? 'Edit Prize' : 'Add Prize';
   document.getElementById('modal-body').innerHTML = `
     ${id ? `<input type="hidden" id="p-id" value="${id}">` : ''}
-    <div class="form-group"><label class="form-label">Prize Name</label><input class="form-input" id="p-name" value="${pr?.name||''}" placeholder="e.g. Movie night" autofocus></div>
+    <div class="form-group"><label class="form-label">Prize Name</label><input class="form-input" id="p-name" value="${escAttr(pr?.name||'')}" placeholder="e.g. Movie night" autofocus></div>
     <div class="form-group"><label class="form-label">Emoji</label>${emojiPicker(PRIZE_EMOJIS, pr?.emoji||'🎁')}</div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Point Cost</label><input class="form-input" id="p-cost" type="number" min="1" value="${pr?.pointCost||50}"></div>
+      <div class="form-group"><label class="form-label">Point Cost</label><input class="form-input" id="p-cost" type="number" max="99999999" min="1" value="${pr?.pointCost||50}"></div>
       <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="p-type"><option value="outing" ${pr?.type==='outing'?'selected':''}>Outing</option><option value="cash" ${pr?.type==='cash'?'selected':''}>Cash</option><option value="voucher" ${pr?.type==='voucher'?'selected':''}>Voucher</option><option value="custom" ${pr?.type==='custom'?'selected':''}>Custom</option></select></div>
     </div>
-    <div class="form-group"><label class="form-label">Description (optional)</label><input class="form-input" id="p-desc" value="${pr?.description||''}" placeholder="e.g. Any movie of your choice"></div>
+    <div class="form-group"><label class="form-label">Description (optional)</label><input class="form-input" id="p-desc" value="${escAttr(pr?.description||'')}" placeholder="e.g. Any movie of your choice"></div>
   `;
   document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="savePrize()">Save Prize</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
@@ -9661,7 +9699,7 @@ function openSavingsModal(kidId) {
   document.getElementById('modal-title').textContent = `${kid.emoji} ${kid.name}'s Savings Jar`;
   document.getElementById('modal-body').innerHTML = `
     <div class="form-group"><label class="form-label">Current balance: $${(kid.savings||0).toFixed(2)}</label>
-    <input class="form-input" id="s-amount" type="number" step="0.01" placeholder="Amount to add e.g. 5.00" autofocus></div>
+    <input class="form-input" id="s-amount" type="number" max="99999999" step="0.01" placeholder="Amount to add e.g. 5.00" autofocus></div>
     <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="s-note" placeholder="e.g. Birthday money from Grandma"></div>
   `;
   document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="addSavings('${kidId}')">Add to Jar 💰</button>`;
@@ -9805,7 +9843,7 @@ async function renderReceiptsList(itemKey, itemName) {
       <div style="display:flex;flex-direction:column;gap:8px">
         <input class="form-input" id="link-url" type="url" placeholder="https://drive.google.com/…" style="font-size:13px">
         <div style="display:flex;gap:8px">
-          <input class="form-input" id="link-name" type="text" placeholder="Label (optional — e.g. Invoice #1234)" style="font-size:13px;flex:1">
+          <input class="form-input" id="link-name" type="text" maxlength="200" placeholder="Label (optional — e.g. Invoice #1234)" style="font-size:13px;flex:1">
           <button class="btn btn-primary btn-sm" onclick="addLink('${safeKey}','${safeName}')">Add</button>
         </div>
       </div>
@@ -9988,7 +10026,7 @@ function renderNetWorth() {
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
             <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
-            <input id="nw-name" type="text" placeholder="e.g. Home, Super, Credit card" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+            <input id="nw-name" type="text" maxlength="200" placeholder="e.g. Home, Super, Credit card" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Category</label>
@@ -9996,7 +10034,7 @@ function renderNetWorth() {
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Value ($)</label>
-            <input id="nw-value" type="number" min="0" step="100" placeholder="0" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+            <input id="nw-value" type="number" max="99999999" min="0" step="100" placeholder="0" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
           </div>
           <div id="nw-debt-fields" style="display:none;flex-direction:column;gap:14px">
             <div style="border-top:1px solid var(--border);padding-top:14px;font-size:12px;font-weight:600;color:#64748b;letter-spacing:0.04em;text-transform:uppercase">Debt details (optional)</div>
@@ -10007,7 +10045,7 @@ function renderNetWorth() {
               </div>
               <div>
                 <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Monthly repayment ($)</label>
-                <input id="nw-payment" type="number" min="0" step="50" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+                <input id="nw-payment" type="number" max="99999999" min="0" step="50" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
               </div>
             </div>
           </div>
@@ -10027,7 +10065,7 @@ function renderNetWorth() {
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
             <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Target net worth ($)</label>
-            <input id="nw-t-amount" type="number" min="0" step="10000" placeholder="e.g. 1000000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+            <input id="nw-t-amount" type="number" max="99999999" min="0" step="10000" placeholder="e.g. 1000000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">By year</label>
@@ -10055,7 +10093,7 @@ function nwItemRow(item, type) {
   return `
     <div class="nw-item">
       <div style="flex:1;min-width:0">
-        <div class="nw-item-name">${item.name}</div>
+        <div class="nw-item-name">${escHtml(item.name)}</div>
         ${subLine ? `<div class="nw-item-cat">${subLine}</div>` : ''}
       </div>
       <div class="nw-item-value">${fmtNW(parseFloat(item.value)||0)}</div>
@@ -10181,7 +10219,7 @@ function renderNWDebtCard(liabs) {
       }
     }
     return `<div class="nw-debt-row">
-      <span class="nw-debt-name">${l.name}</span>
+      <span class="nw-debt-name">${escHtml(l.name)}</span>
       <span class="nw-debt-rate">${rate}% p.a.</span>
       <span class="nw-debt-int">$${Math.round(monthlyInt).toLocaleString()}/mo interest</span>
       ${payoffHtml}
@@ -10405,12 +10443,12 @@ function renderObStep() {
       <div class="ob-input-row">
         <div>
           <div class="ob-input-label">Income source</div>
-          <input ${inputStyle} placeholder="e.g. Chris's salary" value="${inc.name}"
+          <input ${inputStyle} placeholder="e.g. Chris's salary" value="${escAttr(inc.name)}"
             oninput="_ob.incomes[${i}].name=this.value">
         </div>
         <div>
           <div class="ob-input-label">Amount ($)</div>
-          <input ${inputStyle} type="number" min="0" placeholder="0" value="${inc.amount}"
+          <input ${inputStyle} type="number" max="99999999" min="0" placeholder="0" value="${inc.amount}"
             oninput="_ob.incomes[${i}].amount=this.value">
         </div>
         <div>
@@ -10432,10 +10470,10 @@ function renderObStep() {
     const rows = _ob.expenses.map((exp, i) => `
       <div class="ob-expense-row">
         <div>
-          <div class="ob-expense-name">${exp.name}</div>
+          <div class="ob-expense-name">${escHtml(exp.name)}</div>
           <div class="ob-expense-cat">${exp.category}</div>
         </div>
-        <input class="ob-input" type="number" min="0" placeholder="0" value="${exp.amount}"
+        <input class="ob-input" type="number" max="99999999" min="0" placeholder="0" value="${exp.amount}"
           oninput="_ob.expenses[${i}].amount=parseFloat(this.value)||0" style="text-align:right">
       </div>`).join('');
 
@@ -10616,7 +10654,7 @@ function renderBills() {
     return `<div class="bill-row ${rowCls}">
       <div class="bill-icon">${billCatIcon(b.category)}</div>
       <div class="bill-info">
-        <div class="bill-name">${b.name}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#fef3c7;color:#92400e;margin-left:6px">BILL</span></div>
+        <div class="bill-name">${escHtml(b.name)}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#fef3c7;color:#92400e;margin-left:6px">BILL</span></div>
         <div class="bill-meta">${b.category||''}${freqLabel}${b.autopay?' · Autopay ✓':''}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
@@ -10641,7 +10679,7 @@ function renderBills() {
     return `<div class="bill-row">
       <div class="bill-icon">${subCatIcon(sub.category)}</div>
       <div class="bill-info">
-        <div class="bill-name">${sub.name}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#ede9fe;color:#5b21b6;margin-left:6px">SUB</span></div>
+        <div class="bill-name">${escHtml(sub.name)}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#ede9fe;color:#5b21b6;margin-left:6px">SUB</span></div>
         <div class="bill-meta">${sub.category||'Other'} · ${freqAmt}${renewal}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
@@ -10725,7 +10763,7 @@ function renderBills() {
       <div style="margin-top:14px">
         <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px">Upload a bank statement CSV and AI will find subscriptions and bills you haven't tracked yet.</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <input type="text" class="sub-api-input" id="sub-api-key" placeholder="Anthropic API key"
+          <input type="text" maxlength="200" class="sub-api-input" id="sub-api-key" placeholder="Anthropic API key"
             value="${localStorage.getItem('toto_ai_key')||''}"
             oninput="localStorage.setItem('toto_ai_key', this.value)" style="flex:1;min-width:200px">
           <label class="sub-upload-btn" for="sub-csv-input">📎 Upload CSV</label>
@@ -10743,7 +10781,7 @@ function renderBills() {
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
             <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
-            <input id="sub-name" type="text" placeholder="e.g. Netflix, Spotify" class="form-input" style="width:100%">
+            <input id="sub-name" type="text" maxlength="200" placeholder="e.g. Netflix, Spotify" class="form-input" style="width:100%">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
@@ -10762,7 +10800,7 @@ function renderBills() {
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
               <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Amount ($)</label>
-              <input id="sub-amount" type="number" min="0" step="0.01" placeholder="0.00" class="form-input" style="width:100%">
+              <input id="sub-amount" type="number" max="99999999" min="0" step="0.01" placeholder="0.00" class="form-input" style="width:100%">
             </div>
             <div>
               <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Renewal date</label>
@@ -10797,7 +10835,7 @@ function billsModal(id) {
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
             <label style="${labelStyle}">Bill name</label>
-            <input id="bill-name" type="text" placeholder="e.g. AGL Electricity" style="${inputStyle}" value="${bill?bill.name:''}">
+            <input id="bill-name" type="text" maxlength="200" placeholder="e.g. AGL Electricity" style="${inputStyle}" value="${bill?escAttr(bill.name):''}">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
@@ -10812,7 +10850,7 @@ function billsModal(id) {
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
               <label style="${labelStyle}">Amount ($)</label>
-              <input id="bill-amount" type="number" min="0" step="1" placeholder="0" style="${inputStyle}" value="${bill?bill.amount:''}">
+              <input id="bill-amount" type="number" max="99999999" min="0" step="1" placeholder="0" style="${inputStyle}" value="${bill?bill.amount:''}">
             </div>
             <div id="bill-day-wrap">
               <label style="${labelStyle}">Day of month due</label>
@@ -10939,8 +10977,8 @@ function renderSubImportResults(results) {
     <div class="sub-result-row">
       <div class="sub-result-icon">${subCatIcon(r.category)}</div>
       <div class="sub-result-info">
-        <div class="sub-result-name">${r.name}</div>
-        <div class="sub-result-meta">${r.category} · ${r.frequency} · ${r.description||''}</div>
+        <div class="sub-result-name">${escHtml(r.name)}</div>
+        <div class="sub-result-meta">${escHtml(r.category)} · ${r.frequency} · ${escHtml(r.description||'')}</div>
       </div>
       <div class="sub-result-amount">$${parseFloat(r.amount).toFixed(2)}</div>
       <div class="sub-result-actions">
@@ -11230,13 +11268,13 @@ function renderForecast() {
                 const hasEst = ev.estimates && ev.estimates.length > 0;
                 return `<tr>
                   <td style="font-weight:600;color:var(--primary);white-space:nowrap">${dateLabel}</td>
-                  <td style="font-weight:500">${ev.title}</td>
+                  <td style="font-weight:500">${escHtml(ev.title)}</td>
                   <td><span style="display:inline-block;padding:2px 8px;border-radius:99px;background:${cat.color};color:${cat.text};font-size:11px;font-weight:600">${cat.label}</span></td>
                   <td class="amount" style="font-weight:600;${hasEst ? '' : 'color:var(--text-muted)'}">${hasEst ? aud(evTotal) : '—'}</td>
                   <td style="text-align:right">
                     ${hasEst
                       ? `<details style="font-size:11px;color:var(--text-muted)"><summary style="cursor:pointer">breakdown</summary>
-                          <div style="padding:4px 0">${ev.estimates.filter(e=>e.accepted).map(e => `<div style="display:flex;justify-content:space-between;gap:12px;padding:2px 0"><span>${e.name}</span><span>${aud(e.amount)}</span></div>`).join('')}</div>
+                          <div style="padding:4px 0">${ev.estimates.filter(e=>e.accepted).map(e => `<div style="display:flex;justify-content:space-between;gap:12px;padding:2px 0"><span>${escHtml(e.name)}</span><span>${aud(e.amount)}</span></div>`).join('')}</div>
                         </details>`
                       : hasKey ? `<button class="btn btn-sm" style="font-size:11px" onclick="estimatePlannerEvent('${ev.id}')">Estimate</button>` : '<span style="font-size:11px;color:var(--text-muted)">No API key</span>'}
                   </td>
@@ -11376,7 +11414,7 @@ function renderPlanner() {
       const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
       return `<div class="diary-today-ev">
         <span class="diary-today-ev-badge">${cat.emoji}</span>
-        <span>${ev.title}</span>
+        <span>${escHtml(ev.title)}</span>
       </div>`;
     }).join('');
   }
@@ -11395,7 +11433,7 @@ function renderPlanner() {
       <div class="diary-tile-icon">${cat.emoji}</div>
       <div class="diary-tile-label">${cat.label}</div>
       ${next
-        ? `<div class="diary-tile-next">${next.title}</div>
+        ? `<div class="diary-tile-next">${escHtml(next.title)}</div>
            <div class="diary-tile-meta">${nextDate}${catEvs.length > 1 ? ` · ${catEvs.length} events` : ''}</div>
            ${cost > 0 ? `<div class="diary-tile-cost">$${cost.toLocaleString('en-AU')} est.</div>` : ''}`
         : `<div class="diary-tile-empty">Nothing planned</div>`
@@ -11478,7 +11516,7 @@ function _renderPlannerCalendar() {
     const dayEvs     = byDate[cell.dateStr] || [];
     const chips      = dayEvs.slice(0,3).map(ev => {
       const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
-      return `<div class="planner-chip" style="background:${cat.color};color:${cat.text}" title="${ev.title}">${cat.emoji} ${ev.title}</div>`;
+      return `<div class="planner-chip" style="background:${cat.color};color:${cat.text}" title="${escAttr(ev.title)}">${cat.emoji} ${escHtml(ev.title)}</div>`;
     }).join('');
     const more = dayEvs.length > 3 ? `<div class="planner-chip-more">+${dayEvs.length-3}</div>` : '';
     return `<div class="planner-cal-cell ${cell.muted?'muted':''} ${isToday?'today':''} ${isSelected?'selected':''}"
@@ -11528,14 +11566,14 @@ function _renderPlannerEventRow(ev) {
   let body = '';
   if (isOpen) {
     body = `<div class="planner-event-body">`;
-    if (ev.notes) body += `<p class="planner-notes">${ev.notes}</p>`;
+    if (ev.notes) body += `<p class="planner-notes">${escHtml(ev.notes)}</p>`;
     if (estimates.length > 0) {
       body += estimates.map(est => `
         <div class="planner-estimate-row">
           <div class="planner-estimate-check ${est.accepted?'accepted':''}" onclick="togglePlannerEstimate('${ev.id}','${est.id}')">
             ${est.accepted ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
           </div>
-          <div class="planner-estimate-name"><div>${est.name}</div><div class="planner-estimate-cat">${est.category}</div></div>
+          <div class="planner-estimate-name"><div>${escHtml(est.name)}</div><div class="planner-estimate-cat">${escHtml(est.category)}</div></div>
           <div class="planner-estimate-amount">$${est.amount.toLocaleString('en-AU')}</div>
         </div>`).join('');
       body += `<div class="planner-estimate-footer">
@@ -11566,7 +11604,7 @@ function _renderPlannerEventRow(ev) {
     <div class="planner-event-header" onclick="togglePlannerCard('${ev.id}')">
       <div class="planner-event-type-badge" style="background:${cat.color};color:${cat.text}">${cat.emoji}</div>
       <div class="planner-event-meta">
-        <div class="planner-event-title">${ev.title}</div>
+        <div class="planner-event-title">${escHtml(ev.title)}</div>
         <div class="planner-event-date">${cat.label}</div>
       </div>
       <div class="planner-event-side">
@@ -11625,7 +11663,7 @@ function renderWeeklyStrip() {
     }, 0);
     const chips = dayEvs.slice(0,2).map(ev => {
       const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
-      return `<div class="ws-event-chip" style="background:${cat.color};color:${cat.text}">${cat.emoji} ${ev.title}</div>`;
+      return `<div class="ws-event-chip" style="background:${cat.color};color:${cat.text}">${cat.emoji} ${escHtml(ev.title)}</div>`;
     }).join('');
     const more = dayEvs.length > 2 ? `<div class="ws-event-chip" style="background:#f1f5f9;color:#64748b">+${dayEvs.length-2}</div>` : '';
     return `<div class="ws-day ${isToday?'ws-today':''}" onclick="goToPlannerDay('${dateStr}')">
@@ -11730,9 +11768,9 @@ function renderBudgetSuggestions(monthStr) {
   pending.forEach(s => { if (!grouped[s.eventTitle]) grouped[s.eventTitle] = []; grouped[s.eventTitle].push(s); });
   const rows = pending.map(s => `
     <div class="suggestion-row">
-      <span class="suggestion-event-tag">📅 ${s.eventTitle}</span>
+      <span class="suggestion-event-tag">📅 ${escHtml(s.eventTitle)}</span>
       <div style="flex:1;min-width:0">
-        <div class="suggestion-name">${s.name}</div>
+        <div class="suggestion-name">${escHtml(s.name)}</div>
         <div class="suggestion-cat">${s.category}</div>
       </div>
       <span class="suggestion-amount">${aud(s.amount)}</span>
@@ -11855,7 +11893,7 @@ function openPlannerModal(id, presetDate) {
     </div>
     <div class="modal-body">
       <label class="form-label">Title *</label>
-      <input class="form-input" id="pe-title" placeholder="e.g. Jake's Birthday, Trip to Melbourne, Dentist" value="${ev?ev.title:''}">
+      <input class="form-input" id="pe-title" placeholder="e.g. Jake's Birthday, Trip to Melbourne, Dentist" value="${ev?escAttr(ev.title):''}">
       <label class="form-label" style="margin-top:14px">Category *</label>
       <select class="form-input" id="pe-cat">
         ${Object.entries(PLANNER_CATS).map(([k,v])=>`<option value="${k}" ${(ev?.category||'other')===k?'selected':''}>${v.emoji} ${v.label}</option>`).join('')}
@@ -11863,7 +11901,7 @@ function openPlannerModal(id, presetDate) {
       <label class="form-label" style="margin-top:14px">Date *</label>
       <input class="form-input" id="pe-date" type="date" value="${ev?ev.date:defaultDate}">
       <label class="form-label" style="margin-top:14px">Notes <span style="font-weight:400;color:var(--text-muted)">(helps AI estimate costs)</span></label>
-      <textarea class="form-input" id="pe-notes" rows="3" placeholder="e.g. Flying from Sydney, 5 nights, gift budget ~$100">${ev?(ev.notes||''):''}</textarea>
+      <textarea class="form-input" id="pe-notes" rows="3" placeholder="e.g. Flying from Sydney, 5 nights, gift budget ~$100">${ev?escHtml(ev.notes||''):''}</textarea>
       <label class="form-label" style="margin-top:14px">Repeats</label>
       <select class="form-input" id="pe-recurring">
         <option value="none"        ${(ev?.recurring||'none')==='none'?'selected':''}>Does not repeat</option>
@@ -11927,7 +11965,7 @@ function renderBudgetForecast(monthStr, regularSurplus) {
     const cost = (ev.estimates||[]).filter(e=>e.accepted).reduce((s,e)=>s+(e.amount||0),0);
     const dl   = new Date(ev.date+'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'});
     return `<div class="forecast-row">
-      <span class="forecast-ev-name">${cat.emoji} ${ev.title}</span>
+      <span class="forecast-ev-name">${cat.emoji} ${escHtml(ev.title)}</span>
       <span class="forecast-ev-date">${dl}</span>
       <span class="forecast-ev-cost">${aud(cost)}</span>
       ${ev.pushed
@@ -12004,11 +12042,11 @@ function _renderNudgeSection() {
   if (nudges.length === 0) return '';
   const cards = nudges.map(n => {
     const daysLabel = n.days < 0 ? 'Now!' : n.days === 0 ? 'Today!' : n.days === 1 ? 'Tomorrow' : `In ${n.days} days`;
-    return `<div class="nudge-card" onclick="openTotoAssistant();_totoSend('Help me plan for ${n.title}')">
+    return `<div class="nudge-card" onclick="openTotoAssistant();_totoSend('Help me plan for ${escAttr(n.title)}')">
       <div class="nudge-card-icon">${n.emoji}</div>
-      <div class="nudge-card-title">${n.title}</div>
+      <div class="nudge-card-title">${escHtml(n.title)}</div>
       <div class="nudge-card-days">${daysLabel}</div>
-      <div class="nudge-card-body">${n.body}</div>
+      <div class="nudge-card-body">${escHtml(n.body)}</div>
     </div>`;
   }).join('');
   return `<div class="nudge-section">
@@ -12124,14 +12162,14 @@ function _totoInitPanel() {
     const cat = PLANNER_CATS[ev.category] || PLANNER_CATS.other;
     const dateLabel = new Date(ev.date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
     if (cat.financial && (!ev.estimates || ev.estimates.length === 0)) {
-      contextSuggestions.push({ icon: cat.emoji, text: `${ev.title} is ${dateLabel} — want me to estimate costs?` });
+      contextSuggestions.push({ icon: cat.emoji, text: `${escHtml(ev.title)} is ${dateLabel} — want me to estimate costs?` });
     } else if (ev.date === todayStr) {
-      contextSuggestions.push({ icon: cat.emoji, text: `You have "${ev.title}" today — anything to prepare?` });
+      contextSuggestions.push({ icon: cat.emoji, text: `You have "${escHtml(ev.title)}" today — anything to prepare?` });
     }
   });
 
   const seasonalNudges = getSeasonalNudges().slice(0, 2).map(n => ({
-    icon: n.emoji, text: `Help me plan for ${n.title} (${n.days <= 0 ? 'now!' : `in ${n.days} days`})`
+    icon: n.emoji, text: `Help me plan for ${escHtml(n.title)} (${n.days <= 0 ? 'now!' : `in ${n.days} days`})`
   }));
   const allSuggestions = [...contextSuggestions, ...seasonalNudges, ...TOTO_SUGGESTIONS].slice(0, 4);
   const sugEl = document.getElementById('toto-suggestions');
