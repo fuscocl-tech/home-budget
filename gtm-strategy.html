@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — GTM Strategy</title>
+  <style>
+    :root { --teal: #0d9488; --teal-dark: #0f766e; --bg: #fafafa; --surface: #fff; --text: #1e293b; --muted: #64748b; --border: #e2e8f0; --red: #ef4444; --green: #10b981; --amber: #f59e0b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.7; }
+
+    .hero { background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%); color: #fff; padding: 80px 24px 60px; text-align: center; }
+    .hero h1 { font-size: 42px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .hero p { font-size: 18px; opacity: 0.9; max-width: 520px; margin: 0 auto; }
+    .hero .tag { display: inline-block; margin-top: 20px; padding: 6px 16px; border-radius: 99px; background: rgba(255,255,255,0.15); font-size: 13px; font-weight: 600; letter-spacing: 0.03em; }
+
+    .container { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 56px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--text); }
+    h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; margin-top: 28px; color: var(--text); }
+    h3:first-child { margin-top: 0; }
+    .section-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+
+    p { margin-bottom: 16px; }
+    strong { font-weight: 700; }
+
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; }
+    .card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
+    .card-value { font-size: 24px; font-weight: 800; }
+    .card-note { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    th { text-align: left; padding: 10px 14px; background: var(--bg); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    .check { color: var(--green); font-weight: 700; }
+    .dash { color: var(--muted); }
+    .pro-badge { display: inline-block; padding: 1px 8px; border-radius: 99px; background: var(--teal); color: #fff; font-size: 11px; font-weight: 700; }
+
+    .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+    .phase-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .phase-num { width: 36px; height: 36px; border-radius: 50%; background: var(--teal); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
+    .phase-title { font-size: 18px; font-weight: 800; }
+    .phase-time { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+    ol, ul { padding-left: 24px; margin-bottom: 16px; }
+    li { margin-bottom: 8px; }
+    li strong { color: var(--text); }
+
+    .quote { border-left: 3px solid var(--teal); padding: 16px 20px; background: #f0fdfa; border-radius: 0 10px 10px 0; margin: 20px 0; font-style: italic; color: var(--teal-dark); }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 20px 0; }
+    .metric { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .metric-label { font-size: 13px; font-weight: 600; }
+    .metric-target { font-size: 15px; font-weight: 800; color: var(--teal); }
+
+    .makes-breaks { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+    @media(max-width: 640px) { .makes-breaks { grid-template-columns: 1fr; } }
+    .mb-col { border-radius: 12px; padding: 22px 24px; }
+    .mb-col.makes { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .mb-col.breaks { background: #fef2f2; border: 1px solid #fca5a5; }
+    .mb-col h3 { margin-top: 0; margin-bottom: 12px; }
+    .mb-col ul { padding-left: 18px; margin-bottom: 0; }
+
+    .cta-box { background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%); color: #fff; border-radius: 16px; padding: 40px; text-align: center; margin: 40px 0; }
+    .cta-box h2 { color: #fff; margin-bottom: 12px; }
+    .cta-box p { opacity: 0.9; margin-bottom: 0; }
+
+    .footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Toto GTM Strategy</h1>
+  <p>Go-to-market plan for launching Toto as a freemium family life assistant</p>
+  <div class="tag">CONFIDENTIAL — INTERNAL PLANNING</div>
+</div>
+
+<div class="container">
+
+<!-- ─── POSITIONING ─────────────────────────── -->
+<section>
+  <h2>Positioning</h2>
+  <p class="section-sub">What Toto is and who it's for</p>
+
+  <div class="quote">"The app that runs your household."</div>
+
+  <p>Not a budget app. Not a meal planner. Not a to-do list. It's the <strong>one app that replaces the five apps, three spreadsheets, and constant mental load</strong> of running a home.</p>
+
+  <h3>Target User</h3>
+  <p>The <strong>household manager</strong> — the person who pays the bills, plans the meals, books the car service, remembers the rego, and knows where the insurance policy is. They're exhausted by the mental load and currently using a mess of disconnected tools.</p>
+
+  <h3>Competitive Landscape</h3>
+  <table>
+    <thead><tr><th>App</th><th>What it does</th><th>What it doesn't</th></tr></thead>
+    <tbody>
+      <tr><td><strong>YNAB</strong></td><td>Budget</td><td>No meals, maintenance, documents</td></tr>
+      <tr><td><strong>Cozi</strong></td><td>Family calendar</td><td>No money, no home management</td></tr>
+      <tr><td><strong>Frollo</strong></td><td>Aussie budget</td><td>No household management</td></tr>
+      <tr><td><strong>Notion</strong></td><td>Everything (manual)</td><td>Not purpose-built, steep learning curve</td></tr>
+    </tbody>
+  </table>
+  <p>Toto sits in a gap nobody's filled: <strong>the family operating system.</strong></p>
+</section>
+
+<!-- ─── PRICING ─────────────────────────────── -->
+<section>
+  <h2>Free vs Pro</h2>
+  <p class="section-sub">Generous free tier, pay for AI magic and scale</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-label">Free</div>
+      <div class="card-value">$0</div>
+      <div class="card-note">Genuinely useful for core features</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Pro Monthly</div>
+      <div class="card-value" style="color:var(--teal)">$5.99/mo</div>
+      <div class="card-note">Full power, cancel anytime</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Pro Annual</div>
+      <div class="card-value" style="color:var(--teal)">$49/yr</div>
+      <div class="card-note">Save 32% — best value</div>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>Feature</th><th>Free</th><th>Pro</th></tr></thead>
+    <tbody>
+      <tr><td>Budget + Bills</td><td class="check">Full</td><td class="check">Full</td></tr>
+      <tr><td>Meal Planning</td><td class="check">Manual</td><td class="check">+ AI suggestions by cuisine, price, dietary</td></tr>
+      <tr><td>Shopping List</td><td class="check">Manual</td><td class="check">+ AI generation from meal plan</td></tr>
+      <tr><td>Vehicles</td><td>1 vehicle</td><td class="check">Unlimited</td></tr>
+      <tr><td>Documents</td><td>5 documents</td><td class="check">Unlimited</td></tr>
+      <tr><td>Maintenance</td><td>3 items</td><td class="check">Unlimited</td></tr>
+      <tr><td>Planner</td><td class="check">Events</td><td class="check">+ cost estimation</td></tr>
+      <tr><td>Monthly Forecast</td><td class="dash">—</td><td><span class="pro-badge">PRO</span> Full costed calendar</td></tr>
+      <tr><td>AI Daily Briefing</td><td class="dash">—</td><td><span class="pro-badge">PRO</span> Personalised morning summary</td></tr>
+      <tr><td>Bank CSV Import</td><td class="dash">—</td><td><span class="pro-badge">PRO</span> Auto-categorise transactions</td></tr>
+      <tr><td>Financial Health Score</td><td>Number only</td><td><span class="pro-badge">PRO</span> Full breakdown + insights</td></tr>
+      <tr><td>Family Sharing</td><td class="dash">—</td><td><span class="pro-badge">PRO</span> Up to 5 members</td></tr>
+      <tr><td>Data Export</td><td>JSON</td><td><span class="pro-badge">PRO</span> JSON + CSV + PDF reports</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Price anchor:</strong> $49/year is below YNAB ($99/yr) but above most meal planners ($20-30/yr). For a family saving even $100/month by budgeting better, it's a no-brainer.</p>
+  <p><strong>Psychology:</strong> Free should feel generous, not crippled. The paywall hits when users want AI features, the forecast, or scale beyond a few items.</p>
+</section>
+
+<!-- ─── LAUNCH PHASES ──────────────────────── -->
+<section>
+  <h2>Launch Strategy</h2>
+  <p class="section-sub">Three phases from validation to growth</p>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num">1</div>
+      <div>
+        <div class="phase-title">Validate</div>
+        <div class="phase-time">Weeks 1–4</div>
+      </div>
+    </div>
+    <ol>
+      <li><strong>Landing page</strong> — single page at toto.app with the pitch, screenshots, and waitlist email capture. Use Carrd or simple HTML. One afternoon of work.</li>
+      <li><strong>Reddit seeding</strong> — post in r/AusFinance, r/AusProperty, r/MealPrepAustralia, r/YNAB. Genuine "I built this" posts. Australian finance Reddit is active and supportive of local tools. Don't sell — show.
+        <div class="quote">"I was sick of using 5 apps to run my household so I built one that does it all."</div>
+      </li>
+      <li><strong>Facebook Groups</strong> — Australian family/parenting groups: "Budgeting Mums Australia", "Meal Planning Australia", "First Home Buyers Australia". Same genuine approach.</li>
+      <li><strong>TestFlight / direct install</strong> — 50 families using it. Watch what they use daily vs what they ignore. The features that get daily opens are your product. Kill or hide the rest.</li>
+    </ol>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num">2</div>
+      <div>
+        <div class="phase-title">Content Engine</div>
+        <div class="phase-time">Weeks 4–12</div>
+      </div>
+    </div>
+    <ol>
+      <li><strong>TikTok / Instagram Reels</strong> — short demos: "How I plan my family's entire month in 2 minutes." The meal planning to shopping list to budget flow is inherently visual and satisfying. One reel a week.</li>
+      <li><strong>"Monthly Money Reset" content series</strong> — a monthly ritual: review spending, plan meals, check maintenance, forecast costs. Position Toto as the tool for this ritual. Blog + socials.</li>
+      <li><strong>SEO play</strong> — target long-tail keywords Australians search:
+        <ul>
+          <li>"family budget app australia"</li>
+          <li>"meal planning shopping list app"</li>
+          <li>"when is my car rego due"</li>
+          <li>"household maintenance schedule template"</li>
+        </ul>
+        One landing page per use case. All things Toto does.
+      </li>
+      <li><strong>Podcast guest circuit</strong> — Australian personal finance podcasts (She's On The Money, The Money Cafe, Get Rich Slow Club). Story: "I built a family life assistant because no single app did everything."</li>
+    </ol>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-num">3</div>
+      <div>
+        <div class="phase-title">Growth</div>
+        <div class="phase-time">Months 3–6</div>
+      </div>
+    </div>
+    <ol>
+      <li><strong>Referral program</strong> — "Give a friend 1 month Pro free, get 1 month free." Families talk to families. School drop-off, sport sidelines, BBQs — word of mouth is the primary channel.</li>
+      <li><strong>Partnerships:</strong>
+        <ul>
+          <li><strong>Meal kit companies</strong> (HelloFresh, Marley Spoon) — integrate recipes into the meal planner</li>
+          <li><strong>Insurance comparison</strong> (Compare the Market, iSelect) — "Insurance expires in 30 days. Compare renewals?"</li>
+          <li><strong>Car servicing</strong> (Ultra Tune, mycar) — "Service due. Book here?"</li>
+        </ul>
+        These become revenue streams beyond subscriptions.
+      </li>
+      <li><strong>Financial advisor channel</strong> — advisors need tools to recommend to clients. Toto as a "homework tool" between meetings. Bulk licensing for advisory firms.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ─── METRICS ─────────────────────────────── -->
+<section>
+  <h2>Metrics That Matter</h2>
+  <p class="section-sub">What to track from day one</p>
+
+  <div class="metric-grid">
+    <div class="metric">
+      <div><div class="metric-label">Daily Active Users</div><div style="font-size:12px;color:var(--muted)">% of registered</div></div>
+      <div class="metric-target">40%+</div>
+    </div>
+    <div class="metric">
+      <div><div class="metric-label">Free to Pro Conversion</div><div style="font-size:12px;color:var(--muted)">of free users</div></div>
+      <div class="metric-target">8–12%</div>
+    </div>
+    <div class="metric">
+      <div><div class="metric-label">Monthly Churn (Pro)</div><div style="font-size:12px;color:var(--muted)">cancellations/month</div></div>
+      <div class="metric-target">&lt;5%</div>
+    </div>
+    <div class="metric">
+      <div><div class="metric-label">Referral Rate</div><div style="font-size:12px;color:var(--muted)">of Pro users who refer</div></div>
+      <div class="metric-target">15%+</div>
+    </div>
+    <div class="metric">
+      <div><div class="metric-label">Time to First Value</div><div style="font-size:12px;color:var(--muted)">onboarding completion</div></div>
+      <div class="metric-target">&lt;3 min</div>
+    </div>
+    <div class="metric">
+      <div><div class="metric-label">Feature That Drives Opens</div><div style="font-size:12px;color:var(--muted)">product-market fit signal</div></div>
+      <div class="metric-target">Meals or Today</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MAKES / BREAKS ─────────────────────── -->
+<section>
+  <h2>What Makes or Breaks It</h2>
+  <p class="section-sub">Honest assessment of risks and advantages</p>
+
+  <div class="makes-breaks">
+    <div class="mb-col makes">
+      <h3 style="color:#065f46">What makes it</h3>
+      <ul>
+        <li><strong>Meal planning gets people opening daily</strong> — that's the hook</li>
+        <li><strong>The Today screen makes them feel in control</strong> — that's the retention</li>
+        <li><strong>AI features feel magical enough to pay for</strong> — that's the conversion</li>
+        <li><strong>Being Australian-specific is a moat</strong> — no US competitor can copy easily</li>
+        <li><strong>Every feature reinforces the others</strong> — meal plans link to shopping lists link to budget. The more you use, the harder it is to leave.</li>
+      </ul>
+    </div>
+    <div class="mb-col breaks">
+      <h3 style="color:#991b1b">What breaks it</h3>
+      <ul>
+        <li><strong>Onboarding takes too long</strong> — if it takes more than 3 minutes to feel useful, people drop</li>
+        <li><strong>AI feels gimmicky</strong> — must save real time, not just demo well</li>
+        <li><strong>Trying to be everything</strong> — better to nail the core loop than ship 20 mediocre features</li>
+        <li><strong>Building in isolation</strong> — if you spend 6 months building and 0 months talking to users</li>
+        <li><strong>Technical debt</strong> — single-file architecture needs rebuilding for scale, multi-user, and App Store</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NEXT STEPS ─────────────────────────── -->
+<section>
+  <h2>Immediate Next Steps</h2>
+  <p class="section-sub">The next 30 days — in priority order</p>
+
+  <table>
+    <thead><tr><th>#</th><th>Action</th><th>Effort</th><th>Impact</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1</strong></td><td>Landing page + waitlist</td><td>1 day</td><td>Start collecting interest</td></tr>
+      <tr><td><strong>2</strong></td><td>Onboarding wizard (name, income, bills, cars)</td><td>3 days</td><td>New users get value in 2 minutes</td></tr>
+      <tr><td><strong>3</strong></td><td>TestFlight with 20 families</td><td>1 week</td><td>Real usage data</td></tr>
+      <tr><td><strong>4</strong></td><td>Watch, listen, iterate</td><td>Ongoing</td><td>Find product-market fit</td></tr>
+      <tr><td><strong>5</strong></td><td>First Reddit/Facebook posts</td><td>2 hours</td><td>Early traffic + feedback</td></tr>
+      <tr><td><strong>6</strong></td><td>First TikTok demo reel</td><td>1 hour</td><td>Visual proof of concept</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cta-box">
+    <h2>The bottom line</h2>
+    <p>Don't build more features. You have enough. The next month should be about putting Toto in front of real families and learning what they actually use.</p>
+  </div>
+</section>
+
+</div>
+
+<div class="footer">
+  Toto GTM Strategy — Confidential — April 2026
+</div>
+
+</body>
+</html>
