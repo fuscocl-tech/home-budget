@@ -1712,6 +1712,23 @@
     .section-pill:hover { color:var(--text); }
     .section-pill.active { background:#0891b2; color:#fff; border-color:#0891b2; }
 
+    /* ─── Lunchbox ─────────────────────────── */
+    .lb-kid-tabs { display:flex; gap:6px; margin-bottom:16px; }
+    .lb-kid-tab { padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid var(--border); background:var(--surface); cursor:pointer; transition:all 0.15s; }
+    .lb-kid-tab.active { background:#0891b2; color:#fff; border-color:#0891b2; }
+    .lb-grid { display:grid; grid-template-columns:70px repeat(5,1fr); gap:1px; background:var(--border); border-radius:12px; overflow:hidden; margin-bottom:16px; }
+    .lb-header { background:var(--surface2); padding:8px 4px; text-align:center; font-size:11px; font-weight:700; color:var(--text-muted); }
+    .lb-label { background:var(--surface2); padding:8px 8px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); display:flex; align-items:center; }
+    .lb-cell { background:var(--surface); padding:6px 6px; min-height:44px; cursor:pointer; transition:background 0.1s; display:flex; align-items:center; justify-content:center; }
+    .lb-cell:hover { background:var(--primary-light); }
+    .lb-cell-text { font-size:11px; line-height:1.3; text-align:center; word-break:break-word; }
+    .lb-cell-plus { font-size:14px; color:var(--border); }
+    .lb-profile-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:12px; }
+    .lb-tag { display:inline-block; padding:2px 8px; border-radius:99px; font-size:11px; font-weight:600; margin:2px; }
+    .lb-tag.allergy { background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; }
+    .lb-tag.dislike { background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; }
+    .lb-tag.fav { background:#ecfeff; color:#0e7490; border:1px solid #a5f3fc; }
+
     /* ─── Quick-add FAB ───────────────────────── */
     .qa-fab {
       position: fixed;
@@ -2017,6 +2034,11 @@
     <div id="forecast-content"></div>
   </div>
 
+  <!-- LUNCHBOX -->
+  <div class="tab-panel" id="tab-lunchbox">
+    <div id="lunchbox-content"></div>
+  </div>
+
   <!-- PLANNER -->
   <div class="tab-panel" id="tab-planner">
     <div id="planner-content"></div>
@@ -2247,7 +2269,7 @@ const DEFAULT_DATA = {
   bills: [],
   subscriptions: [],
   planner: { events: [] },
-  meals: { plan: {}, shopping: [] },
+  meals: { plan: {}, shopping: [], lunchbox: { profiles: [], plans: {} } },
   vehicles: [],
   documents: [],
   maintenance: [],
@@ -2327,6 +2349,9 @@ function loadData() {
     if (!d.meals) d.meals = { plan: {}, shopping: [] };
     if (!d.meals.plan) d.meals.plan = {};
     if (!d.meals.shopping) d.meals.shopping = [];
+    if (!d.meals.lunchbox) d.meals.lunchbox = { profiles: [], plans: {} };
+    if (!d.meals.lunchbox.profiles) d.meals.lunchbox.profiles = [];
+    if (!d.meals.lunchbox.plans) d.meals.lunchbox.plans = {};
     if (!d.vehicles) d.vehicles = [];
     if (!d.documents) d.documents = [];
     if (!d.maintenance) d.maintenance = [];
@@ -3334,6 +3359,7 @@ const SECTIONS = {
     { tab:'planner',  label:'Planner' },
     { tab:'forecast', label:'Forecast' },
     { tab:'meals',    label:'Meals' },
+    { tab:'lunchbox', label:'Lunchbox' },
   ]},
   home: { navTab:'documents', label:'Home', tabs:[
     { tab:'documents',   label:'Documents' },
@@ -9240,6 +9266,367 @@ function quickAddMaint(starterIdx) {
   renderAll();
 }
 
+// ─────────────────────────────────────────────────
+// LUNCHBOX PLANNER
+// ─────────────────────────────────────────────────
+let _lbWeekOffset = 0;
+let _lbActiveKid = null;
+
+const LB_SLOTS = [
+  { key: 'main', label: 'Main' },
+  { key: 'snack', label: 'Snack' },
+  { key: 'fruit', label: 'Fruit' },
+  { key: 'drink', label: 'Drink' }
+];
+
+const LB_ALLERGIES = ['Nuts','Dairy','Gluten','Eggs','Soy','Seafood','Sesame'];
+
+function renderLunchbox() {
+  const el = document.getElementById('lunchbox-content');
+  if (!el) return;
+  const lb = state.meals.lunchbox;
+  const profiles = lb.profiles || [];
+
+  // No profiles yet — show setup
+  if (profiles.length === 0) {
+    el.innerHTML = `
+      <div class="empty" style="margin-top:24px">
+        <div class="empty-icon" style="font-size:48px">🍱</div>
+        <p style="margin:12px 0">Set up your child's profile to start planning school lunches.</p>
+        <button class="btn btn-primary" onclick="openLunchboxProfile()">+ Add Child</button>
+      </div>`;
+    return;
+  }
+
+  // Default to first kid if none selected
+  if (!_lbActiveKid || !profiles.find(p => p.id === _lbActiveKid)) {
+    _lbActiveKid = profiles[0].id;
+  }
+
+  const kid = profiles.find(p => p.id === _lbActiveKid);
+  const weekKey = _mealWeekKey(_lbWeekOffset);
+  const dates = _mealWeekDates(weekKey).slice(0, 5); // Mon-Fri only
+  const plan = (lb.plans[weekKey] || {})[_lbActiveKid] || {};
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri'];
+
+  // Kid tabs
+  const kidTabs = profiles.map(p =>
+    `<button class="lb-kid-tab${p.id === _lbActiveKid ? ' active' : ''}" onclick="_lbActiveKid=${p.id};renderLunchbox()">${escHtml(p.name)}</button>`
+  ).join('');
+
+  // Week label
+  const weekStart = dates[0].toLocaleDateString('en-AU', { day:'numeric', month:'short' });
+  const weekEnd = dates[4].toLocaleDateString('en-AU', { day:'numeric', month:'short' });
+
+  // Grid
+  let gridRows = '';
+  LB_SLOTS.forEach(slot => {
+    gridRows += `<div class="lb-label">${slot.label}</div>`;
+    dates.forEach((date, di) => {
+      const dayPlan = plan[di] || {};
+      const val = dayPlan[slot.key] || '';
+      const isToday = date.toISOString().slice(0, 10) === todayStr;
+      gridRows += `<div class="lb-cell${isToday ? ' today' : ''}" onclick="openLunchboxEdit('${weekKey}',${_lbActiveKid},${di},'${slot.key}')">
+        ${val ? `<span class="lb-cell-text">${escHtml(val)}</span>` : `<span class="lb-cell-plus">+</span>`}
+      </div>`;
+    });
+  });
+
+  // Profile summary
+  const allergies = (kid.allergies || []).map(a => `<span class="lb-tag allergy">${escHtml(a)}</span>`).join('');
+  const dislikes = (kid.dislikes || []).map(d => `<span class="lb-tag dislike">${escHtml(d)}</span>`).join('');
+  const favourites = (kid.favourites || []).map(f => `<span class="lb-tag fav">${escHtml(f)}</span>`).join('');
+  const hasKey = !!localStorage.getItem('toto_ai_key');
+
+  // Count filled slots
+  const filledSlots = Object.values(plan).reduce((s, day) => s + Object.values(day || {}).filter(Boolean).length, 0);
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+      <div class="lb-kid-tabs">${kidTabs}
+        <button class="lb-kid-tab" onclick="openLunchboxProfile()" style="border-style:dashed">+</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="openLunchboxProfile(${kid.id})">Edit profile</button>
+      </div>
+    </div>
+
+    <div class="lb-profile-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:15px;font-weight:700">${escHtml(kid.name)}</div>
+        ${kid.school ? `<span style="font-size:12px;color:var(--text-muted)">${escHtml(kid.school)}</span>` : ''}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${allergies || ''}${dislikes || ''}${favourites || ''}
+        ${!allergies && !dislikes && !favourites ? '<span style="font-size:12px;color:var(--text-muted)">No preferences set — edit profile to add allergies, dislikes, favourites</span>' : ''}
+      </div>
+      ${kid.schoolRules ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px">School rules: ${escHtml(kid.schoolRules)}</div>` : ''}
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn btn-sm" onclick="_lbWeekOffset--;renderLunchbox()" style="font-size:16px;padding:2px 10px">‹</button>
+        <span style="font-size:14px;font-weight:700;min-width:140px;text-align:center">
+          ${_lbWeekOffset === 0 ? 'This Week' : _lbWeekOffset === 1 ? 'Next Week' : `${weekStart} – ${weekEnd}`}
+        </span>
+        <button class="btn btn-sm" onclick="_lbWeekOffset++;renderLunchbox()" style="font-size:16px;padding:2px 10px">›</button>
+        ${_lbWeekOffset !== 0 ? `<button class="btn btn-sm" onclick="_lbWeekOffset=0;renderLunchbox()">This week</button>` : ''}
+      </div>
+      <div style="display:flex;gap:8px">
+        ${hasKey ? `<button class="btn btn-primary btn-sm" id="lb-ai-btn" onclick="aiPlanLunchbox('${weekKey}',${kid.id})">Plan this week</button>` : ''}
+        ${filledSlots > 0 ? `<button class="btn btn-sm" onclick="lbToShoppingList('${weekKey}',${kid.id})">Add to shopping list</button>` : ''}
+      </div>
+    </div>
+
+    <div style="overflow-x:auto">
+      <div class="lb-grid" style="min-width:460px">
+        <div class="lb-header"></div>
+        ${dates.map((date, i) => {
+          const isToday = date.toISOString().slice(0, 10) === todayStr;
+          return `<div class="lb-header" style="${isToday ? 'background:#0891b2;color:#fff' : ''}">${DAYS[i]}<div style="font-size:9px;opacity:0.7">${date.getDate()}/${date.getMonth()+1}</div></div>`;
+        }).join('')}
+        ${gridRows}
+      </div>
+    </div>`;
+}
+
+function openLunchboxProfile(editId) {
+  const p = editId ? (state.meals.lunchbox.profiles || []).find(p => p.id === editId) : null;
+
+  document.getElementById('modal-title').textContent = p ? `Edit ${escHtml(p.name)}` : 'Add Child';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Child's Name</label>
+      <input class="form-input" id="lb-name" type="text" maxlength="200" value="${p ? escAttr(p.name) : ''}" placeholder="e.g. Jake">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">School</label>
+        <input class="form-input" id="lb-school" type="text" maxlength="200" value="${p ? escAttr(p.school || '') : ''}" placeholder="e.g. Emmaus Christian">
+      </div>
+      <div class="form-group">
+        <label class="form-label">School Rules</label>
+        <input class="form-input" id="lb-rules" type="text" maxlength="200" value="${p ? escAttr(p.schoolRules || '') : ''}" placeholder="e.g. Nut-free zone">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Allergies <span style="font-weight:400;color:var(--text-muted)">(click to toggle)</span></label>
+      <div id="lb-allergies" style="display:flex;flex-wrap:wrap;gap:6px">
+        ${LB_ALLERGIES.map(a => {
+          const active = p && (p.allergies || []).includes(a);
+          return `<button type="button" class="lb-tag${active ? ' allergy' : ''}" style="cursor:pointer;${active ? '' : 'background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)'}"
+            onclick="this.classList.toggle('allergy');if(!this.classList.contains('allergy')){this.style.background='var(--surface2)';this.style.color='var(--text-muted)';this.style.borderColor='var(--border)'}else{this.style.background='#fef2f2';this.style.color='#dc2626';this.style.borderColor='#fca5a5'}"
+            data-val="${a}">${a}</button>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Dislikes <span style="font-weight:400;color:var(--text-muted)">(comma separated)</span></label>
+      <input class="form-input" id="lb-dislikes" type="text" maxlength="200" value="${p ? escAttr((p.dislikes || []).join(', ')) : ''}" placeholder="e.g. mushrooms, brown bread, olives">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Favourites <span style="font-weight:400;color:var(--text-muted)">(comma separated)</span></label>
+      <input class="form-input" id="lb-favs" type="text" maxlength="200" value="${p ? escAttr((p.favourites || []).join(', ')) : ''}" placeholder="e.g. wraps, cheese, strawberries, pasta">
+    </div>`;
+
+  document.getElementById('modal-footer').innerHTML = `
+    ${p ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="deleteLbProfile(${editId})">Delete</button>` : ''}
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveLbProfile(${editId || 'null'})">Save</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function saveLbProfile(editId) {
+  const name = document.getElementById('lb-name')?.value.trim();
+  if (!name) return;
+
+  const allergies = [...document.querySelectorAll('#lb-allergies .allergy')].map(b => b.dataset.val);
+  const dislikes = (document.getElementById('lb-dislikes')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+  const favourites = (document.getElementById('lb-favs')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+
+  const data = {
+    name,
+    school: document.getElementById('lb-school')?.value.trim() || '',
+    schoolRules: document.getElementById('lb-rules')?.value.trim() || '',
+    allergies,
+    dislikes,
+    favourites
+  };
+
+  const profiles = state.meals.lunchbox.profiles;
+  if (editId) {
+    const p = profiles.find(p => p.id === editId);
+    if (p) Object.assign(p, data);
+  } else {
+    data.id = profiles.length ? Math.max(...profiles.map(p => p.id)) + 1 : 1;
+    profiles.push(data);
+    _lbActiveKid = data.id;
+  }
+
+  saveData(state);
+  closeModal();
+  renderLunchbox();
+}
+
+function deleteLbProfile(id) {
+  if (!confirm('Delete this child profile and their lunchbox plans?')) return;
+  state.meals.lunchbox.profiles = state.meals.lunchbox.profiles.filter(p => p.id !== id);
+  // Clean up plans
+  Object.keys(state.meals.lunchbox.plans).forEach(wk => {
+    delete state.meals.lunchbox.plans[wk][id];
+  });
+  _lbActiveKid = null;
+  saveData(state);
+  closeModal();
+  renderLunchbox();
+}
+
+function openLunchboxEdit(weekKey, kidId, dayIdx, slot) {
+  const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+  const SLOTS = { main:'Main', snack:'Snack', fruit:'Fruit', drink:'Drink' };
+  const plan = (state.meals.lunchbox.plans[weekKey] || {})[kidId] || {};
+  const current = (plan[dayIdx] || {})[slot] || '';
+
+  // Collect previously used items for this slot
+  const seen = new Set();
+  Object.values(state.meals.lunchbox.plans).forEach(week => {
+    Object.values(week).forEach(kidPlan => {
+      Object.values(kidPlan).forEach(day => {
+        if (day && day[slot]) seen.add(day[slot]);
+      });
+    });
+  });
+  const prev = [...seen].filter(v => v !== current).slice(0, 12);
+
+  document.getElementById('modal-title').textContent = `${DAYS[dayIdx]} · ${SLOTS[slot]}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">${SLOTS[slot]}</label>
+      <input class="form-input" id="lb-input" type="text" maxlength="200" value="${escAttr(current)}" placeholder="e.g. ${slot === 'main' ? 'Ham & cheese wrap' : slot === 'snack' ? 'Muesli bar' : slot === 'fruit' ? 'Apple' : 'Water'}" autocomplete="off">
+    </div>
+    ${prev.length ? `
+    <div>
+      <div class="form-label" style="margin-bottom:6px">Previous</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${prev.map(v => `<button style="padding:4px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface2);font-size:12px;cursor:pointer"
+          onclick="document.getElementById('lb-input').value='${escAttr(v)}'">${escHtml(v)}</button>`).join('')}
+      </div>
+    </div>` : ''}`;
+
+  document.getElementById('modal-footer').innerHTML = `
+    <button class="btn" onclick="_saveLbSlot('${weekKey}',${kidId},${dayIdx},'${slot}','')">Clear</button>
+    <button class="btn btn-primary" onclick="_saveLbSlot('${weekKey}',${kidId},${dayIdx},'${slot}',document.getElementById('lb-input').value.trim())">Save</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  setTimeout(() => { const el = document.getElementById('lb-input'); if (el) { el.focus(); el.select(); } }, 80);
+}
+
+function _saveLbSlot(weekKey, kidId, dayIdx, slot, value) {
+  if (!state.meals.lunchbox.plans[weekKey]) state.meals.lunchbox.plans[weekKey] = {};
+  if (!state.meals.lunchbox.plans[weekKey][kidId]) state.meals.lunchbox.plans[weekKey][kidId] = {};
+  if (!state.meals.lunchbox.plans[weekKey][kidId][dayIdx]) state.meals.lunchbox.plans[weekKey][kidId][dayIdx] = {};
+  state.meals.lunchbox.plans[weekKey][kidId][dayIdx][slot] = value;
+  saveData(state);
+  closeModal();
+  renderLunchbox();
+}
+
+async function aiPlanLunchbox(weekKey, kidId) {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key) return;
+  const kid = (state.meals.lunchbox.profiles || []).find(p => p.id === kidId);
+  if (!kid) return;
+
+  const btn = document.getElementById('lb-ai-btn');
+  if (btn) { btn.textContent = 'Planning...'; btn.disabled = true; }
+
+  const prompt = `Plan 5 days (Monday to Friday) of school lunches for a child:
+
+Name: ${kid.name}
+School: ${kid.school || 'not specified'}
+Allergies: ${(kid.allergies || []).join(', ') || 'none'}
+Dislikes: ${(kid.dislikes || []).join(', ') || 'none'}
+Favourites: ${(kid.favourites || []).join(', ') || 'not specified'}
+School rules: ${kid.schoolRules || 'none specified'}
+
+Each day needs: main (sandwich/wrap/salad/pasta etc), snack, fruit, drink.
+Keep it realistic — things a parent can prep in under 5 minutes.
+Vary the options across the week. Respect all allergies strictly.
+Use Australian food items and brands where relevant.
+
+Return ONLY a JSON array, one object per day (Mon=0 to Fri=4):
+[{"day":0,"main":"Ham & cheese wrap","snack":"Muesli bar","fruit":"Apple","drink":"Water"},{"day":1,...}]
+
+No markdown, no code fences, just raw JSON.`;
+
+  try {
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 1024, messages: [{ role: 'user', content: prompt }] })
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    const raw = data.content[0].text.replace(/```[\w]*\n?/g, '').trim();
+    const match = raw.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('No JSON');
+    const days = JSON.parse(match[0]);
+
+    if (!state.meals.lunchbox.plans[weekKey]) state.meals.lunchbox.plans[weekKey] = {};
+    if (!state.meals.lunchbox.plans[weekKey][kidId]) state.meals.lunchbox.plans[weekKey][kidId] = {};
+
+    days.forEach(d => {
+      state.meals.lunchbox.plans[weekKey][kidId][d.day] = {
+        main: d.main || '',
+        snack: d.snack || '',
+        fruit: d.fruit || '',
+        drink: d.drink || ''
+      };
+    });
+
+    saveData(state);
+    renderLunchbox();
+  } catch (err) {
+    console.error('Lunchbox AI error:', err);
+    if (btn) { btn.textContent = 'Plan this week'; btn.disabled = false; }
+  }
+}
+
+function lbToShoppingList(weekKey, kidId) {
+  const plan = (state.meals.lunchbox.plans[weekKey] || {})[kidId] || {};
+  const items = new Set();
+  Object.values(plan).forEach(day => {
+    if (day.main) items.add(day.main);
+    if (day.snack) items.add(day.snack);
+    if (day.fruit) items.add(day.fruit);
+    // Skip drinks (water etc)
+  });
+
+  const existing = state.meals.shopping;
+  let maxId = existing.length ? Math.max(...existing.map(i => i.id)) : 0;
+  let added = 0;
+  items.forEach(name => {
+    if (!existing.some(e => e.name.toLowerCase() === name.toLowerCase())) {
+      existing.push({ id: ++maxId, name, qty: '', cat: 'Other', checked: false });
+      added++;
+    }
+  });
+
+  if (added > 0) {
+    saveData(state);
+    renderLunchbox();
+  }
+
+  // Brief confirmation
+  const btn = document.querySelector('[onclick^="lbToShoppingList"]');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = `Added ${added} items`;
+    btn.style.color = 'var(--success)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+  }
+}
+
 function safeRender(fn) {
   try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
 }
@@ -9260,6 +9647,7 @@ const _TAB_RENDERERS = {
   planner:     [renderPlanner],
   forecast:    [renderForecast],
   meals:       [renderMeals],
+  lunchbox:    [renderLunchbox],
   vehicles:    [renderVehicles],
   documents:   [renderDocuments],
   maintenance: [renderMaintenance],
