@@ -311,8 +311,9 @@
       padding: 28px 32px;
     }
 
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .tab-panel { display: none; opacity: 0; }
+    .tab-panel.active { display: block; animation: fadeIn 0.2s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
     .page-header {
       margin-bottom: 24px;
@@ -1670,9 +1671,12 @@
     .today-section-label { font-size:17px; font-weight:800; color:#0d9488; margin-bottom:6px; letter-spacing:-0.01em; }
     .today-section-sub { font-size:12px; color:var(--text-muted); line-height:1.5; }
     .today-action-cards { display:flex; flex-direction:column; gap:6px; margin-bottom:24px; }
-    .today-acard { border-radius:var(--radius); padding:12px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:filter 0.15s; }
+    .today-acard { border-radius:var(--radius); padding:12px 16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:filter 0.15s,transform 0.15s; }
     .today-acard:hover { filter:brightness(0.96); }
-    .today-acard:active { filter:brightness(0.93); }
+    .today-acard:active { filter:brightness(0.93); transform:scale(0.99); }
+    .today-acard.featured { padding:16px 20px; }
+    .today-acard.featured .today-acard-title { font-size:15px; }
+    .today-acard.featured .today-acard-sub { font-size:12px; }
     .today-acard.red { background:#fef2f2; border-left:3px solid #ef4444; }
     .today-acard.amber { background:#fffbeb; border-left:3px solid #f59e0b; }
     .today-acard.green { background:#f0fdf4; border-left:3px solid #10b981; }
@@ -1695,10 +1699,16 @@
     .today-quick-btn:active { transform:scale(0.97); }
 
     /* ─── Section Pills ────────────────────── */
-    .section-pills { display:flex; gap:8px; overflow-x:auto; padding:4px 0 20px; scrollbar-width:none; }
+    .section-nav { position:sticky; top:56px; z-index:20; background:var(--bg); padding:12px 0 0; margin:-12px 0 0; }
+    .section-breadcrumb { font-size:12px; color:var(--text-muted); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
+    .section-breadcrumb a { color:var(--text-muted); text-decoration:none; font-weight:600; cursor:pointer; }
+    .section-breadcrumb a:hover { color:#0d9488; }
+    .section-breadcrumb .sep { opacity:0.4; }
+    .section-breadcrumb .current { color:var(--text); font-weight:700; }
+    .section-pills { display:flex; gap:8px; overflow-x:auto; padding:0 0 14px; scrollbar-width:none; border-bottom:1px solid var(--border); margin-bottom:20px; }
     .section-pills::-webkit-scrollbar { display:none; }
-    .section-pill { padding:8px 18px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid var(--border); background:var(--surface); cursor:pointer; white-space:nowrap; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
-    .section-pill:hover { border-color:#94a3b8; }
+    .section-pill { padding:7px 16px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--text-muted); cursor:pointer; white-space:nowrap; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
+    .section-pill:hover { color:var(--text); }
     .section-pill.active { background:#0d9488; color:#fff; border-color:#0d9488; }
 
     /* ─── Quick-add FAB ───────────────────────── */
@@ -3389,9 +3399,19 @@ function _tabSection(tab) {
 function _sectionPillsHtml(sectionKey, activeTab) {
   const sec = SECTIONS[sectionKey];
   if (!sec) return '';
-  return `<div class="section-pills">${sec.tabs.map(t =>
-    `<button class="section-pill${t.tab === activeTab ? ' active' : ''}" onclick="activateTab('${t.tab}')">${t.label}</button>`
-  ).join('')}</div>`;
+  const activeLabel = sec.tabs.find(t => t.tab === activeTab)?.label || '';
+  return `<div class="section-nav">
+    <div class="section-breadcrumb">
+      <a onclick="activateTab('today')">Today</a>
+      <span class="sep">›</span>
+      <a onclick="activateTab('${sec.navTab}')">${sec.label}</a>
+      <span class="sep">›</span>
+      <span class="current">${activeLabel}</span>
+    </div>
+    <div class="section-pills">${sec.tabs.map(t =>
+      `<button class="section-pill${t.tab === activeTab ? ' active' : ''}" onclick="activateTab('${t.tab}')">${t.label}</button>`
+    ).join('')}</div>
+  </div>`;
 }
 
 function activateTab(tab) {
@@ -3881,9 +3901,9 @@ function renderToday() {
     ? `<div class="today-ticker-wrap"><div class="today-ticker">${tickerItems.concat(tickerItems).map(t => `<span class="today-ticker-item">${t}</span>`).join('')}</div></div>`
     : '';
 
-  const cardsHtml = cards.slice(0, 8).map(c => {
+  const cardsHtml = cards.slice(0, 8).map((c, ci) => {
     const clickAttr = c.onclick ? `onclick="${c.onclick}"` : c.tab ? `onclick="activateTab('${c.tab}')"` : '';
-    return `<div class="today-acard ${c.cls}" ${clickAttr}>
+    return `<div class="today-acard ${c.cls}${ci === 0 ? ' featured' : ''}" ${clickAttr}>
       <div class="today-acard-body">
         <div class="today-acard-title">${c.title}</div>
         ${c.sub ? `<div class="today-acard-sub">${c.sub}</div>` : ''}
@@ -8479,6 +8499,12 @@ function renderVehicles() {
           ${monthlyCost > 0 ? `<div class="veh-stat"><div class="veh-stat-label">Monthly Cost</div><div class="veh-stat-value">${aud(monthlyCost)}/mo</div></div>` : ''}
         </div>
 
+        ${regoBill || insBill ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          ${regoBill ? `<span style="font-size:11px;color:#0369a1;cursor:pointer;font-weight:600" onclick="activateTab('bills')">Rego bill: ${aud(parseFloat(regoBill.amount)||0)} →</span>` : ''}
+          ${insBill ? `<span style="font-size:11px;color:#0369a1;cursor:pointer;font-weight:600" onclick="activateTab('bills')">Insurance bill: ${aud(parseFloat(insBill.amount)||0)} →</span>` : ''}
+          <span style="font-size:11px;color:var(--text-muted);cursor:pointer" onclick="activateTab('budget')">See in Budget →</span>
+        </div>` : ''}
+
         <!-- Service History -->
         <div class="section" style="margin-top:8px">
           <div class="section-header">
@@ -10654,7 +10680,7 @@ function renderBills() {
     return `<div class="bill-row ${rowCls}">
       <div class="bill-icon">${billCatIcon(b.category)}</div>
       <div class="bill-info">
-        <div class="bill-name">${escHtml(b.name)}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#fef3c7;color:#92400e;margin-left:6px">BILL</span></div>
+        <div class="bill-name">${escHtml(b.name)}<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;background:#fef3c7;color:#92400e;margin-left:6px">BILL</span>${b._vehicleRef ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#f0f9ff;color:#0369a1;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();activateTab('vehicles')">Vehicle →</span>` : ''}${b._docRef ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#f5f3ff;color:#6d28d9;margin-left:4px;cursor:pointer" onclick="event.stopPropagation();activateTab('documents')">Document →</span>` : ''}</div>
         <div class="bill-meta">${b.category||''}${freqLabel}${b.autopay?' · Autopay ✓':''}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
