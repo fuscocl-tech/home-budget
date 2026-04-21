@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Competitive Analysis</title>
+  <style>
+    :root { --teal: #0d9488; --teal-dark: #0f766e; --bg: #fafafa; --surface: #fff; --text: #1e293b; --muted: #64748b; --border: #e2e8f0; --red: #ef4444; --green: #10b981; --amber: #f59e0b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.7; }
+    .hero { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: #fff; padding: 80px 24px 60px; text-align: center; }
+    .hero h1 { font-size: 42px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .hero p { font-size: 18px; opacity: 0.8; max-width: 560px; margin: 0 auto; }
+    .hero .tag { display: inline-block; margin-top: 20px; padding: 6px 16px; border-radius: 99px; background: rgba(255,255,255,0.1); font-size: 13px; font-weight: 600; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 56px 0; }
+    section + section { border-top: 1px solid var(--border); }
+    h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+    h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; margin-top: 28px; }
+    .section-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+    p { margin-bottom: 16px; }
+
+    .comp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+    .comp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .comp-name { font-size: 20px; font-weight: 800; }
+    .comp-what { font-size: 14px; color: var(--muted); margin-top: 2px; }
+    .comp-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .comp-badge { padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .comp-badge.price { background: #eff6ff; color: #1d4ed8; }
+    .comp-badge.rating { background: #fef9c3; color: #854d0e; }
+    .comp-badge.au { background: #f0fdf4; color: #065f46; }
+    .comp-badge.no-au { background: #fef2f2; color: #991b1b; }
+    .comp-badge.closest { background: var(--teal); color: #fff; }
+
+    .comp-features { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .comp-feat { padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; background: var(--bg); border: 1px solid var(--border); }
+    .comp-feat.has { background: #f0fdf4; border-color: #bbf7d0; color: #065f46; }
+    .comp-feat.missing { background: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+
+    .comp-gap { font-size: 13px; color: var(--muted); padding: 12px 16px; background: #fef2f2; border-radius: 8px; border-left: 3px solid var(--red); }
+    .comp-gap strong { color: #991b1b; }
+
+    .comp-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; background: var(--bg); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); position: sticky; top: 0; }
+    td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    .yes { color: var(--green); font-weight: 700; }
+    .no { color: #cbd5e1; }
+    .partial { color: var(--amber); font-weight: 600; }
+    .toto-col { background: #f0fdfa; }
+
+    .insight-box { border-radius: 12px; padding: 22px 24px; margin-bottom: 12px; }
+    .insight-box.green { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .insight-box.amber { background: #fffbeb; border: 1px solid #fde68a; }
+    .insight-box.blue { background: #eff6ff; border: 1px solid #bfdbfe; }
+    .insight-box h3 { margin-top: 0; margin-bottom: 8px; font-size: 15px; }
+    .insight-box p { margin-bottom: 0; font-size: 14px; }
+
+    .footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; }
+
+    @media(max-width: 640px) {
+      .hero h1 { font-size: 28px; }
+      .comp-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Competitive Analysis</h1>
+  <p>How Toto compares against every relevant player in the family life management space</p>
+  <div class="tag">CONFIDENTIAL — April 2026</div>
+</div>
+
+<div class="container">
+
+<!-- ─── FEATURE MATRIX ─────────────────────── -->
+<section>
+  <h2>Feature Comparison Matrix</h2>
+  <p class="section-sub">Toto vs the market — apples to apples across all capabilities</p>
+
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th class="toto-col">Toto</th>
+        <th>FamilyWall</th>
+        <th>Homechart</th>
+        <th>YNAB</th>
+        <th>Frollo</th>
+        <th>Mealime</th>
+        <th>Cozi</th>
+        <th>Notion</th>
+        <th>Fami</th>
+        <th>Nori</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Budgeting</strong></td><td class="yes toto-col">Full</td><td class="partial">Basic</td><td class="yes">Yes</td><td class="yes">Best</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="partial">Manual</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>Bills & Subs</strong></td><td class="yes toto-col">Full</td><td class="no">No</td><td class="no">No</td><td class="partial">Basic</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="partial">Manual</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>Net Worth</strong></td><td class="yes toto-col">Full</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>Meal Planning</strong></td><td class="yes toto-col">AI-powered</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="yes">Best</td><td class="partial">Basic</td><td class="partial">Manual</td><td class="yes">AI</td><td class="yes">Yes</td></tr>
+      <tr><td><strong>Shopping Lists</strong></td><td class="yes toto-col">AI-gen</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td><td class="yes">Yes</td><td class="partial">Manual</td><td class="yes">Yes</td><td class="yes">Yes</td></tr>
+      <tr><td><strong>Vehicle Tracking</strong></td><td class="yes toto-col">Full</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>Home Maintenance</strong></td><td class="yes toto-col">Full</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>Document Vault</strong></td><td class="yes toto-col">Full</td><td class="partial">Storage</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>Event Planner</strong></td><td class="yes toto-col">+ Costs</td><td class="yes">Calendar</td><td class="yes">Calendar</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">Calendar</td><td class="partial">Manual</td><td class="yes">Calendar</td><td class="yes">AI</td></tr>
+      <tr><td><strong>Cost Forecasting</strong></td><td class="yes toto-col">Monthly</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>AI Features</strong></td><td class="yes toto-col">7 integrations</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="partial">Basic</td><td class="no">No</td><td class="no">No</td><td class="yes">Agents</td><td class="partial">Basic</td><td class="yes">Voice AI</td></tr>
+      <tr><td><strong>Bank CSV Import</strong></td><td class="yes toto-col">AI-categorise</td><td class="no">No</td><td class="no">No</td><td class="yes">Sync</td><td class="yes">Open Banking</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+      <tr><td><strong>Australian Focus</strong></td><td class="yes toto-col">Built for AU</td><td class="no">Global</td><td class="no">Global</td><td class="no">US-first</td><td class="yes">AU-built</td><td class="no">US/Canada</td><td class="no">US-first</td><td class="no">Global</td><td class="no">Global</td><td class="no">Global</td></tr>
+      <tr><td><strong>Kids / Chores</strong></td><td class="yes toto-col">Full</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="yes">AI</td><td class="no">No</td></tr>
+      <tr>
+        <td><strong>Price</strong></td>
+        <td class="toto-col"><strong>$49/yr</strong></td>
+        <td>$45/yr</td>
+        <td>Free*</td>
+        <td>$109/yr</td>
+        <td>Free</td>
+        <td>$72/yr</td>
+        <td>$39/yr</td>
+        <td>$120/yr</td>
+        <td>$45/yr</td>
+        <td>~$60/yr</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="font-size:12px;color:var(--muted)">* Homechart is free for personal use, web-only. Notion price is per user.</p>
+</section>
+
+<!-- ─── CLOSEST COMPETITORS ────────────────── -->
+<section>
+  <h2>Closest Competitors</h2>
+  <p class="section-sub">Apps that overlap with 3+ of Toto's feature areas</p>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">FamilyWall</div>
+        <div class="comp-what">Shared calendar + budget + meals + shopping + document storage</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge closest">Closest competitor</span>
+        <span class="comp-badge price">$45/yr</span>
+        <span class="comp-badge rating">4.8/5 · 5M+ downloads</span>
+      </div>
+    </div>
+    <div class="comp-features">
+      <span class="comp-feat has">Calendar</span>
+      <span class="comp-feat has">Budget (basic)</span>
+      <span class="comp-feat has">Meal planning</span>
+      <span class="comp-feat has">Shopping lists</span>
+      <span class="comp-feat has">Document storage</span>
+      <span class="comp-feat has">Location sharing</span>
+      <span class="comp-feat missing">No vehicles</span>
+      <span class="comp-feat missing">No maintenance</span>
+      <span class="comp-feat missing">No AI</span>
+      <span class="comp-feat missing">No cost forecasting</span>
+      <span class="comp-feat missing">No AU-specific</span>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> Deeper budgeting (full income/expense/actuals vs basic expense tracking), vehicle tracker, household maintenance, AI across 7 features, monthly cost forecasting, Australian bank CSV import. FamilyWall was acquired by OurFamilyWizard in 2024 — unclear product direction.</div>
+    <div class="comp-meta">
+      <span>Acquired by OurFamilyWizard (2024)</span>
+      <span>~4 employees pre-acquisition</span>
+      <span>$2.7M raised</span>
+    </div>
+  </div>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">Homechart</div>
+        <div class="comp-what">Budget + calendar + meals + tasks + health tracking + inventory</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge price">Free / web-only</span>
+        <span class="comp-badge au">Open source</span>
+      </div>
+    </div>
+    <div class="comp-features">
+      <span class="comp-feat has">Budget</span>
+      <span class="comp-feat has">Calendar</span>
+      <span class="comp-feat has">Meal planning</span>
+      <span class="comp-feat has">Tasks</span>
+      <span class="comp-feat has">Health tracking</span>
+      <span class="comp-feat has">Inventory</span>
+      <span class="comp-feat missing">No vehicles</span>
+      <span class="comp-feat missing">No documents</span>
+      <span class="comp-feat missing">No AI</span>
+      <span class="comp-feat missing">No mobile apps</span>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> Native mobile experience, AI features, vehicle tracking, document vault, Australian focus. Homechart is web-only and technically oriented — not suitable for mainstream families. Its breadth is impressive but the UX is for power users.</div>
+    <div class="comp-meta">
+      <span>Open source (GitHub)</span>
+      <span>Individual/small team project</span>
+      <span>Niche technical audience</span>
+    </div>
+  </div>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">Fami</div>
+        <div class="comp-what">AI chores + meal planning + calendar + shopping lists</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge price">$45/yr</span>
+        <span class="comp-badge rating">New entrant</span>
+      </div>
+    </div>
+    <div class="comp-features">
+      <span class="comp-feat has">AI chore suggestions</span>
+      <span class="comp-feat has">AI meal planning</span>
+      <span class="comp-feat has">Calendar</span>
+      <span class="comp-feat has">Shopping lists</span>
+      <span class="comp-feat missing">No budgeting</span>
+      <span class="comp-feat missing">No vehicles</span>
+      <span class="comp-feat missing">No maintenance</span>
+      <span class="comp-feat missing">No documents</span>
+      <span class="comp-feat missing">No cost forecasting</span>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> Full financial suite (budget, bills, net worth, goals, CSV import), vehicle tracking, home maintenance, document vault, cost forecasting. Fami is AI-first for chores and meals but has zero financial tools.</div>
+    <div class="comp-meta">
+      <span>Startup</span>
+      <span>No funding data</span>
+      <span>Emerging AI-first family app</span>
+    </div>
+  </div>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">Nori</div>
+        <div class="comp-what">AI-powered family organizer with voice/photo/email input</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge price">Free + pay-per-use AI</span>
+        <span class="comp-badge rating">New entrant</span>
+      </div>
+    </div>
+    <div class="comp-features">
+      <span class="comp-feat has">Voice input</span>
+      <span class="comp-feat has">AI calendar</span>
+      <span class="comp-feat has">Meal planning</span>
+      <span class="comp-feat has">Shopping lists</span>
+      <span class="comp-feat has">Smart reminders</span>
+      <span class="comp-feat missing">No budgeting</span>
+      <span class="comp-feat missing">No vehicles</span>
+      <span class="comp-feat missing">No maintenance</span>
+      <span class="comp-feat missing">No documents</span>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> Complete financial management, vehicle/maintenance/document tracking, cost forecasting. Nori's voice/photo AI input is novel but it has no financial or property management tools. Watch as a potential input-UX inspiration.</div>
+    <div class="comp-meta">
+      <span>Startup</span>
+      <span>iOS primary</span>
+      <span>Notable AI-first approach</span>
+    </div>
+  </div>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">Trustworthy</div>
+        <div class="comp-what">"The Family Operating System" — secure document vault + estate planning</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge price">Up to $40/mo</span>
+        <span class="comp-badge rating">Venture-backed</span>
+      </div>
+    </div>
+    <div class="comp-features">
+      <span class="comp-feat has">Document vault (enterprise-grade)</span>
+      <span class="comp-feat has">AI summaries</span>
+      <span class="comp-feat has">Automated reminders</span>
+      <span class="comp-feat has">Estate planning</span>
+      <span class="comp-feat missing">No budgeting</span>
+      <span class="comp-feat missing">No meals</span>
+      <span class="comp-feat missing">No vehicles</span>
+      <span class="comp-feat missing">No maintenance</span>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> Breadth — Toto does everything Trustworthy does for documents plus full budgeting, meals, vehicles, maintenance, and planning. <strong>Toto's risk:</strong> Trustworthy uses the exact same "Family Operating System" positioning. Their vault security (SOC2, HIPAA, 256-bit) is enterprise-grade; Toto's is basic.</div>
+    <div class="comp-meta">
+      <span>Venture-backed</span>
+      <span>Up to $480/yr — premium positioning</span>
+      <span>Direct branding competitor</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── BUDGET-ONLY COMPETITORS ────────────── -->
+<section>
+  <h2>Budget-Only Competitors</h2>
+  <p class="section-sub">Strong in finance, but single-purpose — users need additional apps for everything else</p>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">YNAB</div>
+        <div class="comp-what">Gold standard in zero-based budgeting</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge price">$109/yr</span>
+        <span class="comp-badge rating">4.8/5 · 55K+ ratings</span>
+        <span class="comp-badge no-au">AU banks via 3rd party ($72/yr extra)</span>
+      </div>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> One app vs YNAB + meal planner + maintenance tracker + document storage + vehicle tracker. YNAB costs $109/yr PLUS $72/yr for Australian bank sync — $181/yr total vs Toto's $49/yr. <strong>YNAB's advantage:</strong> Best-in-class budgeting methodology, large community, proven at scale. 199 employees, bootstrapped, $5-25M revenue.</div>
+  </div>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">Frollo</div>
+        <div class="comp-what">Free Australian budgeting with Open Banking</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge price">Free</span>
+        <span class="comp-badge au">AU-built, Open Banking</span>
+        <span class="comp-badge rating">145K+ AU users</span>
+      </div>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> Meals, vehicles, maintenance, documents, AI, cost forecasting — everything beyond money. <strong>Frollo's advantage:</strong> Free, native Open Banking (no CSV upload needed), government-backed data rights. If Toto adds Open Banking (via Basiq), this gap narrows significantly.</div>
+  </div>
+
+  <div class="comp-card">
+    <div class="comp-header">
+      <div>
+        <div class="comp-name">Goodbudget</div>
+        <div class="comp-what">Digital envelope budgeting with fortnightly support</div>
+      </div>
+      <div class="comp-badges">
+        <span class="comp-badge price">Free / $80/yr</span>
+        <span class="comp-badge rating">4.7/5 iOS</span>
+      </div>
+    </div>
+    <div class="comp-gap"><strong>Toto's advantage:</strong> Everything beyond budgeting. Goodbudget supports fortnightly budgets (common in AU) which is a nice touch, but it's purely a budget tool. No meals, vehicles, maintenance, documents, or AI.</div>
+  </div>
+</section>
+
+<!-- ─── KEY INSIGHTS ───────────────────────── -->
+<section>
+  <h2>Key Insights</h2>
+  <p class="section-sub">What the competitive landscape tells us</p>
+
+  <div class="insight-box green">
+    <h3>Vehicle Tracking + Household Maintenance = Unserved</h3>
+    <p>Zero family organiser apps include vehicle maintenance or household maintenance scheduling. These exist only in standalone specialist apps (Simply Auto, HomeZada). Toto integrating these into a family hub is genuinely novel.</p>
+  </div>
+
+  <div class="insight-box green">
+    <h3>Event Cost Forecasting = Nonexistent</h3>
+    <p>No competitor offers event planning with AI-powered cost estimation and monthly forecasting. This is a unique Toto differentiator with no equivalent in market.</p>
+  </div>
+
+  <div class="insight-box green">
+    <h3>No Australian All-in-One Exists</h3>
+    <p>Frollo is the only Australian-built app in this space, and it only does budgeting. There is no Australian-focused family life management app. Bank CSV formats tuned for ANZ/CBA/Westpac/NAB, AUD formatting, and local context (rego, Medicare, Super) give Toto a defensible local moat.</p>
+  </div>
+
+  <div class="insight-box amber">
+    <h3>The "Family OS" Market is Emerging</h3>
+    <p>FamilyWall (acquired 2024), Fami, Nori, and Homsy are all competing for this position. None have achieved dominance. The market is fragmented and ripe — but moving fast. Trustworthy already claims the "Family Operating System" brand. First-mover advantage matters less than execution quality.</p>
+  </div>
+
+  <div class="insight-box blue">
+    <h3>Pricing Sweet Spot: $49/yr</h3>
+    <p>Most family apps sit at $39-$45/yr. YNAB at $109/yr is the consumer ceiling for household tools. At $49/yr, Toto is priced to replace 3-5 separate subscriptions (budget app $80 + meal planner $72 + maintenance tracker $30 = $182/yr) while feeling affordable. The value proposition writes itself.</p>
+  </div>
+
+  <div class="insight-box blue">
+    <h3>AI is the Differentiator — If It's Genuine</h3>
+    <p>Notion has AI agents. Nori has voice AI. Fami has AI chore suggestions. But none apply AI to financial categorisation, cost forecasting, or cross-feature daily briefings the way Toto does. The risk: users are increasingly sceptical of "AI-powered" marketing. The features must save real time, not just demo well.</p>
+  </div>
+</section>
+
+<!-- ─── TOTO'S MOAT ────────────────────────── -->
+<section>
+  <h2>Toto's Competitive Moat</h2>
+  <p class="section-sub">Why this is defensible</p>
+
+  <table>
+    <thead><tr><th>Moat</th><th>Why it matters</th><th>How hard to copy</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Feature breadth</strong></td><td>Budget + Meals + Vehicles + Maintenance + Documents + Forecast in one app</td><td>12+ months for a new entrant to replicate</td></tr>
+      <tr><td><strong>Data lock-in</strong></td><td>The more you use, the harder to leave — your budget history, meal plans, vehicle records, documents all in one place</td><td>Increases over time</td></tr>
+      <tr><td><strong>Cross-feature intelligence</strong></td><td>Vehicle service costs auto-log to budget. Document expiries create bill reminders. Meal plans generate shopping lists against grocery budget.</td><td>Hard to replicate without the same architecture</td></tr>
+      <tr><td><strong>Australian localisation</strong></td><td>Bank CSV parsing for AU banks, AUD, rego tracking, Medicare, Super integration potential</td><td>Requires local market knowledge + testing</td></tr>
+      <tr><td><strong>AI breadth</strong></td><td>7 AI integration points across different features — not just one gimmick</td><td>Medium — but the training/prompting is specific to the data model</td></tr>
+      <tr><td><strong>Daily habit formation</strong></td><td>Meal planning drives daily opens. Today screen briefing creates a morning ritual.</td><td>Requires the same breadth of features to feed the briefing</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</div>
+
+<div class="footer">
+  Toto Competitive Analysis — Confidential — April 2026
+</div>
+
+</body>
+</html>
