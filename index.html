@@ -3419,8 +3419,8 @@ function activateTab(tab) {
 
   // Inject section pills into the active panel
   if (section && panel) {
-    let pillsEl = panel.querySelector('.section-pills');
-    if (pillsEl) pillsEl.outerHTML = _sectionPillsHtml(section, tab);
+    let navEl = panel.querySelector('.section-nav');
+    if (navEl) navEl.outerHTML = _sectionPillsHtml(section, tab);
     else panel.insertAdjacentHTML('afterbegin', _sectionPillsHtml(section, tab));
   }
 
