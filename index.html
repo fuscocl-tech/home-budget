@@ -1873,7 +1873,7 @@
 <div class="app-body">
 
 <!-- ─── Sidebar ───────────────────────────────── -->
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar collapsed" id="sidebar">
 
   <!-- Teal icon column — always visible -->
   <div class="icon-col">
@@ -1882,7 +1882,7 @@
       <div class="nav-item active" data-tab="today" title="Today">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
-      <div class="nav-item" data-tab="money" title="Wallet">
+      <div class="nav-item" data-tab="budget" title="Wallet">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
       </div>
       <div class="nav-item" data-tab="planner" title="Plan">
@@ -1915,7 +1915,7 @@
     </div>
     <nav class="text-nav">
       <div class="nav-text-item active" data-tab="today">Today</div>
-      <div class="nav-text-item" data-tab="money">👛 Wallet</div>
+      <div class="nav-text-item" data-tab="budget">👛 Wallet</div>
       <div class="nav-text-item" data-tab="planner">📅 Plan</div>
       <div class="nav-text-item" data-tab="documents">🏠 Home</div>
     </nav>
@@ -1944,55 +1944,31 @@
 
   <!-- MONEY DASHBOARD -->
   <div class="tab-panel" id="tab-money">
-    <div class="page-header">
-      <h1>Money</h1>
-      <p>Monthly income and expense overview</p>
-    </div>
     <div id="money-content"></div>
   </div>
 
   <!-- BUILD COSTS -->
   <div class="tab-panel" id="tab-build">
-    <div class="page-header">
-      <h1>Build Costs</h1>
-      <p>Fixed price contract progress payments and outside-contract extras</p>
-    </div>
     <div id="build-content"></div>
   </div>
 
   <!-- MONTHLY BUDGET -->
   <div class="tab-panel" id="tab-budget">
-    <div class="page-header">
-      <h1>Monthly Budget</h1>
-      <p>Household income and expenses</p>
-    </div>
     <div id="budget-content"></div>
   </div>
 
   <!-- GOALS -->
   <div class="tab-panel" id="tab-goals">
-    <div class="page-header">
-      <h1>Goals</h1>
-      <p>Track financial targets and spending reduction goals</p>
-    </div>
     <div id="goals-content"></div>
   </div>
 
   <!-- SCENARIOS -->
   <div class="tab-panel" id="tab-scenarios">
-    <div class="page-header">
-      <h1>Scenarios</h1>
-      <p>Model "what if" changes to your income and expenses</p>
-    </div>
     <div id="scenarios-content"></div>
   </div>
 
   <!-- INSIGHTS -->
   <div class="tab-panel" id="tab-insights">
-    <div class="page-header">
-      <h1>Insights</h1>
-      <p>AI-powered analysis of your finances</p>
-    </div>
     <div id="insights-content"></div>
   </div>
 
@@ -2018,46 +1994,26 @@
 
   <!-- MEALS -->
   <div class="tab-panel" id="tab-meals">
-    <div class="page-header">
-      <h1>Meal Planner</h1>
-      <p>Plan the week's meals and build your shopping list</p>
-    </div>
     <div id="meals-content"></div>
   </div>
 
   <!-- DOCUMENTS -->
   <div class="tab-panel" id="tab-documents">
-    <div class="page-header">
-      <h1>Document Vault</h1>
-      <p>Track important documents, policies, warranties and expiry dates</p>
-    </div>
     <div id="documents-content"></div>
   </div>
 
   <!-- MAINTENANCE -->
   <div class="tab-panel" id="tab-maintenance">
-    <div class="page-header">
-      <h1>Household Maintenance</h1>
-      <p>Track recurring home tasks, services and repairs</p>
-    </div>
     <div id="maintenance-content"></div>
   </div>
 
   <!-- VEHICLES -->
   <div class="tab-panel" id="tab-vehicles">
-    <div class="page-header">
-      <h1>Vehicles</h1>
-      <p>Registration, insurance, service history and reminders</p>
-    </div>
     <div id="vehicles-content"></div>
   </div>
 
   <!-- FORECAST -->
   <div class="tab-panel" id="tab-forecast">
-    <div class="page-header">
-      <h1>Monthly Forecast</h1>
-      <p>Estimated costs for all planned events this month</p>
-    </div>
     <div id="forecast-content"></div>
   </div>
 
@@ -3366,16 +3322,13 @@ function isOverdue(dueDate) {
 
 // Section definitions — maps each sub-tab to its section and pill config
 const SECTIONS = {
-  wallet: { navTab:'money', label:'Wallet', tabs:[
-    { tab:'money',     label:'Overview' },
+  wallet: { navTab:'budget', label:'Wallet', tabs:[
     { tab:'budget',    label:'Budget' },
     { tab:'bills',     label:'Bills' },
     { tab:'networth',  label:'Net Worth' },
     { tab:'goals',     label:'Goals' },
-    { tab:'scenarios', label:'Scenarios' },
     { tab:'insights',  label:'Insights' },
     { tab:'build',     label:'Build' },
-    { tab:'dashboard', label:'Charts' },
   ]},
   plan: { navTab:'planner', label:'Plan', tabs:[
     { tab:'planner',  label:'Planner' },
@@ -3417,6 +3370,9 @@ function _sectionPillsHtml(sectionKey, activeTab) {
 
 function activateTab(tab) {
   if (tab === 'subscriptions') tab = 'bills';
+  if (tab === 'scenarios') tab = 'insights';
+  if (tab === 'money') tab = 'budget';
+  if (tab === 'dashboard') tab = 'budget';
 
   // Clear all active states
   document.querySelectorAll('.nav-item, .nav-text-item').forEach(n => n.classList.remove('active'));
@@ -3857,23 +3813,6 @@ function renderToday() {
   const clsPriority = { red: 0, amber: 1, green: 2, blue: 3 };
   cards.sort((a, b) => (clsPriority[a.cls] || 9) - (clsPriority[b.cls] || 9) || a.priority - b.priority);
 
-  // ── Build ticker items ──
-  const tickerItems = [];
-  const totalActual = curData.expenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
-  if (totalActual > 0) tickerItems.push(`💰 <strong>${aud(totalActual)}</strong> spent this month`);
-  if (monthlyIncome > 0) tickerItems.push(`📈 <strong>${aud(monthlyIncome)}</strong>/mo income`);
-  const overdueMaint = (state.maintenance || []).filter(m => { const d = _maintDaysUntil(m); return d !== null && d < 0; }).length;
-  if (overdueMaint > 0) tickerItems.push(`🔧 <strong>${overdueMaint}</strong> maintenance overdue`);
-  const activeBills = (state.bills || []).filter(b => billDaysUntil(b) >= 0 && billDaysUntil(b) <= 31).length;
-  if (activeBills > 0) tickerItems.push(`💳 <strong>${activeBills}</strong> bills due this month`);
-  const activeGoals = (state.goals || []).filter(g => g.status !== 'achieved').length;
-  if (activeGoals > 0) tickerItems.push(`🎯 <strong>${activeGoals}</strong> active goals`);
-  const vehicleCount = (state.vehicles || []).length;
-  if (vehicleCount > 0) tickerItems.push(`🚗 <strong>${vehicleCount}</strong> vehicle${vehicleCount !== 1 ? 's' : ''} tracked`);
-  const docCount = (state.documents || []).length;
-  if (docCount > 0) tickerItems.push(`📋 <strong>${docCount}</strong> documents stored`);
-  if (todayMeals.d) tickerItems.push(`🍽️ Dinner: <strong>${todayMeals.d}</strong>`);
-
   // ── Section summaries ──
   const walletSub = surplus >= 0 ? `${aud(surplus)} surplus · ${aud(monthlyIncome)}/mo` : `${aud(Math.abs(surplus))} over budget`;
   const maintDue = (state.maintenance || []).filter(m => { const d = _maintDaysUntil(m); return d !== null && d <= 14; }).length;
@@ -3923,10 +3862,8 @@ function renderToday() {
 
     ${cardsHtml ? `<div class="today-action-cards">${cardsHtml}</div>` : ''}
 
-    ${tickerHtml}
-
     <div class="today-actions-grid">
-      <div class="today-section-card" onclick="activateTab('money')">
+      <div class="today-section-card" onclick="activateTab('budget')">
         <div class="today-section-label">Wallet</div>
         <div class="today-section-sub">${walletSub}</div>
       </div>
@@ -3938,12 +3875,6 @@ function renderToday() {
         <div class="today-section-label">Home</div>
         <div class="today-section-sub">${homeSub}</div>
       </div>
-    </div>
-
-    <div class="today-quick-bar">
-      <button class="today-quick-btn" onclick="openQuickAdd()">Log spend</button>
-      <button class="today-quick-btn" onclick="activateTab('meals')">Plan dinner</button>
-      <button class="today-quick-btn" onclick="activateTab('maintenance')">Mark task done</button>
     </div>`;
 
   // Async AI briefing — replaces the template text if API key available
