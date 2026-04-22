@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Notification UX Mockups</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f9ff; color: #18181b; font-size: 15px; line-height: 1.7; }
+
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 60px 0; }
+    section + section { border-top: 1px solid #e4e4e7; }
+    h2 { font-size: 28px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 8px; }
+    .sub { font-size: 14px; color: #71717a; margin-bottom: 36px; }
+    p { margin-bottom: 16px; color: #52525b; }
+    h3 { font-size: 16px; font-weight: 800; margin-top: 32px; margin-bottom: 12px; }
+
+    .hero { background: #fff; padding: 80px 24px 60px; text-align: center; border-bottom: 1px solid #e4e4e7; }
+    .hero h1 { font-size: 42px; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px; }
+    .hero h1 span { color: #DC2626; }
+    .hero p { font-size: 18px; color: #71717a; max-width: 480px; margin: 0 auto; }
+
+    .phone-row { display: flex; gap: 28px; overflow-x: auto; padding: 20px 0 32px; scroll-snap-type: x mandatory; }
+    .phone-col { flex-shrink: 0; scroll-snap-align: start; }
+    .phone-label { font-size: 11px; font-weight: 800; color: #a1a1aa; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 0.08em; }
+    .phone-desc { font-size: 12px; color: #71717a; text-align: center; max-width: 280px; margin-top: 12px; line-height: 1.5; }
+    .phone { width: 300px; border-radius: 32px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 20px 60px rgba(0,0,0,0.08); border: 1px solid #e4e4e7; background: #fff; position: relative; }
+    .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 22px; background: #18181b; border-radius: 0 0 14px 14px; z-index: 10; }
+    .phone-body { min-height: 560px; padding-top: 22px; background: #f0f9ff; }
+
+    .mk-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px 0; }
+    .mk-logo { font-size: 18px; font-weight: 900; letter-spacing: 0.04em; color: #18181b; }
+    .mk-logo span { color: #DC2626; }
+
+    .mk-greeting { padding: 20px; }
+    .mk-greeting h2 { font-size: 22px; font-weight: 900; color: #18181b; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .mk-greeting p { font-size: 13px; color: #71717a; line-height: 1.5; margin: 0; }
+
+    /* ─── Approach A: Focus Card ─── */
+    .focus-card { margin: 0 16px 12px; border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
+    .focus-card .focus-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.6; margin-bottom: 8px; }
+    .focus-card .focus-title { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+    .focus-card .focus-sub { font-size: 13px; opacity: 0.7; }
+    .focus-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .focus-btn { padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; }
+    .focus-dismiss { position: absolute; top: 14px; right: 14px; font-size: 18px; opacity: 0.4; cursor: pointer; background: none; border: none; color: inherit; }
+
+    /* ─── Approach B: Stack ─── */
+    .stack-wrap { margin: 0 16px; position: relative; margin-bottom: 24px; }
+    .stack-card { border-radius: 14px; padding: 16px 18px; position: relative; }
+    .stack-shadow-1 { position: absolute; bottom: -4px; left: 6px; right: 6px; height: 20px; border-radius: 0 0 14px 14px; background: rgba(0,0,0,0.04); }
+    .stack-shadow-2 { position: absolute; bottom: -8px; left: 12px; right: 12px; height: 20px; border-radius: 0 0 14px 14px; background: rgba(0,0,0,0.02); }
+    .stack-count { position: absolute; top: -8px; right: -4px; width: 22px; height: 22px; border-radius: 50%; background: #ef4444; color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #f0f9ff; z-index: 2; }
+    .stack-title { font-size: 14px; font-weight: 700; color: #18181b; }
+    .stack-sub { font-size: 12px; color: #71717a; margin-top: 2px; }
+    .stack-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .stack-btn { padding: 6px 14px; border-radius: 99px; font-size: 11px; font-weight: 700; border: none; cursor: pointer; }
+
+    /* ─── Approach C: Timeline ─── */
+    .timeline { padding: 0 20px; }
+    .tl-section { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #a1a1aa; margin-bottom: 8px; margin-top: 16px; }
+    .tl-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f4f4f5; }
+    .tl-item:last-child { border: none; }
+    .tl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .tl-body { flex: 1; }
+    .tl-title { font-size: 13px; font-weight: 600; color: #18181b; }
+    .tl-sub { font-size: 11px; color: #a1a1aa; }
+    .tl-action { font-size: 11px; font-weight: 700; color: #0891b2; flex-shrink: 0; align-self: center; }
+
+    /* ─── Approach D: Banner ─── */
+    .banner { margin: 0 16px 8px; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; animation: bannerSlide 0.3s ease; }
+    @keyframes bannerSlide { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .banner-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .banner-body { flex: 1; }
+    .banner-title { font-size: 13px; font-weight: 600; }
+    .banner-action { font-size: 12px; font-weight: 700; flex-shrink: 0; }
+
+    .mk-divider { height: 1px; background: #e4e4e7; margin: 0 20px; }
+
+    .mk-sections { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin: 16px 16px; background: #e4e4e7; border-radius: 12px; overflow: hidden; }
+    .mk-section { background: #fff; padding: 16px 12px; text-align: center; }
+    .mk-section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #a1a1aa; margin-bottom: 4px; }
+    .mk-section-val { font-size: 16px; font-weight: 900; color: #18181b; }
+
+    .mk-fab { position: absolute; bottom: 20px; right: 20px; width: 48px; height: 48px; border-radius: 50%; background: #0891b2; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 300; box-shadow: 0 4px 16px rgba(8,145,178,0.35); }
+
+    .verdict { background: #fff; border: 2px solid #0891b2; border-radius: 16px; padding: 28px; margin: 24px 0; }
+    .verdict h3 { margin-top: 0; color: #0891b2; }
+
+    .compare-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    .compare-table th { text-align: left; padding: 10px 14px; background: #fff; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #a1a1aa; border-bottom: 2px solid #e4e4e7; }
+    .compare-table td { padding: 10px 14px; border-bottom: 1px solid #e4e4e7; }
+    .compare-table tr:last-child td { border: none; }
+    .yes { color: #10b981; font-weight: 700; }
+    .no { color: #d4d4d8; }
+    .partial { color: #f59e0b; font-weight: 600; }
+
+    .footer { text-align: center; padding: 40px 24px; color: #d4d4d8; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>t<span>o</span>t<span>o</span> notifications</h1>
+  <p>Four approaches to making Toto proactive — which one feels right?</p>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <h2>Approach A: The Focus Card</h2>
+  <p class="sub">One big card showing the single most important thing right now. Deal with it, swipe it away, next one appears. Like a stack of post-it notes from your assistant.</p>
+
+  <div class="phone-row">
+    <div class="phone-col">
+      <div class="phone-label">Morning — urgent item</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body">
+          <div class="mk-header">
+            <div class="mk-logo">t<span>o</span>t<span>o</span></div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#e4e4e7"></div>
+          </div>
+          <div class="mk-greeting">
+            <h2>Good morning, Chris</h2>
+          </div>
+
+          <div class="focus-card" style="background:linear-gradient(135deg,#fef2f2,#fff5f5);border:1px solid #fca5a5">
+            <button class="focus-dismiss" style="color:#ef4444">&times;</button>
+            <div class="focus-label" style="color:#ef4444">Needs attention</div>
+            <div class="focus-title" style="color:#991b1b">Your car rego expires Thursday</div>
+            <div class="focus-sub" style="color:#b91c1c">Mitsubishi Outlander &middot; ABC123 &middot; SA</div>
+            <div class="focus-actions">
+              <button class="focus-btn" style="background:#ef4444;color:#fff">Remind me tomorrow</button>
+              <button class="focus-btn" style="background:#fff;color:#991b1b;border:1px solid #fca5a5">I've renewed it</button>
+            </div>
+          </div>
+
+          <div style="text-align:center;font-size:11px;color:#a1a1aa;margin-bottom:16px">2 more items below</div>
+
+          <div class="mk-divider"></div>
+
+          <div class="mk-sections" style="margin-top:16px">
+            <div class="mk-section"><div class="mk-section-label">Wallet</div><div class="mk-section-val">$1,240</div></div>
+            <div class="mk-section"><div class="mk-section-label">Plan</div><div class="mk-section-val">Pasta</div></div>
+            <div class="mk-section"><div class="mk-section-label">Home</div><div class="mk-section-val">1 due</div></div>
+          </div>
+
+          <div class="mk-fab">+</div>
+        </div>
+      </div>
+      <div class="phone-desc">Big, prominent, impossible to miss. One thing at a time. "Remind me tomorrow" snoozes it. "I've renewed it" marks it done and the next card slides up.</div>
+    </div>
+
+    <div class="phone-col">
+      <div class="phone-label">All clear — no focus card</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body">
+          <div class="mk-header">
+            <div class="mk-logo">t<span>o</span>t<span>o</span></div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#e4e4e7"></div>
+          </div>
+          <div class="mk-greeting">
+            <h2>Good morning, Chris</h2>
+            <p>Everything's on track. $1,240 buffer, pasta tonight.</p>
+          </div>
+
+          <div class="focus-card" style="background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #a7f3d0">
+            <div class="focus-label" style="color:#10b981">All clear</div>
+            <div class="focus-title" style="color:#065f46">Nothing needs your attention</div>
+            <div class="focus-sub" style="color:#059669">Next up: Home insurance renews in 24 days</div>
+          </div>
+
+          <div class="mk-sections" style="margin-top:8px">
+            <div class="mk-section"><div class="mk-section-label">Wallet</div><div class="mk-section-val">$1,240</div></div>
+            <div class="mk-section"><div class="mk-section-label">Plan</div><div class="mk-section-val">Pasta</div></div>
+            <div class="mk-section"><div class="mk-section-label">Home</div><div class="mk-section-val">0 due</div></div>
+          </div>
+
+          <div class="mk-fab">+</div>
+        </div>
+      </div>
+      <div class="phone-desc">When everything's handled, the focus card turns green and shows what's coming next. Feels calm and in control.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <h2>Approach B: The Stack</h2>
+  <p class="sub">A card with shadow layers behind it showing there's more underneath. Badge shows count. Swipe to dismiss, next card slides forward. Feels like handling a deck of tasks.</p>
+
+  <div class="phone-row">
+    <div class="phone-col">
+      <div class="phone-label">3 items to handle</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body">
+          <div class="mk-header">
+            <div class="mk-logo">t<span>o</span>t<span>o</span></div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#e4e4e7"></div>
+          </div>
+          <div class="mk-greeting">
+            <h2>Good morning, Chris</h2>
+            <p>3 things need your attention today.</p>
+          </div>
+
+          <div class="stack-wrap">
+            <div class="stack-shadow-2"></div>
+            <div class="stack-shadow-1"></div>
+            <div class="stack-card" style="background:#fff;border:1px solid #e4e4e7;z-index:1;position:relative">
+              <div class="stack-count">3</div>
+              <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Urgent</div>
+              <div class="stack-title">Car rego expires Thursday</div>
+              <div class="stack-sub">Outlander &middot; ABC123</div>
+              <div class="stack-actions">
+                <button class="stack-btn" style="background:#0891b2;color:#fff">Open</button>
+                <button class="stack-btn" style="background:#f4f4f5;color:#71717a">Snooze</button>
+                <button class="stack-btn" style="background:#f4f4f5;color:#71717a">Dismiss</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mk-sections">
+            <div class="mk-section"><div class="mk-section-label">Wallet</div><div class="mk-section-val">$1,240</div></div>
+            <div class="mk-section"><div class="mk-section-label">Plan</div><div class="mk-section-val">Pasta</div></div>
+            <div class="mk-section"><div class="mk-section-label">Home</div><div class="mk-section-val">1 due</div></div>
+          </div>
+
+          <div class="mk-fab">+</div>
+        </div>
+      </div>
+      <div class="phone-desc">The shadow layers behind the card hint that there's more. Badge shows count. Handle it, swipe it, next one slides forward. Satisfying to clear the deck.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <h2>Approach C: The Timeline</h2>
+  <p class="sub">A chronological feed grouped by urgency: Now, This Week, Coming Up. Feels like a personal assistant's briefing notes. Scrollable, scannable.</p>
+
+  <div class="phone-row">
+    <div class="phone-col">
+      <div class="phone-label">Timeline view</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body">
+          <div class="mk-header">
+            <div class="mk-logo">t<span>o</span>t<span>o</span></div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#e4e4e7"></div>
+          </div>
+          <div class="mk-greeting">
+            <h2>Good morning, Chris</h2>
+          </div>
+
+          <div class="timeline">
+            <div class="tl-section">Right now</div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#ef4444"></div>
+              <div class="tl-body"><div class="tl-title">Car rego expires Thursday</div><div class="tl-sub">Outlander &middot; ABC123 &middot; 2 days</div></div>
+              <div class="tl-action">Renew</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#ef4444"></div>
+              <div class="tl-body"><div class="tl-title">Pest control overdue</div><div class="tl-sub">3 days late</div></div>
+              <div class="tl-action">Done</div>
+            </div>
+
+            <div class="tl-section">This week</div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#f59e0b"></div>
+              <div class="tl-body"><div class="tl-title">Grocery budget at 80%</div><div class="tl-sub">$680 of $850 spent</div></div>
+              <div class="tl-action">Budget</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#f59e0b"></div>
+              <div class="tl-body"><div class="tl-title">No lunches planned for next week</div><div class="tl-sub">Jake &middot; 5 days to fill</div></div>
+              <div class="tl-action">Plan</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#0891b2"></div>
+              <div class="tl-body"><div class="tl-title">Jake's birthday party Saturday</div><div class="tl-sub">Estimated $380</div></div>
+              <div class="tl-action">View</div>
+            </div>
+
+            <div class="tl-section">Coming up</div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#a1a1aa"></div>
+              <div class="tl-body"><div class="tl-title">Home insurance renews</div><div class="tl-sub">24 days &middot; AAMI &middot; $1,850</div></div>
+              <div class="tl-action">View</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#a1a1aa"></div>
+              <div class="tl-body"><div class="tl-title">AC filter due</div><div class="tl-sub">28 days</div></div>
+              <div class="tl-action">View</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot" style="background:#10b981"></div>
+              <div class="tl-body"><div class="tl-title">Savings goal at 68%</div><div class="tl-sub">Holiday fund &middot; $3,400 of $5,000</div></div>
+              <div class="tl-action">View</div>
+            </div>
+          </div>
+
+          <div class="mk-fab">+</div>
+        </div>
+      </div>
+      <div class="phone-desc">Natural to scan. "Right now" → "This week" → "Coming up" mirrors how you think about time. Each item is one tap to handle. Scrolls naturally.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <h2>Approach D: Smart Banners</h2>
+  <p class="sub">Contextual notifications that slide in at the top of any screen when relevant. Like a gentle tap on the shoulder — appears when you need it, goes away when you don't.</p>
+
+  <div class="phone-row">
+    <div class="phone-col">
+      <div class="phone-label">Banner on Today screen</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body">
+          <div class="mk-header">
+            <div class="mk-logo">t<span>o</span>t<span>o</span></div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#e4e4e7"></div>
+          </div>
+
+          <div class="banner" style="background:#fef2f2;border:1px solid #fca5a5;margin-top:12px">
+            <div class="banner-dot" style="background:#ef4444"></div>
+            <div class="banner-body"><div class="banner-title" style="color:#991b1b">Rego expires Thursday</div></div>
+            <div class="banner-action" style="color:#ef4444">View &rsaquo;</div>
+          </div>
+
+          <div class="mk-greeting" style="padding-top:8px">
+            <h2>Good morning, Chris</h2>
+            <p>$1,240 buffer. Pasta tonight. 1 task overdue.</p>
+          </div>
+
+          <div class="mk-sections">
+            <div class="mk-section"><div class="mk-section-label">Wallet</div><div class="mk-section-val">$1,240</div></div>
+            <div class="mk-section"><div class="mk-section-label">Plan</div><div class="mk-section-val">Pasta</div></div>
+            <div class="mk-section"><div class="mk-section-label">Home</div><div class="mk-section-val">1 due</div></div>
+          </div>
+
+          <div class="mk-fab">+</div>
+        </div>
+      </div>
+      <div class="phone-desc">Banners appear at the top of any screen. Subtle, not blocking. Tap to go handle it. Auto-dismiss after 10 seconds or swipe away.</div>
+    </div>
+
+    <div class="phone-col">
+      <div class="phone-label">Context-aware on Budget screen</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body" style="background:#fff">
+          <div style="padding:32px 16px 8px">
+            <div style="font-size:11px;color:#71717a;margin-bottom:6px">Today &rsaquo; <strong>Wallet</strong></div>
+            <div style="display:flex;gap:4px;margin-bottom:12px">
+              <div style="padding:6px 14px;border-radius:99px;background:#0891b2;color:#fff;font-size:11px;font-weight:700">Budget</div>
+              <div style="padding:6px 14px;border-radius:99px;color:#a1a1aa;font-size:11px;font-weight:700">Bills</div>
+              <div style="padding:6px 14px;border-radius:99px;color:#a1a1aa;font-size:11px;font-weight:700">Net Worth</div>
+            </div>
+          </div>
+
+          <div class="banner" style="background:#fffbeb;border:1px solid #fde68a">
+            <div class="banner-dot" style="background:#f59e0b"></div>
+            <div class="banner-body"><div class="banner-title" style="color:#92400e">Groceries at 80% — $170 left</div></div>
+            <div class="banner-action" style="color:#d97706">Details</div>
+          </div>
+
+          <div style="padding:8px 16px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#e4e4e7;border-radius:12px;overflow:hidden;margin-bottom:16px">
+              <div style="background:#fff;padding:16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#a1a1aa;margin-bottom:4px">Income</div><div style="font-size:22px;font-weight:900;color:#10b981">$6,200</div></div>
+              <div style="background:#fff;padding:16px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#a1a1aa;margin-bottom:4px">Expenses</div><div style="font-size:22px;font-weight:900">$4,960</div></div>
+            </div>
+          </div>
+
+          <div class="mk-fab">+</div>
+        </div>
+      </div>
+      <div class="phone-desc">Context-aware: the grocery warning only appears when you're looking at your budget. Relevant, not spammy. Different screens show different banners.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ -->
+<section>
+  <h2>Comparison</h2>
+  <p class="sub">How each approach stacks up</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr><th>Quality</th><th>A. Focus Card</th><th>B. Stack</th><th>C. Timeline</th><th>D. Banners</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Mobile-friendly</strong></td><td class="yes">Excellent</td><td class="yes">Excellent</td><td class="yes">Good</td><td class="yes">Excellent</td></tr>
+      <tr><td><strong>Feels like an assistant</strong></td><td class="yes">Very</td><td class="partial">Somewhat</td><td class="yes">Very</td><td class="partial">Somewhat</td></tr>
+      <tr><td><strong>Handles 0 items well</strong></td><td class="yes">Green "all clear"</td><td class="no">Empty space</td><td class="no">Empty list</td><td class="yes">Nothing shown</td></tr>
+      <tr><td><strong>Handles 10+ items</strong></td><td class="partial">One at a time</td><td class="partial">One at a time</td><td class="yes">All visible</td><td class="no">Too many banners</td></tr>
+      <tr><td><strong>Actionable</strong></td><td class="yes">2 clear buttons</td><td class="yes">3 buttons</td><td class="partial">Tap action link</td><td class="partial">Tap to navigate</td></tr>
+      <tr><td><strong>Snooze/dismiss</strong></td><td class="yes">Built in</td><td class="yes">Built in</td><td class="no">Not natural</td><td class="yes">Auto-dismiss</td></tr>
+      <tr><td><strong>Non-intrusive</strong></td><td class="partial">Takes space</td><td class="partial">Takes space</td><td class="yes">Scrollable</td><td class="yes">Appears/disappears</td></tr>
+    </tbody>
+  </table>
+
+  <div class="verdict">
+    <h3>Recommended: Combine A + C</h3>
+    <p style="color:#52525b">Use the <strong>Focus Card</strong> for the single most urgent item (with snooze/dismiss). Below it, use the <strong>Timeline</strong> for everything else grouped by time horizon. This gives you:</p>
+    <ul style="padding-left:20px;margin-top:12px;color:#52525b">
+      <li><strong>Focus Card</strong> — one big thing that demands attention, impossible to miss</li>
+      <li><strong>Timeline below</strong> — "This week" and "Coming up" for everything else, scannable</li>
+      <li><strong>Green "all clear"</strong> when the deck is empty — feels great</li>
+      <li><strong>Snooze on the focus card</strong> — "remind me tomorrow" pushes it to tomorrow</li>
+      <li>The Today greeting sits above both — always there, always personal</li>
+    </ul>
+    <p style="margin-top:16px;margin-bottom:0;color:#52525b">Plus <strong>Banners (D)</strong> for context-aware alerts on other screens — like showing the grocery budget warning only when you're on the Budget page.</p>
+  </div>
+</section>
+
+</div>
+
+<div class="footer">
+  Toto Notification UX Mockups — Confidential — April 2026
+</div>
+
+</body>
+</html>
