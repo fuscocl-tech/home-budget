@@ -9933,11 +9933,11 @@ function _showGuideStep() {
   const step = _guideSteps[_guideIdx];
 
   // Navigate to tab if needed, then highlight after render
-  if (step.tab) {
+  if (step.tab && _activeTab() !== step.tab) {
     activateTab(step.tab);
-    setTimeout(() => _highlightStep(step), 300);
+    setTimeout(() => _highlightStep(step), 500);
   } else {
-    _highlightStep(step);
+    setTimeout(() => _highlightStep(step), 100);
   }
 }
 
@@ -10030,21 +10030,24 @@ function _cleanupGuide() {
 // ── Pre-built guides for health score dimensions ──
 const HEALTH_GUIDES = {
   emergency: [
-    { tab: 'goals', title: 'Create an Emergency Fund goal', text: 'First, let\'s set up a savings goal. Look for the "+ Add Goal" button.', el: null },
-    { tab: 'goals', title: 'Add a new goal', text: 'Tap the "Add Goal" button to create your emergency fund target.', el: '[onclick*="openAddGoal"]', watchClick: true },
+    { tab: 'goals', title: 'Create an Emergency Fund', text: 'An emergency fund covers 3-6 months of expenses. Let\'s set one up as a savings goal.', el: null },
+    { tab: 'goals', title: 'Tap "+ New Goal"', text: 'This button creates a new savings goal. Set the name to "Emergency Fund" and the target to your 3-month expenses.', el: '[onclick*="openAddGoal"]', watchClick: true },
   ],
   savings: [
-    { tab: 'budget', title: 'Review your expenses', text: 'Your savings rate improves when you reduce expenses or increase income. Let\'s look at your budget.', el: null },
-    { tab: 'budget', title: 'Find expenses to cut', text: 'Look through your expense list. Can any be reduced? Tap an expense to edit its amount.', el: '.section-title' },
+    { tab: 'budget', title: 'Improve your savings rate', text: 'Your savings rate is the gap between income and expenses. To improve it, you can either reduce expenses or increase income.', el: null },
+    { tab: 'budget', title: 'Review your expenses', text: 'Look through your expenses below. Are there any you could reduce? Tap any expense to edit it.', el: '#budget-content' },
   ],
   tracking: [
-    { tab: 'budget', title: 'Log your actual spending', text: 'Recording what you actually spend each month helps you stay on track. Look for the "Import Transactions" button or edit individual actuals.', el: '[onclick*="openCsvImport"]', watchClick: true },
+    { tab: 'budget', title: 'Track your actual spending', text: 'Recording what you actually spend helps you stay on track. You can import your bank statement or log spends manually.', el: null },
+    { tab: 'budget', title: 'Import transactions', text: 'Tap "Import Transactions" to upload a bank CSV, or use the + button to log individual spends.', el: '[onclick*="openCsvImport"]', watchClick: true },
   ],
   netWorth: [
-    { tab: 'networth', title: 'Track your assets and liabilities', text: 'Add your property, savings, superannuation as assets. Add your mortgage, loans as liabilities. This builds your net worth picture.', el: null },
+    { tab: 'networth', title: 'Build your net worth picture', text: 'Add what you own (property, savings, super) as assets. Add what you owe (mortgage, loans, credit cards) as liabilities.', el: null },
+    { tab: 'networth', title: 'Start adding', text: 'Use the buttons below to add your first asset or liability. Even rough numbers help build the picture.', el: '#networth-content' },
   ],
   goals: [
-    { tab: 'goals', title: 'Set a financial goal', text: 'Goals keep you motivated. Set a target for a holiday, emergency fund, or debt payoff.', el: '[onclick*="openAddGoal"]', watchClick: true },
+    { tab: 'goals', title: 'Set a financial goal', text: 'Goals keep you motivated — a holiday fund, debt payoff, or savings target. Let\'s create your first one.', el: null },
+    { tab: 'goals', title: 'Tap "+ New Goal"', text: 'Choose a goal type, set a target amount, and start tracking your progress.', el: '[onclick*="openAddGoal"]', watchClick: true },
   ]
 };
 
