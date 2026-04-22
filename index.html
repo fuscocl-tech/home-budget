@@ -1712,6 +1712,12 @@
     .section-pill:hover { color:var(--text); }
     .section-pill.active { background:#0891b2; color:#fff; border-color:#0891b2; }
 
+    /* ─── Settings Save Bar ───────────────── */
+    .settings-save-bar { position:sticky; bottom:0; left:0; right:0; z-index:30; background:var(--surface); border-top:1px solid var(--border); padding:12px 20px; display:none; align-items:center; justify-content:flex-end; gap:10px; box-shadow:0 -4px 12px rgba(0,0,0,0.06); }
+    .settings-save-bar .unsaved-dot { width:8px; height:8px; border-radius:50%; background:#f59e0b; flex-shrink:0; animation:pulse 1.5s infinite; }
+    .settings-save-bar .unsaved-text { font-size:13px; font-weight:600; color:var(--text-muted); flex:1; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
     /* ─── Notification Styles ─────────────── */
     .notif-focus { margin:0 0 16px; border-radius:16px; padding:20px; position:relative; }
     .notif-focus.urgent { background:linear-gradient(135deg,#fef2f2,#fff5f5); border:1px solid #fca5a5; }
@@ -3440,6 +3446,9 @@ function activateTab(tab) {
   if (tab === 'scenarios') tab = 'insights';
   if (tab === 'money') tab = 'budget';
   if (tab === 'dashboard') tab = 'budget';
+
+  // Check unsaved settings before leaving
+  if (_activeTab() === 'settings' && tab !== 'settings') _checkSettingsUnsaved(tab);
 
   // Clear all active states
   document.querySelectorAll('.nav-item, .nav-text-item').forEach(n => n.classList.remove('active'));
@@ -5544,36 +5553,36 @@ function profileChildren() { return (state.householdProfile.members||[]).filter(
 
 function addHouseholdMember(role) {
   state.householdProfile.members.push({ role: role||'adult', age: null });
-  saveData(state); renderSettings();
+  _markSettingsDirty(); renderSettings();
 }
 function removeHouseholdMember(idx) {
   state.householdProfile.members.splice(idx, 1);
-  saveData(state); renderSettings();
+  _markSettingsDirty(); renderSettings();
 }
 function updateMember(idx, field, value) {
   const m = state.householdProfile.members[idx];
   if (!m) return;
   m[field] = value;
-  saveData(state);
+  _markSettingsDirty();
   if (field === 'role') renderSettings();
 }
 function addPet(type) {
   state.householdProfile.pets.push({ type: type||'dog', name: '' });
-  saveData(state); renderSettings();
+  _markSettingsDirty(); renderSettings();
 }
 function removePet(idx) {
   state.householdProfile.pets.splice(idx, 1);
-  saveData(state); renderSettings();
+  _markSettingsDirty(); renderSettings();
 }
 function updatePet(idx, field, value) {
   const p = state.householdProfile.pets[idx];
   if (!p) return;
   p[field] = value;
-  saveData(state);
+  _markSettingsDirty();
 }
 function updateCars(n) {
   state.householdProfile.cars = n;
-  saveData(state);
+  _markSettingsDirty();
 }
 
 // ─────────────────────────────────────────────────
@@ -6491,10 +6500,57 @@ function removeCatFromGroup(groupId, cat) {
 
 // ─────────────────────────────────────────────────
 
+let _settingsDirty = false;
+let _settingsSnapshot = null;
+
+function _markSettingsDirty() {
+  if (!_settingsDirty) {
+    // Take snapshot on first change so we can revert
+    _settingsSnapshot = JSON.parse(JSON.stringify(state));
+  }
+  _settingsDirty = true;
+  const bar = document.getElementById('settings-save-bar');
+  if (bar) bar.style.display = 'flex';
+}
+
+function saveSettingsChanges() {
+  _settingsDirty = false;
+  _settingsSnapshot = null;
+  saveData(state);
+  const bar = document.getElementById('settings-save-bar');
+  if (bar) bar.style.display = 'none';
+  // Brief confirmation
+  const btn = document.getElementById('settings-save-btn');
+  if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; btn.style.background = '#10b981'; setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500); }
+  renderAll();
+}
+
+function cancelSettingsChanges() {
+  if (_settingsSnapshot) {
+    // Restore state from snapshot
+    Object.assign(state, _settingsSnapshot);
+  }
+  _settingsDirty = false;
+  _settingsSnapshot = null;
+  const bar = document.getElementById('settings-save-bar');
+  if (bar) bar.style.display = 'none';
+  renderSettings();
+}
+
+function _checkSettingsUnsaved(targetTab) {
+  if (_settingsDirty) {
+    if (confirm('You have unsaved changes in Settings. Save before leaving?')) {
+      saveSettingsChanges();
+    } else {
+      cancelSettingsChanges();
+    }
+  }
+}
+
 function updateSetting(key, value) {
   if (!state.settings) state.settings = {};
   state.settings[key] = value;
-  saveData(state);
+  _markSettingsDirty();
 }
 
 function saveApiKey() {
@@ -6559,10 +6615,9 @@ function addCategory(type) {
   if (list.includes(name)) { alert('That category already exists.'); return; }
   list.push(name);
   logActivity(`Added ${type} category`, name);
-  saveData(state);
+  _markSettingsDirty();
   input.value = '';
   renderSettings();
-  renderBudget();
 }
 
 function removeCategory(type, name) {
@@ -6577,9 +6632,8 @@ function removeCategory(type, name) {
   const idx = list.indexOf(name);
   if (idx !== -1) list.splice(idx, 1);
   logActivity(`Removed ${type} category`, name);
-  saveData(state);
+  _markSettingsDirty();
   renderSettings();
-  renderBudget();
 }
 
 function renderSettings() {
@@ -6689,7 +6743,7 @@ function renderSettings() {
             { val:'timeline', label:'Timeline Only', desc:'Chronological feed grouped by urgency' },
             { val:'banners', label:'Banners', desc:'Subtle alerts at the top' },
           ].map(o => `<label style="display:block;cursor:pointer;border:2px solid ${(state.settings?.notifStyle||'focus-timeline')===o.val?'#0891b2':'var(--border)'};border-radius:12px;padding:14px;background:${(state.settings?.notifStyle||'focus-timeline')===o.val?'#ecfeff':'var(--surface)'}">
-            <input type="radio" name="notif-style" value="${o.val}" ${(state.settings?.notifStyle||'focus-timeline')===o.val?'checked':''} onchange="state.settings.notifStyle=this.value;saveData(state);renderSettings();renderToday()" style="display:none">
+            <input type="radio" name="notif-style" value="${o.val}" ${(state.settings?.notifStyle||'focus-timeline')===o.val?'checked':''} onchange="state.settings.notifStyle=this.value;_markSettingsDirty();renderSettings();renderToday()" style="display:none">
             <div style="font-size:13px;font-weight:700;margin-bottom:2px">${o.label}</div>
             <div style="font-size:11px;color:var(--text-muted)">${o.desc}</div>
           </label>`).join('')}
@@ -6860,6 +6914,13 @@ function renderSettings() {
         </div>
       </div>`) +
   '';
+
+  html += `<div class="settings-save-bar" id="settings-save-bar" style="display:${_settingsDirty ? 'flex' : 'none'}">
+    <div class="unsaved-dot"></div>
+    <div class="unsaved-text">Unsaved changes</div>
+    <button class="btn" onclick="cancelSettingsChanges()">Cancel</button>
+    <button class="btn btn-primary" id="settings-save-btn" onclick="saveSettingsChanges()">Save</button>
+  </div>`;
 
   document.getElementById('settings-content').innerHTML = html;
 }
