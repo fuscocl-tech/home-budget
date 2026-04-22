@@ -3831,12 +3831,20 @@ function calcFinancialHealth() {
 // DASHBOARD
 // ─────────────────────────────────────────────────
 
+const _SECTION_COLORS = { Wallet:'#059669', Plan:'#0891b2', Home:'#7c3aed' };
+
+function _sectionTag(section) {
+  if (!section) return '';
+  const color = _SECTION_COLORS[section] || '#71717a';
+  return `<span style="font-size:10px;font-weight:700;color:${color};margin-right:6px">${section}</span>`;
+}
+
 function _tlItem(c) {
   const dotColor = { red:'#ef4444', amber:'#f59e0b', green:'#10b981', blue:'#0891b2' }[c.cls] || '#a1a1aa';
   const clickAttr = c.onclick ? c.onclick : c.tab ? `activateTab('${c.tab}')` : '';
   return `<div class="notif-tl-item">
     <div class="notif-tl-dot" style="background:${dotColor}"></div>
-    <div class="notif-tl-body"><div class="notif-tl-title">${c.title}</div>${c.sub ? `<div class="notif-tl-sub">${c.sub}</div>` : ''}</div>
+    <div class="notif-tl-body"><div class="notif-tl-title">${_sectionTag(c.section)}${c.title}</div>${c.sub ? `<div class="notif-tl-sub">${c.sub}</div>` : ''}</div>
     <div class="notif-tl-action" onclick="${clickAttr}">${c.action.replace(' →','')}</div>
   </div>`;
 }
@@ -3878,26 +3886,26 @@ function renderToday() {
   // Bills due soon
   (state.bills || []).forEach(b => {
     const days = billDaysUntil(b);
-    if (days >= 0 && days <= 7) cards.push({ cls: days <= 1 ? 'red' : 'amber', icon: '💳', title: `${escHtml(b.name)} due${days === 0 ? ' today' : days === 1 ? ' tomorrow' : ` in ${days}d`}`, sub: aud(parseFloat(b.amount) || 0), action: 'View bills →', tab: 'bills', priority: days });
+    if (days >= 0 && days <= 7) cards.push({ cls: days <= 1 ? 'red' : 'amber', section: 'Wallet', title: `${escHtml(b.name)} due${days === 0 ? ' today' : days === 1 ? ' tomorrow' : ` in ${days}d`}`, sub: aud(parseFloat(b.amount) || 0), action: 'View bills →', tab: 'bills', priority: days });
   });
 
   // Maintenance overdue / due soon
   (state.maintenance || []).forEach(m => {
     const days = _maintDaysUntil(m);
-    if (days !== null && days < 0) cards.push({ cls: 'red', icon: '🔧', title: `${escHtml(m.name)} overdue by ${Math.abs(days)}d`, sub: escHtml(m.provider || ''), action: 'Mark done ✓', onclick: `markMaintDone(${m.id})`, priority: days });
-    else if (days !== null && days <= 14) cards.push({ cls: 'amber', icon: '🔧', title: `${escHtml(m.name)} due in ${days}d`, sub: escHtml(m.provider || ''), action: 'View →', tab: 'maintenance', priority: days + 100 });
+    if (days !== null && days < 0) cards.push({ cls: 'red', section: 'Home', title: `${escHtml(m.name)} overdue by ${Math.abs(days)}d`, sub: escHtml(m.provider || ''), action: 'Mark done ✓', onclick: `markMaintDone(${m.id})`, priority: days });
+    else if (days !== null && days <= 14) cards.push({ cls: 'amber', section: 'Home', title: `${escHtml(m.name)} due in ${days}d`, sub: escHtml(m.provider || ''), action: 'View →', tab: 'maintenance', priority: days + 100 });
   });
 
   // Vehicle rego / insurance expiring
   (state.vehicles || []).forEach(v => {
     if (v.regoExpiry) {
       const days = Math.ceil((new Date(v.regoExpiry) - today) / 86400000);
-      if (days < 0) cards.push({ cls: 'red', icon: '🚗', title: `${escHtml(v.name)} rego expired ${Math.abs(days)}d ago`, sub: escHtml(v.plate || ''), action: 'View →', tab: 'vehicles', priority: days });
-      else if (days <= 30) cards.push({ cls: 'amber', icon: '🚗', title: `${escHtml(v.name)} rego expires in ${days}d`, sub: escHtml(v.plate || ''), action: 'View →', tab: 'vehicles', priority: days + 50 });
+      if (days < 0) cards.push({ cls: 'red', section: 'Home', title: `${escHtml(v.name)} rego expired ${Math.abs(days)}d ago`, sub: escHtml(v.plate || ''), action: 'View →', tab: 'vehicles', priority: days });
+      else if (days <= 30) cards.push({ cls: 'amber', section: 'Home', title: `${escHtml(v.name)} rego expires in ${days}d`, sub: escHtml(v.plate || ''), action: 'View →', tab: 'vehicles', priority: days + 50 });
     }
     if (v.insurance?.renewalDate) {
       const days = Math.ceil((new Date(v.insurance.renewalDate) - today) / 86400000);
-      if (days >= 0 && days <= 30) cards.push({ cls: 'amber', icon: '🛡️', title: `${escHtml(v.name)} insurance renews in ${days}d`, sub: escHtml(v.insurance.provider || ''), action: 'View →', tab: 'vehicles', priority: days + 50 });
+      if (days >= 0 && days <= 30) cards.push({ cls: 'amber', section: 'Home', title: `${escHtml(v.name)} insurance renews in ${days}d`, sub: escHtml(v.insurance.provider || ''), action: 'View →', tab: 'vehicles', priority: days + 50 });
     }
   });
 
@@ -3905,24 +3913,24 @@ function renderToday() {
   (state.documents || []).forEach(d => {
     if (!d.expiryDate) return;
     const days = Math.ceil((new Date(d.expiryDate) - today) / 86400000);
-    if (days < 0) cards.push({ cls: 'red', icon: '📄', title: `${escHtml(d.name)} expired ${Math.abs(days)}d ago`, sub: escHtml(d.provider || ''), action: 'View →', tab: 'documents', priority: days });
-    else if (days <= 30) cards.push({ cls: 'amber', icon: '📄', title: `${escHtml(d.name)} expires in ${days}d`, sub: escHtml(d.provider || ''), action: 'View →', tab: 'documents', priority: days + 50 });
+    if (days < 0) cards.push({ cls: 'red', section: 'Home', title: `${escHtml(d.name)} expired ${Math.abs(days)}d ago`, sub: escHtml(d.provider || ''), action: 'View →', tab: 'documents', priority: days });
+    else if (days <= 30) cards.push({ cls: 'amber', section: 'Home', title: `${escHtml(d.name)} expires in ${days}d`, sub: escHtml(d.provider || ''), action: 'View →', tab: 'documents', priority: days + 50 });
   });
 
   // Budget status
   const budgetPct = monthlyExpenses > 0 ? Math.round((monthlyExpenses - surplus) / monthlyExpenses * 100) : 0;
-  if (surplus >= 0) cards.push({ cls: 'green', icon: '💰', title: `${aud(surplus)} left in budget`, sub: `${daysLeft} days remaining this month`, action: 'See budget →', tab: 'budget', priority: 200 });
-  else cards.push({ cls: 'red', icon: '💰', title: `Over budget by ${aud(Math.abs(surplus))}`, sub: `${daysLeft} days remaining`, action: 'See budget →', tab: 'budget', priority: -5 });
+  if (surplus >= 0) cards.push({ cls: 'green', section: 'Wallet', title: `${aud(surplus)} left in budget`, sub: `${daysLeft} days remaining this month`, action: 'See budget →', tab: 'budget', priority: 200 });
+  else cards.push({ cls: 'red', section: 'Wallet', title: `Over budget by ${aud(Math.abs(surplus))}`, sub: `${daysLeft} days remaining`, action: 'See budget →', tab: 'budget', priority: -5 });
 
   // Tonight's meal
   const mealWeekKey = _mealWeekKey(0);
   const todayDow = today.getDay() === 0 ? 6 : today.getDay() - 1;
   const todayMeals = (state.meals?.plan?.[mealWeekKey]?.[todayDow]) || {};
-  if (todayMeals.d) cards.push({ cls: 'green', icon: '🍽️', title: `Dinner tonight: ${todayMeals.d}`, sub: todayMeals.l ? `Lunch: ${todayMeals.l}` : '', action: 'Meal plan →', tab: 'meals', priority: 300 });
+  if (todayMeals.d) cards.push({ cls: 'green', section: 'Plan', title: `Dinner tonight: ${todayMeals.d}`, sub: todayMeals.l ? `Lunch: ${todayMeals.l}` : '', action: 'Meal plan →', tab: 'meals', priority: 300 });
 
   // Financial health
   const health = calcFinancialHealth();
-  cards.push({ cls: health.total >= 70 ? 'green' : health.total >= 50 ? 'amber' : 'red', icon: '📊', title: `Health Score: ${health.total} / ${health.grade}`, sub: health.insight, action: 'Details →', tab: 'money', priority: 400 });
+  cards.push({ cls: health.total >= 70 ? 'green' : health.total >= 50 ? 'amber' : 'red', section: 'Wallet', title: `Health Score: ${health.total} / ${health.grade}`, sub: health.insight, action: 'Details →', tab: 'budget', priority: 400 });
 
   // Sort: red first, then amber, then green
   const clsPriority = { red: 0, amber: 1, green: 2, blue: 3 };
@@ -3967,7 +3975,7 @@ function renderToday() {
       const clickAttr = urgent.onclick ? urgent.onclick : urgent.tab ? `activateTab('${urgent.tab}')` : '';
       notifHtml += `<div class="notif-focus ${focusCls}">
         <div class="notif-focus-label" style="color:${labelColor}">${urgent.cls === 'red' ? 'Needs attention' : 'Coming up'}</div>
-        <div class="notif-focus-title" style="color:${titleColor}">${urgent.title}</div>
+        <div class="notif-focus-title" style="color:${titleColor}">${_sectionTag(urgent.section)}${urgent.title}</div>
         ${urgent.sub ? `<div class="notif-focus-sub" style="color:${titleColor}">${urgent.sub}</div>` : ''}
         <div class="notif-focus-actions">
           <button class="notif-focus-btn" style="background:${btnBg};color:#fff" onclick="${clickAttr}">View</button>
@@ -4018,7 +4026,7 @@ function renderToday() {
         <div class="notif-stack-card">
           ${total > 1 ? `<div class="notif-stack-count">${total}</div>` : ''}
           <div class="notif-stack-label" style="color:${top.cls === 'red' ? '#ef4444' : '#d97706'}">${top.cls === 'red' ? 'Urgent' : 'Upcoming'}</div>
-          <div class="notif-stack-title">${top.title}</div>
+          <div class="notif-stack-title">${_sectionTag(top.section)}${top.title}</div>
           ${top.sub ? `<div class="notif-stack-sub">${top.sub}</div>` : ''}
           <div class="notif-stack-actions">
             <button class="notif-stack-btn" style="background:#0891b2;color:#fff" onclick="${clickAttr}">Open</button>
@@ -4054,7 +4062,7 @@ function renderToday() {
       const dotColor = c.cls === 'red' ? '#ef4444' : '#f59e0b';
       notifHtml += `<div class="notif-banner ${c.cls}">
         <div class="notif-banner-dot" style="background:${dotColor}"></div>
-        <div class="notif-banner-body" style="color:${c.cls === 'red' ? '#991b1b' : '#92400e'}">${c.title}</div>
+        <div class="notif-banner-body" style="color:${c.cls === 'red' ? '#991b1b' : '#92400e'}">${_sectionTag(c.section)}${c.title}</div>
         <div class="notif-banner-action" onclick="${clickAttr}">View</div>
       </div>`;
     });
