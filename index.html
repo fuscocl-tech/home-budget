@@ -1712,6 +1712,23 @@
     .section-pill:hover { color:var(--text); }
     .section-pill.active { background:#0891b2; color:#fff; border-color:#0891b2; }
 
+    /* ─── Health Popover ──────────────────── */
+    .health-popover { position:fixed; z-index:200; background:#fff; border-radius:16px; padding:20px; width:300px; box-shadow:0 12px 40px rgba(0,0,0,0.18); border:1px solid var(--border); }
+    .health-popover-title { font-size:16px; font-weight:800; margin-bottom:4px; }
+    .health-popover-subtitle { font-size:12px; color:var(--text-muted); margin-bottom:16px; }
+    .health-dim { margin-bottom:14px; }
+    .health-dim:last-child { margin-bottom:0; }
+    .health-dim-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+    .health-dim-name { font-size:12px; font-weight:600; }
+    .health-dim-score { font-size:11px; font-weight:700; }
+    .health-dim-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; margin-bottom:4px; }
+    .health-dim-fill { height:100%; border-radius:3px; }
+    .health-dim-tip { font-size:11px; color:var(--text-muted); line-height:1.4; }
+    .health-dim-fix { font-size:11px; font-weight:700; color:#0891b2; cursor:pointer; margin-left:4px; }
+    .health-dim-fix:hover { text-decoration:underline; }
+    .health-grade-badge:hover { filter:brightness(1.1); transform:scale(1.05); }
+    .health-grade-badge { transition:all 0.15s; }
+
     /* ─── Guide Walkthrough ─────────────── */
     .guide-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; transition:opacity 0.2s; }
     .guide-spotlight { position:fixed; z-index:501; border-radius:12px; box-shadow:0 0 0 4000px rgba(0,0,0,0.5); transition:all 0.3s ease; }
@@ -3948,13 +3965,17 @@ function renderToday() {
   const weakestDim = health.dimensions.reduce((w, d, i) => d.score < w.score ? { score: d.score, key: dimKeys[i] } : w, { score: 99, key: null });
   const guideKey = weakestDim.score < 15 ? weakestDim.key : null;
 
+  // Store health data globally for the popover
+  window._lastHealth = health;
+  window._lastHealthGuides = dimKeys;
+
   cards.push({
     cls: health.total >= 70 ? 'green' : health.total >= 50 ? 'amber' : 'red',
     section: 'Wallet',
-    title: `Health Score: ${health.total} / ${health.grade}`,
+    title: `Health: <span class="health-grade-badge" style="display:inline-block;padding:2px 10px;border-radius:6px;font-size:15px;font-weight:900;color:#fff;background:${health.color};cursor:pointer;margin-left:4px" onclick="event.stopPropagation();toggleHealthPopover(this)">${health.grade}</span>`,
     sub: health.insight,
-    action: guideKey ? 'Fix it →' : 'Details →',
-    onclick: guideKey ? `startHealthGuide('${guideKey}')` : `activateTab('budget')`,
+    action: guideKey ? 'Fix it →' : '',
+    onclick: guideKey ? `startHealthGuide('${guideKey}')` : null,
     priority: 400
   });
 
@@ -9910,6 +9931,78 @@ function lbToShoppingList(weekKey, kidId) {
     btn.style.color = 'var(--success)';
     setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
   }
+}
+
+// ─────────────────────────────────────────────────
+// HEALTH SCORE POPOVER
+// ─────────────────────────────────────────────────
+function toggleHealthPopover(badge) {
+  // Remove existing popover
+  const existing = document.querySelector('.health-popover');
+  if (existing) { existing.remove(); return; }
+
+  const h = window._lastHealth;
+  if (!h) return;
+
+  const dimKeys = window._lastHealthGuides || ['savings','tracking','netWorth','emergency','goals'];
+  const gradeColors = { A:'#10b981', B:'#0891b2', C:'#f59e0b', D:'#f97316', F:'#ef4444' };
+  const gradeDescs = { A:'Excellent', B:'Good', C:'Fair — some areas need work', D:'Needs attention', F:'Critical — take action' };
+
+  const dimTips = {
+    'Savings Rate': h.dimensions[0].score >= 15 ? 'Healthy savings rate' : h.dimensions[0].score >= 8 ? 'Could save more each month' : 'Very little being saved',
+    'Budget Tracking': h.dimensions[1].score >= 15 ? 'Consistently logging actuals' : h.dimensions[1].score >= 8 ? 'Some months tracked' : 'Not tracking actual spending',
+    'Net Worth': h.dimensions[2].score >= 15 ? 'Assets outweigh liabilities' : h.dimensions[2].score >= 8 ? 'Building slowly' : 'Liabilities are high or no data',
+    'Emergency Buffer': h.dimensions[3].score >= 15 ? '3+ months of expenses covered' : h.dimensions[3].score >= 8 ? 'Some buffer building' : 'Less than 1 month covered',
+    'Goals': h.dimensions[4].score >= 15 ? 'Goals set and progressing' : h.dimensions[4].score >= 8 ? 'Goals need more progress' : 'No active goals set',
+  };
+
+  let dimsHtml = '';
+  h.dimensions.forEach((dim, i) => {
+    const pct = Math.round(dim.score / dim.max * 100);
+    const barColor = pct >= 75 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+    const tip = dimTips[dim.label] || '';
+    const guideKey = dimKeys[i];
+    const showFix = dim.score < 15 && HEALTH_GUIDES[guideKey];
+
+    dimsHtml += `<div class="health-dim">
+      <div class="health-dim-header">
+        <span class="health-dim-name">${dim.label}</span>
+        <span class="health-dim-score" style="color:${barColor}">${dim.score}/${dim.max}</span>
+      </div>
+      <div class="health-dim-bar"><div class="health-dim-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <div class="health-dim-tip">${tip}${showFix ? `<span class="health-dim-fix" onclick="document.querySelector('.health-popover').remove();startHealthGuide('${guideKey}')">Fix it →</span>` : ''}</div>
+    </div>`;
+  });
+
+  const popover = document.createElement('div');
+  popover.className = 'health-popover';
+  popover.innerHTML = `
+    <div class="health-popover-title" style="color:${gradeColors[h.grade] || '#71717a'}">Grade ${h.grade} — ${h.total}/100</div>
+    <div class="health-popover-subtitle">${gradeDescs[h.grade] || ''}</div>
+    ${dimsHtml}`;
+
+  document.body.appendChild(popover);
+
+  // Position near the badge
+  const rect = badge.getBoundingClientRect();
+  let top = rect.bottom + 10;
+  let left = rect.left + (rect.width / 2) - 150;
+  if (left < 12) left = 12;
+  if (left + 300 > window.innerWidth - 12) left = window.innerWidth - 312;
+  if (top + popover.offsetHeight > window.innerHeight - 12) top = rect.top - popover.offsetHeight - 10;
+  popover.style.top = top + 'px';
+  popover.style.left = left + 'px';
+
+  // Close on click outside
+  setTimeout(() => {
+    const closer = (e) => {
+      if (!popover.contains(e.target) && e.target !== badge) {
+        popover.remove();
+        document.removeEventListener('click', closer);
+      }
+    };
+    document.addEventListener('click', closer);
+  }, 10);
 }
 
 // ─────────────────────────────────────────────────
