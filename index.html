@@ -1712,6 +1712,21 @@
     .section-pill:hover { color:var(--text); }
     .section-pill.active { background:#0891b2; color:#fff; border-color:#0891b2; }
 
+    /* ─── Summary Cards ────────────────────── */
+    .summary-hero { border-radius:16px; padding:28px; margin-bottom:20px; text-align:center; cursor:pointer; transition:box-shadow 0.2s; }
+    .summary-hero:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+    .summary-hero-num { font-size:42px; font-weight:900; letter-spacing:-0.03em; line-height:1.1; }
+    .summary-hero-label { font-size:13px; font-weight:600; margin-top:6px; }
+    .summary-hero-sub { font-size:12px; color:var(--text-muted); margin-top:4px; }
+    .summary-hero-expand { font-size:12px; font-weight:600; color:#0891b2; margin-top:12px; display:inline-block; }
+    .summary-mini-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:20px; }
+    .summary-mini { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; text-align:center; }
+    .summary-mini-num { font-size:22px; font-weight:900; }
+    .summary-mini-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); margin-top:4px; }
+    .detail-panel { overflow:hidden; transition:max-height 0.3s ease, opacity 0.3s ease; }
+    .detail-panel.collapsed { max-height:0; opacity:0; pointer-events:none; }
+    .detail-panel.expanded { max-height:none; opacity:1; }
+
     /* ─── Health Popover ──────────────────── */
     .health-popover { position:fixed; z-index:200; background:#fff; border-radius:16px; padding:20px; width:300px; box-shadow:0 12px 40px rgba(0,0,0,0.18); border:1px solid var(--border); }
     .health-popover-title { font-size:16px; font-weight:800; margin-bottom:4px; }
@@ -7154,45 +7169,72 @@ function renderBudget() {
   const surplusClass = surplus >= 0 ? 'positive' : 'negative';
   const surplusLabel = surplus >= 0 ? 'Budget Surplus' : 'Budget Deficit';
 
+  const daysInMonth = new Date(...selectedBudgetMonth.split('-').map((v,i) => i===1 ? v : +v), 0).getDate();
+  const dayOfMonth = new Date().getDate();
+  const pctMonth = Math.round(dayOfMonth / daysInMonth * 100);
+  const spentPct = totalBudgetExpenses > 0 ? Math.round(totalActual / totalBudgetExpenses * 100) : 0;
+  const prevMo = prevMonthStr(selectedBudgetMonth);
+
   let html = '';
 
   // Month picker
-  const customBadge = isMonthCustomized(selectedBudgetMonth)
-    ? `<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--primary);color:#fff;margin-left:8px">Custom</span>`
-    : '';
-  const prevMo = prevMonthStr(selectedBudgetMonth);
-  const showCopyBanner = !isMonthCustomized(selectedBudgetMonth);
   html += `
-    <div class="month-picker">
+    <div class="month-picker" style="margin-bottom:16px">
       <button class="month-btn" onclick="prevMonth()">&#8249;</button>
-      <div class="month-picker-label">${monthLabel(selectedBudgetMonth)}${customBadge}</div>
+      <div class="month-picker-label">${monthLabel(selectedBudgetMonth)}</div>
       <button class="month-btn" onclick="nextMonth()">&#8250;</button>
-    </div>
-    <div style="text-align:right;margin:-4px 0 12px">
-      <button class="btn btn-sm" style="font-size:12px" onclick="openCsvImport()">⬆ Import Transactions</button>
-    </div>
-    ${showCopyBanner ? `
-    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--primary-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+    </div>`;
+
+  // ── Summary hero card ──
+  const heroColor = surplus >= 0 ? '#10b981' : '#ef4444';
+  const heroBg = surplus >= 0 ? '#ecfdf5' : '#fef2f2';
+  html += `
+    <div class="summary-hero" style="background:${heroBg};border:1px solid ${surplus >= 0 ? '#a7f3d0' : '#fca5a5'}" onclick="toggleBudgetDetail()">
+      <div class="summary-hero-num" style="color:${heroColor}">${aud(Math.abs(surplus))}</div>
+      <div class="summary-hero-label" style="color:${heroColor}">${surplus >= 0 ? 'monthly surplus' : 'over budget'}</div>
+      <div class="summary-hero-sub">${aud(totalIncome)} income · ${aud(totalBudgetExpenses)} expenses</div>
+      <div class="summary-hero-expand" id="budget-expand-label">${_budgetDetailOpen ? 'Hide details ▲' : 'See breakdown ▼'}</div>
+    </div>`;
+
+  // Mini stat cards
+  html += `
+    <div class="summary-mini-grid">
+      <div class="summary-mini">
+        <div class="summary-mini-num" style="color:#10b981">${aud(totalIncome)}</div>
+        <div class="summary-mini-label">Income</div>
+      </div>
+      <div class="summary-mini">
+        <div class="summary-mini-num">${aud(totalBudgetExpenses)}</div>
+        <div class="summary-mini-label">Budgeted</div>
+      </div>
+      <div class="summary-mini">
+        <div class="summary-mini-num" style="color:${totalActual > totalBudgetExpenses ? '#ef4444' : '#0891b2'}">${aud(totalActual)}</div>
+        <div class="summary-mini-label">Actual spent</div>
+      </div>
+      <div class="summary-mini">
+        <div class="summary-mini-num">${spentPct}%</div>
+        <div class="summary-mini-label">of budget used</div>
+      </div>
+    </div>`;
+
+  // ── Detail panel (collapsed by default) ──
+  html += `<div class="detail-panel ${_budgetDetailOpen ? 'expanded' : 'collapsed'}" id="budget-detail">`;
+
+  // Import + copy banner
+  html += `<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
+    <button class="btn btn-sm" style="font-size:12px" onclick="openCsvImport()">Import Transactions</button>
+  </div>`;
+
+  const showCopyBanner = !isMonthCustomized(selectedBudgetMonth);
+  if (showCopyBanner) {
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--primary-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;gap:12px;flex-wrap:wrap">
       <div>
         <span style="font-size:13px;font-weight:600;color:var(--primary)">Using default budget</span>
-        <span style="font-size:13px;color:var(--text-muted);margin-left:6px">— changes in other months won't appear here</span>
       </div>
       <button class="btn btn-primary btn-sm" onclick="copyMonthFromPrevious('${selectedBudgetMonth}')">
         Copy from ${monthLabel(prevMo)}
       </button>
-    </div>` : ''}
-  `;
-
-  if (mi.length > 0 || me.length > 0) {
-    html += `
-      <div class="surplus-banner ${surplusClass}" style="margin-bottom:20px">
-        <div>
-          <div class="surplus-label">${surplusLabel} (budgeted)</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${aud(totalIncome)}/mo income · ${aud(totalBudgetExpenses)}/mo budgeted</div>
-        </div>
-        <div class="surplus-amount">${aud(Math.abs(surplus))}/mo</div>
-      </div>
-    `;
+    </div>`;
   }
 
   // Planned events forecast widget
@@ -7346,7 +7388,22 @@ function renderBudget() {
     </div>
   `;
 
+  // Close detail panel
+  html += `</div>`; // end .detail-panel
+
   document.getElementById('budget-content').innerHTML = html;
+}
+
+let _budgetDetailOpen = false;
+function toggleBudgetDetail() {
+  _budgetDetailOpen = !_budgetDetailOpen;
+  const panel = document.getElementById('budget-detail');
+  const label = document.getElementById('budget-expand-label');
+  if (panel) {
+    panel.classList.toggle('collapsed', !_budgetDetailOpen);
+    panel.classList.toggle('expanded', _budgetDetailOpen);
+  }
+  if (label) label.textContent = _budgetDetailOpen ? 'Hide details ▲' : 'See breakdown ▼';
 }
 
 // ─────────────────────────────────────────────────
