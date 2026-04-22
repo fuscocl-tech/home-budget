@@ -1712,6 +1712,19 @@
     .section-pill:hover { color:var(--text); }
     .section-pill.active { background:#0891b2; color:#fff; border-color:#0891b2; }
 
+    /* ─── Guide Walkthrough ─────────────── */
+    .guide-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; transition:opacity 0.2s; }
+    .guide-spotlight { position:fixed; z-index:501; border-radius:12px; box-shadow:0 0 0 4000px rgba(0,0,0,0.5); transition:all 0.3s ease; }
+    .guide-pulse { animation:guidePulse 1.5s ease infinite; }
+    @keyframes guidePulse { 0%,100% { box-shadow:0 0 0 4000px rgba(0,0,0,0.5), 0 0 0 0 rgba(8,145,178,0.4); } 50% { box-shadow:0 0 0 4000px rgba(0,0,0,0.5), 0 0 0 12px rgba(8,145,178,0.15); } }
+    .guide-tooltip { position:fixed; z-index:502; background:#fff; border-radius:14px; padding:16px 20px; max-width:280px; box-shadow:0 8px 32px rgba(0,0,0,0.2); }
+    .guide-tooltip-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+    .guide-tooltip-text { font-size:13px; color:var(--text-muted); line-height:1.5; margin-bottom:12px; }
+    .guide-tooltip-step { font-size:11px; font-weight:600; color:var(--text-muted); margin-bottom:8px; }
+    .guide-tooltip-actions { display:flex; gap:8px; justify-content:flex-end; }
+    .guide-tooltip-btn { padding:7px 14px; border-radius:99px; font-size:12px; font-weight:700; border:none; cursor:pointer; }
+    .guide-arrow { position:absolute; width:12px; height:12px; background:#fff; transform:rotate(45deg); }
+
     /* ─── Settings Save Bar ───────────────── */
     .settings-save-bar { position:sticky; bottom:0; left:0; right:0; z-index:30; background:var(--surface); border-top:1px solid var(--border); padding:12px 20px; display:none; align-items:center; justify-content:flex-end; gap:10px; box-shadow:0 -4px 12px rgba(0,0,0,0.06); }
     .settings-save-bar .unsaved-dot { width:8px; height:8px; border-radius:50%; background:#f59e0b; flex-shrink:0; animation:pulse 1.5s infinite; }
@@ -3930,7 +3943,20 @@ function renderToday() {
 
   // Financial health
   const health = calcFinancialHealth();
-  cards.push({ cls: health.total >= 70 ? 'green' : health.total >= 50 ? 'amber' : 'red', section: 'Wallet', title: `Health Score: ${health.total} / ${health.grade}`, sub: health.insight, action: 'Details →', tab: 'budget', priority: 400 });
+  // Find weakest dimension for guide
+  const dimKeys = ['savings','tracking','netWorth','emergency','goals'];
+  const weakestDim = health.dimensions.reduce((w, d, i) => d.score < w.score ? { score: d.score, key: dimKeys[i] } : w, { score: 99, key: null });
+  const guideKey = weakestDim.score < 15 ? weakestDim.key : null;
+
+  cards.push({
+    cls: health.total >= 70 ? 'green' : health.total >= 50 ? 'amber' : 'red',
+    section: 'Wallet',
+    title: `Health Score: ${health.total} / ${health.grade}`,
+    sub: health.insight,
+    action: guideKey ? 'Fix it →' : 'Details →',
+    onclick: guideKey ? `startHealthGuide('${guideKey}')` : `activateTab('budget')`,
+    priority: 400
+  });
 
   // Sort: red first, then amber, then green
   const clsPriority = { red: 0, amber: 1, green: 2, blue: 3 };
@@ -9884,6 +9910,147 @@ function lbToShoppingList(weekKey, kidId) {
     btn.style.color = 'var(--success)';
     setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
   }
+}
+
+// ─────────────────────────────────────────────────
+// GUIDED WALKTHROUGH ENGINE
+// ─────────────────────────────────────────────────
+let _guideSteps = [];
+let _guideIdx = 0;
+let _guideCleanup = null;
+
+function startGuide(steps) {
+  _guideSteps = steps;
+  _guideIdx = 0;
+  _showGuideStep();
+}
+
+function _showGuideStep() {
+  // Clean up previous
+  _cleanupGuide();
+
+  if (_guideIdx >= _guideSteps.length) { endGuide(); return; }
+  const step = _guideSteps[_guideIdx];
+
+  // Navigate to tab if needed, then highlight after render
+  if (step.tab) {
+    activateTab(step.tab);
+    setTimeout(() => _highlightStep(step), 300);
+  } else {
+    _highlightStep(step);
+  }
+}
+
+function _highlightStep(step) {
+  const el = step.el ? (typeof step.el === 'string' ? document.querySelector(step.el) : step.el) : null;
+
+  // Create overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'guide-overlay';
+  overlay.onclick = () => endGuide();
+  document.body.appendChild(overlay);
+
+  // Spotlight on target element
+  let spotlight = null;
+  let rect = null;
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    rect = el.getBoundingClientRect();
+    spotlight = document.createElement('div');
+    spotlight.className = 'guide-spotlight guide-pulse';
+    spotlight.style.cssText = `top:${rect.top - 6}px;left:${rect.left - 6}px;width:${rect.width + 12}px;height:${rect.height + 12}px;`;
+    document.body.appendChild(spotlight);
+  }
+
+  // Tooltip
+  const tooltip = document.createElement('div');
+  tooltip.className = 'guide-tooltip';
+  tooltip.innerHTML = `
+    <div class="guide-tooltip-step">Step ${_guideIdx + 1} of ${_guideSteps.length}</div>
+    <div class="guide-tooltip-title">${step.title}</div>
+    <div class="guide-tooltip-text">${step.text}</div>
+    <div class="guide-tooltip-actions">
+      <button class="guide-tooltip-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="endGuide()">Skip</button>
+      ${_guideIdx < _guideSteps.length - 1
+        ? `<button class="guide-tooltip-btn" style="background:#0891b2;color:#fff" onclick="nextGuideStep()">Next</button>`
+        : `<button class="guide-tooltip-btn" style="background:#0891b2;color:#fff" onclick="endGuide()">Done</button>`}
+    </div>`;
+  tooltip.onclick = e => e.stopPropagation();
+  document.body.appendChild(tooltip);
+
+  // Position tooltip relative to target
+  if (rect) {
+    const tw = tooltip.offsetWidth;
+    const th = tooltip.offsetHeight;
+    let top = rect.bottom + 14;
+    let left = rect.left + (rect.width / 2) - (tw / 2);
+    // Keep on screen
+    if (left < 12) left = 12;
+    if (left + tw > window.innerWidth - 12) left = window.innerWidth - tw - 12;
+    if (top + th > window.innerHeight - 12) top = rect.top - th - 14;
+    tooltip.style.top = top + 'px';
+    tooltip.style.left = left + 'px';
+  } else {
+    tooltip.style.top = '50%';
+    tooltip.style.left = '50%';
+    tooltip.style.transform = 'translate(-50%, -50%)';
+  }
+
+  _guideCleanup = () => {
+    overlay.remove();
+    if (spotlight) spotlight.remove();
+    tooltip.remove();
+  };
+
+  // If step has an action to watch (e.g. user clicks the target), auto-advance
+  if (step.watchClick && el) {
+    const handler = () => {
+      el.removeEventListener('click', handler);
+      setTimeout(() => nextGuideStep(), 400);
+    };
+    el.addEventListener('click', handler);
+  }
+}
+
+function nextGuideStep() {
+  _guideIdx++;
+  _showGuideStep();
+}
+
+function endGuide() {
+  _cleanupGuide();
+  _guideSteps = [];
+  _guideIdx = 0;
+}
+
+function _cleanupGuide() {
+  if (_guideCleanup) { _guideCleanup(); _guideCleanup = null; }
+}
+
+// ── Pre-built guides for health score dimensions ──
+const HEALTH_GUIDES = {
+  emergency: [
+    { tab: 'goals', title: 'Create an Emergency Fund goal', text: 'First, let\'s set up a savings goal. Look for the "+ Add Goal" button.', el: null },
+    { tab: 'goals', title: 'Add a new goal', text: 'Tap the "Add Goal" button to create your emergency fund target.', el: '[onclick*="openAddGoal"]', watchClick: true },
+  ],
+  savings: [
+    { tab: 'budget', title: 'Review your expenses', text: 'Your savings rate improves when you reduce expenses or increase income. Let\'s look at your budget.', el: null },
+    { tab: 'budget', title: 'Find expenses to cut', text: 'Look through your expense list. Can any be reduced? Tap an expense to edit its amount.', el: '.section-title' },
+  ],
+  tracking: [
+    { tab: 'budget', title: 'Log your actual spending', text: 'Recording what you actually spend each month helps you stay on track. Look for the "Import Transactions" button or edit individual actuals.', el: '[onclick*="openCsvImport"]', watchClick: true },
+  ],
+  netWorth: [
+    { tab: 'networth', title: 'Track your assets and liabilities', text: 'Add your property, savings, superannuation as assets. Add your mortgage, loans as liabilities. This builds your net worth picture.', el: null },
+  ],
+  goals: [
+    { tab: 'goals', title: 'Set a financial goal', text: 'Goals keep you motivated. Set a target for a holiday, emergency fund, or debt payoff.', el: '[onclick*="openAddGoal"]', watchClick: true },
+  ]
+};
+
+function startHealthGuide(dimension) {
+  const guide = HEALTH_GUIDES[dimension];
+  if (guide) startGuide(guide);
 }
 
 function safeRender(fn) {
