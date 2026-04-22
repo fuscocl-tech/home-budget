@@ -4004,7 +4004,7 @@ function renderToday() {
         <div class="notif-focus-title" style="color:${titleColor}">${_sectionTag(urgent.section)}${urgent.title}</div>
         ${urgent.sub ? `<div class="notif-focus-sub" style="color:${titleColor}">${urgent.sub}</div>` : ''}
         <div class="notif-focus-actions">
-          <button class="notif-focus-btn" style="background:${btnBg};color:#fff" onclick="${clickAttr}">View</button>
+          <button class="notif-focus-btn" style="background:${btnBg};color:#fff" onclick="${clickAttr}">${urgent.action.replace(' →','')}</button>
           <button class="notif-focus-btn" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border)" onclick="this.closest('.notif-focus').remove()">Dismiss</button>
         </div>
       </div>`;
@@ -4055,7 +4055,7 @@ function renderToday() {
           <div class="notif-stack-title">${_sectionTag(top.section)}${top.title}</div>
           ${top.sub ? `<div class="notif-stack-sub">${top.sub}</div>` : ''}
           <div class="notif-stack-actions">
-            <button class="notif-stack-btn" style="background:#0891b2;color:#fff" onclick="${clickAttr}">Open</button>
+            <button class="notif-stack-btn" style="background:#0891b2;color:#fff" onclick="${clickAttr}">${top.action.replace(' →','')}</button>
             <button class="notif-stack-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="this.closest('.notif-stack').remove()">Dismiss</button>
           </div>
         </div>
