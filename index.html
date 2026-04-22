@@ -6788,6 +6788,19 @@ function renderSettings() {
         </label>
       </div>`) +
 
+    acc('meals-prefs', 'Meal Preferences', 'Calorie tracking and meal display options', `
+      <div class="section-body">
+        <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none">
+          <input type="checkbox" ${(state.settings||{}).showCalories ? 'checked' : ''}
+            onchange="updateSetting('showCalories', this.checked)"
+            style="width:16px;height:16px;margin-top:2px;cursor:pointer;flex-shrink:0">
+          <div>
+            <span style="font-size:13px;font-weight:600">Show calorie estimates on meals</span>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:3px">AI estimates calories for each meal. Shows per-meal calories and daily totals in the meal planner and lunchbox grids.</p>
+          </div>
+        </label>
+      </div>`) +
+
     acc('notif', 'Notification Style', 'Choose how Toto shows alerts on the Today screen', `
       <div class="section-body">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
@@ -8340,7 +8353,7 @@ function _renderMealPlan() {
       const meal    = (plan[di] || {})[slot.key] || '';
       const isToday = date.toISOString().slice(0, 10) === todayStr;
       gridRows += `<div class="meal-cell${isToday ? ' today' : ''}" onclick="openMealEdit('${weekKey}',${di},'${slot.key}')">
-        ${meal ? `<span class="meal-cell-text">${meal}</span>` : `<span class="meal-cell-plus">+</span>`}
+        ${meal ? `<span class="meal-cell-text">${meal}${state.settings?.showCalories && (plan[di] || {})['cal_' + slot.key] ? `<br><span style="font-size:9px;color:var(--text-muted);font-weight:600">${(plan[di])['cal_' + slot.key]} cal</span>` : ''}</span>` : `<span class="meal-cell-plus">+</span>`}
       </div>`;
     });
   });
@@ -8369,6 +8382,11 @@ function _renderMealPlan() {
           return `<div class="meal-grid-header${isToday ? ' today' : ''}"><div>${DAYS[i]}</div><div style="font-size:10px;opacity:0.7">${date.getDate()}/${date.getMonth()+1}</div></div>`;
         }).join('')}
         ${gridRows}
+        ${state.settings?.showCalories ? `<div class="meal-grid-label" style="font-weight:800;font-size:9px">Total</div>` + dates.map((date, di) => {
+          const dp = plan[di] || {};
+          const total = (dp.cal_b || 0) + (dp.cal_l || 0) + (dp.cal_d || 0);
+          return `<div style="background:var(--surface);padding:6px;text-align:center;font-size:11px;font-weight:700;color:${total > 0 ? (total > 2500 ? 'var(--danger)' : total > 2000 ? 'var(--warning)' : 'var(--text)') : 'var(--border)'}">${total > 0 ? total.toLocaleString() : '—'}</div>`;
+        }).join('') : ''}
       </div>
     </div>
     <p style="font-size:12px;color:var(--text-muted);margin-top:6px">Tap any cell to add or change a meal.</p>`;
@@ -8524,9 +8542,35 @@ function saveMealSlot(weekKey, dayIdx, slot, value) {
   if (!state.meals.plan[weekKey]) state.meals.plan[weekKey] = {};
   if (!state.meals.plan[weekKey][dayIdx]) state.meals.plan[weekKey][dayIdx] = { b:'', l:'', d:'' };
   state.meals.plan[weekKey][dayIdx][slot] = value;
+  // Clear old calorie estimate
+  delete state.meals.plan[weekKey][dayIdx]['cal_' + slot];
   saveData(state);
   closeModal();
   _renderMealPlan();
+  // Estimate calories async if enabled
+  if (value && state.settings?.showCalories) _estimateMealCalories(weekKey, dayIdx, slot, value);
+}
+
+async function _estimateMealCalories(weekKey, dayIdx, slot, mealName) {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key || !mealName) return;
+  try {
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 50,
+        messages: [{ role: 'user', content: `Estimate the calories in this meal: "${mealName}". Return ONLY a number, nothing else. For example: 450` }]
+      })
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const cal = parseInt(data.content[0].text.trim().replace(/[^0-9]/g, ''));
+    if (cal > 0 && cal < 5000 && state.meals.plan[weekKey]?.[dayIdx]) {
+      state.meals.plan[weekKey][dayIdx]['cal_' + slot] = cal;
+      saveData(state);
+      _renderMealPlan();
+    }
+  } catch(e) { /* silent */ }
 }
 
 function _renderShoppingList() {
@@ -9634,7 +9678,7 @@ function renderLunchbox() {
       const val = dayPlan[slot.key] || '';
       const isToday = date.toISOString().slice(0, 10) === todayStr;
       gridRows += `<div class="lb-cell${isToday ? ' today' : ''}" onclick="openLunchboxEdit('${weekKey}',${_lbActiveKid},${di},'${slot.key}')">
-        ${val ? `<span class="lb-cell-text">${escHtml(val)}</span>` : `<span class="lb-cell-plus">+</span>`}
+        ${val ? `<span class="lb-cell-text">${escHtml(val)}${state.settings?.showCalories && (plan[di] || {})['cal_' + slot.key] ? `<br><span style="font-size:8px;color:var(--text-muted);font-weight:600">${(plan[di])['cal_' + slot.key]} cal</span>` : ''}</span>` : `<span class="lb-cell-plus">+</span>`}
       </div>`;
     });
   });
@@ -9693,6 +9737,11 @@ function renderLunchbox() {
           return `<div class="lb-header" style="${isToday ? 'background:#0891b2;color:#fff' : ''}">${DAYS[i]}<div style="font-size:9px;opacity:0.7">${date.getDate()}/${date.getMonth()+1}</div></div>`;
         }).join('')}
         ${gridRows}
+        ${state.settings?.showCalories ? `<div class="lb-label" style="font-weight:800;font-size:9px">Total</div>` + dates.map((date, di) => {
+          const dp = plan[di] || {};
+          const total = (dp.cal_main || 0) + (dp.cal_snack || 0) + (dp.cal_fruit || 0) + (dp.cal_drink || 0);
+          return `<div style="background:var(--surface);padding:6px;text-align:center;font-size:10px;font-weight:700;color:${total > 0 ? 'var(--text)' : 'var(--border)'}">${total > 0 ? total : '—'}</div>`;
+        }).join('') : ''}
       </div>
     </div>`;
 }
@@ -9832,9 +9881,33 @@ function _saveLbSlot(weekKey, kidId, dayIdx, slot, value) {
   if (!state.meals.lunchbox.plans[weekKey][kidId]) state.meals.lunchbox.plans[weekKey][kidId] = {};
   if (!state.meals.lunchbox.plans[weekKey][kidId][dayIdx]) state.meals.lunchbox.plans[weekKey][kidId][dayIdx] = {};
   state.meals.lunchbox.plans[weekKey][kidId][dayIdx][slot] = value;
+  delete state.meals.lunchbox.plans[weekKey][kidId][dayIdx]['cal_' + slot];
   saveData(state);
   closeModal();
   renderLunchbox();
+  if (value && state.settings?.showCalories) _estimateLbCalories(weekKey, kidId, dayIdx, slot, value);
+}
+
+async function _estimateLbCalories(weekKey, kidId, dayIdx, slot, itemName) {
+  const key = localStorage.getItem('toto_ai_key');
+  if (!key || !itemName) return;
+  try {
+    const res = await fetch(CLAUDE_API, {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 50,
+        messages: [{ role: 'user', content: `Estimate the calories in this school lunch item: "${itemName}". Return ONLY a number, nothing else. For example: 250` }]
+      })
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const cal = parseInt(data.content[0].text.trim().replace(/[^0-9]/g, ''));
+    if (cal > 0 && cal < 3000 && state.meals.lunchbox.plans[weekKey]?.[kidId]?.[dayIdx]) {
+      state.meals.lunchbox.plans[weekKey][kidId][dayIdx]['cal_' + slot] = cal;
+      saveData(state);
+      renderLunchbox();
+    }
+  } catch(e) { /* silent */ }
 }
 
 async function aiPlanLunchbox(weekKey, kidId) {
@@ -9860,8 +9933,9 @@ Keep it realistic — things a parent can prep in under 5 minutes.
 Vary the options across the week. Respect all allergies strictly.
 Use Australian food items and brands where relevant.
 
-Return ONLY a JSON array, one object per day (Mon=0 to Fri=4):
-[{"day":0,"main":"Ham & cheese wrap","snack":"Muesli bar","fruit":"Apple","drink":"Water"},{"day":1,...}]
+Return ONLY a JSON array, one object per day (Mon=0 to Fri=4).
+${state.settings?.showCalories ? 'Include estimated calories for each item as cal_main, cal_snack, cal_fruit, cal_drink.' : ''}
+[{"day":0,"main":"Ham & cheese wrap","snack":"Muesli bar","fruit":"Apple","drink":"Water"${state.settings?.showCalories ? ',"cal_main":320,"cal_snack":180,"cal_fruit":80,"cal_drink":0' : ''}},{"day":1,...}]
 
 No markdown, no code fences, just raw JSON.`;
 
@@ -9882,12 +9956,17 @@ No markdown, no code fences, just raw JSON.`;
     if (!state.meals.lunchbox.plans[weekKey][kidId]) state.meals.lunchbox.plans[weekKey][kidId] = {};
 
     days.forEach(d => {
-      state.meals.lunchbox.plans[weekKey][kidId][d.day] = {
+      const dayData = {
         main: d.main || '',
         snack: d.snack || '',
         fruit: d.fruit || '',
         drink: d.drink || ''
       };
+      if (d.cal_main) dayData.cal_main = d.cal_main;
+      if (d.cal_snack) dayData.cal_snack = d.cal_snack;
+      if (d.cal_fruit) dayData.cal_fruit = d.cal_fruit;
+      if (d.cal_drink) dayData.cal_drink = d.cal_drink;
+      state.meals.lunchbox.plans[weekKey][kidId][d.day] = dayData;
     });
 
     saveData(state);
