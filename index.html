@@ -1712,6 +1712,49 @@
     .section-pill:hover { color:var(--text); }
     .section-pill.active { background:#0891b2; color:#fff; border-color:#0891b2; }
 
+    /* ─── Notification Styles ─────────────── */
+    .notif-focus { margin:0 0 16px; border-radius:16px; padding:20px; position:relative; }
+    .notif-focus.urgent { background:linear-gradient(135deg,#fef2f2,#fff5f5); border:1px solid #fca5a5; }
+    .notif-focus.warning { background:linear-gradient(135deg,#fffbeb,#fef9c3); border:1px solid #fde68a; }
+    .notif-focus.clear { background:linear-gradient(135deg,#ecfdf5,#f0fdf4); border:1px solid #a7f3d0; }
+    .notif-focus-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
+    .notif-focus-title { font-size:17px; font-weight:800; margin-bottom:4px; }
+    .notif-focus-sub { font-size:13px; opacity:0.7; }
+    .notif-focus-actions { display:flex; gap:8px; margin-top:14px; }
+    .notif-focus-btn { padding:8px 16px; border-radius:99px; font-size:12px; font-weight:700; border:none; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .notif-focus-dismiss { position:absolute; top:14px; right:14px; font-size:18px; opacity:0.4; cursor:pointer; background:none; border:none; color:inherit; }
+    .notif-focus-more { text-align:center; font-size:11px; color:var(--text-muted); margin:-8px 0 16px; }
+
+    .notif-stack { position:relative; margin:0 0 28px; }
+    .notif-stack-shadow1 { position:absolute; bottom:-4px; left:6px; right:6px; height:20px; border-radius:0 0 14px 14px; background:rgba(0,0,0,0.04); }
+    .notif-stack-shadow2 { position:absolute; bottom:-8px; left:12px; right:12px; height:20px; border-radius:0 0 14px 14px; background:rgba(0,0,0,0.02); }
+    .notif-stack-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; position:relative; z-index:1; }
+    .notif-stack-count { position:absolute; top:-8px; right:-4px; width:22px; height:22px; border-radius:50%; background:#ef4444; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg); z-index:2; }
+    .notif-stack-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; }
+    .notif-stack-title { font-size:14px; font-weight:700; }
+    .notif-stack-sub { font-size:12px; color:var(--text-muted); margin-top:2px; }
+    .notif-stack-actions { display:flex; gap:8px; margin-top:12px; }
+    .notif-stack-btn { padding:6px 14px; border-radius:99px; font-size:11px; font-weight:700; border:none; cursor:pointer; }
+
+    .notif-tl-section { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin:16px 0 8px; }
+    .notif-tl-section:first-child { margin-top:0; }
+    .notif-tl-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid #f4f4f5; }
+    .notif-tl-item:last-child { border:none; }
+    .notif-tl-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .notif-tl-body { flex:1; min-width:0; }
+    .notif-tl-title { font-size:13px; font-weight:600; }
+    .notif-tl-sub { font-size:11px; color:var(--text-muted); }
+    .notif-tl-action { font-size:11px; font-weight:700; color:#0891b2; flex-shrink:0; align-self:center; cursor:pointer; }
+
+    .notif-banner { border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:10px; margin:8px 0; animation:bannerSlide 0.3s ease; }
+    .notif-banner.red { background:#fef2f2; border:1px solid #fca5a5; }
+    .notif-banner.amber { background:#fffbeb; border:1px solid #fde68a; }
+    .notif-banner.blue { background:#ecfeff; border:1px solid #a5f3fc; }
+    .notif-banner-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .notif-banner-body { flex:1; font-size:12px; font-weight:600; }
+    .notif-banner-action { font-size:11px; font-weight:700; color:#0891b2; cursor:pointer; }
+    @keyframes bannerSlide { from { transform:translateY(-8px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
     /* ─── Lunchbox ─────────────────────────── */
     .lb-kid-tabs { display:flex; gap:6px; margin-bottom:16px; }
     .lb-kid-tab { padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid var(--border); background:var(--surface); cursor:pointer; transition:all 0.15s; }
@@ -2356,6 +2399,7 @@ function loadData() {
     if (!d.documents) d.documents = [];
     if (!d.maintenance) d.maintenance = [];
     if (!d.settings) d.settings = { autoFillMonths: false };
+    if (!d.settings.notifStyle) d.settings.notifStyle = 'focus-timeline';
     if (!d.categoryGroups) d.categoryGroups = JSON.parse(JSON.stringify(DEFAULT_DATA.categoryGroups));
     if (!d.buildContract.variations) d.buildContract.variations = [];
     d.buildContract.stages.forEach(s => { if (!s.expectedDate) s.expectedDate = ''; });
@@ -3417,7 +3461,14 @@ function activateTab(tab) {
   // Inject section pills into the active panel (remove all old ones first)
   if (section && panel) {
     panel.querySelectorAll('.section-nav').forEach(el => el.remove());
+    panel.querySelectorAll('.notif-banner').forEach(el => el.remove());
     panel.insertAdjacentHTML('afterbegin', _sectionPillsHtml(section, tab));
+    // Context-aware banners on sub-pages
+    const bannerHtml = _renderContextBanners(tab);
+    if (bannerHtml) {
+      const nav = panel.querySelector('.section-nav');
+      if (nav) nav.insertAdjacentHTML('afterend', bannerHtml);
+    }
   }
 
   renderAll();
@@ -3771,6 +3822,39 @@ function calcFinancialHealth() {
 // DASHBOARD
 // ─────────────────────────────────────────────────
 
+function _tlItem(c) {
+  const dotColor = { red:'#ef4444', amber:'#f59e0b', green:'#10b981', blue:'#0891b2' }[c.cls] || '#a1a1aa';
+  const clickAttr = c.onclick ? c.onclick : c.tab ? `activateTab('${c.tab}')` : '';
+  return `<div class="notif-tl-item">
+    <div class="notif-tl-dot" style="background:${dotColor}"></div>
+    <div class="notif-tl-body"><div class="notif-tl-title">${c.title}</div>${c.sub ? `<div class="notif-tl-sub">${c.sub}</div>` : ''}</div>
+    <div class="notif-tl-action" onclick="${clickAttr}">${c.action.replace(' →','')}</div>
+  </div>`;
+}
+
+function _renderContextBanners(tab) {
+  // Context-aware banners on sub-pages
+  const banners = [];
+  if (tab === 'budget') {
+    const md = getMonthData(selectedBudgetMonth);
+    md.expenses.forEach(e => {
+      const budgeted = itemMonthly(e);
+      const actual = getActual(e.id, selectedBudgetMonth);
+      if (budgeted > 0 && actual / budgeted >= 0.8 && actual < budgeted) {
+        banners.push({ cls: 'amber', text: `${escHtml(e.name)} at ${Math.round(actual/budgeted*100)}% — ${aud(budgeted - actual)} left`, tab: null });
+      } else if (budgeted > 0 && actual >= budgeted) {
+        banners.push({ cls: 'red', text: `${escHtml(e.name)} over budget by ${aud(actual - budgeted)}`, tab: null });
+      }
+    });
+  }
+  return banners.slice(0, 2).map(b =>
+    `<div class="notif-banner ${b.cls}">
+      <div class="notif-banner-dot" style="background:${b.cls === 'red' ? '#ef4444' : '#f59e0b'}"></div>
+      <div class="notif-banner-body" style="color:${b.cls === 'red' ? '#991b1b' : '#92400e'}">${b.text}</div>
+    </div>`
+  ).join('');
+}
+
 function renderToday() {
   const today = new Date();
   const curData = getMonthData(selectedBudgetMonth);
@@ -3858,21 +3942,114 @@ function renderToday() {
     ? `${redCount + amberCount} thing${redCount + amberCount !== 1 ? 's' : ''} need${redCount + amberCount === 1 ? 's' : ''} your attention.`
     : 'Everything looks good today.';
 
-  // ── Render ──
-  const tickerHtml = tickerItems.length > 1
-    ? `<div class="today-ticker-wrap"><div class="today-ticker">${tickerItems.concat(tickerItems).map(t => `<span class="today-ticker-item">${t}</span>`).join('')}</div></div>`
-    : '';
+  // ── Render notification area based on user's chosen style ──
+  const style = (state.settings?.notifStyle) || 'focus-timeline';
+  let notifHtml = '';
 
-  const cardsHtml = cards.slice(0, 8).map((c, ci) => {
-    const clickAttr = c.onclick ? `onclick="${c.onclick}"` : c.tab ? `onclick="activateTab('${c.tab}')"` : '';
-    return `<div class="today-acard ${c.cls}${ci === 0 ? ' featured' : ''}" ${clickAttr}>
-      <div class="today-acard-body">
-        <div class="today-acard-title">${c.title}</div>
-        ${c.sub ? `<div class="today-acard-sub">${c.sub}</div>` : ''}
-      </div>
-      <div class="today-acard-action">${c.action}</div>
-    </div>`;
-  }).join('');
+  if (style === 'focus-timeline' || style === 'focus') {
+    // Focus Card — top urgent item
+    const urgent = cards.find(c => c.cls === 'red' || c.cls === 'amber');
+    const rest = cards.filter(c => c !== urgent);
+    if (urgent) {
+      const focusCls = urgent.cls === 'red' ? 'urgent' : 'warning';
+      const labelColor = urgent.cls === 'red' ? '#ef4444' : '#d97706';
+      const titleColor = urgent.cls === 'red' ? '#991b1b' : '#92400e';
+      const btnBg = urgent.cls === 'red' ? '#ef4444' : '#f59e0b';
+      const clickAttr = urgent.onclick ? urgent.onclick : urgent.tab ? `activateTab('${urgent.tab}')` : '';
+      notifHtml += `<div class="notif-focus ${focusCls}">
+        <div class="notif-focus-label" style="color:${labelColor}">${urgent.cls === 'red' ? 'Needs attention' : 'Coming up'}</div>
+        <div class="notif-focus-title" style="color:${titleColor}">${urgent.title}</div>
+        ${urgent.sub ? `<div class="notif-focus-sub" style="color:${titleColor}">${urgent.sub}</div>` : ''}
+        <div class="notif-focus-actions">
+          <button class="notif-focus-btn" style="background:${btnBg};color:#fff" onclick="${clickAttr}">View</button>
+          <button class="notif-focus-btn" style="background:var(--surface);color:var(--text-muted);border:1px solid var(--border)" onclick="this.closest('.notif-focus').remove()">Dismiss</button>
+        </div>
+      </div>`;
+      if (rest.filter(c => c.cls === 'red' || c.cls === 'amber').length > 0) {
+        notifHtml += `<div class="notif-focus-more">${rest.filter(c => c.cls === 'red' || c.cls === 'amber').length} more item${rest.filter(c => c.cls === 'red' || c.cls === 'amber').length !== 1 ? 's' : ''} below</div>`;
+      }
+    } else {
+      notifHtml += `<div class="notif-focus clear">
+        <div class="notif-focus-label" style="color:#10b981">All clear</div>
+        <div class="notif-focus-title" style="color:#065f46">Nothing needs your attention</div>
+        <div class="notif-focus-sub" style="color:#059669">${cards.length > 0 ? `Next up: ${cards[0].title}` : 'Your household is running smoothly.'}</div>
+      </div>`;
+    }
+
+    // Timeline below (for focus-timeline combo)
+    if (style === 'focus-timeline') {
+      const now = cards.filter(c => c.cls === 'red');
+      const soon = cards.filter(c => c.cls === 'amber');
+      const ok = cards.filter(c => c.cls === 'green' || c.cls === 'blue');
+      if (now.length + soon.length + ok.length > 0) {
+        notifHtml += `<div style="margin-bottom:20px">`;
+        if (now.length) {
+          notifHtml += `<div class="notif-tl-section">Right now</div>`;
+          now.forEach(c => { notifHtml += _tlItem(c); });
+        }
+        if (soon.length) {
+          notifHtml += `<div class="notif-tl-section">This week</div>`;
+          soon.forEach(c => { notifHtml += _tlItem(c); });
+        }
+        if (ok.length) {
+          notifHtml += `<div class="notif-tl-section">On track</div>`;
+          ok.forEach(c => { notifHtml += _tlItem(c); });
+        }
+        notifHtml += `</div>`;
+      }
+    }
+  } else if (style === 'stack') {
+    const total = cards.filter(c => c.cls === 'red' || c.cls === 'amber').length;
+    const top = cards[0];
+    if (top && (top.cls === 'red' || top.cls === 'amber')) {
+      const clickAttr = top.onclick || (top.tab ? `activateTab('${top.tab}')` : '');
+      notifHtml += `<div class="notif-stack">
+        <div class="notif-stack-shadow2"></div>
+        <div class="notif-stack-shadow1"></div>
+        <div class="notif-stack-card">
+          ${total > 1 ? `<div class="notif-stack-count">${total}</div>` : ''}
+          <div class="notif-stack-label" style="color:${top.cls === 'red' ? '#ef4444' : '#d97706'}">${top.cls === 'red' ? 'Urgent' : 'Upcoming'}</div>
+          <div class="notif-stack-title">${top.title}</div>
+          ${top.sub ? `<div class="notif-stack-sub">${top.sub}</div>` : ''}
+          <div class="notif-stack-actions">
+            <button class="notif-stack-btn" style="background:#0891b2;color:#fff" onclick="${clickAttr}">Open</button>
+            <button class="notif-stack-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="this.closest('.notif-stack').remove()">Dismiss</button>
+          </div>
+        </div>
+      </div>`;
+    }
+  } else if (style === 'timeline') {
+    const now = cards.filter(c => c.cls === 'red');
+    const soon = cards.filter(c => c.cls === 'amber');
+    const ok = cards.filter(c => c.cls === 'green' || c.cls === 'blue');
+    notifHtml += `<div style="margin-bottom:20px">`;
+    if (now.length) {
+      notifHtml += `<div class="notif-tl-section">Right now</div>`;
+      now.forEach(c => { notifHtml += _tlItem(c); });
+    }
+    if (soon.length) {
+      notifHtml += `<div class="notif-tl-section">This week</div>`;
+      soon.forEach(c => { notifHtml += _tlItem(c); });
+    }
+    if (ok.length) {
+      notifHtml += `<div class="notif-tl-section">On track</div>`;
+      ok.forEach(c => { notifHtml += _tlItem(c); });
+    }
+    if (!now.length && !soon.length && !ok.length) {
+      notifHtml += `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Nothing to report — your household is running smoothly.</div>`;
+    }
+    notifHtml += `</div>`;
+  } else if (style === 'banners') {
+    cards.filter(c => c.cls === 'red' || c.cls === 'amber').slice(0, 3).forEach(c => {
+      const clickAttr = c.onclick ? c.onclick : c.tab ? `activateTab('${c.tab}')` : '';
+      const dotColor = c.cls === 'red' ? '#ef4444' : '#f59e0b';
+      notifHtml += `<div class="notif-banner ${c.cls}">
+        <div class="notif-banner-dot" style="background:${dotColor}"></div>
+        <div class="notif-banner-body" style="color:${c.cls === 'red' ? '#991b1b' : '#92400e'}">${c.title}</div>
+        <div class="notif-banner-action" onclick="${clickAttr}">View</div>
+      </div>`;
+    });
+  }
 
   const fallbackBrief = `${attentionText} You have ${aud(Math.abs(surplus))} ${surplus >= 0 ? 'left' : 'over'} in your budget with ${daysLeft} days to go.`;
 
@@ -3882,7 +4059,7 @@ function renderToday() {
       <p id="today-briefing-text">${fallbackBrief}</p>
     </div>
 
-    ${cardsHtml ? `<div class="today-action-cards">${cardsHtml}</div>` : ''}
+    ${notifHtml}
 
     <div class="today-actions-grid">
       <div class="today-section-card" onclick="activateTab('budget')">
@@ -6500,6 +6677,23 @@ function renderSettings() {
             <p style="font-size:12px;color:var(--text-muted);margin-top:3px">When you navigate forward to a month with no data, automatically copy all recurring items from the previous month.</p>
           </div>
         </label>
+      </div>`) +
+
+    acc('notif', 'Notification Style', 'Choose how Toto shows alerts on the Today screen', `
+      <div class="section-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+          ${[
+            { val:'focus-timeline', label:'Focus + Timeline', desc:'One big card + chronological feed' },
+            { val:'focus', label:'Focus Card', desc:'One urgent item at a time' },
+            { val:'stack', label:'Stack', desc:'Card deck with count badge' },
+            { val:'timeline', label:'Timeline Only', desc:'Chronological feed grouped by urgency' },
+            { val:'banners', label:'Banners', desc:'Subtle alerts at the top' },
+          ].map(o => `<label style="display:block;cursor:pointer;border:2px solid ${(state.settings?.notifStyle||'focus-timeline')===o.val?'#0891b2':'var(--border)'};border-radius:12px;padding:14px;background:${(state.settings?.notifStyle||'focus-timeline')===o.val?'#ecfeff':'var(--surface)'}">
+            <input type="radio" name="notif-style" value="${o.val}" ${(state.settings?.notifStyle||'focus-timeline')===o.val?'checked':''} onchange="state.settings.notifStyle=this.value;saveData(state);renderSettings();renderToday()" style="display:none">
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px">${o.label}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${o.desc}</div>
+          </label>`).join('')}
+        </div>
       </div>`) +
 
     acc('log', 'Activity Log', `${log.length} recorded action${log.length !== 1 ? 's' : ''} — synced across all devices`, `
