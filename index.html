@@ -1806,6 +1806,23 @@
     .notif-banner-action { font-size:11px; font-weight:700; color:#0891b2; cursor:pointer; }
     @keyframes bannerSlide { from { transform:translateY(-8px); opacity:0; } to { transform:translateY(0); opacity:1; } }
 
+    /* ─── Pantry ───────────────────────────── */
+    .pantry-item { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #f4f4f5; }
+    .pantry-item:last-child { border-bottom:none; }
+    .pantry-status { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; flex-shrink:0; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
+    .pantry-status.stocked { background:#f0fdf4; color:#10b981; border:1.5px solid #bbf7d0; }
+    .pantry-status.low { background:#fffbeb; color:#f59e0b; border:1.5px solid #fde68a; }
+    .pantry-status.need { background:#fef2f2; color:#ef4444; border:1.5px solid #fca5a5; }
+    .pantry-body { flex:1; min-width:0; }
+    .pantry-name { font-size:14px; font-weight:600; }
+    .pantry-meta { font-size:11px; color:var(--text-muted); }
+    .pantry-actions { display:flex; gap:4px; flex-shrink:0; }
+    .pantry-cat-header { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin:16px 0 6px; }
+    .pantry-cat-header:first-child { margin-top:0; }
+    .pantry-starter { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:6px; margin-top:12px; }
+    .pantry-starter-btn { border:1.5px dashed var(--border); border-radius:8px; padding:8px 12px; background:var(--surface); cursor:pointer; font-size:12px; font-weight:600; text-align:center; transition:border-color 0.15s; }
+    .pantry-starter-btn:hover { border-color:var(--primary); }
+
     /* ─── Lunchbox ─────────────────────────── */
     .lb-kid-tabs { display:flex; gap:6px; margin-bottom:16px; }
     .lb-kid-tab { padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid var(--border); background:var(--surface); cursor:pointer; transition:all 0.15s; }
@@ -2128,6 +2145,11 @@
     <div id="forecast-content"></div>
   </div>
 
+  <!-- PANTRY -->
+  <div class="tab-panel" id="tab-pantry">
+    <div id="pantry-content"></div>
+  </div>
+
   <!-- LUNCHBOX -->
   <div class="tab-panel" id="tab-lunchbox">
     <div id="lunchbox-content"></div>
@@ -2363,7 +2385,7 @@ const DEFAULT_DATA = {
   bills: [],
   subscriptions: [],
   planner: { events: [] },
-  meals: { plan: {}, shopping: [], lunchbox: { profiles: [], plans: {} } },
+  meals: { plan: {}, shopping: [], lunchbox: { profiles: [], plans: {} }, pantry: [] },
   vehicles: [],
   documents: [],
   maintenance: [],
@@ -2446,6 +2468,7 @@ function loadData() {
     if (!d.meals.lunchbox) d.meals.lunchbox = { profiles: [], plans: {} };
     if (!d.meals.lunchbox.profiles) d.meals.lunchbox.profiles = [];
     if (!d.meals.lunchbox.plans) d.meals.lunchbox.plans = {};
+    if (!d.meals.pantry) d.meals.pantry = [];
     if (!d.vehicles) d.vehicles = [];
     if (!d.documents) d.documents = [];
     if (!d.maintenance) d.maintenance = [];
@@ -3455,6 +3478,7 @@ const SECTIONS = {
     { tab:'forecast', label:'Forecast' },
     { tab:'meals',    label:'Meals' },
     { tab:'lunchbox', label:'Lunchbox' },
+    { tab:'pantry', label:'Pantry' },
   ]},
   home: { navTab:'documents', label:'Home', tabs:[
     { tab:'documents',   label:'Documents' },
@@ -9674,6 +9698,219 @@ function quickAddMaint(starterIdx) {
 }
 
 // ─────────────────────────────────────────────────
+// PANTRY STOCKTAKE
+// ─────────────────────────────────────────────────
+const PANTRY_CATS = ['Fridge','Freezer','Pantry','Fruit & Veg','Spices','Drinks','Cleaning','Other'];
+
+const PANTRY_STARTERS = [
+  { name:'Milk', cat:'Fridge' },{ name:'Eggs', cat:'Fridge' },{ name:'Cheese', cat:'Fridge' },{ name:'Butter', cat:'Fridge' },{ name:'Yoghurt', cat:'Fridge' },
+  { name:'Chicken breast', cat:'Freezer' },{ name:'Mince', cat:'Freezer' },{ name:'Fish fillets', cat:'Freezer' },{ name:'Frozen veg', cat:'Freezer' },
+  { name:'Pasta', cat:'Pantry' },{ name:'Rice', cat:'Pantry' },{ name:'Tinned tomatoes', cat:'Pantry' },{ name:'Olive oil', cat:'Pantry' },{ name:'Flour', cat:'Pantry' },{ name:'Sugar', cat:'Pantry' },{ name:'Bread', cat:'Pantry' },{ name:'Cereal', cat:'Pantry' },
+  { name:'Onions', cat:'Fruit & Veg' },{ name:'Potatoes', cat:'Fruit & Veg' },{ name:'Bananas', cat:'Fruit & Veg' },{ name:'Apples', cat:'Fruit & Veg' },
+  { name:'Salt', cat:'Spices' },{ name:'Pepper', cat:'Spices' },{ name:'Garlic', cat:'Spices' },
+];
+
+function renderPantry() {
+  const el = document.getElementById('pantry-content');
+  if (!el) return;
+  const items = state.meals.pantry || [];
+
+  if (items.length === 0) {
+    const starters = PANTRY_STARTERS;
+    el.innerHTML = `
+      <div class="empty" style="margin-top:24px">
+        <div class="empty-icon" style="font-size:48px">🥫</div>
+        <p style="margin:12px 0">Track what's in your kitchen. Tap items you usually keep stocked.</p>
+        <button class="btn btn-primary" onclick="openPantryForm()">+ Add Item</button>
+      </div>
+      <div style="margin-top:20px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Quick-add common items</div>
+        <div class="pantry-starter">
+          ${starters.map(s => `<button class="pantry-starter-btn" onclick="quickAddPantry('${escAttr(s.name)}','${s.cat}')">${escHtml(s.name)}</button>`).join('')}
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Group by category
+  const byCategory = {};
+  PANTRY_CATS.forEach(c => byCategory[c] = []);
+  items.forEach(item => {
+    const cat = PANTRY_CATS.includes(item.cat) ? item.cat : 'Other';
+    byCategory[cat].push(item);
+  });
+
+  // Count statuses
+  const needCount = items.filter(i => i.status === 'need').length;
+  const lowCount = items.filter(i => i.status === 'low').length;
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${needCount > 0 ? `<span class="veh-badge red">${needCount} need</span>` : ''}
+        ${lowCount > 0 ? `<span class="veh-badge amber">${lowCount} low</span>` : ''}
+        <span style="font-size:13px;color:var(--text-muted)">${items.length} items tracked</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        ${needCount > 0 ? `<button class="btn btn-sm" onclick="pantryToShoppingList()">Add ${needCount + lowCount} to shopping list</button>` : ''}
+        <button class="btn btn-primary btn-sm" onclick="openPantryForm()">+ Add Item</button>
+      </div>
+    </div>`;
+
+  PANTRY_CATS.forEach(cat => {
+    const catItems = byCategory[cat];
+    if (!catItems.length) return;
+    html += `<div class="pantry-cat-header">${escHtml(cat)} (${catItems.length})</div>`;
+    catItems.forEach(item => {
+      const statusIcon = item.status === 'stocked' ? '✓' : item.status === 'low' ? '!' : '✗';
+      const nextStatus = item.status === 'stocked' ? 'low' : item.status === 'low' ? 'need' : 'stocked';
+      html += `<div class="pantry-item">
+        <div class="pantry-status ${item.status}" onclick="cyclePantryStatus(${item.id})" title="Tap to change">${statusIcon}</div>
+        <div class="pantry-body">
+          <div class="pantry-name">${escHtml(item.name)}</div>
+          ${item.qty ? `<div class="pantry-meta">${escHtml(item.qty)}</div>` : ''}
+        </div>
+        <div class="pantry-actions">
+          <button class="btn btn-sm" style="font-size:11px" onclick="openPantryForm(${item.id})">Edit</button>
+          <button class="btn btn-sm" style="font-size:11px;color:var(--danger)" onclick="deletePantryItem(${item.id})">×</button>
+        </div>
+      </div>`;
+    });
+  });
+
+  // Quick-add more if fewer than 10 items
+  if (items.length < 10) {
+    const existing = new Set(items.map(i => i.name.toLowerCase()));
+    const starters = PANTRY_STARTERS.filter(s => !existing.has(s.name.toLowerCase()));
+    if (starters.length) {
+      html += `<div style="margin-top:20px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px">Quick-add more</div>
+        <div class="pantry-starter">
+          ${starters.slice(0, 12).map(s => `<button class="pantry-starter-btn" onclick="quickAddPantry('${escAttr(s.name)}','${s.cat}')">${escHtml(s.name)}</button>`).join('')}
+        </div>
+      </div>`;
+    }
+  }
+
+  el.innerHTML = html;
+}
+
+function cyclePantryStatus(id) {
+  const item = (state.meals.pantry || []).find(i => i.id === id);
+  if (!item) return;
+  const cycle = { stocked: 'low', low: 'need', need: 'stocked' };
+  item.status = cycle[item.status] || 'stocked';
+  saveData(state);
+  renderPantry();
+}
+
+function openPantryForm(editId) {
+  const item = editId ? (state.meals.pantry || []).find(i => i.id === editId) : null;
+
+  document.getElementById('modal-title').textContent = item ? 'Edit Item' : 'Add Pantry Item';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Item Name</label>
+      <input class="form-input" id="pf-name" type="text" maxlength="200" value="${item ? escAttr(item.name) : ''}" placeholder="e.g. Pasta, Milk, Chicken">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="pf-cat">
+          ${PANTRY_CATS.map(c => `<option value="${c}"${item && item.cat === c ? ' selected' : ''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quantity <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+        <input class="form-input" id="pf-qty" type="text" maxlength="200" value="${item ? escAttr(item.qty || '') : ''}" placeholder="e.g. 2 bags, 1L, 500g">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <div style="display:flex;gap:8px">
+        ${['stocked','low','need'].map(s => {
+          const labels = { stocked:'Stocked', low:'Running Low', need:'Need to Buy' };
+          const colors = { stocked:'#10b981', low:'#f59e0b', need:'#ef4444' };
+          const active = (item?.status || 'stocked') === s;
+          return `<label style="flex:1;cursor:pointer;text-align:center;padding:10px;border-radius:8px;border:2px solid ${active ? colors[s] : 'var(--border)'};background:${active ? colors[s] + '15' : 'var(--surface)'};font-size:12px;font-weight:600;color:${active ? colors[s] : 'var(--text-muted)'}">
+            <input type="radio" name="pf-status" value="${s}" ${active ? 'checked' : ''} style="display:none">${labels[s]}
+          </label>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('modal-footer').innerHTML = `
+    ${item ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="deletePantryItem(${editId});closeModal()">Delete</button>` : ''}
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="savePantryItem(${editId || 'null'})">Save</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function savePantryItem(editId) {
+  const name = document.getElementById('pf-name')?.value.trim();
+  if (!name) return;
+  const data = {
+    name,
+    cat: document.getElementById('pf-cat')?.value || 'Other',
+    qty: document.getElementById('pf-qty')?.value.trim() || '',
+    status: document.querySelector('input[name="pf-status"]:checked')?.value || 'stocked'
+  };
+
+  const pantry = state.meals.pantry;
+  if (editId) {
+    const item = pantry.find(i => i.id === editId);
+    if (item) Object.assign(item, data);
+  } else {
+    data.id = pantry.length ? Math.max(...pantry.map(i => i.id)) + 1 : 1;
+    pantry.push(data);
+  }
+  saveData(state);
+  closeModal();
+  renderPantry();
+}
+
+function deletePantryItem(id) {
+  state.meals.pantry = (state.meals.pantry || []).filter(i => i.id !== id);
+  saveData(state);
+  renderPantry();
+}
+
+function quickAddPantry(name, cat) {
+  const pantry = state.meals.pantry;
+  pantry.push({
+    id: pantry.length ? Math.max(...pantry.map(i => i.id)) + 1 : 1,
+    name, cat, qty: '', status: 'stocked'
+  });
+  saveData(state);
+  renderPantry();
+}
+
+function pantryToShoppingList() {
+  const toAdd = (state.meals.pantry || []).filter(i => i.status === 'need' || i.status === 'low');
+  if (!toAdd.length) return;
+  const existing = state.meals.shopping;
+  let maxId = existing.length ? Math.max(...existing.map(i => i.id)) : 0;
+  let added = 0;
+  toAdd.forEach(item => {
+    if (!existing.some(e => e.name.toLowerCase() === item.name.toLowerCase())) {
+      const shopCat = { 'Fridge':'Dairy & Eggs', 'Freezer':'Frozen', 'Pantry':'Pantry', 'Fruit & Veg':'Produce', 'Spices':'Pantry', 'Drinks':'Other', 'Cleaning':'Household', 'Other':'Other' }[item.cat] || 'Other';
+      existing.push({ id: ++maxId, name: item.name, qty: item.qty || '', cat: shopCat, checked: false });
+      added++;
+    }
+  });
+  if (added > 0) saveData(state);
+
+  // Brief confirmation
+  const btn = document.querySelector('[onclick*="pantryToShoppingList"]');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = `Added ${added} items`;
+    btn.style.color = 'var(--success)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+  }
+}
+
+// ─────────────────────────────────────────────────
 // LUNCHBOX PLANNER
 // ─────────────────────────────────────────────────
 let _lbWeekOffset = 0;
@@ -10306,6 +10543,7 @@ const _TAB_RENDERERS = {
   forecast:    [renderForecast],
   meals:       [renderMeals],
   lunchbox:    [renderLunchbox],
+  pantry:      [renderPantry],
   vehicles:    [renderVehicles],
   documents:   [renderDocuments],
   maintenance: [renderMaintenance],
