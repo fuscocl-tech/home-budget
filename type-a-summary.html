@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Type A Mode</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fff; color: #18181b; font-size: 15px; line-height: 1.7; }
+
+    .hero { padding: 80px 24px 60px; text-align: center; border-bottom: 1px solid #f4f4f5; }
+    .hero h1 { font-size: 44px; font-weight: 900; letter-spacing: -0.04em; margin-bottom: 8px; }
+    .hero h1 .r { color: #DC2626; }
+    .hero .badge { display: inline-block; margin-bottom: 16px; padding: 6px 16px; border-radius: 99px; background: linear-gradient(135deg, #0891b2, #7c3aed); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
+    .hero p { font-size: 18px; color: #71717a; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+    section { padding: 56px 0; }
+    section + section { border-top: 1px solid #f4f4f5; }
+    h2 { font-size: 24px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .sub { font-size: 14px; color: #a1a1aa; margin-bottom: 28px; }
+    p { margin-bottom: 16px; color: #52525b; }
+    strong { color: #18181b; }
+
+    .component { background: #fafafa; border: 1px solid #f4f4f5; border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+    .component-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #0891b2, #7c3aed); color: #fff; font-size: 13px; font-weight: 800; margin-bottom: 12px; }
+    .component h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+
+    .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+    @media(max-width: 500px) { .dims { grid-template-columns: 1fr; } }
+    .dim { background: #fff; border: 1px solid #e4e4e7; border-radius: 10px; padding: 12px 14px; }
+    .dim-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+    .dim-desc { font-size: 11px; color: #a1a1aa; }
+
+    .escalation { display: flex; gap: 12px; margin: 20px 0; }
+    @media(max-width: 500px) { .escalation { flex-direction: column; } }
+    .esc-step { flex: 1; border-radius: 12px; padding: 16px; text-align: center; }
+    .esc-step h4 { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+    .esc-step p { font-size: 12px; margin: 0; }
+
+    .reset-steps { counter-reset: step; }
+    .reset-step { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f4f4f5; }
+    .reset-step:last-child { border: none; }
+    .reset-step::before { counter-increment: step; content: counter(step); width: 28px; height: 28px; border-radius: 50%; background: #f4f4f5; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #71717a; flex-shrink: 0; margin-top: 2px; }
+    .reset-step-body { flex: 1; }
+    .reset-step-title { font-size: 14px; font-weight: 700; color: #18181b; }
+    .reset-step-desc { font-size: 12px; color: #a1a1aa; }
+
+    .quote { border-left: 3px solid #0891b2; padding: 16px 20px; background: #f0f9ff; border-radius: 0 10px 10px 0; margin: 24px 0; font-size: 14px; color: #0e7490; font-style: italic; }
+
+    .off-note { background: #f4f4f5; border-radius: 12px; padding: 20px; text-align: center; margin-top: 24px; }
+    .off-note p { margin: 0; font-size: 13px; color: #71717a; }
+    .off-note strong { color: #18181b; }
+
+    .footer { text-align: center; padding: 48px 24px; color: #d4d4d8; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">NEW FEATURE</div>
+  <h1>t<span class="r">o</span>t<span class="r">o</span> Type A Mode</h1>
+  <p>Turns Toto from a passive tracker into an active personal coach. It tells you what to do, when to do it, and gets in your face if you ignore it.</p>
+</div>
+
+<div class="container">
+
+<section>
+  <h2>What it does</h2>
+  <p class="sub">Three components that work together</p>
+
+  <div class="component">
+    <div class="component-num">1</div>
+    <h3>Life Score</h3>
+    <p>A percentage showing how "on top of things" you are — calculated across everything in Toto. It's gamified. You want to get to 100%.</p>
+
+    <div class="dims">
+      <div class="dim">
+        <div class="dim-name">Budget</div>
+        <div class="dim-desc">Income set up, expenses tracked, actuals logged</div>
+      </div>
+      <div class="dim">
+        <div class="dim-name">Meals</div>
+        <div class="dim-desc">This week planned, shopping list generated</div>
+      </div>
+      <div class="dim">
+        <div class="dim-name">Home</div>
+        <div class="dim-desc">Maintenance current, rego up to date, documents tracked</div>
+      </div>
+      <div class="dim">
+        <div class="dim-name">Family</div>
+        <div class="dim-desc">School lunches planned, pantry stocked</div>
+      </div>
+      <div class="dim">
+        <div class="dim-name">Goals</div>
+        <div class="dim-desc">Savings goals set and progressing</div>
+      </div>
+    </div>
+
+    <p>Each dimension shows a progress bar, a specific tip on what's dragging it down, and a "Fix" link that takes you straight there. The ring gauge gives you the overall number.</p>
+  </div>
+
+  <div class="component">
+    <div class="component-num">2</div>
+    <h3>Daily Mission</h3>
+    <p>One specific task per day, picked automatically based on your weakest Life Score area. Things like:</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:#52525b">
+      <li>"Plan this week's dinners — takes 2 minutes"</li>
+      <li>"Log actual spending this month"</li>
+      <li>"Mark pest control as done"</li>
+      <li>"Set your first savings goal"</li>
+    </ul>
+    <p><strong>The escalation is the key part:</strong></p>
+
+    <div class="escalation">
+      <div class="esc-step" style="background:#f0f9ff;border:1px solid #bae6fd">
+        <h4 style="color:#0891b2">Day 1</h4>
+        <p style="color:#0e7490">Card on the Today screen. "Let's do it" or "Not today".</p>
+      </div>
+      <div class="esc-step" style="background:#fef2f2;border:1px solid #fca5a5">
+        <h4 style="color:#dc2626">Day 2+</h4>
+        <p style="color:#991b1b">Full-screen lightbox pops up. "This has been waiting 2 days." Can't miss it.</p>
+      </div>
+    </div>
+
+    <p>You either do it or actively dismiss it. The app doesn't let you pretend it's not there.</p>
+  </div>
+
+  <div class="component">
+    <div class="component-num">3</div>
+    <h3>Weekly Reset</h3>
+    <p>A 5-minute guided wizard that walks you through getting your week sorted:</p>
+
+    <div class="reset-steps">
+      <div class="reset-step">
+        <div class="reset-step-body">
+          <div class="reset-step-title">Review this month's spending</div>
+          <div class="reset-step-desc">Shows actual vs budgeted with live numbers</div>
+        </div>
+      </div>
+      <div class="reset-step">
+        <div class="reset-step-body">
+          <div class="reset-step-title">Plan next week's meals</div>
+          <div class="reset-step-desc">Shows how many meals are planned, links to planner</div>
+        </div>
+      </div>
+      <div class="reset-step">
+        <div class="reset-step-body">
+          <div class="reset-step-title">Check the pantry</div>
+          <div class="reset-step-desc">Shows items needing restock, links to stocktake</div>
+        </div>
+      </div>
+      <div class="reset-step">
+        <div class="reset-step-body">
+          <div class="reset-step-title">Review upcoming bills</div>
+          <div class="reset-step-desc">Shows bills due this week with total amount</div>
+        </div>
+      </div>
+      <div class="reset-step">
+        <div class="reset-step-body">
+          <div class="reset-step-title">Household maintenance</div>
+          <div class="reset-step-desc">Shows overdue items, links to maintenance tracker</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:16px">Each step shows live data and links to the relevant feature. Skip what you don't need. Completing it builds a <strong>streak counter</strong> — motivates consistency week to week.</p>
+  </div>
+</section>
+
+<section>
+  <h2>The idea behind it</h2>
+  <p class="sub">Why this matters</p>
+
+  <div class="quote">Most people want to be organised but don't know what to do next. Type A mode removes the thinking — Toto decides what's most important and walks you through it, one thing at a time.</div>
+
+  <p>The gap isn't tools. Most people have a budget app, a calendar, a notes app, a shopping list. The gap is <strong>knowing the next action</strong>. They open the app, see data, think "yeah I should do something", then close it.</p>
+
+  <p>Type A mode shifts Toto from <strong>"here's your data"</strong> to <strong>"here's what to do right now."</strong> The daily mission gives you one thing. The weekly reset gives you five things. The life score makes it a game. The escalation makes sure you don't ignore it.</p>
+
+  <p>It's the difference between a dashboard and a coach.</p>
+
+  <div class="off-note">
+    <p><strong>When it's off</strong> — none of this appears. The app works exactly the same as before. It's opt-in, not forced. Toggle it on in Settings when you're ready.</p>
+  </div>
+</section>
+
+</div>
+
+<div class="footer">
+  toto — type a mode — 2026
+</div>
+
+</body>
+</html>
