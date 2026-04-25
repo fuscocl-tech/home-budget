@@ -185,6 +185,172 @@
   </div>
 </section>
 
+<section>
+  <h2>What it looks like</h2>
+  <p class="sub">Scroll through the key screens</p>
+
+  <style>
+    .phone-row { display: flex; gap: 24px; overflow-x: auto; padding: 16px 0 32px; justify-content: center; }
+    .phone-col { flex-shrink: 0; }
+    .phone-label { font-size: 11px; font-weight: 700; color: #a1a1aa; margin-bottom: 10px; text-align: center; text-transform: uppercase; letter-spacing: 0.08em; }
+    .phone { width: 280px; border-radius: 30px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.1); border: 1px solid #e4e4e7; position: relative; }
+    .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90px; height: 20px; background: #18181b; border-radius: 0 0 12px 12px; z-index: 10; }
+    .phone-body { min-height: 500px; padding-top: 20px; background: #f0f9ff; }
+    .mk-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px 0; }
+    .mk-logo { font-size: 16px; font-weight: 900; letter-spacing: 0.04em; color: #18181b; }
+    .mk-logo .r { color: #DC2626; }
+  </style>
+
+  <div class="phone-row">
+
+    <!-- TODAY WITH TYPE A -->
+    <div class="phone-col">
+      <div class="phone-label">Today — Type A on</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body">
+          <div class="mk-header"><div class="mk-logo">t<span class="r">o</span>t<span class="r">o</span></div><div style="width:24px;height:24px;border-radius:50%;background:#e4e4e7"></div></div>
+
+          <!-- Greeting -->
+          <div style="margin:10px 14px;border-radius:14px;padding:16px;background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff">
+            <div style="font-size:17px;font-weight:900;margin-bottom:3px">Good morning, Chris</div>
+            <div style="font-size:11px;opacity:0.75">2 things need attention. $1,240 left with 16 days to go.</div>
+          </div>
+
+          <!-- Daily Mission -->
+          <div style="margin:0 14px 10px;border-radius:12px;padding:14px 16px;background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff">
+            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;opacity:0.6;margin-bottom:5px">Today's Mission</div>
+            <div style="font-size:14px;font-weight:800;margin-bottom:3px">Plan this week's dinners</div>
+            <div style="font-size:11px;opacity:0.7;margin-bottom:10px">Just the evening meals — takes 2 minutes</div>
+            <div style="display:flex;gap:6px">
+              <div style="padding:6px 12px;border-radius:99px;background:rgba(255,255,255,0.2);font-size:11px;font-weight:700">Not today</div>
+              <div style="padding:6px 12px;border-radius:99px;background:#fff;color:#0891b2;font-size:11px;font-weight:700">Let's do it</div>
+            </div>
+          </div>
+
+          <!-- Notification cards -->
+          <div style="margin:0 14px 6px;background:#fff;border-left:3px solid #ef4444;border-radius:8px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+            <div style="flex:1"><div style="font-size:12px;font-weight:600;color:#18181b"><span style="color:#7c3aed;font-size:9px;font-weight:700;margin-right:3px">Home</span>Pest control overdue</div></div>
+            <div style="font-size:10px;font-weight:700;color:#0891b2">Fix it</div>
+          </div>
+
+          <!-- Life Score -->
+          <div style="margin:12px 14px;border:1px solid #e4e4e7;border-radius:12px;padding:14px;background:#fff">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+              <div style="position:relative;width:50px;height:50px">
+                <svg viewBox="0 0 50 50" width="50" height="50"><circle cx="25" cy="25" r="20" fill="none" stroke="#e4e4e7" stroke-width="5"/><circle cx="25" cy="25" r="20" fill="none" stroke="#f59e0b" stroke-width="5" stroke-dasharray="75.4 125.6" stroke-linecap="round" transform="rotate(-90 25 25)"/><text x="25" y="29" text-anchor="middle" font-size="13" font-weight="900" fill="#f59e0b">60</text></svg>
+              </div>
+              <div>
+                <div style="font-size:14px;font-weight:800">Life Score</div>
+                <div style="font-size:11px;color:#a1a1aa">Good shape — a few things to tidy</div>
+                <div style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;background:#fff3e0;color:#e65100;border:1px solid #ffcc02;margin-top:4px">🔥 4 week streak</div>
+              </div>
+            </div>
+            <!-- Dimension bars -->
+            <div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:600">Budget</span><span style="font-weight:700;color:#10b981">85%</span></div>
+              <div style="height:4px;background:#e4e4e7;border-radius:2px;overflow:hidden"><div style="height:100%;width:85%;background:#10b981;border-radius:2px"></div></div>
+            </div>
+            <div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:600">Meals</span><span style="font-weight:700;color:#f59e0b">45%</span></div>
+              <div style="height:4px;background:#e4e4e7;border-radius:2px;overflow:hidden"><div style="height:100%;width:45%;background:#f59e0b;border-radius:2px"></div></div>
+              <div style="font-size:9px;color:#a1a1aa;margin-top:1px">6/21 meals planned <span style="color:#0891b2;font-weight:700;cursor:pointer">Fix →</span></div>
+            </div>
+            <div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:600">Home</span><span style="font-weight:700;color:#ef4444">35%</span></div>
+              <div style="height:4px;background:#e4e4e7;border-radius:2px;overflow:hidden"><div style="height:100%;width:35%;background:#ef4444;border-radius:2px"></div></div>
+              <div style="font-size:9px;color:#a1a1aa;margin-top:1px">1 maintenance overdue <span style="color:#0891b2;font-weight:700;cursor:pointer">Fix →</span></div>
+            </div>
+            <div style="margin-bottom:8px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:600">Family</span><span style="font-weight:700;color:#0891b2">70%</span></div>
+              <div style="height:4px;background:#e4e4e7;border-radius:2px;overflow:hidden"><div style="height:100%;width:70%;background:#0891b2;border-radius:2px"></div></div>
+            </div>
+            <div style="margin-bottom:4px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="font-weight:600">Goals</span><span style="font-weight:700;color:#0891b2">65%</span></div>
+              <div style="height:4px;background:#e4e4e7;border-radius:2px;overflow:hidden"><div style="height:100%;width:65%;background:#0891b2;border-radius:2px"></div></div>
+            </div>
+            <div style="margin-top:12px;text-align:center">
+              <div style="display:inline-block;padding:8px 16px;border-radius:99px;background:#0891b2;color:#fff;font-size:11px;font-weight:700">Weekly Reset — 5 minutes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MISSION LIGHTBOX (Day 2+) -->
+    <div class="phone-col">
+      <div class="phone-label">Day 2+ — Lightbox</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body" style="background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;padding:20px">
+          <div style="background:linear-gradient(135deg,#0891b2,#7c3aed);border-radius:20px;padding:28px 24px;color:#fff;text-align:center;width:100%">
+            <div style="font-size:40px;margin-bottom:12px">⚡</div>
+            <div style="font-size:18px;font-weight:900;margin-bottom:6px">Plan this week's dinners</div>
+            <div style="font-size:13px;opacity:0.75;margin-bottom:6px">Just the evening meals — takes 2 minutes</div>
+            <div style="font-size:11px;font-weight:700;opacity:0.4;margin-bottom:18px">This has been waiting 2 days</div>
+            <div style="display:flex;gap:8px;justify-content:center">
+              <div style="padding:10px 20px;border-radius:99px;background:rgba(255,255,255,0.2);font-size:13px;font-weight:700">Skip</div>
+              <div style="padding:10px 20px;border-radius:99px;background:#fff;color:#0891b2;font-size:13px;font-weight:700">Do it now</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEKLY RESET -->
+    <div class="phone-col">
+      <div class="phone-label">Weekly Reset Wizard</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-body" style="background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:12px">
+          <div style="background:#fff;border-radius:16px;width:100%;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#0891b2,#7c3aed);color:#fff;padding:20px;text-align:center">
+              <div style="font-size:17px;font-weight:900;margin-bottom:3px">Weekly Reset</div>
+              <div style="font-size:11px;opacity:0.75">5 minutes to get your week sorted</div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid #f4f4f5">
+              <div style="font-size:9px;font-weight:800;color:#0891b2;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Step 1 of 5</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:2px">Review spending</div>
+              <div style="font-size:11px;color:#a1a1aa;margin-bottom:8px">$3,420 of $4,960 spent</div>
+              <div style="display:flex;gap:6px">
+                <div style="padding:5px 12px;border-radius:99px;background:#0891b2;color:#fff;font-size:10px;font-weight:700">Review</div>
+                <div style="padding:5px 12px;border-radius:99px;background:#f4f4f5;color:#a1a1aa;font-size:10px;font-weight:700">Skip</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid #f4f4f5">
+              <div style="font-size:9px;font-weight:800;color:#0891b2;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Step 2 of 5</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:2px">Plan next week's meals</div>
+              <div style="font-size:11px;color:#a1a1aa;margin-bottom:8px">0/21 meals planned</div>
+              <div style="display:flex;gap:6px">
+                <div style="padding:5px 12px;border-radius:99px;background:#0891b2;color:#fff;font-size:10px;font-weight:700">Plan meals</div>
+                <div style="padding:5px 12px;border-radius:99px;background:#f4f4f5;color:#a1a1aa;font-size:10px;font-weight:700">Skip</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid #f4f4f5;opacity:0.4">
+              <div style="font-size:9px;font-weight:800;color:#0891b2;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Step 3 of 5</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:2px">Check the pantry</div>
+              <div style="font-size:11px;color:#a1a1aa">Pantry looks good — skipped</div>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid #f4f4f5">
+              <div style="font-size:9px;font-weight:800;color:#0891b2;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Step 4 of 5</div>
+              <div style="font-size:13px;font-weight:700;margin-bottom:2px">Upcoming bills</div>
+              <div style="font-size:11px;color:#a1a1aa;margin-bottom:8px">3 bills due — $487</div>
+              <div style="display:flex;gap:6px">
+                <div style="padding:5px 12px;border-radius:99px;background:#0891b2;color:#fff;font-size:10px;font-weight:700">Review</div>
+                <div style="padding:5px 12px;border-radius:99px;background:#f4f4f5;color:#a1a1aa;font-size:10px;font-weight:700">Skip</div>
+              </div>
+            </div>
+            <div style="padding:14px 16px;text-align:center">
+              <div style="display:inline-block;padding:8px 20px;border-radius:99px;background:#0891b2;color:#fff;font-size:12px;font-weight:700">Done — I'm reset ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 </div>
 
 <div class="footer">
