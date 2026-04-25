@@ -1737,6 +1737,32 @@
 
     .streak-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:99px; font-size:12px; font-weight:700; background:#fff3e0; color:#e65100; border:1px solid #ffcc02; }
 
+    /* ─── Mission Lightbox ────────────────── */
+    .mission-lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:300; display:flex; align-items:center; justify-content:center; padding:24px; animation:fadeIn 0.3s ease; }
+    .mission-lightbox-card { background:linear-gradient(135deg,#0891b2,#7c3aed); border-radius:24px; padding:32px 28px; max-width:360px; width:100%; color:#fff; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,0.4); animation:missionPop 0.3s ease; }
+    @keyframes missionPop { from { transform:scale(0.9); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .mission-lightbox-icon { font-size:48px; margin-bottom:16px; }
+    .mission-lightbox-title { font-size:20px; font-weight:900; margin-bottom:8px; }
+    .mission-lightbox-sub { font-size:14px; opacity:0.8; line-height:1.5; margin-bottom:8px; }
+    .mission-lightbox-days { font-size:12px; font-weight:700; opacity:0.5; margin-bottom:20px; }
+    .mission-lightbox-actions { display:flex; gap:10px; justify-content:center; }
+    .mission-lightbox-btn { padding:12px 24px; border-radius:99px; font-size:14px; font-weight:700; border:none; cursor:pointer; }
+
+    /* ─── Weekly Reset Wizard ─────────────── */
+    .reset-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:250; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .reset-card { background:#fff; border-radius:20px; max-width:420px; width:100%; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.2); }
+    .reset-header { background:linear-gradient(135deg,#0891b2,#7c3aed); color:#fff; padding:24px; border-radius:20px 20px 0 0; text-align:center; }
+    .reset-header h2 { font-size:20px; font-weight:900; margin-bottom:4px; }
+    .reset-header p { font-size:13px; opacity:0.8; }
+    .reset-step { padding:20px 24px; border-bottom:1px solid #f4f4f5; }
+    .reset-step:last-child { border:none; }
+    .reset-step-num { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:#0891b2; margin-bottom:6px; }
+    .reset-step-title { font-size:15px; font-weight:700; margin-bottom:4px; }
+    .reset-step-sub { font-size:12px; color:var(--text-muted); margin-bottom:10px; }
+    .reset-step-actions { display:flex; gap:8px; }
+    .reset-step-btn { padding:7px 14px; border-radius:99px; font-size:12px; font-weight:700; border:none; cursor:pointer; }
+    .reset-footer { padding:16px 24px; text-align:center; border-top:1px solid #f4f4f5; }
+
     /* ─── Summary Cards ────────────────────── */
     .summary-hero { border-radius:16px; padding:28px; margin-bottom:20px; text-align:center; cursor:pointer; transition:box-shadow 0.2s; }
     .summary-hero:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
@@ -2503,6 +2529,9 @@ function loadData() {
     if (!d.settings.typeAStreak) d.settings.typeAStreak = 0;
     if (!d.settings.typeALastReset) d.settings.typeALastReset = '';
     if (!d.settings.typeADismissedMission) d.settings.typeADismissedMission = '';
+    if (!d.settings.typeAMissionShownDate) d.settings.typeAMissionShownDate = '';
+    if (!d.settings.typeAMissionId) d.settings.typeAMissionId = '';
+    if (!d.settings.typeALastResetDate) d.settings.typeALastResetDate = '';
     if (!d.categoryGroups) d.categoryGroups = JSON.parse(JSON.stringify(DEFAULT_DATA.categoryGroups));
     if (!d.buildContract.variations) d.buildContract.variations = [];
     d.buildContract.stages.forEach(s => { if (!s.expectedDate) s.expectedDate = ''; });
@@ -4116,6 +4145,180 @@ function dismissMission(missionId) {
   if (!state.settings) state.settings = {};
   state.settings.typeADismissedMission = missionId;
   saveData(state);
+  // Close lightbox if open
+  const lb = document.querySelector('.mission-lightbox');
+  if (lb) lb.remove();
+  renderToday();
+}
+
+function completeMission(missionId) {
+  if (!state.settings) state.settings = {};
+  // Reset tracking — mission completed, new one tomorrow
+  state.settings.typeAMissionId = '';
+  state.settings.typeAMissionShownDate = '';
+  state.settings.typeADismissedMission = missionId;
+  saveData(state);
+  const lb = document.querySelector('.mission-lightbox');
+  if (lb) lb.remove();
+}
+
+function _missionDaysIgnored() {
+  const shownDate = state.settings?.typeAMissionShownDate;
+  if (!shownDate) return 0;
+  const diff = Math.floor((new Date() - new Date(shownDate)) / 86400000);
+  return Math.max(0, diff);
+}
+
+function _showMissionLightbox(mission) {
+  // Don't show if already showing
+  if (document.querySelector('.mission-lightbox')) return;
+
+  const days = _missionDaysIgnored();
+  const clickAttr = mission.onclick
+    ? mission.onclick
+    : mission.tab ? `activateTab('${mission.tab}')` : '';
+
+  const lb = document.createElement('div');
+  lb.className = 'mission-lightbox';
+  lb.innerHTML = `
+    <div class="mission-lightbox-card">
+      <div class="mission-lightbox-icon">⚡</div>
+      <div class="mission-lightbox-title">${mission.title}</div>
+      <div class="mission-lightbox-sub">${mission.sub}</div>
+      <div class="mission-lightbox-days">This has been waiting ${days} day${days !== 1 ? 's' : ''}</div>
+      <div class="mission-lightbox-actions">
+        <button class="mission-lightbox-btn" style="background:rgba(255,255,255,0.2);color:#fff" onclick="dismissMission('${mission.id}')">Skip</button>
+        <button class="mission-lightbox-btn" style="background:#fff;color:#0891b2" onclick="completeMission('${mission.id}');${clickAttr}">Do it now</button>
+      </div>
+    </div>`;
+  lb.addEventListener('click', e => { if (e.target === lb) dismissMission(mission.id); });
+  document.body.appendChild(lb);
+}
+
+function _checkMissionEscalation() {
+  if (!state.settings?.typeAMode) return;
+  const mission = generateMission();
+  if (!mission) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Track when this mission was first shown
+  if (state.settings.typeAMissionId !== mission.id) {
+    state.settings.typeAMissionId = mission.id;
+    state.settings.typeAMissionShownDate = today;
+    saveData(state);
+    return; // Day 1 — just the card
+  }
+
+  // Day 2+ — show lightbox
+  const days = _missionDaysIgnored();
+  if (days >= 1) {
+    setTimeout(() => _showMissionLightbox(mission), 1500);
+  }
+}
+
+// ── Weekly Reset Wizard ──
+function openWeeklyReset() {
+  const life = calcLifeScore();
+  const curData = getMonthData(selectedBudgetMonth);
+  const totalActual = curData.expenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const totalBudget = monthlyTotal(curData.expenses);
+  const weekKey = _mealWeekKey(1); // Next week
+  const nextWeekPlan = state.meals?.plan?.[weekKey] || {};
+  const nextMealsFilled = Object.values(nextWeekPlan).reduce((s, d) => s + (d.b?1:0) + (d.l?1:0) + (d.d?1:0), 0);
+  const overdueMaint = (state.maintenance || []).filter(m => { const d = _maintDaysUntil(m); return d !== null && d < 0; }).length;
+  const dueSoonBills = (state.bills || []).filter(b => { const d = billDaysUntil(b); return d >= 0 && d <= 7; });
+  const pantryNeed = (state.meals?.pantry || []).filter(i => i.status === 'need' || i.status === 'low').length;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'reset-overlay';
+  overlay.innerHTML = `
+    <div class="reset-card">
+      <div class="reset-header">
+        <h2>Weekly Reset</h2>
+        <p>5 minutes to get your week sorted</p>
+      </div>
+
+      <div class="reset-step">
+        <div class="reset-step-num">Step 1 of 5</div>
+        <div class="reset-step-title">Review this month's spending</div>
+        <div class="reset-step-sub">${totalActual > 0 ? `You've spent ${aud(totalActual)} of ${aud(totalBudget)} budgeted` : 'No actuals logged yet this month'}</div>
+        <div class="reset-step-actions">
+          <button class="reset-step-btn" style="background:#0891b2;color:#fff" onclick="this.closest('.reset-overlay').remove();activateTab('budget')">Review budget</button>
+          <button class="reset-step-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="this.closest('.reset-step').style.opacity='0.4'">Skip</button>
+        </div>
+      </div>
+
+      <div class="reset-step">
+        <div class="reset-step-num">Step 2 of 5</div>
+        <div class="reset-step-title">Plan next week's meals</div>
+        <div class="reset-step-sub">${nextMealsFilled > 0 ? `${nextMealsFilled}/21 meals planned` : 'Nothing planned for next week yet'}</div>
+        <div class="reset-step-actions">
+          <button class="reset-step-btn" style="background:#0891b2;color:#fff" onclick="this.closest('.reset-overlay').remove();_mealWeekOffset=1;activateTab('meals')">Plan meals</button>
+          <button class="reset-step-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="this.closest('.reset-step').style.opacity='0.4'">Skip</button>
+        </div>
+      </div>
+
+      <div class="reset-step">
+        <div class="reset-step-num">Step 3 of 5</div>
+        <div class="reset-step-title">Check the pantry</div>
+        <div class="reset-step-sub">${pantryNeed > 0 ? `${pantryNeed} items need restocking` : (state.meals?.pantry || []).length > 0 ? 'Pantry looks good' : 'Not set up yet'}</div>
+        <div class="reset-step-actions">
+          <button class="reset-step-btn" style="background:#0891b2;color:#fff" onclick="this.closest('.reset-overlay').remove();activateTab('pantry')">Stocktake</button>
+          <button class="reset-step-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="this.closest('.reset-step').style.opacity='0.4'">Skip</button>
+        </div>
+      </div>
+
+      <div class="reset-step">
+        <div class="reset-step-num">Step 4 of 5</div>
+        <div class="reset-step-title">Upcoming bills</div>
+        <div class="reset-step-sub">${dueSoonBills.length > 0 ? `${dueSoonBills.length} bill${dueSoonBills.length !== 1 ? 's' : ''} due this week — ${aud(dueSoonBills.reduce((s, b) => s + (parseFloat(b.amount) || 0), 0))}` : 'No bills due this week'}</div>
+        <div class="reset-step-actions">
+          <button class="reset-step-btn" style="background:#0891b2;color:#fff" onclick="this.closest('.reset-overlay').remove();activateTab('bills')">Review bills</button>
+          <button class="reset-step-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="this.closest('.reset-step').style.opacity='0.4'">Skip</button>
+        </div>
+      </div>
+
+      <div class="reset-step">
+        <div class="reset-step-num">Step 5 of 5</div>
+        <div class="reset-step-title">Household maintenance</div>
+        <div class="reset-step-sub">${overdueMaint > 0 ? `${overdueMaint} item${overdueMaint !== 1 ? 's' : ''} overdue` : 'Everything up to date'}</div>
+        <div class="reset-step-actions">
+          <button class="reset-step-btn" style="background:#0891b2;color:#fff" onclick="this.closest('.reset-overlay').remove();activateTab('maintenance')">Check maintenance</button>
+          <button class="reset-step-btn" style="background:var(--surface2);color:var(--text-muted)" onclick="this.closest('.reset-step').style.opacity='0.4'">Skip</button>
+        </div>
+      </div>
+
+      <div class="reset-footer">
+        <button class="reset-step-btn" style="background:#0891b2;color:#fff;padding:10px 24px;font-size:14px" onclick="completeWeeklyReset()">Done — I'm reset</button>
+      </div>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function completeWeeklyReset() {
+  const overlay = document.querySelector('.reset-overlay');
+  if (overlay) overlay.remove();
+
+  if (!state.settings) state.settings = {};
+  const today = new Date().toISOString().slice(0, 10);
+  const lastReset = state.settings.typeALastResetDate || '';
+
+  // Check if this continues the streak (within 9 days of last reset)
+  if (lastReset) {
+    const daysSince = Math.floor((new Date() - new Date(lastReset)) / 86400000);
+    if (daysSince <= 9) {
+      state.settings.typeAStreak = (state.settings.typeAStreak || 0) + 1;
+    } else {
+      state.settings.typeAStreak = 1; // Streak broken, start fresh
+    }
+  } else {
+    state.settings.typeAStreak = 1;
+  }
+
+  state.settings.typeALastResetDate = today;
+  saveData(state);
   renderToday();
 }
 
@@ -4154,6 +4357,9 @@ function _renderLifeScore() {
       </div>
     </div>
     ${dimsHtml}
+    <div style="margin-top:14px;text-align:center">
+      <button class="btn btn-primary btn-sm" onclick="openWeeklyReset()" style="width:100%;justify-content:center">Weekly Reset — 5 minutes</button>
+    </div>
   </div>`;
 }
 
@@ -4161,12 +4367,13 @@ function _renderMissionCard() {
   const mission = generateMission();
   if (!mission) return '';
 
+  const days = _missionDaysIgnored();
   const clickAttr = mission.onclick
     ? `onclick="${mission.onclick}"`
     : mission.tab ? `onclick="activateTab('${mission.tab}')"` : '';
 
   return `<div class="mission-card" ${clickAttr}>
-    <div class="mission-label">Today's Mission</div>
+    <div class="mission-label">${days > 0 ? `Day ${days + 1} — still waiting` : 'Today\'s Mission'}</div>
     <div class="mission-title">${mission.title}</div>
     <div class="mission-sub">${mission.sub}</div>
     <div class="mission-actions">
@@ -4425,6 +4632,9 @@ function renderToday() {
 
   // Async AI briefing — replaces the template text if API key available
   _fetchAIBriefing(cards, surplus, daysLeft, todayMeals, health);
+
+  // Check if mission should escalate to lightbox (day 2+)
+  _checkMissionEscalation();
 }
 
 let _lastBriefingDate = '';
