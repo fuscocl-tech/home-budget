@@ -1713,7 +1713,8 @@
     .section-breadcrumb a:hover { color:#FF3B3B; }
     .section-breadcrumb .sep { opacity:0.4; }
     .section-breadcrumb .current { color:var(--text); font-weight:700; }
-    .section-pills { display:flex; gap:8px; overflow-x:auto; padding:0 0 14px; scrollbar-width:none; border-bottom:1px solid var(--border); margin-bottom:20px; }
+    .section-pills { display:flex; gap:8px; overflow-x:auto; padding:0 0 14px; scrollbar-width:none; border-bottom:1px solid var(--border); margin-bottom:20px; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; }
+    .section-pill { flex-shrink:0; }
     .section-pills::-webkit-scrollbar { display:none; }
     .section-pill { padding:7px 16px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--text-muted); cursor:pointer; white-space:nowrap; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
     .section-pill:hover { color:var(--text); }
