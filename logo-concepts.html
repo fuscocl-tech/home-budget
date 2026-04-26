@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blueprint — Logo Concepts</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0f1a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      padding: 60px 40px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #4b7aad;
+      margin-bottom: 64px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 48px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #3b6ea5;
+    }
+    .icon-row {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    /* icon sizes */
+    .sz-lg svg { width: 160px; height: 160px; }
+    .sz-md svg { width: 80px;  height: 80px;  }
+    .sz-sm svg { width: 40px;  height: 40px;  }
+    .sz-xs svg { width: 24px;  height: 24px;  }
+
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .wordmark svg { width: 44px; height: 44px; }
+    .wordmark-text {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .wordmark-text span { color: #3b82f6; }
+
+    .concept-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e2e8f0;
+      letter-spacing: -0.3px;
+    }
+    .concept-desc {
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+      max-width: 340px;
+      line-height: 1.6;
+    }
+    .divider {
+      width: 100%;
+      max-width: 960px;
+      margin: 64px auto;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #1e3a5f, transparent);
+    }
+  </style>
+</head>
+<body>
+
+<h1>Blueprint — Logo Concepts</h1>
+
+<div class="grid">
+
+  <!-- ─── CONCEPT A: The Line Drawing ─── -->
+  <div class="card">
+    <div class="label">A — The Line Drawing</div>
+
+    <div class="icon-row">
+      <!-- Large -->
+      <div class="sz-lg">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <!-- grid dots -->
+          <circle cx="176" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="226" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="276" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="326" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="176" cy="354" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="226" cy="354" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="276" cy="354" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="326" cy="354" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="176" cy="402" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="326" cy="402" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <!-- roof lines -->
+          <polyline points="256,104 136,272 376,272" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+          <!-- walls -->
+          <rect x="136" y="264" width="240" height="148" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+          <!-- door -->
+          <rect x="214" y="316" width="68" height="96" rx="5" fill="none" stroke="#3b82f6" stroke-width="12"/>
+          <!-- crosshair at peak -->
+          <line x1="256" y1="78" x2="256" y2="104" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="243" y1="91" x2="269" y2="91" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <!-- Medium -->
+      <div class="sz-md">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <circle cx="176" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="226" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="276" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="326" cy="306" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="176" cy="354" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="276" cy="354" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="326" cy="354" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="176" cy="402" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <circle cx="326" cy="402" r="4.5" fill="#3b82f6" opacity=".3"/>
+          <polyline points="256,104 136,272 376,272" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="136" y="264" width="240" height="148" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+          <rect x="214" y="316" width="68" height="96" rx="5" fill="none" stroke="#3b82f6" stroke-width="12"/>
+          <line x1="256" y1="78" x2="256" y2="104" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="243" y1="91" x2="269" y2="91" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <!-- Small -->
+      <div class="sz-sm">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <polyline points="256,104 136,272 376,272" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="136" y="264" width="240" height="148" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+          <rect x="214" y="316" width="68" height="96" rx="5" fill="none" stroke="#3b82f6" stroke-width="12"/>
+          <line x1="256" y1="78" x2="256" y2="104" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="243" y1="91" x2="269" y2="91" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <!-- XS -->
+      <div class="sz-xs">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <polyline points="256,104 136,272 376,272" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="136" y="264" width="240" height="148" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+          <rect x="214" y="316" width="68" height="96" rx="5" fill="none" stroke="#3b82f6" stroke-width="12"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="wordmark">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#0e2240"/>
+        <polyline points="256,104 136,272 376,272" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round" stroke-linecap="round"/>
+        <rect x="136" y="264" width="240" height="148" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+        <rect x="214" y="316" width="68" height="96" rx="5" fill="none" stroke="#3b82f6" stroke-width="12"/>
+        <line x1="256" y1="78" x2="256" y2="104" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        <line x1="243" y1="91" x2="269" y2="91" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <span class="wordmark-text">Blue<span>print</span></span>
+    </div>
+
+    <div class="concept-name">The Line Drawing</div>
+    <div class="concept-desc">House drawn as thin architectural lines — like it was drafted by hand. Blueprint crosshair at the peak. Precise, technical, sleek.</div>
+  </div>
+
+  <!-- ─── CONCEPT B: The Folded Blueprint ─── -->
+  <div class="card">
+    <div class="label">B — The Folded Blueprint</div>
+
+    <div class="icon-row">
+      <div class="sz-lg">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <!-- document body -->
+          <path d="M108,80 L348,80 L404,136 L404,432 L108,432 Z" fill="#0a2a52" stroke="#1e4a7a" stroke-width="8"/>
+          <!-- folded corner -->
+          <path d="M348,80 L348,136 L404,136 Z" fill="#1e3a6a" stroke="#1e4a7a" stroke-width="8" stroke-linejoin="round"/>
+          <!-- fold crease line -->
+          <line x1="348" y1="80" x2="404" y2="136" stroke="#2563a8" stroke-width="6"/>
+          <!-- grid lines inside doc -->
+          <line x1="148" y1="196" x2="344" y2="196" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="148" y1="238" x2="344" y2="238" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="148" y1="280" x2="344" y2="280" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="148" y1="322" x2="344" y2="322" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="192" y1="166" x2="192" y2="380" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="248" y1="166" x2="248" y2="380" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="304" y1="166" x2="304" y2="380" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <!-- mini house on the doc -->
+          <polyline points="246,196 166,260 326,260" fill="none" stroke="#fff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="174" y="255" width="144" height="88" fill="none" stroke="#fff" stroke-width="11" stroke-linejoin="round"/>
+          <rect x="220" y="295" width="52" height="48" rx="3" fill="none" stroke="#60a5fa" stroke-width="9"/>
+        </svg>
+      </div>
+      <div class="sz-md">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <path d="M108,80 L348,80 L404,136 L404,432 L108,432 Z" fill="#0a2a52" stroke="#1e4a7a" stroke-width="8"/>
+          <path d="M348,80 L348,136 L404,136 Z" fill="#1e3a6a" stroke="#1e4a7a" stroke-width="8" stroke-linejoin="round"/>
+          <line x1="148" y1="196" x2="344" y2="196" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="148" y1="238" x2="344" y2="238" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="148" y1="280" x2="344" y2="280" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="148" y1="322" x2="344" y2="322" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="192" y1="166" x2="192" y2="380" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="248" y1="166" x2="248" y2="380" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <line x1="304" y1="166" x2="304" y2="380" stroke="#2563a8" stroke-width="4" opacity=".5"/>
+          <polyline points="246,196 166,260 326,260" fill="none" stroke="#fff" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="174" y="255" width="144" height="88" fill="none" stroke="#fff" stroke-width="11" stroke-linejoin="round"/>
+          <rect x="220" y="295" width="52" height="48" rx="3" fill="none" stroke="#60a5fa" stroke-width="9"/>
+        </svg>
+      </div>
+      <div class="sz-sm">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <path d="M108,80 L348,80 L404,136 L404,432 L108,432 Z" fill="#0a2a52" stroke="#1e4a7a" stroke-width="8"/>
+          <path d="M348,80 L348,136 L404,136 Z" fill="#1e3a6a" stroke="#2563a8" stroke-width="6"/>
+          <polyline points="246,196 166,260 326,260" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="174" y="255" width="144" height="88" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round"/>
+          <rect x="220" y="295" width="52" height="48" rx="3" fill="none" stroke="#60a5fa" stroke-width="11"/>
+        </svg>
+      </div>
+      <div class="sz-xs">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <path d="M108,80 L348,80 L404,136 L404,432 L108,432 Z" fill="#0a2a52" stroke="#1e4a7a" stroke-width="8"/>
+          <path d="M348,80 L348,136 L404,136 Z" fill="#1e3a6a"/>
+          <polyline points="246,196 166,260 326,260" fill="none" stroke="#fff" stroke-width="18" stroke-linejoin="round" stroke-linecap="round"/>
+          <rect x="174" y="255" width="144" height="88" fill="none" stroke="#fff" stroke-width="18" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="wordmark">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#0e2240"/>
+        <path d="M108,80 L348,80 L404,136 L404,432 L108,432 Z" fill="#0a2a52" stroke="#1e4a7a" stroke-width="8"/>
+        <path d="M348,80 L348,136 L404,136 Z" fill="#1e3a6a" stroke="#2563a8" stroke-width="6"/>
+        <polyline points="246,196 166,260 326,260" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/>
+        <rect x="174" y="255" width="144" height="88" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round"/>
+        <rect x="220" y="295" width="52" height="48" rx="3" fill="none" stroke="#60a5fa" stroke-width="11"/>
+      </svg>
+      <span class="wordmark-text">Blue<span>print</span></span>
+    </div>
+
+    <div class="concept-name">The Folded Blueprint</div>
+    <div class="concept-desc">A document with a folded corner — like an actual blueprint rolled out. Blueprint grid lines inside, house drawn on the page.</div>
+  </div>
+
+  <!-- ─── CONCEPT C: The Floor Plan ─── -->
+  <div class="card">
+    <div class="label">C — The Floor Plan</div>
+
+    <div class="icon-row">
+      <div class="sz-lg">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <!-- outer walls -->
+          <rect x="88" y="108" width="336" height="296" fill="none" stroke="#fff" stroke-width="18" stroke-linejoin="round"/>
+          <!-- interior walls -->
+          <!-- vertical divider -->
+          <line x1="256" y1="108" x2="256" y2="310" stroke="#fff" stroke-width="14"/>
+          <!-- horizontal divider in right half -->
+          <line x1="256" y1="240" x2="424" y2="240" stroke="#fff" stroke-width="14"/>
+          <!-- horizontal divider bottom left -->
+          <line x1="88" y1="280" x2="218" y2="280" stroke="#fff" stroke-width="14"/>
+          <!-- door openings (gaps) -->
+          <!-- Front door bottom center -->
+          <line x1="210" y1="404" x2="302" y2="404" stroke="#0e2240" stroke-width="22"/>
+          <!-- door arc front -->
+          <path d="M 210,404 A 46,46 0 0 1 256,358" fill="none" stroke="#3b82f6" stroke-width="9" stroke-linecap="round"/>
+          <!-- interior door -->
+          <line x1="256" y1="280" x2="256" y2="310" stroke="#0e2240" stroke-width="22"/>
+          <path d="M 256,280 A 30,30 0 0 0 226,280" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <!-- accent dot in each room -->
+          <circle cx="172" cy="194" r="8" fill="#3b82f6" opacity=".6"/>
+          <circle cx="172" cy="342" r="8" fill="#3b82f6" opacity=".6"/>
+          <circle cx="340" cy="174" r="8" fill="#3b82f6" opacity=".6"/>
+          <circle cx="340" cy="322" r="8" fill="#3b82f6" opacity=".6"/>
+          <!-- compass N -->
+          <circle cx="400" cy="136" r="22" fill="none" stroke="#3b82f6" stroke-width="6" opacity=".7"/>
+          <line x1="400" y1="124" x2="400" y2="120" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" opacity=".7"/>
+          <text x="400" y="142" text-anchor="middle" font-size="20" font-weight="700" fill="#3b82f6" font-family="sans-serif" opacity=".9">N</text>
+        </svg>
+      </div>
+      <div class="sz-md">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <rect x="88" y="108" width="336" height="296" fill="none" stroke="#fff" stroke-width="18" stroke-linejoin="round"/>
+          <line x1="256" y1="108" x2="256" y2="310" stroke="#fff" stroke-width="14"/>
+          <line x1="256" y1="240" x2="424" y2="240" stroke="#fff" stroke-width="14"/>
+          <line x1="88" y1="280" x2="218" y2="280" stroke="#fff" stroke-width="14"/>
+          <line x1="210" y1="404" x2="302" y2="404" stroke="#0e2240" stroke-width="22"/>
+          <path d="M 210,404 A 46,46 0 0 1 256,358" fill="none" stroke="#3b82f6" stroke-width="9" stroke-linecap="round"/>
+          <line x1="256" y1="280" x2="256" y2="310" stroke="#0e2240" stroke-width="22"/>
+          <path d="M 256,280 A 30,30 0 0 0 226,280" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="172" cy="194" r="8" fill="#3b82f6" opacity=".6"/>
+          <circle cx="172" cy="342" r="8" fill="#3b82f6" opacity=".6"/>
+          <circle cx="340" cy="174" r="8" fill="#3b82f6" opacity=".6"/>
+          <circle cx="340" cy="322" r="8" fill="#3b82f6" opacity=".6"/>
+        </svg>
+      </div>
+      <div class="sz-sm">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <rect x="88" y="108" width="336" height="296" fill="none" stroke="#fff" stroke-width="22" stroke-linejoin="round"/>
+          <line x1="256" y1="108" x2="256" y2="310" stroke="#fff" stroke-width="18"/>
+          <line x1="256" y1="240" x2="424" y2="240" stroke="#fff" stroke-width="18"/>
+          <line x1="88" y1="280" x2="218" y2="280" stroke="#fff" stroke-width="18"/>
+          <line x1="210" y1="404" x2="302" y2="404" stroke="#0e2240" stroke-width="26"/>
+          <path d="M 210,404 A 46,46 0 0 1 256,358" fill="none" stroke="#3b82f6" stroke-width="12" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sz-xs">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <rect x="88" y="108" width="336" height="296" fill="none" stroke="#fff" stroke-width="26" stroke-linejoin="round"/>
+          <line x1="256" y1="108" x2="256" y2="310" stroke="#fff" stroke-width="22"/>
+          <line x1="256" y1="240" x2="424" y2="240" stroke="#fff" stroke-width="22"/>
+          <line x1="88" y1="280" x2="218" y2="280" stroke="#fff" stroke-width="22"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="wordmark">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#0e2240"/>
+        <rect x="88" y="108" width="336" height="296" fill="none" stroke="#fff" stroke-width="18" stroke-linejoin="round"/>
+        <line x1="256" y1="108" x2="256" y2="310" stroke="#fff" stroke-width="14"/>
+        <line x1="256" y1="240" x2="424" y2="240" stroke="#fff" stroke-width="14"/>
+        <line x1="88" y1="280" x2="218" y2="280" stroke="#fff" stroke-width="14"/>
+        <line x1="210" y1="404" x2="302" y2="404" stroke="#0e2240" stroke-width="22"/>
+        <path d="M 210,404 A 46,46 0 0 1 256,358" fill="none" stroke="#3b82f6" stroke-width="9" stroke-linecap="round"/>
+      </svg>
+      <span class="wordmark-text">Blue<span>print</span></span>
+    </div>
+
+    <div class="concept-name">The Floor Plan</div>
+    <div class="concept-desc">Top-down floor plan view — rooms, walls, door arcs. Unique angle no other app uses. Instantly reads as "planning your home."</div>
+  </div>
+
+  <!-- ─── CONCEPT D: House + Crosshair ─── -->
+  <div class="card">
+    <div class="label">D — The House + Crosshair</div>
+
+    <div class="icon-row">
+      <div class="sz-lg">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <!-- house solid fill (navy cutout style) -->
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="#1a3a64"/>
+          <!-- house outline -->
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round"/>
+          <!-- door -->
+          <rect x="214" y="316" width="84" height="100" rx="6" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+          <!-- windows -->
+          <rect x="148" y="286" width="62" height="58" rx="5" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+          <rect x="302" y="286" width="62" height="58" rx="5" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+          <!-- crosshair target at roof peak -->
+          <circle cx="256" cy="96" r="28" fill="none" stroke="#3b82f6" stroke-width="8"/>
+          <line x1="256" y1="60" x2="256" y2="80" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="256" y1="112" x2="256" y2="132" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="220" y1="96" x2="240" y2="96" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="272" y1="96" x2="292" y2="96" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sz-md">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="#1a3a64"/>
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round"/>
+          <rect x="214" y="316" width="84" height="100" rx="6" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+          <rect x="148" y="286" width="62" height="58" rx="5" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+          <rect x="302" y="286" width="62" height="58" rx="5" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+          <circle cx="256" cy="96" r="28" fill="none" stroke="#3b82f6" stroke-width="8"/>
+          <line x1="256" y1="60" x2="256" y2="80" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="256" y1="112" x2="256" y2="132" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="220" y1="96" x2="240" y2="96" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+          <line x1="272" y1="96" x2="292" y2="96" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sz-sm">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="#1a3a64"/>
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+          <rect x="214" y="316" width="84" height="100" rx="6" fill="#0e2240" stroke="#fff" stroke-width="12"/>
+          <circle cx="256" cy="96" r="28" fill="none" stroke="#3b82f6" stroke-width="9"/>
+          <line x1="256" y1="58" x2="256" y2="80" stroke="#3b82f6" stroke-width="9" stroke-linecap="round"/>
+          <line x1="256" y1="112" x2="256" y2="134" stroke="#3b82f6" stroke-width="9" stroke-linecap="round"/>
+          <line x1="218" y1="96" x2="240" y2="96" stroke="#3b82f6" stroke-width="9" stroke-linecap="round"/>
+          <line x1="272" y1="96" x2="294" y2="96" stroke="#3b82f6" stroke-width="9" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="sz-xs">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#0e2240"/>
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="#1a3a64"/>
+          <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="none" stroke="#fff" stroke-width="18" stroke-linejoin="round"/>
+          <rect x="214" y="316" width="84" height="100" rx="6" fill="#0e2240" stroke="#fff" stroke-width="14"/>
+          <circle cx="256" cy="96" r="28" fill="none" stroke="#3b82f6" stroke-width="10"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="wordmark">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#0e2240"/>
+        <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="#1a3a64"/>
+        <polygon points="256,96 80,264 136,264 136,416 376,416 376,264 432,264" fill="none" stroke="#fff" stroke-width="14" stroke-linejoin="round"/>
+        <rect x="214" y="316" width="84" height="100" rx="6" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+        <rect x="148" y="286" width="62" height="58" rx="5" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+        <rect x="302" y="286" width="62" height="58" rx="5" fill="#0e2240" stroke="#fff" stroke-width="10"/>
+        <circle cx="256" cy="96" r="28" fill="none" stroke="#3b82f6" stroke-width="8"/>
+        <line x1="256" y1="60" x2="256" y2="80" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        <line x1="256" y1="112" x2="256" y2="132" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        <line x1="220" y1="96" x2="240" y2="96" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+        <line x1="272" y1="96" x2="292" y2="96" stroke="#3b82f6" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <span class="wordmark-text">Blue<span>print</span></span>
+    </div>
+
+    <div class="concept-name">The House + Crosshair</div>
+    <div class="concept-desc">Solid house with a surveyor's crosshair target at the peak. Minimal and bold — the crosshair signals precision, planning, and purpose.</div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+<p style="text-align:center;font-size:12px;color:#2a4a6a;letter-spacing:2px;text-transform:uppercase">Each concept shown at 160px · 80px · 40px · 24px</p>
+
+</body>
+</html>

@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Logo Concepts</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0c0a09;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      padding: 64px 40px 80px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .header-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: #d97706;
+      margin-bottom: 14px;
+    }
+    .header-title {
+      font-size: 64px;
+      font-weight: 900;
+      letter-spacing: -3px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .header-title span { color: #d97706; }
+    .header-sub {
+      font-size: 15px;
+      color: #44403c;
+      letter-spacing: .3px;
+    }
+
+    .concept {
+      max-width: 1040px;
+      margin: 0 auto 100px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 72px;
+      align-items: start;
+    }
+    .concept.flip { direction: rtl; }
+    .concept.flip > * { direction: ltr; }
+
+    .concept-visual { display: flex; flex-direction: column; gap: 24px; }
+
+    .icon-row { display: flex; align-items: center; gap: 18px; }
+    .sz-xl svg { width: 180px; height: 180px; }
+    .sz-lg svg { width: 96px;  height: 96px; }
+    .sz-md svg { width: 56px;  height: 56px; }
+    .sz-sm svg { width: 36px;  height: 36px; }
+    .sz-xs svg { width: 24px;  height: 24px; }
+
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+      background: #1c1917;
+      border-radius: 12px;
+      border: 1px solid #292524;
+    }
+    .wordmark svg { width: 48px; height: 48px; }
+    .wm-text {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+    .wm-text span { color: #fff; }
+
+    .wordmark-light {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e7e5e4;
+    }
+    .wordmark-light svg { width: 48px; height: 48px; }
+    .wm-light-text {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #1c1917;
+      text-transform: uppercase;
+    }
+    .wm-light-text span { color: #1c1917; }
+
+    .wordmark-hero {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 28px 36px;
+      background: #ffffff;
+      border-radius: 16px;
+    }
+    .wordmark-hero svg { width: 72px; height: 72px; }
+    .wm-hero-text {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      color: #1c1917;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .concept-info { padding-top: 6px; }
+    .concept-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #d97706;
+      margin-bottom: 14px;
+    }
+    .concept-name {
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: #fff;
+      margin-bottom: 14px;
+      line-height: 1.1;
+    }
+    .concept-desc {
+      font-size: 14px;
+      color: #78716c;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+    .concept-desc strong { color: #a8a29e; font-weight: 600; }
+
+    .taglines { display: flex; flex-direction: column; gap: 8px; }
+    .tagline {
+      font-size: 13px;
+      font-style: italic;
+      color: #44403c;
+      padding-left: 14px;
+      border-left: 2px solid #292524;
+      line-height: 1.5;
+    }
+    .tagline.hero {
+      color: #e7e5e4;
+      border-left-color: #d97706;
+      font-size: 15px;
+    }
+
+    .palette { display: flex; gap: 10px; margin-top: 24px; }
+    .swatch-wrap { display: flex; flex-direction: column; align-items: center; }
+    .swatch { width: 30px; height: 30px; border-radius: 50%; }
+    .swatch-label { font-size: 10px; color: #44403c; margin-top: 5px; text-align: center; }
+
+    .divider {
+      max-width: 1040px;
+      margin: 0 auto 100px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #292524, transparent);
+    }
+    .sizes-note { font-size: 11px; color: #44403c; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">Logo Concepts</div>
+  <div class="header-title">To<span>to</span></div>
+  <div class="header-sub">Your life's companion &nbsp;·&nbsp; Add it to Toto</div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     CONCEPT A — The Full Body
+══════════════════════════════════════ -->
+<div class="concept">
+  <div class="concept-visual">
+    <div class="sizes-note">5 sizes</div>
+    <div class="icon-row">
+
+      <!-- front-facing shaggy silhouette -->
+      <div class="sz-xl">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <!-- tail — right side, curves up -->
+          <path d="M 372,288 C 394,252 408,208 396,174 C 390,154 374,144 356,152"
+                fill="none" stroke="#7a6a62" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- back legs -->
+          <rect x="150" y="354" width="50" height="98" rx="25" fill="#7a6a62"/>
+          <rect x="314" y="354" width="50" height="98" rx="25" fill="#7a6a62"/>
+          <!-- body main -->
+          <ellipse cx="256" cy="316" rx="140" ry="90" fill="#7a6a62"/>
+          <!-- shaggy fur skirt / bottom -->
+          <path d="M 118,336 C 114,360 120,384 132,400 C 136,410 142,420 146,430 C 148,438 156,444 164,440 C 166,450 174,454 182,448 C 184,456 192,460 198,452 C 202,460 210,462 216,454 C 218,464 226,466 232,458 C 234,466 242,468 248,462 C 250,470 258,472 264,466 C 266,472 274,470 278,462 C 282,468 290,466 292,458 C 296,464 304,462 306,454 C 310,460 318,458 320,448 C 326,454 334,450 334,440 C 342,438 350,428 348,416 C 354,404 362,386 360,368 C 366,354 374,340 374,322"
+                fill="#7a6a62"/>
+          <!-- front legs -->
+          <rect x="184" y="362" width="44" height="92" rx="22" fill="#7a6a62"/>
+          <rect x="286" y="362" width="44" height="92" rx="22" fill="#7a6a62"/>
+          <!-- left body side fur -->
+          <path d="M 116,298 C 102,290 94,302 98,318 C 86,324 82,340 92,354 C 82,362 84,380 98,384 C 94,396 104,410 118,410"
+                fill="#7a6a62"/>
+          <!-- right body side fur -->
+          <path d="M 396,298 C 410,290 418,302 414,318 C 426,324 430,340 420,354 C 430,362 428,380 414,384 C 418,396 408,410 394,410"
+                fill="#7a6a62"/>
+          <!-- neck -->
+          <ellipse cx="256" cy="284" rx="70" ry="42" fill="#7a6a62"/>
+          <!-- head -->
+          <circle cx="256" cy="208" r="90" fill="#7a6a62"/>
+          <!-- head left side fur -->
+          <path d="M 168,196 C 154,188 146,172 150,158 C 144,146 152,134 164,132 C 160,120 168,108 180,110 C 178,98 188,90 200,96"
+                fill="#7a6a62"/>
+          <!-- head right side fur -->
+          <path d="M 344,196 C 358,188 366,172 362,158 C 368,146 360,134 348,132 C 352,120 344,108 332,110 C 334,98 324,90 312,96"
+                fill="#7a6a62"/>
+          <!-- head top fur bumps -->
+          <path d="M 198,126 C 200,114 208,108 214,114 C 216,104 224,100 230,106 C 232,98 240,94 246,100 C 248,92 256,88 262,94 C 264,88 272,86 276,94 C 280,100 286,108 284,120 C 290,114 300,120 298,132"
+                fill="#7a6a62"/>
+          <!-- left ear -->
+          <path d="M 194,126 L 172,52 L 236,112 Z" fill="#7a6a62"/>
+          <!-- right ear -->
+          <path d="M 318,126 L 340,48 L 280,108 Z" fill="#7a6a62"/>
+          <!-- eyes — white highlights -->
+          <circle cx="224" cy="200" r="18" fill="#fff" opacity=".9"/>
+          <circle cx="288" cy="200" r="18" fill="#fff" opacity=".9"/>
+          <circle cx="224" cy="200" r="9" fill="#1c1917"/>
+          <circle cx="288" cy="200" r="9" fill="#1c1917"/>
+          <circle cx="227" cy="197" r="4" fill="#fff"/>
+          <circle cx="291" cy="197" r="4" fill="#fff"/>
+          <!-- smile -->
+          <path d="M 238,238 Q 256,252 274,238" fill="none" stroke="#1c1917" stroke-width="4" stroke-linecap="round"/>
+          <!-- GREEN COLLAR -->
+          <rect x="160" y="267" width="192" height="24" rx="12" fill="#10b981"/>
+          <rect x="246" y="267" width="20" height="24" fill="#059669"/>
+          <circle cx="256" cy="303" r="17" fill="#10b981"/>
+          <circle cx="256" cy="303" r="12" fill="#047857"/>
+          <polyline points="249,303 253,309 263,297" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="sz-lg">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <path d="M 372,288 C 394,252 408,208 396,174 C 390,154 374,144 356,152"
+                fill="none" stroke="#7a6a62" stroke-width="24" stroke-linecap="round"/>
+          <rect x="150" y="354" width="50" height="98" rx="25" fill="#7a6a62"/>
+          <rect x="314" y="354" width="50" height="98" rx="25" fill="#7a6a62"/>
+          <ellipse cx="256" cy="316" rx="140" ry="90" fill="#7a6a62"/>
+          <path d="M 118,336 C 114,360 120,384 132,400 C 140,416 148,434 162,440 C 168,450 178,452 184,446 C 188,456 198,458 204,450 C 208,460 218,460 224,452 C 228,462 238,464 244,458 C 248,468 258,468 264,462 C 268,468 278,466 280,458 C 286,464 296,460 296,450 C 304,452 314,446 314,436 C 324,432 336,416 332,400 C 346,382 370,356 374,322"
+                fill="#7a6a62"/>
+          <rect x="184" y="362" width="44" height="92" rx="22" fill="#7a6a62"/>
+          <rect x="286" y="362" width="44" height="92" rx="22" fill="#7a6a62"/>
+          <path d="M 116,298 C 102,290 94,302 98,318 C 86,324 82,340 92,354 C 82,362 84,380 98,384"
+                fill="#7a6a62"/>
+          <path d="M 396,298 C 410,290 418,302 414,318 C 426,324 430,340 420,354 C 430,362 428,380 414,384"
+                fill="#7a6a62"/>
+          <ellipse cx="256" cy="284" rx="70" ry="42" fill="#7a6a62"/>
+          <circle cx="256" cy="208" r="90" fill="#7a6a62"/>
+          <path d="M 168,196 C 154,188 146,172 150,158 C 144,146 152,134 164,132"
+                fill="#7a6a62"/>
+          <path d="M 344,196 C 358,188 366,172 362,158 C 368,146 360,134 348,132"
+                fill="#7a6a62"/>
+          <path d="M 198,126 C 200,114 208,108 214,114 C 216,104 224,100 230,106 C 232,98 240,94 246,100 C 248,92 256,88 262,94 C 264,88 272,86 276,94 C 280,100 286,108 284,120 C 290,114 300,120 298,132"
+                fill="#7a6a62"/>
+          <path d="M 194,126 L 172,52 L 236,112 Z" fill="#7a6a62"/>
+          <path d="M 318,126 L 340,48 L 280,108 Z" fill="#7a6a62"/>
+          <circle cx="224" cy="200" r="18" fill="#fff" opacity=".9"/>
+          <circle cx="288" cy="200" r="18" fill="#fff" opacity=".9"/>
+          <circle cx="224" cy="200" r="9" fill="#1c1917"/>
+          <circle cx="288" cy="200" r="9" fill="#1c1917"/>
+          <circle cx="227" cy="197" r="4" fill="#fff"/>
+          <circle cx="291" cy="197" r="4" fill="#fff"/>
+          <path d="M 238,238 Q 256,252 274,238" fill="none" stroke="#1c1917" stroke-width="4" stroke-linecap="round"/>
+          <rect x="160" y="267" width="192" height="24" rx="12" fill="#10b981"/>
+          <circle cx="256" cy="303" r="17" fill="#10b981"/>
+          <circle cx="256" cy="303" r="12" fill="#047857"/>
+          <polyline points="249,303 253,309 263,297" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="sz-md">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <path d="M 372,288 C 394,252 408,208 396,174 C 390,154 374,144 356,152"
+                fill="none" stroke="#7a6a62" stroke-width="24" stroke-linecap="round"/>
+          <rect x="148" y="352" width="52" height="100" rx="26" fill="#7a6a62"/>
+          <rect x="314" y="352" width="52" height="100" rx="26" fill="#7a6a62"/>
+          <ellipse cx="256" cy="316" rx="142" ry="92" fill="#7a6a62"/>
+          <path d="M 114,334 C 110,362 124,390 138,406 C 148,422 162,440 178,444 C 186,454 200,454 206,444 C 212,454 226,452 230,442 C 236,452 250,450 254,440 C 258,450 270,450 274,440 C 278,450 292,452 296,442 C 302,452 316,452 320,442 C 330,444 346,428 356,408 C 372,386 382,356 382,330"
+                fill="#7a6a62"/>
+          <ellipse cx="256" cy="282" rx="72" ry="44" fill="#7a6a62"/>
+          <circle cx="256" cy="206" r="92" fill="#7a6a62"/>
+          <path d="M 196,124 C 200,112 208,106 214,112 C 218,102 226,98 232,104 C 234,96 242,92 248,98 C 250,90 258,86 264,92 C 268,86 276,86 278,94 C 284,102 288,112 284,124 C 292,116 302,124 298,136"
+                fill="#7a6a62"/>
+          <path d="M 192,124 L 168,48 L 236,110 Z" fill="#7a6a62"/>
+          <path d="M 320,124 L 344,44 L 280,106 Z" fill="#7a6a62"/>
+          <circle cx="224" cy="198" r="19" fill="#fff" opacity=".9"/>
+          <circle cx="288" cy="198" r="19" fill="#fff" opacity=".9"/>
+          <circle cx="224" cy="198" r="9" fill="#1c1917"/>
+          <circle cx="288" cy="198" r="9" fill="#1c1917"/>
+          <circle cx="227" cy="195" r="4" fill="#fff"/>
+          <circle cx="291" cy="195" r="4" fill="#fff"/>
+          <rect x="158" y="265" width="196" height="24" rx="12" fill="#10b981"/>
+          <circle cx="256" cy="302" r="18" fill="#047857"/>
+          <polyline points="249,302 253,308 263,296" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="sz-sm">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <path d="M 374,286 C 396,248 410,202 396,168 C 388,148 370,138 352,148"
+                fill="none" stroke="#7a6a62" stroke-width="26" stroke-linecap="round"/>
+          <rect x="146" y="350" width="56" height="102" rx="28" fill="#7a6a62"/>
+          <rect x="314" y="350" width="56" height="102" rx="28" fill="#7a6a62"/>
+          <ellipse cx="256" cy="314" rx="146" ry="96" fill="#7a6a62"/>
+          <path d="M 110,330 C 106,362 122,394 140,410 C 156,434 178,448 202,446 C 210,456 226,454 230,444 C 238,454 254,452 256,442 C 258,452 274,454 282,444 C 286,454 302,456 310,446 C 334,448 356,434 372,410 C 390,394 406,362 402,330"
+                fill="#7a6a62"/>
+          <ellipse cx="256" cy="280" rx="76" ry="48" fill="#7a6a62"/>
+          <circle cx="256" cy="204" r="96" fill="#7a6a62"/>
+          <path d="M 188,122 L 164,42 L 236,108 Z" fill="#7a6a62"/>
+          <path d="M 324,122 L 348,38 L 280,104 Z" fill="#7a6a62"/>
+          <circle cx="222" cy="196" r="21" fill="#fff" opacity=".9"/>
+          <circle cx="290" cy="196" r="21" fill="#fff" opacity=".9"/>
+          <circle cx="222" cy="196" r="10" fill="#1c1917"/>
+          <circle cx="290" cy="196" r="10" fill="#1c1917"/>
+          <circle cx="225" cy="193" r="4.5" fill="#fff"/>
+          <circle cx="293" cy="193" r="4.5" fill="#fff"/>
+          <rect x="154" y="262" width="204" height="26" rx="13" fill="#10b981"/>
+          <circle cx="256" cy="302" r="20" fill="#047857"/>
+          <polyline points="248,302 253,309 265,295" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="sz-xs">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <path d="M 376,284 C 400,244 414,196 398,160 C 388,140 368,132 348,142"
+                fill="none" stroke="#7a6a62" stroke-width="28" stroke-linecap="round"/>
+          <rect x="142" y="346" width="60" height="106" rx="30" fill="#7a6a62"/>
+          <rect x="314" y="346" width="60" height="106" rx="30" fill="#7a6a62"/>
+          <ellipse cx="256" cy="312" rx="152" ry="100" fill="#7a6a62"/>
+          <ellipse cx="256" cy="278" rx="80" ry="52" fill="#7a6a62"/>
+          <circle cx="256" cy="200" r="100" fill="#7a6a62"/>
+          <path d="M 184,120 L 158,38 L 236,106 Z" fill="#7a6a62"/>
+          <path d="M 328,120 L 354,34 L 280,102 Z" fill="#7a6a62"/>
+          <circle cx="220" cy="192" r="24" fill="#fff" opacity=".9"/>
+          <circle cx="292" cy="192" r="24" fill="#fff" opacity=".9"/>
+          <circle cx="220" cy="192" r="12" fill="#1c1917"/>
+          <circle cx="292" cy="192" r="12" fill="#1c1917"/>
+          <circle cx="224" cy="188" r="5" fill="#fff"/>
+          <circle cx="296" cy="188" r="5" fill="#fff"/>
+          <rect x="150" y="258" width="212" height="28" rx="14" fill="#10b981"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- ── HERO: clean white wordmark, silhouette style ── -->
+    <div class="wordmark-hero">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <!-- dark silhouette on white — no background rect -->
+        <path d="M 372,288 C 394,252 408,208 396,174 C 390,154 374,144 356,152"
+              fill="none" stroke="#1c1917" stroke-width="24" stroke-linecap="round"/>
+        <rect x="150" y="354" width="50" height="98" rx="25" fill="#1c1917"/>
+        <rect x="314" y="354" width="50" height="98" rx="25" fill="#1c1917"/>
+        <ellipse cx="256" cy="316" rx="140" ry="90" fill="#1c1917"/>
+        <path d="M 118,336 C 114,360 120,384 132,400 C 140,416 148,434 162,440 C 168,450 178,452 184,446 C 188,456 198,458 204,450 C 208,460 218,460 224,452 C 228,462 238,464 244,458 C 248,468 258,468 264,462 C 268,468 278,466 280,458 C 286,464 296,460 296,450 C 304,452 314,446 314,436 C 326,432 340,412 334,394 C 348,374 374,346 374,320"
+              fill="#1c1917"/>
+        <rect x="184" y="362" width="44" height="92" rx="22" fill="#1c1917"/>
+        <rect x="286" y="362" width="44" height="92" rx="22" fill="#1c1917"/>
+        <path d="M 116,298 C 102,290 94,302 98,318 C 86,324 82,340 92,354 C 82,362 84,380 98,384" fill="#1c1917"/>
+        <path d="M 396,298 C 410,290 418,302 414,318 C 426,324 430,340 420,354 C 430,362 428,380 414,384" fill="#1c1917"/>
+        <ellipse cx="256" cy="284" rx="70" ry="42" fill="#1c1917"/>
+        <circle cx="256" cy="208" r="90" fill="#1c1917"/>
+        <path d="M 168,196 C 154,188 146,172 150,158 C 144,146 152,134 164,132" fill="#1c1917"/>
+        <path d="M 344,196 C 358,188 366,172 362,158 C 368,146 360,134 348,132" fill="#1c1917"/>
+        <path d="M 198,126 C 200,114 208,108 214,114 C 216,104 224,100 230,106 C 232,98 240,94 246,100 C 248,92 256,88 262,94 C 264,88 272,86 276,94 C 280,100 286,108 284,120 C 290,114 300,120 298,132" fill="#1c1917"/>
+        <path d="M 194,126 L 172,52 L 236,112 Z" fill="#1c1917"/>
+        <path d="M 318,126 L 340,48 L 280,108 Z" fill="#1c1917"/>
+        <!-- eyes — light grey visible on white bg too -->
+        <circle cx="224" cy="200" r="18" fill="#e8e4e0"/>
+        <circle cx="288" cy="200" r="18" fill="#e8e4e0"/>
+        <circle cx="224" cy="200" r="9" fill="#1c1917"/>
+        <circle cx="288" cy="200" r="9" fill="#1c1917"/>
+        <circle cx="227" cy="197" r="4" fill="#e8e4e0"/>
+        <circle cx="291" cy="197" r="4" fill="#e8e4e0"/>
+        <!-- GREEN COLLAR -->
+        <rect x="160" y="267" width="192" height="24" rx="12" fill="#10b981"/>
+        <rect x="246" y="267" width="20" height="24" fill="#059669"/>
+        <circle cx="256" cy="303" r="17" fill="#10b981"/>
+        <circle cx="256" cy="303" r="12" fill="#047857"/>
+        <polyline points="249,303 253,309 263,297" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="wm-hero-text">TOTO</span>
+    </div>
+
+    <div class="wordmark">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#1c1917"/>
+        <path d="M 372,288 C 394,252 408,208 396,174 C 390,154 374,144 356,152"
+              fill="none" stroke="#7a6a62" stroke-width="24" stroke-linecap="round"/>
+        <rect x="150" y="354" width="50" height="98" rx="25" fill="#7a6a62"/>
+        <rect x="314" y="354" width="50" height="98" rx="25" fill="#7a6a62"/>
+        <ellipse cx="256" cy="316" rx="140" ry="90" fill="#7a6a62"/>
+        <path d="M 118,336 C 114,360 120,384 132,400 C 140,416 148,434 162,440 C 168,450 178,452 184,446 C 188,456 198,458 204,450 C 208,460 218,460 224,452 C 228,462 238,464 244,458 C 248,468 258,468 264,462 C 268,468 278,466 280,458 C 286,464 296,460 296,450 C 304,452 314,446 314,436 C 324,432 336,416 332,400 C 346,382 370,356 374,322"
+              fill="#7a6a62"/>
+        <rect x="184" y="362" width="44" height="92" rx="22" fill="#7a6a62"/>
+        <rect x="286" y="362" width="44" height="92" rx="22" fill="#7a6a62"/>
+        <ellipse cx="256" cy="284" rx="70" ry="42" fill="#7a6a62"/>
+        <circle cx="256" cy="208" r="90" fill="#7a6a62"/>
+        <path d="M 198,126 C 200,114 208,108 214,114 C 216,104 224,100 230,106 C 232,98 240,94 246,100 C 248,92 256,88 262,94 C 264,88 272,86 276,94 C 280,100 286,108 284,120 C 290,114 300,120 298,132" fill="#7a6a62"/>
+        <path d="M 194,126 L 172,52 L 236,112 Z" fill="#7a6a62"/>
+        <path d="M 318,126 L 340,48 L 280,108 Z" fill="#7a6a62"/>
+        <circle cx="224" cy="200" r="18" fill="#fff" opacity=".9"/>
+        <circle cx="288" cy="200" r="18" fill="#fff" opacity=".9"/>
+        <circle cx="224" cy="200" r="9" fill="#1c1917"/>
+        <circle cx="288" cy="200" r="9" fill="#1c1917"/>
+        <circle cx="227" cy="197" r="4" fill="#fff"/>
+        <circle cx="291" cy="197" r="4" fill="#fff"/>
+        <rect x="160" y="267" width="192" height="24" rx="12" fill="#10b981"/>
+        <circle cx="256" cy="303" r="16" fill="#047857"/>
+        <polyline points="249,303 253,309 263,297" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="wm-text">TOTO</span>
+    </div>
+
+    <div class="wordmark-light">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 372,288 C 394,252 408,208 396,174 C 390,154 374,144 356,152"
+              fill="none" stroke="#1c1917" stroke-width="24" stroke-linecap="round"/>
+        <rect x="150" y="354" width="50" height="98" rx="25" fill="#1c1917"/>
+        <rect x="314" y="354" width="50" height="98" rx="25" fill="#1c1917"/>
+        <ellipse cx="256" cy="316" rx="140" ry="90" fill="#1c1917"/>
+        <path d="M 118,336 C 114,360 120,384 132,400 C 140,416 148,434 162,440 C 168,450 178,452 184,446 C 188,456 198,458 204,450 C 208,460 218,460 224,452 C 228,462 238,464 244,458 C 248,468 258,468 264,462 C 268,468 278,466 280,458 C 286,464 296,460 296,450 C 304,452 314,446 314,436 C 326,432 340,412 334,394 C 348,374 374,346 374,320"
+              fill="#1c1917"/>
+        <rect x="184" y="362" width="44" height="92" rx="22" fill="#1c1917"/>
+        <rect x="286" y="362" width="44" height="92" rx="22" fill="#1c1917"/>
+        <ellipse cx="256" cy="284" rx="70" ry="42" fill="#1c1917"/>
+        <circle cx="256" cy="208" r="90" fill="#1c1917"/>
+        <path d="M 194,126 L 172,52 L 236,112 Z" fill="#1c1917"/>
+        <path d="M 318,126 L 340,48 L 280,108 Z" fill="#1c1917"/>
+        <path d="M 198,126 C 200,114 208,108 214,114 C 216,104 224,100 230,106 C 232,98 240,94 246,100 C 248,92 256,88 262,94 C 264,88 272,86 276,94 C 280,100 286,108 284,120" fill="#1c1917"/>
+        <circle cx="224" cy="200" r="18" fill="#e8e4e0"/>
+        <circle cx="288" cy="200" r="18" fill="#e8e4e0"/>
+        <circle cx="224" cy="200" r="9" fill="#1c1917"/>
+        <circle cx="288" cy="200" r="9" fill="#1c1917"/>
+        <circle cx="227" cy="197" r="4" fill="#e8e4e0"/>
+        <circle cx="291" cy="197" r="4" fill="#e8e4e0"/>
+        <rect x="160" y="267" width="192" height="24" rx="12" fill="#10b981"/>
+        <circle cx="256" cy="303" r="16" fill="#047857"/>
+        <polyline points="249,303 253,309 263,297" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="wm-light-text">TOTO</span>
+    </div>
+
+    <div class="palette">
+      <div class="swatch-wrap"><div class="swatch" style="background:#1c1917"></div><div class="swatch-label">Bark</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#62504a"></div><div class="swatch-label">Slate</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#7a6a62"></div><div class="swatch-label">Pewter</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#10b981"></div><div class="swatch-label">Emerald</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#ffffff;border:1px solid #e7e5e4"></div><div class="swatch-label">White</div></div>
+    </div>
+  </div>
+
+  <div class="concept-info">
+    <div class="concept-label">Concept A</div>
+    <div class="concept-name">The Full Body</div>
+    <div class="concept-desc">
+      A full-body <strong>Cairn Terrier side profile</strong> — tail up, ears pricked, facing forward. Scruffy charcoal coat, four sturdy little legs, and that classic Toto silhouette straight out of the 1939 film.
+      <br><br>
+      The <strong>emerald green collar with checkmark tag</strong> is the to-do wink — Emerald City meets your to-do list. Clean outline on white. Warm and solid on dark. Scales beautifully from hero to favicon.
+    </div>
+    <div class="taglines">
+      <div class="tagline hero">"Add it to Toto."</div>
+      <div class="tagline">"Your life's faithful companion."</div>
+      <div class="tagline">"Small dog. Big plans."</div>
+      <div class="tagline">"There's no place like a plan."</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════
+     CONCEPT B — The Paw + Check
+══════════════════════════════════════ -->
+<div class="concept flip">
+  <div class="concept-visual">
+    <div class="sizes-note">5 sizes</div>
+    <div class="icon-row">
+
+      <div class="sz-xl">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <!-- main pad -->
+          <ellipse cx="256" cy="308" rx="110" ry="96" fill="#d97706"/>
+          <!-- toe pads — top left -->
+          <ellipse cx="158" cy="196" rx="44" ry="40" fill="#d97706"/>
+          <!-- toe pads — top centre-left -->
+          <ellipse cx="218" cy="164" rx="44" ry="40" fill="#d97706"/>
+          <!-- toe pads — top centre-right (replaced with check circle) -->
+          <circle cx="294" cy="164" r="44" fill="#10b981"/>
+          <!-- checkmark in place of toe -->
+          <polyline points="276,164 289,178 314,150" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- toe pads — top right -->
+          <ellipse cx="354" cy="196" rx="44" ry="40" fill="#d97706"/>
+          <!-- inner pad lines for texture -->
+          <ellipse cx="256" cy="308" rx="72" ry="62" fill="#b45309" opacity=".35"/>
+        </svg>
+      </div>
+
+      <div class="sz-lg">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="256" cy="308" rx="110" ry="96" fill="#d97706"/>
+          <ellipse cx="158" cy="196" rx="44" ry="40" fill="#d97706"/>
+          <ellipse cx="218" cy="164" rx="44" ry="40" fill="#d97706"/>
+          <circle cx="294" cy="164" r="44" fill="#10b981"/>
+          <polyline points="276,164 289,178 314,150" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <ellipse cx="354" cy="196" rx="44" ry="40" fill="#d97706"/>
+          <ellipse cx="256" cy="308" rx="72" ry="62" fill="#b45309" opacity=".35"/>
+        </svg>
+      </div>
+
+      <div class="sz-md">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="256" cy="308" rx="110" ry="96" fill="#d97706"/>
+          <ellipse cx="158" cy="196" rx="44" ry="40" fill="#d97706"/>
+          <ellipse cx="218" cy="164" rx="44" ry="40" fill="#d97706"/>
+          <circle cx="294" cy="164" r="44" fill="#10b981"/>
+          <polyline points="276,164 289,178 314,150" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+          <ellipse cx="354" cy="196" rx="44" ry="40" fill="#d97706"/>
+        </svg>
+      </div>
+
+      <div class="sz-sm">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="256" cy="308" rx="110" ry="96" fill="#d97706"/>
+          <ellipse cx="158" cy="196" rx="44" ry="40" fill="#d97706"/>
+          <ellipse cx="218" cy="164" rx="44" ry="40" fill="#d97706"/>
+          <circle cx="294" cy="164" r="44" fill="#10b981"/>
+          <polyline points="276,164 289,178 314,150" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+          <ellipse cx="354" cy="196" rx="44" ry="40" fill="#d97706"/>
+        </svg>
+      </div>
+
+      <div class="sz-xs">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="256" cy="316" rx="114" ry="100" fill="#d97706"/>
+          <ellipse cx="156" cy="200" rx="46" ry="42" fill="#d97706"/>
+          <ellipse cx="218" cy="166" rx="46" ry="42" fill="#d97706"/>
+          <circle cx="296" cy="166" r="46" fill="#10b981"/>
+          <polyline points="277,166 291,181 317,151" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+          <ellipse cx="358" cy="200" rx="46" ry="42" fill="#d97706"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <div class="wordmark">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#1c1917"/>
+        <ellipse cx="256" cy="308" rx="110" ry="96" fill="#d97706"/>
+        <ellipse cx="158" cy="196" rx="44" ry="40" fill="#d97706"/>
+        <ellipse cx="218" cy="164" rx="44" ry="40" fill="#d97706"/>
+        <circle cx="294" cy="164" r="44" fill="#10b981"/>
+        <polyline points="276,164 289,178 314,150" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse cx="354" cy="196" rx="44" ry="40" fill="#d97706"/>
+        <ellipse cx="256" cy="308" rx="72" ry="62" fill="#b45309" opacity=".35"/>
+      </svg>
+      <span class="wm-text">To<span>to</span></span>
+    </div>
+
+    <div class="wordmark-light">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#1c1917"/>
+        <ellipse cx="256" cy="308" rx="110" ry="96" fill="#d97706"/>
+        <ellipse cx="158" cy="196" rx="44" ry="40" fill="#d97706"/>
+        <ellipse cx="218" cy="164" rx="44" ry="40" fill="#d97706"/>
+        <circle cx="294" cy="164" r="44" fill="#10b981"/>
+        <polyline points="276,164 289,178 314,150" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse cx="354" cy="196" rx="44" ry="40" fill="#d97706"/>
+      </svg>
+      <span class="wm-light-text">To<span>to</span></span>
+    </div>
+
+    <div class="palette">
+      <div class="swatch-wrap"><div class="swatch" style="background:#1c1917"></div><div class="swatch-label">Bark</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#d97706"></div><div class="swatch-label">Golden</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#10b981"></div><div class="swatch-label">Emerald</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#ffffff;border:1px solid #e7e5e4"></div><div class="swatch-label">White</div></div>
+    </div>
+  </div>
+
+  <div class="concept-info">
+    <div class="concept-label">Concept B</div>
+    <div class="concept-name">The Paw + Check</div>
+    <div class="concept-desc">
+      A paw print where <strong>one toe is a checkmark</strong> — the to-do pun hiding in plain sight. Clean, minimal, works perfectly at any size. Clever without trying too hard.
+      <br><br>
+      The emerald green checkmark toe is the <strong>only colour contrast</strong> — it draws the eye straight to the meaning. Functional as an icon, fun as a brand mark. The kind of logo people notice and smile at.
+    </div>
+    <div class="taglines">
+      <div class="tagline hero">"Tick it off. Toto's got it."</div>
+      <div class="tagline">"One paw at a time."</div>
+      <div class="tagline">"Leave a mark on your day."</div>
+      <div class="tagline">"Follow the paw prints."</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+
+<!-- ══════════════════════════════════════
+     CONCEPT C — The Running Toto
+══════════════════════════════════════ -->
+<div class="concept">
+  <div class="concept-visual">
+    <div class="sizes-note">5 sizes</div>
+    <div class="icon-row">
+
+      <div class="sz-xl">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <!-- paw print trail -->
+          <ellipse cx="96" cy="370" rx="18" ry="14" fill="#d97706" opacity=".25" transform="rotate(-20,96,370)"/>
+          <ellipse cx="88" cy="320" rx="15" ry="11" fill="#d97706" opacity=".18" transform="rotate(15,88,320)"/>
+          <ellipse cx="108" cy="274" rx="13" ry="10" fill="#d97706" opacity=".12" transform="rotate(-10,108,274)"/>
+          <!-- body -->
+          <ellipse cx="270" cy="316" rx="118" ry="72" fill="#d97706" transform="rotate(-12,270,316)"/>
+          <!-- tail (up and curled) -->
+          <path d="M 362,268 Q 420,220 408,168 Q 400,136 376,148" fill="none" stroke="#d97706" stroke-width="22" stroke-linecap="round"/>
+          <path d="M 362,268 Q 420,220 408,168 Q 400,136 376,148" fill="none" stroke="#b45309" stroke-width="10" stroke-linecap="round"/>
+          <!-- back leg -->
+          <ellipse cx="176" cy="366" rx="26" ry="42" fill="#b45309" transform="rotate(30,176,366)"/>
+          <ellipse cx="156" cy="398" rx="34" ry="18" fill="#b45309" transform="rotate(-10,156,398)"/>
+          <!-- back leg raised -->
+          <ellipse cx="204" cy="348" rx="22" ry="38" fill="#d97706" transform="rotate(-40,204,348)"/>
+          <!-- front leg extended -->
+          <ellipse cx="348" cy="378" rx="22" ry="40" fill="#b45309" transform="rotate(20,348,378)"/>
+          <ellipse cx="360" cy="408" rx="34" ry="16" fill="#b45309" transform="rotate(5,360,408)"/>
+          <!-- front leg raised forward -->
+          <ellipse cx="310" cy="340" rx="20" ry="36" fill="#d97706" transform="rotate(-30,310,340)"/>
+          <!-- neck -->
+          <ellipse cx="340" cy="252" rx="54" ry="44" fill="#d97706" transform="rotate(-20,340,252)"/>
+          <!-- head -->
+          <circle cx="368" cy="210" r="68" fill="#d97706"/>
+          <!-- ear (floppy, back) -->
+          <ellipse cx="320" cy="166" rx="26" ry="44" fill="#b45309" transform="rotate(30,320,166)"/>
+          <!-- ear (perky, front) -->
+          <ellipse cx="406" cy="160" rx="22" ry="40" fill="#b45309" transform="rotate(-20,406,160)"/>
+          <!-- eye -->
+          <circle cx="384" cy="202" r="18" fill="#1c1917"/>
+          <circle cx="390" cy="197" r="6" fill="#fff"/>
+          <!-- nose -->
+          <ellipse cx="414" cy="218" rx="14" ry="10" fill="#1c1917"/>
+          <!-- mouth -->
+          <path d="M 406,226 Q 416,234 426,228" fill="none" stroke="#92400e" stroke-width="4" stroke-linecap="round"/>
+          <!-- tongue -->
+          <ellipse cx="422" cy="232" rx="9" ry="12" fill="#f87171"/>
+          <!-- collar -->
+          <path d="M 338,246 Q 368,270 400,252" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round"/>
+          <!-- notepad / list being carried -->
+          <rect x="96" y="290" width="72" height="88" rx="8" fill="#fef9c3" transform="rotate(12,132,334)"/>
+          <rect x="96" y="290" width="72" height="12" rx="4" fill="#d97706" transform="rotate(12,132,296)"/>
+          <!-- list lines -->
+          <line x1="104" y1="314" x2="158" y2="308" stroke="#a3a3a3" stroke-width="4" stroke-linecap="round" transform="rotate(12,131,311)"/>
+          <line x1="104" y1="328" x2="158" y2="322" stroke="#a3a3a3" stroke-width="4" stroke-linecap="round" transform="rotate(12,131,325)"/>
+          <line x1="104" y1="342" x2="148" y2="337" stroke="#a3a3a3" stroke-width="4" stroke-linecap="round" transform="rotate(12,126,339)"/>
+          <!-- checkmark on first line -->
+          <polyline points="107,314 113,320 124,307" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(12,116,314)"/>
+        </svg>
+      </div>
+
+      <div class="sz-lg">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="270" cy="316" rx="118" ry="72" fill="#d97706" transform="rotate(-12,270,316)"/>
+          <path d="M 362,268 Q 420,220 408,168 Q 400,136 376,148" fill="none" stroke="#d97706" stroke-width="22" stroke-linecap="round"/>
+          <ellipse cx="176" cy="366" rx="26" ry="42" fill="#b45309" transform="rotate(30,176,366)"/>
+          <ellipse cx="156" cy="398" rx="34" ry="18" fill="#b45309" transform="rotate(-10,156,398)"/>
+          <ellipse cx="204" cy="348" rx="22" ry="38" fill="#d97706" transform="rotate(-40,204,348)"/>
+          <ellipse cx="348" cy="378" rx="22" ry="40" fill="#b45309" transform="rotate(20,348,378)"/>
+          <ellipse cx="360" cy="408" rx="34" ry="16" fill="#b45309" transform="rotate(5,360,408)"/>
+          <ellipse cx="340" cy="252" rx="54" ry="44" fill="#d97706" transform="rotate(-20,340,252)"/>
+          <circle cx="368" cy="210" r="68" fill="#d97706"/>
+          <ellipse cx="320" cy="166" rx="26" ry="44" fill="#b45309" transform="rotate(30,320,166)"/>
+          <ellipse cx="406" cy="160" rx="22" ry="40" fill="#b45309" transform="rotate(-20,406,160)"/>
+          <circle cx="384" cy="202" r="18" fill="#1c1917"/>
+          <circle cx="390" cy="197" r="6" fill="#fff"/>
+          <ellipse cx="414" cy="218" rx="14" ry="10" fill="#1c1917"/>
+          <ellipse cx="422" cy="232" rx="9" ry="12" fill="#f87171"/>
+          <path d="M 338,246 Q 368,270 400,252" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round"/>
+          <rect x="102" y="294" width="68" height="82" rx="8" fill="#fef9c3" transform="rotate(12,136,335)"/>
+          <rect x="102" y="294" width="68" height="12" rx="4" fill="#d97706" transform="rotate(12,136,300)"/>
+        </svg>
+      </div>
+
+      <div class="sz-md">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="270" cy="316" rx="118" ry="72" fill="#d97706" transform="rotate(-12,270,316)"/>
+          <path d="M 362,268 Q 420,220 408,168 Q 400,136 376,148" fill="none" stroke="#d97706" stroke-width="22" stroke-linecap="round"/>
+          <ellipse cx="176" cy="366" rx="26" ry="42" fill="#b45309" transform="rotate(30,176,366)"/>
+          <ellipse cx="156" cy="398" rx="34" ry="18" fill="#b45309" transform="rotate(-10,156,398)"/>
+          <ellipse cx="348" cy="378" rx="22" ry="40" fill="#b45309" transform="rotate(20,348,378)"/>
+          <ellipse cx="360" cy="408" rx="34" ry="16" fill="#b45309" transform="rotate(5,360,408)"/>
+          <ellipse cx="340" cy="252" rx="54" ry="44" fill="#d97706" transform="rotate(-20,340,252)"/>
+          <circle cx="368" cy="210" r="68" fill="#d97706"/>
+          <ellipse cx="320" cy="166" rx="26" ry="44" fill="#b45309" transform="rotate(30,320,166)"/>
+          <ellipse cx="406" cy="160" rx="22" ry="40" fill="#b45309" transform="rotate(-20,406,160)"/>
+          <circle cx="384" cy="202" r="20" fill="#1c1917"/>
+          <circle cx="391" cy="196" r="7" fill="#fff"/>
+          <ellipse cx="414" cy="220" rx="15" ry="11" fill="#1c1917"/>
+          <path d="M 338,246 Q 368,270 400,252" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="sz-sm">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="260" cy="320" rx="124" ry="76" fill="#d97706" transform="rotate(-12,260,320)"/>
+          <path d="M 358,270 Q 416,222 404,170 Q 396,138 372,150" fill="none" stroke="#d97706" stroke-width="24" stroke-linecap="round"/>
+          <ellipse cx="170" cy="368" rx="28" ry="44" fill="#b45309" transform="rotate(30,170,368)"/>
+          <ellipse cx="350" cy="380" rx="24" ry="42" fill="#b45309" transform="rotate(20,350,380)"/>
+          <ellipse cx="336" cy="254" rx="56" ry="46" fill="#d97706" transform="rotate(-20,336,254)"/>
+          <circle cx="364" cy="212" r="72" fill="#d97706"/>
+          <ellipse cx="316" cy="166" rx="28" ry="46" fill="#b45309" transform="rotate(30,316,166)"/>
+          <ellipse cx="404" cy="158" rx="24" ry="42" fill="#b45309" transform="rotate(-20,404,158)"/>
+          <circle cx="382" cy="204" r="22" fill="#1c1917"/>
+          <circle cx="390" cy="196" r="8" fill="#fff"/>
+          <ellipse cx="414" cy="222" rx="16" ry="12" fill="#1c1917"/>
+        </svg>
+      </div>
+
+      <div class="sz-xs">
+        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <rect width="512" height="512" rx="96" fill="#1c1917"/>
+          <ellipse cx="260" cy="320" rx="130" ry="80" fill="#d97706" transform="rotate(-12,260,320)"/>
+          <path d="M 360,268 Q 418,218 406,165 Q 398,133 374,145" fill="none" stroke="#d97706" stroke-width="26" stroke-linecap="round"/>
+          <ellipse cx="334" cy="252" rx="60" ry="50" fill="#d97706" transform="rotate(-20,334,252)"/>
+          <circle cx="364" cy="208" r="76" fill="#d97706"/>
+          <ellipse cx="314" cy="160" rx="30" ry="50" fill="#b45309" transform="rotate(30,314,160)"/>
+          <ellipse cx="406" cy="154" rx="26" ry="44" fill="#b45309" transform="rotate(-20,406,154)"/>
+          <circle cx="384" cy="200" r="24" fill="#1c1917"/>
+          <circle cx="393" cy="191" r="9" fill="#fff"/>
+        </svg>
+      </div>
+
+    </div>
+
+    <div class="wordmark">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#1c1917"/>
+        <ellipse cx="270" cy="316" rx="118" ry="72" fill="#d97706" transform="rotate(-12,270,316)"/>
+        <path d="M 362,268 Q 420,220 408,168 Q 400,136 376,148" fill="none" stroke="#d97706" stroke-width="22" stroke-linecap="round"/>
+        <ellipse cx="176" cy="366" rx="26" ry="42" fill="#b45309" transform="rotate(30,176,366)"/>
+        <ellipse cx="156" cy="398" rx="34" ry="18" fill="#b45309" transform="rotate(-10,156,398)"/>
+        <ellipse cx="204" cy="348" rx="22" ry="38" fill="#d97706" transform="rotate(-40,204,348)"/>
+        <ellipse cx="348" cy="378" rx="22" ry="40" fill="#b45309" transform="rotate(20,348,378)"/>
+        <ellipse cx="360" cy="408" rx="34" ry="16" fill="#b45309" transform="rotate(5,360,408)"/>
+        <ellipse cx="340" cy="252" rx="54" ry="44" fill="#d97706" transform="rotate(-20,340,252)"/>
+        <circle cx="368" cy="210" r="68" fill="#d97706"/>
+        <ellipse cx="320" cy="166" rx="26" ry="44" fill="#b45309" transform="rotate(30,320,166)"/>
+        <ellipse cx="406" cy="160" rx="22" ry="40" fill="#b45309" transform="rotate(-20,406,160)"/>
+        <circle cx="384" cy="202" r="18" fill="#1c1917"/>
+        <circle cx="390" cy="197" r="6" fill="#fff"/>
+        <ellipse cx="414" cy="218" rx="14" ry="10" fill="#1c1917"/>
+        <ellipse cx="422" cy="232" rx="9" ry="12" fill="#f87171"/>
+        <path d="M 338,246 Q 368,270 400,252" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round"/>
+        <rect x="102" y="294" width="68" height="82" rx="8" fill="#fef9c3" transform="rotate(12,136,335)"/>
+        <rect x="102" y="294" width="68" height="12" rx="4" fill="#d97706" transform="rotate(12,136,300)"/>
+      </svg>
+      <span class="wm-text">To<span>to</span></span>
+    </div>
+
+    <div class="wordmark-light">
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="96" fill="#1c1917"/>
+        <ellipse cx="270" cy="316" rx="118" ry="72" fill="#d97706" transform="rotate(-12,270,316)"/>
+        <path d="M 362,268 Q 420,220 408,168 Q 400,136 376,148" fill="none" stroke="#d97706" stroke-width="22" stroke-linecap="round"/>
+        <ellipse cx="176" cy="366" rx="26" ry="42" fill="#b45309" transform="rotate(30,176,366)"/>
+        <ellipse cx="156" cy="398" rx="34" ry="18" fill="#b45309" transform="rotate(-10,156,398)"/>
+        <ellipse cx="340" cy="252" rx="54" ry="44" fill="#d97706" transform="rotate(-20,340,252)"/>
+        <circle cx="368" cy="210" r="68" fill="#d97706"/>
+        <ellipse cx="320" cy="166" rx="26" ry="44" fill="#b45309" transform="rotate(30,320,166)"/>
+        <ellipse cx="406" cy="160" rx="22" ry="40" fill="#b45309" transform="rotate(-20,406,160)"/>
+        <circle cx="384" cy="202" r="18" fill="#1c1917"/>
+        <circle cx="390" cy="197" r="6" fill="#fff"/>
+        <ellipse cx="414" cy="218" rx="14" ry="10" fill="#1c1917"/>
+        <path d="M 338,246 Q 368,270 400,252" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round"/>
+      </svg>
+      <span class="wm-light-text">To<span>to</span></span>
+    </div>
+
+    <div class="palette">
+      <div class="swatch-wrap"><div class="swatch" style="background:#1c1917"></div><div class="swatch-label">Bark</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#d97706"></div><div class="swatch-label">Golden</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#b45309"></div><div class="swatch-label">Toffee</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#10b981"></div><div class="swatch-label">Emerald</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:#fef9c3;border:1px solid #fde68a"></div><div class="swatch-label">Brick</div></div>
+    </div>
+  </div>
+
+  <div class="concept-info">
+    <div class="concept-label">Concept C</div>
+    <div class="concept-name">The Running Toto</div>
+    <div class="concept-desc">
+      Toto mid-trot, tail up, <strong>carrying a to-do list</strong> in his wake. Full of personality and movement — this is a mascot as much as a logo. The curled tail signals joy and energy. The notepad says exactly what the app does.
+      <br><br>
+      The most <strong>illustrative and storytelling</strong> of the three — best for social media, onboarding screens, and brand moments. Scales down to a clean silhouette at small sizes.
+    </div>
+    <div class="taglines">
+      <div class="tagline hero">"Follow the yellow brick road."</div>
+      <div class="tagline">"Always running. Always ready."</div>
+      <div class="tagline">"Fetch your plan."</div>
+      <div class="tagline">"There's no place like organised."</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+<p style="text-align:center;font-size:12px;color:#292524;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px">Toto &nbsp;·&nbsp; Your Life's Companion</p>
+<p style="text-align:center;font-size:11px;color:#1c1917;letter-spacing:1px">Each icon shown at 180 · 96 · 56 · 36 · 24px &nbsp;+&nbsp; dark and light wordmark</p>
+
+</body>
+</html>

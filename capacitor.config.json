@@ -1,0 +1,11 @@
+{
+  "appId": "com.toto.app",
+  "appName": "Toto",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}
