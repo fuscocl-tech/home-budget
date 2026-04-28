@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — UI inspiration concepts</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; color: #18181b; font-size: 15px; line-height: 1.6; }
+
+    /* ─── Icons ────────────────────────────────── */
+    .ico { display: inline-block; vertical-align: middle; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .ico-xs { width: 12px; height: 12px; }
+    .ico-sm { width: 14px; height: 14px; stroke-width: 2; }
+    .ico-md { width: 18px; height: 18px; }
+    .ico-lg { width: 22px; height: 22px; }
+    .ico-xl { width: 26px; height: 26px; stroke-width: 1.6; }
+
+    /* ─── Page chrome ──────────────────────────── */
+    .hero { padding: 72px 24px 40px; text-align: center; border-bottom: 1px solid #f4f4f5; background: #fff; }
+    .hero .eyebrow { display: inline-block; padding: 6px 14px; border-radius: 99px; background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+    .hero h1 { font-size: 40px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 10px; }
+    .hero h1 .r { color: #FF3B3B; }
+    .hero p { font-size: 16px; color: #71717a; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+    .hero .meta { margin-top: 20px; font-size: 12px; color: #a1a1aa; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 32px 0; }
+    @media (max-width: 760px) { .legend { grid-template-columns: 1fr; } }
+    .legend-card { background: #fff; border: 1px solid #f4f4f5; border-radius: 14px; padding: 18px 20px; }
+    .legend-card h3 { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+    .legend-card p { font-size: 13px; color: #71717a; }
+    .swatch-row { display: flex; gap: 6px; margin-top: 10px; }
+    .sw { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.06); }
+
+    /* ─── Page section ─────────────────────────── */
+    .page { display: grid; grid-template-columns: 320px 1fr; gap: 56px; padding: 56px 0; align-items: start; border-top: 1px solid #f4f4f5; }
+    @media (max-width: 900px) { .page { grid-template-columns: 1fr; gap: 32px; } .phone-wrap { justify-self: center; } }
+    .annot h2 { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .annot .pageno { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: #FF3B3B; text-transform: uppercase; margin-bottom: 8px; }
+    .annot p.lead { font-size: 14px; color: #52525b; margin-bottom: 16px; line-height: 1.65; }
+    .annot ul { list-style: none; margin: 0; padding: 0; }
+    .annot li { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid #f4f4f5; font-size: 13px; line-height: 1.55; }
+    .annot li:first-child { border-top: none; }
+    .annot li .src { flex-shrink: 0; width: 78px; font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding-top: 2px; }
+    .annot li .src.wp { color: #0891b2; }
+    .annot li .src.bs { color: #FF6F1F; }
+    .annot li .src.toto { color: #71717a; }
+    .annot li .body { color: #3f3f46; }
+    .annot li .body strong { color: #18181b; font-weight: 700; }
+
+    /* ─── Phone frame ──────────────────────────── */
+    .phone-wrap { position: relative; }
+    .phone-wrap::after {
+      content: ''; position: absolute; left: 50%; bottom: -28px; transform: translateX(-50%);
+      width: 220px; height: 14px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0) 70%); filter: blur(2px);
+    }
+    .phone {
+      width: 320px; height: 680px;
+      border-radius: 44px;
+      background: #18181b;
+      padding: 14px 14px;
+      box-shadow: 0 24px 60px rgba(15, 15, 20, 0.18), 0 8px 16px rgba(15, 15, 20, 0.08);
+      position: relative;
+    }
+    .phone .screen {
+      width: 100%; height: 100%;
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      background: #fafafa;
+    }
+    /* Per-screen gradient backgrounds */
+    .screen.s-today {
+      background:
+        radial-gradient(ellipse 320px 200px at 80% -5%, rgba(255, 180, 130, 0.35), transparent 70%),
+        radial-gradient(ellipse 280px 200px at 0% 30%, rgba(255, 220, 220, 0.3), transparent 70%),
+        linear-gradient(180deg, #fff8f1 0%, #fafafa 50%);
+    }
+    .screen.s-wallet {
+      background:
+        radial-gradient(ellipse 320px 200px at 100% -5%, rgba(255, 180, 180, 0.3), transparent 70%),
+        radial-gradient(ellipse 260px 200px at 0% 60%, rgba(255, 230, 230, 0.35), transparent 70%),
+        linear-gradient(180deg, #fff5f5 0%, #fafafa 50%);
+    }
+    .screen.s-plan {
+      background:
+        radial-gradient(ellipse 320px 200px at 100% -5%, rgba(180, 220, 255, 0.4), transparent 70%),
+        radial-gradient(ellipse 260px 200px at 0% 50%, rgba(220, 235, 255, 0.4), transparent 70%),
+        linear-gradient(180deg, #f0f7ff 0%, #fafafa 50%);
+    }
+    .screen.s-home {
+      background:
+        radial-gradient(ellipse 320px 200px at 100% -5%, rgba(255, 220, 165, 0.35), transparent 70%),
+        radial-gradient(ellipse 260px 200px at 0% 50%, rgba(255, 240, 200, 0.4), transparent 70%),
+        linear-gradient(180deg, #fffaf0 0%, #fafafa 50%);
+    }
+    .screen.s-kids {
+      background:
+        radial-gradient(ellipse 320px 200px at 100% -5%, rgba(220, 195, 255, 0.4), transparent 70%),
+        radial-gradient(ellipse 260px 200px at 0% 50%, rgba(255, 220, 240, 0.35), transparent 70%),
+        linear-gradient(180deg, #faf5ff 0%, #fafafa 50%);
+    }
+
+    .phone .notch {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      width: 100px; height: 22px; border-radius: 0 0 14px 14px; background: #18181b; z-index: 20;
+    }
+    .phone .statusbar {
+      position: absolute; top: 0; left: 0; right: 0; height: 38px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 22px 6px; font-size: 11px; font-weight: 700; color: #18181b; z-index: 5;
+    }
+
+    /* ─── Shared in-screen primitives ──────────── */
+    .scr { padding: 38px 0 88px; height: 100%; overflow: hidden; position: relative; }
+    .hdr { display: flex; align-items: center; justify-content: space-between; padding: 4px 18px 10px; }
+    .hdr .logo { font-size: 17px; font-weight: 900; letter-spacing: 0.12em; color: #18181b; }
+    .hdr .ico-row { display: flex; gap: 8px; }
+    .hdr .ico-btn { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; color: #52525b; box-shadow: 0 1px 3px rgba(0,0,0,0.04); backdrop-filter: blur(8px); }
+
+    .pgtitle { padding: 6px 18px 12px; }
+    .pgtitle h1 { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
+    .pgtitle .sub { font-size: 12px; color: #a1a1aa; font-weight: 600; margin-top: 2px; }
+
+    .seclabel { padding: 18px 18px 8px; display: flex; align-items: center; justify-content: space-between; }
+    .seclabel .lbl { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #a1a1aa; }
+    .seclabel .more { font-size: 11px; color: #a1a1aa; display: flex; align-items: center; gap: 3px; }
+
+    /* ─── Floating bottom nav ──────────────────── */
+    .nav {
+      position: absolute; bottom: 14px; left: 14px; right: 14px;
+      height: 58px;
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 22px;
+      box-shadow:
+        0 8px 28px rgba(15, 15, 20, 0.10),
+        0 2px 6px rgba(15, 15, 20, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 4px;
+      z-index: 10;
+    }
+    .nav-item { flex: 1; text-align: center; font-size: 9px; font-weight: 700; color: #a1a1aa; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0; }
+    .nav-item .ico { color: currentColor; }
+    .nav-item.active { color: #FF3B3B; }
+    .nav-item.active .ico { stroke-width: 2; }
+
+    /* ─── Today screen ─────────────────────────── */
+    .hero-card {
+      margin: 4px 18px 14px;
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      background: linear-gradient(150deg, #18181b 0%, #2d1414 60%, #4a1010 100%);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::before {
+      content: ''; position: absolute; right: -20px; top: -20px;
+      width: 90px; height: 90px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,59,59,0.4), rgba(255,59,59,0));
+    }
+    .hero-card .lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; }
+    .hero-card .num { font-size: 38px; font-weight: 900; letter-spacing: -0.03em; margin: 4px 0 0; line-height: 1.05; }
+    .hero-card .num .small { font-size: 18px; opacity: 0.4; font-weight: 700; }
+    .hero-card .of { font-size: 11px; opacity: 0.55; margin-top: 2px; font-weight: 600; }
+    .hero-bar { display: flex; gap: 2px; margin-top: 14px; height: 6px; border-radius: 99px; overflow: hidden; }
+    .hero-bar div { height: 100%; }
+    .hero-card .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0; margin-top: 10px; }
+    .hero-card .legend > div { font-size: 9px; opacity: 0.7; }
+    .hero-card .legend .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: 2px; }
+
+    /* Today briefing list */
+    .brief { padding: 0 14px; }
+    .brief-row {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.85); border-radius: 16px; padding: 12px 14px; margin-bottom: 8px;
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 1px 3px rgba(15, 15, 20, 0.04);
+      backdrop-filter: blur(8px);
+    }
+    .brief-row .glyph { width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .brief-row .glyph.weather { background: #dbeafe; color: #2563eb; }
+    .brief-row .glyph.dinner { background: #fef3c7; color: #d97706; }
+    .brief-row .glyph.chores { background: #f3e8ff; color: #7c3aed; }
+    .brief-row .glyph.bills { background: #fee2e2; color: #dc2626; }
+    .brief-row .glyph.celeb { background: #dcfce7; color: #16a34a; }
+    .brief-row .body { flex: 1; min-width: 0; }
+    .brief-row .body .t { font-size: 12px; font-weight: 700; color: #18181b; line-height: 1.3; }
+    .brief-row .body .s { font-size: 10px; color: #a1a1aa; margin-top: 1px; }
+    .brief-row .meta { font-size: 10px; font-weight: 700; color: #a1a1aa; flex-shrink: 0; }
+
+    /* ─── Wallet screen ────────────────────────── */
+    .summary-card {
+      margin: 4px 14px 14px;
+      background: rgba(255,255,255,0.85); border-radius: 18px; padding: 16px;
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 1px 3px rgba(15, 15, 20, 0.04);
+      backdrop-filter: blur(8px);
+    }
+    .summary-card .lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #a1a1aa; text-transform: uppercase; }
+    .summary-card .num { font-size: 30px; font-weight: 900; color: #18181b; letter-spacing: -0.03em; margin-top: 2px; }
+    .summary-card .num .small { font-size: 16px; color: #a1a1aa; }
+    .summary-card .meta { font-size: 11px; color: #a1a1aa; font-weight: 600; margin-top: 2px; }
+    .summary-card .meta strong { color: #16a34a; font-weight: 800; }
+
+    .alloc-bar { display: flex; gap: 2px; height: 28px; border-radius: 99px; overflow: hidden; margin: 6px 18px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+    .alloc-bar div { height: 100%; }
+    .alloc-list { padding: 0 14px; }
+    .alloc-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 8px; border-bottom: 1px solid #f4f4f5;
+    }
+    .alloc-row:last-child { border-bottom: none; }
+    .alloc-row .tdot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .alloc-row .body { flex: 1; min-width: 0; }
+    .alloc-row .ticker { font-size: 12px; font-weight: 800; letter-spacing: 0.05em; color: #18181b; }
+    .alloc-row .name { font-size: 11px; color: #a1a1aa; margin-top: 1px; }
+    .alloc-row .pct { font-size: 14px; font-weight: 800; color: #18181b; flex-shrink: 0; text-align: right; }
+    .alloc-row .amt { font-size: 9px; color: #a1a1aa; text-align: right; margin-top: 1px; font-weight: 600; }
+
+    /* ─── Plan screen ──────────────────────────── */
+    .upcoming-card {
+      margin: 0 14px 8px;
+      background: rgba(255,255,255,0.85); border-radius: 18px; padding: 14px 14px;
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 1px 3px rgba(15, 15, 20, 0.04);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .upcoming-card .uc-glyph { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .upcoming-card .uc-body { flex: 1; min-width: 0; }
+    .upcoming-card .uc-tag { font-size: 9px; font-weight: 800; letter-spacing: 0.08em; color: #a1a1aa; text-transform: uppercase; }
+    .upcoming-card .uc-title { font-size: 13px; font-weight: 800; color: #18181b; margin-top: 1px; line-height: 1.25; }
+    .upcoming-card .uc-meta { font-size: 11px; color: #71717a; margin-top: 2px; }
+    .upcoming-card .uc-when { font-size: 10px; font-weight: 700; color: #18181b; flex-shrink: 0; text-align: right; }
+    .upcoming-card .uc-when .small { font-size: 9px; color: #a1a1aa; font-weight: 600; display: block; margin-top: 1px; }
+
+    .quick-add { padding: 0 14px; }
+    .quick-row {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.9); border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
+      font-size: 12px; font-weight: 700; color: #52525b;
+      backdrop-filter: blur(8px);
+    }
+    .quick-row .qico { color: #71717a; }
+    .quick-row .arrow { margin-left: auto; color: #d4d4d8; }
+
+    .add-evt-btn {
+      margin: 12px 14px; display: flex; align-items: center; justify-content: center; gap: 6px; width: calc(100% - 28px);
+      padding: 12px; border: none; border-radius: 14px;
+      background: #FF3B3B; color: #fff;
+      font-size: 13px; font-weight: 800; letter-spacing: 0.02em;
+      box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+    }
+
+    /* ─── Home screen (bento grid) ─────────────── */
+    .bento { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 4px 14px 12px; }
+    .bento-card {
+      background: rgba(255,255,255,0.85); border-radius: 18px; padding: 14px 12px 12px;
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 1px 3px rgba(15, 15, 20, 0.04);
+      backdrop-filter: blur(8px);
+      position: relative; overflow: hidden;
+      min-height: 124px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .bento-card .stripe { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .bento-card .code { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; color: #a1a1aa; text-transform: uppercase; }
+    .bento-card .name { font-size: 13px; font-weight: 800; margin-top: 2px; line-height: 1.15; }
+    .bento-card .glyph { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 6px 0; }
+    .bento-card .meta { font-size: 10px; color: #71717a; line-height: 1.35; font-weight: 600; }
+    .bento-card .meta strong { color: #18181b; font-weight: 800; }
+
+    /* ─── Kids dial ────────────────────────────── */
+    .kid-pills { display: flex; gap: 6px; padding: 4px 14px 10px; }
+    .kid-pill { flex: 1; padding: 8px; text-align: center; border-radius: 12px; background: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.9); font-size: 11px; font-weight: 700; backdrop-filter: blur(8px); }
+    .kid-pill.active { background: #18181b; color: #fff; border-color: #18181b; }
+    .dial-card {
+      margin: 4px 14px 14px;
+      background: rgba(255,255,255,0.85); border-radius: 22px; padding: 22px 18px;
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 1px 3px rgba(15, 15, 20, 0.04);
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+    .dial { width: 150px; height: 150px; margin: 0 auto 10px; position: relative; }
+    .dial svg { width: 100%; height: 100%; }
+    .dial .core { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .dial .num { font-size: 36px; font-weight: 900; color: #18181b; letter-spacing: -0.03em; line-height: 1; }
+    .dial .of { font-size: 11px; color: #a1a1aa; margin-top: 2px; font-weight: 700; }
+    .dial-card .lbl { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #FF3B3B; }
+    .dial-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 8px 18px; background: #FF3B3B; color: #fff; border-radius: 99px; font-size: 11px; font-weight: 800; box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3); }
+    .chore-list { padding: 0 14px; }
+    .chore-row { display: flex; align-items: center; gap: 12px; padding: 9px 12px; background: rgba(255,255,255,0.85); border-radius: 12px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.9); font-size: 12px; backdrop-filter: blur(8px); }
+    .chore-row .check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #e4e4e7; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .chore-row .check.done { background: #FF3B3B; border-color: #FF3B3B; color: #fff; }
+    .chore-row .ttl { flex: 1; font-weight: 700; color: #18181b; }
+    .chore-row .ttl.done { color: #a1a1aa; text-decoration: line-through; text-decoration-color: #d4d4d8; }
+    .chore-row .pts { font-size: 10px; font-weight: 800; color: #FF3B3B; }
+    .chore-row .pts.muted { color: #d4d4d8; }
+
+    /* ─── Footer notes ─────────────────────────── */
+    .footnote { padding: 56px 24px; text-align: center; border-top: 1px solid #f4f4f5; background: #fff; }
+    .footnote p { font-size: 13px; color: #71717a; max-width: 580px; margin: 0 auto; }
+
+  </style>
+</head>
+<body>
+
+<!-- ─── SVG icon defs ────────────────────────── -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V8a2 2 0 0 0-2-2H5a2 2 0 0 1 0-4h14v4"/><path d="M3 6v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="11" cy="4.5" r="1.8"/><circle cx="17.5" cy="7.5" r="1.8"/><circle cx="19.5" cy="14" r="1.8"/><circle cx="4.5" cy="7.5" r="1.8"/><circle cx="6.5" cy="14" r="1.8"/><path d="M8 19.5c0-2.5 1.8-4.5 4-4.5s4 2 4 4.5a2 2 0 0 1-2 2c-.7 0-1.3-.4-2-.4s-1.3.4-2 .4a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-cloud-rain" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6M8 14v6M12 16v6"/></symbol>
+    <symbol id="i-chef-hat" viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></symbol>
+    <symbol id="i-clipboard-check" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M4 2v20l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2V2l-2 2-2-2-2 2-2-2-2 2-2-2-2 2Z"/><path d="M16 8H8M16 12H8M13 16H8"/></symbol>
+    <symbol id="i-palm-tree" viewBox="0 0 24 24"><path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-1 1 1h4"/><path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-3l-1-1-1 1h-3"/><path d="M9 12c-2.5 1-4.5 2.5-5 5l4-1 1 4c1-3 2.5-5 5-6"/><path d="M11 12c2.5 0 4.5 0 6 1.5"/><path d="M11 12v10"/></symbol>
+    <symbol id="i-shopping-cart" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 1.95-1.57L23 6H6"/></symbol>
+    <symbol id="i-fuel" viewBox="0 0 24 24"><line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></symbol>
+    <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-waves" viewBox="0 0 24 24"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h-2a1 1 0 0 1-1-1v-3.6a3 3 0 0 1 .27-1.24l1.83-3.84A2 2 0 0 1 5.93 6h12.14a2 2 0 0 1 1.83 1.32l1.83 3.84A3 3 0 0 1 22 12.4V16a1 1 0 0 1-1 1h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  </defs>
+</svg>
+
+<header class="hero">
+  <span class="eyebrow">Concepts · 28 Apr 2026</span>
+  <h1 style="letter-spacing:0.06em">TOTO — UI inspiration</h1>
+  <p>Patterns borrowed from <strong style="color:#0891b2">Wagepay (Gen2)</strong> and <strong style="color:#FF6F1F">Betashares Direct</strong>, applied to Toto's existing red brand. Mockups only — nothing in this file ships into the app.</p>
+  <div class="meta">5 screens · static HTML · no app logic</div>
+</header>
+
+<div class="container">
+  <div class="legend">
+    <div class="legend-card">
+      <h3 style="color:#0891b2">Wagepay — what we're stealing</h3>
+      <p>Confidence-by-numbers. Big white hero figures on a deep card. Circular dial for scores. Mint pill CTAs.</p>
+      <div class="swatch-row">
+        <div class="sw" style="background:#0F172A" title="navy"></div>
+        <div class="sw" style="background:#3DDC97" title="mint"></div>
+        <div class="sw" style="background:#1E3A5F" title="card"></div>
+        <div class="sw" style="background:#fff" title="text"></div>
+      </div>
+    </div>
+    <div class="legend-card">
+      <h3 style="color:#FF6F1F">Betashares Direct — what we're stealing</h3>
+      <p>Horizontal stacked allocation bar (not a pie). Bold ALL-CAPS ticker codes. Bento grid with thin coloured top stripes. Generous corner radius.</p>
+      <div class="swatch-row">
+        <div class="sw" style="background:#FF6F1F" title="orange"></div>
+        <div class="sw" style="background:#FFB088" title="peach"></div>
+        <div class="sw" style="background:#FFE2D0" title="cream"></div>
+        <div class="sw" style="background:#A1A1AA" title="grey"></div>
+        <div class="sw" style="background:#18181b" title="black"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ─── 1. TODAY ─────────────────────────────── -->
+<section class="page">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-today">
+        <div class="statusbar"><span>9:41</span><span>•••</span></div>
+        <div class="scr">
+
+          <div class="hdr">
+            <div class="logo">TOTO</div>
+            <div class="ico-row">
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-paw"/></svg></div>
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-settings"/></svg></div>
+            </div>
+          </div>
+
+          <div class="pgtitle">
+            <h1>Good morning, Chris</h1>
+            <div class="sub">Mon 28 Apr · light rain</div>
+          </div>
+
+          <!-- Wagepay-style hero -->
+          <div class="hero-card">
+            <div class="lbl">Available this week</div>
+            <div class="num"><span class="small">$</span>687<span class="small">.40</span></div>
+            <div class="of">of $1,200 budget · 4 days left</div>
+            <div class="hero-bar">
+              <div style="background:#FF3B3B; flex:32"></div>
+              <div style="background:#FF8A65; flex:24"></div>
+              <div style="background:#FFB088; flex:14"></div>
+              <div style="background:#FCD34D; flex:11"></div>
+              <div style="background:#94A3B8; flex:9"></div>
+              <div style="background:#27272a; flex:6"></div>
+            </div>
+            <div class="legend">
+              <div><span class="dot" style="background:#FF3B3B"></span>Groc 32%</div>
+              <div><span class="dot" style="background:#FF8A65"></span>Rent 24%</div>
+              <div><span class="dot" style="background:#FFB088"></span>Fuel 14%</div>
+            </div>
+          </div>
+
+          <div class="seclabel"><span class="lbl">Today's briefing</span><span class="more">all <svg class="ico ico-xs"><use href="#i-chevron-right"/></svg></span></div>
+          <div class="brief">
+            <div class="brief-row">
+              <div class="glyph weather"><svg class="ico ico-md"><use href="#i-cloud-rain"/></svg></div>
+              <div class="body">
+                <div class="t">18° · light rain till noon</div>
+                <div class="s">Pack Mia's raincoat for swimming</div>
+              </div>
+            </div>
+            <div class="brief-row">
+              <div class="glyph dinner"><svg class="ico ico-md"><use href="#i-chef-hat"/></svg></div>
+              <div class="body">
+                <div class="t">Spag bol tonight</div>
+                <div class="s">4 ingredients to grab</div>
+              </div>
+              <svg class="ico ico-sm meta"><use href="#i-chevron-right"/></svg>
+            </div>
+            <div class="brief-row">
+              <div class="glyph chores"><svg class="ico ico-md"><use href="#i-clipboard-check"/></svg></div>
+              <div class="body">
+                <div class="t">Riley's chores · 2 of 3 done</div>
+                <div class="s">Bins out tonight</div>
+              </div>
+            </div>
+            <div class="brief-row">
+              <div class="glyph bills"><svg class="ico ico-md"><use href="#i-receipt"/></svg></div>
+              <div class="body">
+                <div class="t">Origin gas due Thursday</div>
+                <div class="s">$142.30 · auto-paid</div>
+              </div>
+            </div>
+            <div class="brief-row">
+              <div class="glyph celeb"><svg class="ico ico-md"><use href="#i-palm-tree"/></svg></div>
+              <div class="body">
+                <div class="t">57 days until Bali</div>
+                <div class="s">Goal $4,200 of $6,000</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <div class="nav-item active"><svg class="ico ico-lg"><use href="#i-sun"/></svg><span>Today</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-wallet"/></svg><span>Wallet</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-calendar"/></svg><span>Plan</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-users"/></svg><span>Kids</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="pageno">Screen 01</span>
+    <h2>Today — the morning briefing</h2>
+    <p class="lead">The dark hero card answers the one question Chris actually has at 7am: how much can I spend this week without breaking anything? Everything else on the screen is a card answering "what do I need to know about today" in one tap.</p>
+    <ul>
+      <li><span class="src wp">Wagepay</span><span class="body"><strong>Dark hero card</strong> with a single big white number ($687.40). Subtitle in faded white. The only screen element with a coloured background — earns its weight by being the most important thing.</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Stacked allocation bar inside the hero</strong> — graduated red→peach→amber→grey→black showing where the week's money goes. A pie chart hides the proportions; the bar makes them obvious.</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Section label as a quiet ALL-CAPS eyebrow</strong> ("TODAY'S BRIEFING") with a "all ›" link on the right. Doesn't compete with content.</span></li>
+      <li><span class="src toto">Toto</span><span class="body"><strong>Briefing rows</strong> use the existing red brand for the bills card icon tint and reuse the family-context content (Mia, Riley, Bali countdown).</span></li>
+      <li><span class="src toto">Toto</span><span class="body"><strong>Floating glass nav bar</strong>: lifts off the screen edge, semi-transparent with backdrop blur. Same pill shape as the hero CTA so the visual language repeats.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── 2. WALLET ────────────────────────────── -->
+<section class="page">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-wallet">
+        <div class="statusbar"><span>9:41</span><span>•••</span></div>
+        <div class="scr">
+
+          <div class="hdr">
+            <div class="logo">TOTO</div>
+            <div class="ico-row">
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-plus"/></svg></div>
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-settings"/></svg></div>
+            </div>
+          </div>
+
+          <div class="pgtitle">
+            <h1>Wallet</h1>
+            <div class="sub">April · 4 days left in budget</div>
+          </div>
+
+          <div class="summary-card">
+            <div class="lbl">Spent this month</div>
+            <div class="num">$2,847<span class="small">.20</span></div>
+            <div class="meta">of $4,500 · <strong>$1,653 left</strong></div>
+          </div>
+
+          <div class="seclabel"><span class="lbl">Allocation</span><span class="more">edit <svg class="ico ico-xs"><use href="#i-chevron-right"/></svg></span></div>
+
+          <div class="alloc-bar">
+            <div style="background:#FF3B3B;flex:32"></div>
+            <div style="background:#FF8A65;flex:24"></div>
+            <div style="background:#FFB088;flex:14"></div>
+            <div style="background:#FCD34D;flex:11"></div>
+            <div style="background:#94A3B8;flex:9"></div>
+            <div style="background:#27272a;flex:6"></div>
+            <div style="background:#16a34a;flex:4"></div>
+          </div>
+
+          <div class="alloc-list">
+            <div class="alloc-row">
+              <div class="tdot" style="background:#FF3B3B;color:#fff"><svg class="ico ico-md"><use href="#i-shopping-cart"/></svg></div>
+              <div class="body"><div class="ticker">GROC</div><div class="name">Groceries</div></div>
+              <div><div class="pct">32%</div><div class="amt">$911</div></div>
+            </div>
+            <div class="alloc-row">
+              <div class="tdot" style="background:#FF8A65;color:#fff"><svg class="ico ico-md"><use href="#i-home"/></svg></div>
+              <div class="body"><div class="ticker">RENT</div><div class="name">Rent &amp; mortgage</div></div>
+              <div><div class="pct">24%</div><div class="amt">$683</div></div>
+            </div>
+            <div class="alloc-row">
+              <div class="tdot" style="background:#FFB088;color:#fff"><svg class="ico ico-md"><use href="#i-fuel"/></svg></div>
+              <div class="body"><div class="ticker">FUEL</div><div class="name">Fuel + transport</div></div>
+              <div><div class="pct">14%</div><div class="amt">$398</div></div>
+            </div>
+            <div class="alloc-row">
+              <div class="tdot" style="background:#FCD34D;color:#18181b"><svg class="ico ico-md"><use href="#i-utensils"/></svg></div>
+              <div class="body"><div class="ticker">DINE</div><div class="name">Eating out</div></div>
+              <div><div class="pct">11%</div><div class="amt">$313</div></div>
+            </div>
+            <div class="alloc-row">
+              <div class="tdot" style="background:#94A3B8;color:#fff"><svg class="ico ico-md"><use href="#i-zap"/></svg></div>
+              <div class="body"><div class="ticker">BILLS</div><div class="name">Utilities &amp; subs</div></div>
+              <div><div class="pct">9%</div><div class="amt">$256</div></div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-sun"/></svg><span>Today</span></div>
+            <div class="nav-item active"><svg class="ico ico-lg"><use href="#i-wallet"/></svg><span>Wallet</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-calendar"/></svg><span>Plan</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-users"/></svg><span>Kids</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="pageno">Screen 02</span>
+    <h2>Wallet — money allocation</h2>
+    <p class="lead">This is the page that most fintechs get wrong with a pie chart. Betashares uses a horizontal stacked bar and a list of "tickers" — both work because they reveal proportion at a glance and let you scan totals down a column.</p>
+    <ul>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Horizontal stacked bar with rounded ends</strong>, segments in graduated reds + amber + grey + black. The whole budget at one read.</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Ticker-style category codes</strong> (GROC, RENT, FUEL, DINE, BILLS) in bold ALL-CAPS, full name in muted grey below. Right-aligned big bold percentage with a small dollar figure underneath. Lifted directly from how Betashares lists holdings.</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Coloured circle holders</strong> for the category icon. The colour matches the bar segment so the eye traces from bar to row.</span></li>
+      <li><span class="src wp">Wagepay</span><span class="body"><strong>Compact summary card</strong> at the top showing spent / left of budget — same role as Wagepay's "Available now" card.</span></li>
+      <li><span class="src toto">Toto</span><span class="body">No pies. No donuts. The bar + list does everything a donut chart would and more.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── 3. PLAN ──────────────────────────────── -->
+<section class="page">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-plan">
+        <div class="statusbar"><span>9:41</span><span>•••</span></div>
+        <div class="scr">
+
+          <div class="hdr">
+            <div class="logo">TOTO</div>
+            <div class="ico-row">
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-calendar"/></svg></div>
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-settings"/></svg></div>
+            </div>
+          </div>
+
+          <div class="pgtitle">
+            <h1>Plan</h1>
+            <div class="sub">This week · 6 events</div>
+          </div>
+
+          <div class="seclabel"><span class="lbl">Upcoming</span><span class="more">week <svg class="ico ico-xs"><use href="#i-chevron-right"/></svg></span></div>
+
+          <div class="upcoming-card">
+            <div class="uc-glyph" style="background:#dbeafe;color:#2563eb"><svg class="ico ico-md"><use href="#i-waves"/></svg></div>
+            <div class="uc-body">
+              <div class="uc-tag">SWIM · MIA</div>
+              <div class="uc-title">Swim lesson</div>
+              <div class="uc-meta">Aquatic Centre · Lane 4</div>
+            </div>
+            <div class="uc-when">In 2h<span class="small">4:30pm</span></div>
+          </div>
+
+          <div class="upcoming-card">
+            <div class="uc-glyph" style="background:#dcfce7;color:#16a34a"><svg class="ico ico-md"><use href="#i-activity"/></svg></div>
+            <div class="uc-body">
+              <div class="uc-tag">FOOTY · RILEY</div>
+              <div class="uc-title">Training</div>
+              <div class="uc-meta">Glenelg Oval · bring boots</div>
+            </div>
+            <div class="uc-when">Tomorrow<span class="small">5:00pm</span></div>
+          </div>
+
+          <div class="upcoming-card">
+            <div class="uc-glyph" style="background:#fef3c7;color:#d97706"><svg class="ico ico-md"><use href="#i-utensils"/></svg></div>
+            <div class="uc-body">
+              <div class="uc-tag">FAMILY</div>
+              <div class="uc-title">Pizza night</div>
+              <div class="uc-meta">Budget set · $30</div>
+            </div>
+            <div class="uc-when">Fri<span class="small">6:00pm</span></div>
+          </div>
+
+          <div class="upcoming-card">
+            <div class="uc-glyph" style="background:#fee2e2;color:#dc2626"><svg class="ico ico-md"><use href="#i-car"/></svg></div>
+            <div class="uc-body">
+              <div class="uc-tag">VEHICLES</div>
+              <div class="uc-title">Rego renewal</div>
+              <div class="uc-meta">Mazda CX-5 · $812</div>
+            </div>
+            <div class="uc-when">14 May<span class="small">16 days</span></div>
+          </div>
+
+          <div class="seclabel"><span class="lbl">Quick add</span></div>
+          <div class="quick-add">
+            <div class="quick-row"><svg class="ico ico-md qico"><use href="#i-refresh"/></svg>Set frequency<svg class="ico ico-sm arrow"><use href="#i-chevron-right"/></svg></div>
+            <div class="quick-row"><svg class="ico ico-md qico"><use href="#i-calendar"/></svg>Set date<svg class="ico ico-sm arrow"><use href="#i-chevron-right"/></svg></div>
+            <div class="quick-row"><svg class="ico ico-md qico"><use href="#i-user"/></svg>Assign to<svg class="ico ico-sm arrow"><use href="#i-chevron-right"/></svg></div>
+          </div>
+
+          <button class="add-evt-btn"><svg class="ico ico-sm"><use href="#i-plus"/></svg>Add event</button>
+
+          <div class="nav">
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-sun"/></svg><span>Today</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-wallet"/></svg><span>Wallet</span></div>
+            <div class="nav-item active"><svg class="ico ico-lg"><use href="#i-calendar"/></svg><span>Plan</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-users"/></svg><span>Kids</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="pageno">Screen 03</span>
+    <h2>Plan — what's coming up</h2>
+    <p class="lead">The Plan tab today is mostly a calendar grid. The Betashares "UPCOMING" pattern is better — a vertical list of cards where each card is a self-contained, scannable unit (icon, who-it's-for tag, name, location, when).</p>
+    <ul>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Upcoming card row</strong>: pastel circle icon · ALL-CAPS tag (SWIM · MIA) · bold title · muted secondary line · right-aligned smart relative time ("In 2h", "Tomorrow", "16 days") with the actual time/date below.</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Outline-button setup steps</strong> ("Set frequency", "Set date", "Assign to") for adding new events — copies their AutoInvest setup pattern. Lower commitment than a full modal.</span></li>
+      <li><span class="src toto">Toto</span><span class="body"><strong>Per-person tags</strong> (MIA, RILEY, FAMILY, VEHICLES) double as colour codes — each kid has a colour, household items have grey, vehicles have red.</span></li>
+      <li><span class="src toto">Toto</span><span class="body"><strong>Bottom red CTA</strong> ("+ Add event") because it's the page's primary verb. The little "Quick add" row sits above it for partial setups.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── 4. HOME ──────────────────────────────── -->
+<section class="page">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-home">
+        <div class="statusbar"><span>9:41</span><span>•••</span></div>
+        <div class="scr">
+
+          <div class="hdr">
+            <div class="logo">TOTO</div>
+            <div class="ico-row">
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-plus"/></svg></div>
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-settings"/></svg></div>
+            </div>
+          </div>
+
+          <div class="pgtitle">
+            <h1>Home</h1>
+            <div class="sub">Household · the Fusco family</div>
+          </div>
+
+          <div class="seclabel"><span class="lbl">All sections</span></div>
+
+          <div class="bento">
+            <div class="bento-card">
+              <div class="stripe" style="background:#FF3B3B"></div>
+              <div>
+                <div class="code">B.HOME</div>
+                <div class="name">Property &amp; projects</div>
+              </div>
+              <div class="glyph" style="background:#fef2f2;color:#FF3B3B"><svg class="ico ico-lg"><use href="#i-home"/></svg></div>
+              <div class="meta"><strong>3 projects</strong><br>$4,200 outstanding</div>
+            </div>
+
+            <div class="bento-card">
+              <div class="stripe" style="background:#0891b2"></div>
+              <div>
+                <div class="code">B.AUTO</div>
+                <div class="name">Vehicles</div>
+              </div>
+              <div class="glyph" style="background:#ecfeff;color:#0891b2"><svg class="ico ico-lg"><use href="#i-car"/></svg></div>
+              <div class="meta"><strong>2 vehicles</strong><br>Rego due 14 May</div>
+            </div>
+
+            <div class="bento-card">
+              <div class="stripe" style="background:#7c3aed"></div>
+              <div>
+                <div class="code">B.KIDS</div>
+                <div class="name">Children</div>
+              </div>
+              <div class="glyph" style="background:#f5f3ff;color:#7c3aed"><svg class="ico ico-lg"><use href="#i-users"/></svg></div>
+              <div class="meta"><strong>Riley + Mia</strong><br>2 chores due today</div>
+            </div>
+
+            <div class="bento-card">
+              <div class="stripe" style="background:#16a34a"></div>
+              <div>
+                <div class="code">B.PETS</div>
+                <div class="name">Pets</div>
+              </div>
+              <div class="glyph" style="background:#f0fdf4;color:#16a34a"><svg class="ico ico-lg"><use href="#i-paw"/></svg></div>
+              <div class="meta"><strong>Bandit</strong><br>Vet visit in 3 days</div>
+            </div>
+
+            <div class="bento-card">
+              <div class="stripe" style="background:#f59e0b"></div>
+              <div>
+                <div class="code">B.HEALTH</div>
+                <div class="name">Health &amp; meds</div>
+              </div>
+              <div class="glyph" style="background:#fef3c7;color:#f59e0b"><svg class="ico ico-lg"><use href="#i-pill"/></svg></div>
+              <div class="meta"><strong>4 active scripts</strong><br>Riley puffer · 12d</div>
+            </div>
+
+            <div class="bento-card">
+              <div class="stripe" style="background:#94a3b8"></div>
+              <div>
+                <div class="code">B.DOCS</div>
+                <div class="name">Documents</div>
+              </div>
+              <div class="glyph" style="background:#f1f5f9;color:#475569"><svg class="ico ico-lg"><use href="#i-file-text"/></svg></div>
+              <div class="meta"><strong>14 stored</strong><br>Insurance · Medicare</div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-sun"/></svg><span>Today</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-wallet"/></svg><span>Wallet</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-calendar"/></svg><span>Plan</span></div>
+            <div class="nav-item active"><svg class="ico ico-lg"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-users"/></svg><span>Kids</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="pageno">Screen 04</span>
+    <h2>Home — household sections as a bento grid</h2>
+    <p class="lead">Betashares uses a coloured-stripe bento card to brand each portfolio family (B.EARN, B.GREEN, B.TECH). The same pattern works for household sections — the colour stripe is the section's identity, the code is searchable, the glyph and one line of context tell you what's inside.</p>
+    <ul>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Thin coloured stripe along the top</strong> — strong enough to identify the section, quiet enough not to dominate the card. Each section gets its own colour.</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>"B." prefix codes</strong> (B.HOME, B.AUTO, B.KIDS, B.PETS, B.HEALTH, B.DOCS) — gives the household a coherent brand and reads fast. Could expand to B.MEALS, B.NOTICES later.</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Soft-tinted glyph holder</strong> — pastel circle behind each icon that picks up the stripe colour at low saturation.</span></li>
+      <li><span class="src toto">Toto</span><span class="body"><strong>One concrete hook per card</strong> ("$4,200 outstanding", "Rego due 14 May", "Vet visit in 3 days") so the grid isn't just navigation — it's a status check.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─── 5. KIDS ──────────────────────────────── -->
+<section class="page">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen s-kids">
+        <div class="statusbar"><span>9:41</span><span>•••</span></div>
+        <div class="scr">
+
+          <div class="hdr">
+            <div class="logo">TOTO</div>
+            <div class="ico-row">
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-trophy"/></svg></div>
+              <div class="ico-btn"><svg class="ico ico-md"><use href="#i-settings"/></svg></div>
+            </div>
+          </div>
+
+          <div class="pgtitle">
+            <h1>Kids</h1>
+            <div class="sub">Week of 28 Apr · resets Sunday</div>
+          </div>
+
+          <div class="kid-pills">
+            <div class="kid-pill active">🦊 Riley</div>
+            <div class="kid-pill">🐰 Mia</div>
+          </div>
+
+          <!-- Wagepay-style score dial -->
+          <div class="dial-card">
+            <div class="lbl">Points this week</div>
+            <div class="dial">
+              <svg viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="68" fill="none" stroke="#f4f4f5" stroke-width="14"/>
+                <circle cx="80" cy="80" r="68" fill="none" stroke="#FF3B3B" stroke-width="14" stroke-linecap="round"
+                  stroke-dasharray="427" stroke-dashoffset="85.4"
+                  transform="rotate(-90 80 80)"/>
+              </svg>
+              <div class="core">
+                <div class="num">240</div>
+                <div class="of">of 300</div>
+              </div>
+            </div>
+            <div style="font-size:12px;color:#52525b;font-weight:600;margin-bottom:8px">2 chores left to finish the streak</div>
+            <span class="dial-cta">Open chore list <svg class="ico ico-sm"><use href="#i-arrow-right"/></svg></span>
+          </div>
+
+          <div class="seclabel"><span class="lbl">Today's chores</span></div>
+          <div class="chore-list">
+            <div class="chore-row">
+              <div class="check done"><svg class="ico ico-sm"><use href="#i-check"/></svg></div>
+              <div class="ttl done">Make bed</div>
+              <div class="pts muted">+20</div>
+            </div>
+            <div class="chore-row">
+              <div class="check done"><svg class="ico ico-sm"><use href="#i-check"/></svg></div>
+              <div class="ttl done">Empty dishwasher</div>
+              <div class="pts muted">+30</div>
+            </div>
+            <div class="chore-row">
+              <div class="check"></div>
+              <div class="ttl">Take bins out</div>
+              <div class="pts">+40</div>
+            </div>
+          </div>
+
+          <div class="nav">
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-sun"/></svg><span>Today</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-wallet"/></svg><span>Wallet</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-calendar"/></svg><span>Plan</span></div>
+            <div class="nav-item"><svg class="ico ico-lg"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item active"><svg class="ico ico-lg"><use href="#i-users"/></svg><span>Kids</span></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annot">
+    <span class="pageno">Screen 05</span>
+    <h2>Kids — points dial &amp; chore list</h2>
+    <p class="lead">Wagepay's "Bank Score" / "Credit Score" dial is the perfect visual for kids' weekly chore points. It turns an abstract number into something a 7-year-old can read in two seconds: how full is the ring?</p>
+    <ul>
+      <li><span class="src wp">Wagepay</span><span class="body"><strong>Big circular dial</strong> — grey track, red fill, big bold number in the centre with "of 300" muted below. Resets every Sunday.</span></li>
+      <li><span class="src wp">Wagepay</span><span class="body"><strong>Pill-shaped CTA</strong> ("Open chore list") in primary colour — same shape as Wagepay's "Withdraw Cash".</span></li>
+      <li><span class="src bs">Betashares</span><span class="body"><strong>Profile pill row</strong> at the top (🦊 Riley · 🐰 Mia) — single tap switches kids. Active pill goes black; inactive pills stay light. Same pattern Betashares uses for portfolio toggles.</span></li>
+      <li><span class="src toto">Toto</span><span class="body"><strong>Done chores fade to grey</strong> with strikethrough title and faded points. Pending chore stands up — bright check border, full red points.</span></li>
+    </ul>
+  </div>
+</section>
+
+</div>
+
+<footer class="footnote">
+  <p>This file is design-only. Nothing here is wired into the app. The actual app code in <code>index.html</code> is unchanged. To try a pattern in the app, lift it from this file and ask me to apply it explicitly.</p>
+</footer>
+
+</body>
+</html>

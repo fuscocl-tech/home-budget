@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Logo concepts</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; color: #18181b; font-size: 15px; line-height: 1.6; }
+
+    /* ─── Page chrome ──────────────────────────── */
+    .hero { padding: 72px 24px 40px; text-align: center; border-bottom: 1px solid #f4f4f5; background: #fff; }
+    .hero .eyebrow { display: inline-block; padding: 6px 14px; border-radius: 99px; background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+    .hero h1 { font-size: 40px; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 10px; }
+    .hero h1 .r { color: #FF3B3B; }
+    .hero p { font-size: 16px; color: #71717a; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+    .hero .meta { margin-top: 20px; font-size: 12px; color: #a1a1aa; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* ─── Current state ────────────────────────── */
+    .current {
+      margin: 32px 0 8px;
+      padding: 28px 32px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      display: flex; align-items: center; gap: 24px;
+      flex-wrap: wrap;
+    }
+    .current .label { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #c2410c; }
+    .current .desc { font-size: 13px; color: #9a3412; flex: 1; min-width: 200px; }
+
+    /* ─── Logo card grid ───────────────────────── */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 24px 0 56px; }
+    .card {
+      background: #fff;
+      border: 1px solid #f4f4f5;
+      border-radius: 18px;
+      padding: 28px 24px 22px;
+      display: flex; flex-direction: column; gap: 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .card .num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #18181b; color: #fff; font-size: 11px; font-weight: 800; }
+    .card .ttl { font-size: 14px; font-weight: 800; }
+    .card .note { font-size: 12px; color: #71717a; line-height: 1.5; }
+
+    .head-row { display: flex; align-items: center; gap: 10px; }
+
+    /* Big hero render */
+    .render-lg { padding: 28px 0; text-align: center; border-radius: 12px; background: #fafafa; min-height: 110px; display: flex; align-items: center; justify-content: center; }
+    .render-lg.dark { background: #18181b; }
+
+    /* Small in-context renders */
+    .ctx-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .ctx { padding: 10px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .ctx.light { background: #fafafa; }
+    .ctx.dark { background: #18181b; }
+    .ctx .ico { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; font-size: 10px; }
+    .ctx.dark .ico { background: rgba(255,255,255,0.15); color: #fff; }
+    .ctx .ctx-lbl { font-size: 9px; font-weight: 700; color: #a1a1aa; letter-spacing: 0.05em; text-transform: uppercase; }
+    .ctx.dark .ctx-lbl { color: #71717a; }
+
+    /* ─── Logo style variants (each gets its own class) ─── */
+    /* baseline */
+    .logo { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-weight: 900; letter-spacing: 0.05em; line-height: 1; display: inline-block; }
+    .logo-xl { font-size: 64px; }
+    .logo-md { font-size: 22px; }
+    .logo-sm { font-size: 16px; }
+
+    /* v0 — current */
+    .v0 .b { color: #18181b; } .v0 .r { color: #DC2626; }
+    .dark .v0 .b { color: #fff; }
+
+    /* v1 — all lowercase charcoal */
+    .v1 { color: #18181b; }
+    .dark .v1 { color: #fff; }
+
+    /* v2 — all lowercase brand red */
+    .v2 { color: #FF3B3B; letter-spacing: 0.04em; }
+    .dark .v2 { color: #FF6363; }
+
+    /* v3 — toto. with red dot */
+    .v3 { color: #18181b; }
+    .v3 .dot { color: #FF3B3B; }
+    .dark .v3 { color: #fff; }
+    .dark .v3 .dot { color: #FF6363; }
+
+    /* v4 — toto with second o accented */
+    .v4 .b { color: #18181b; }
+    .v4 .accent { color: #FF3B3B; }
+    .dark .v4 .b { color: #fff; }
+    .dark .v4 .accent { color: #FF6363; }
+
+    /* v5 — toto with red underline */
+    .v5-wrap { display: inline-block; line-height: 1; padding-bottom: 6px; border-bottom: 4px solid #FF3B3B; }
+    .v5 { color: #18181b; }
+    .dark .v5 { color: #fff; }
+    .render-lg .v5-wrap { padding-bottom: 12px; border-bottom-width: 6px; }
+
+    /* v6 — to.to split with red dot */
+    .v6 { color: #18181b; letter-spacing: 0; font-weight: 800; }
+    .v6 .dot { color: #FF3B3B; margin: 0 0.04em; }
+    .dark .v6 { color: #fff; }
+    .dark .v6 .dot { color: #FF6363; }
+
+    /* v7 — TOTO uppercase condensed */
+    .v7 { color: #18181b; font-weight: 900; letter-spacing: 0.12em; }
+    .dark .v7 { color: #fff; }
+
+    /* v8 — italic toto */
+    .v8 { color: #18181b; font-style: italic; font-weight: 800; letter-spacing: -0.02em; }
+    .v8 .accent { color: #FF3B3B; }
+    .dark .v8 { color: #fff; }
+
+    /* v9 — toto with red ring as 2nd o */
+    .v9 { color: #18181b; display: inline-flex; align-items: baseline; gap: 0.02em; }
+    .v9 .ring {
+      display: inline-block;
+      border: 0.13em solid #FF3B3B;
+      background: transparent;
+      border-radius: 50%;
+      box-sizing: border-box;
+    }
+    /* size-relative ring dimensions */
+    .logo-xl.v9 .ring { width: 0.62em; height: 0.62em; transform: translateY(-0.05em); margin: 0 0.02em; }
+    .logo-md.v9 .ring { width: 0.62em; height: 0.62em; transform: translateY(-0.04em); margin: 0 0.02em; border-width: 0.16em; }
+    .logo-sm.v9 .ring { width: 0.62em; height: 0.62em; transform: translateY(-0.04em); margin: 0 0.02em; border-width: 0.18em; }
+    .dark .v9 { color: #fff; }
+    .dark .v9 .ring { border-color: #FF6363; }
+
+    /* ─── Shortlist call-to-action ─────────────── */
+    .pickwell {
+      margin: 24px 0 56px;
+      padding: 24px 28px;
+      background: linear-gradient(135deg, #fef2f2 0%, #fff 60%);
+      border: 1px solid #fee2e2;
+      border-radius: 16px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    .pickwell .badge { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #FF3B3B; }
+    .pickwell h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+    .pickwell p { font-size: 13px; color: #71717a; flex: 1; min-width: 280px; }
+
+    /* footer */
+    .footnote { padding: 56px 24px; text-align: center; border-top: 1px solid #f4f4f5; background: #fff; }
+    .footnote p { font-size: 13px; color: #71717a; max-width: 580px; margin: 0 auto; }
+    .footnote code { background: #f4f4f5; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="eyebrow">Concepts · 28 Apr 2026</span>
+  <h1>Toto — logo concepts</h1>
+  <p>Nine alternatives to the current black-red-black-red alternation. Each shown at hero size, in a mock app header, and on a dark hero card so you can see how it survives different contexts.</p>
+  <div class="meta">Mockups only — not wired into the app.</div>
+</header>
+
+<div class="container">
+
+  <!-- Current state -->
+  <div class="current">
+    <span class="label">Currently in app</span>
+    <div class="render-lg" style="background:transparent;padding:0;min-height:0;flex:0 0 auto"><span class="logo logo-xl v0"><span class="b">t</span><span class="r">o</span><span class="b">t</span><span class="r">o</span></span></div>
+    <div class="desc">The black-red-black-red alternation reads as decorative rather than as a wordmark. The two reds compete with the two blacks; nothing dominates.</div>
+  </div>
+
+  <!-- Variants grid -->
+  <div class="grid">
+
+    <!-- v1 -->
+    <div class="card">
+      <div class="head-row"><span class="num">1</span><span class="ttl">Quiet charcoal</span></div>
+      <div class="render-lg"><span class="logo logo-xl v1">toto</span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v1">toto</span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v1">toto</span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">All charcoal, no red. Lets the red live in CTAs and accents instead. Most "professional fintech" of the set — closest to Wagepay's calm wordmark.</p>
+    </div>
+
+    <!-- v2 -->
+    <div class="card">
+      <div class="head-row"><span class="num">2</span><span class="ttl">Full red</span></div>
+      <div class="render-lg"><span class="logo logo-xl v2">toto</span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v2">toto</span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v2">toto</span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">All red. Loudest option. Brand-forward. Risk: when you also have red CTAs and red accents elsewhere, the logo competes with everything else for attention.</p>
+    </div>
+
+    <!-- v3 -->
+    <div class="card">
+      <div class="head-row"><span class="num">3</span><span class="ttl">Charcoal + red dot</span></div>
+      <div class="render-lg"><span class="logo logo-xl v3">toto<span class="dot">.</span></span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v3">toto<span class="dot">.</span></span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v3">toto<span class="dot">.</span></span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">"toto." — the punctuation becomes the brand mark. One red atom, claimed. Reads like a domain or a sentence-end. Restrained but distinctive.</p>
+    </div>
+
+    <!-- v4 -->
+    <div class="card">
+      <div class="head-row"><span class="num">4</span><span class="ttl">Single red 'o'</span></div>
+      <div class="render-lg"><span class="logo logo-xl v4"><span class="b">tot</span><span class="accent">o</span></span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v4"><span class="b">tot</span><span class="accent">o</span></span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v4"><span class="b">tot</span><span class="accent">o</span></span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">Keeps a single hint of red on the trailing 'o' — the natural "stress" syllable. Quieter than the current alternation; brand still present.</p>
+    </div>
+
+    <!-- v5 -->
+    <div class="card">
+      <div class="head-row"><span class="num">5</span><span class="ttl">Red underline</span></div>
+      <div class="render-lg"><span class="v5-wrap"><span class="logo logo-xl v5">toto</span></span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="v5-wrap" style="padding-bottom:3px;border-bottom-width:2px"><span class="logo logo-md v5">toto</span></span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="v5-wrap" style="padding-bottom:3px;border-bottom-width:2px"><span class="logo logo-md v5">toto</span></span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">Charcoal wordmark with a short red underline acting as a foundation bar. Anchored, confident, slightly editorial.</p>
+    </div>
+
+    <!-- v6 -->
+    <div class="card">
+      <div class="head-row"><span class="num">6</span><span class="ttl">to.to (split)</span></div>
+      <div class="render-lg"><span class="logo logo-xl v6">to<span class="dot">.</span>to</span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v6">to<span class="dot">.</span>to</span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v6">to<span class="dot">.</span>to</span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">Split with a centred red dot. Reads as a tech-brand wordmark (to.do, di.go, etc). Memorable shape; risk that it looks like a domain name.</p>
+    </div>
+
+    <!-- v7 -->
+    <div class="card">
+      <div class="head-row"><span class="num">7</span><span class="ttl">TOTO uppercase</span></div>
+      <div class="render-lg"><span class="logo logo-xl v7">TOTO</span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v7">TOTO</span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v7">TOTO</span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">All caps, wide tracking, charcoal. Architectural — feels like a premium product (think Aesop, Wilson, Mark.). Loses the friendly "toto" warmth though.</p>
+    </div>
+
+    <!-- v8 -->
+    <div class="card">
+      <div class="head-row"><span class="num">8</span><span class="ttl">Italic toto</span></div>
+      <div class="render-lg"><span class="logo logo-xl v8">tot<span class="accent">o</span></span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v8">tot<span class="accent">o</span></span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v8">tot<span class="accent">o</span></span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">Italic with the trailing 'o' in red. Friendliest, most editorial of the set — feels like a magazine masthead. Good if Toto leans into "warm household" rather than "fintech".</p>
+    </div>
+
+    <!-- v9 -->
+    <div class="card">
+      <div class="head-row"><span class="num">9</span><span class="ttl">Red ring 'o'</span></div>
+      <div class="render-lg"><span class="logo logo-xl v9">tot<span class="ring"></span></span></div>
+      <div class="ctx-row">
+        <div class="ctx light"><span class="logo logo-md v9">tot<span class="ring"></span></span><div class="ico">🐕</div></div>
+        <div class="ctx dark"><span class="logo logo-md v9">tot<span class="ring"></span></span><div class="ico">⚙</div></div>
+      </div>
+      <p class="note">The trailing 'o' becomes a red ring — a tiny logomark hidden inside the wordmark. Doubles as a standalone app icon (the ring alone). Most distinctive of the set.</p>
+    </div>
+
+  </div>
+
+  <div class="pickwell">
+    <span class="badge">Recommendation</span>
+    <div style="flex:1;min-width:280px">
+      <h3>If you want one to start with: 1, 4, or 9.</h3>
+      <p>1 (charcoal) is the safest and most professional. 4 (single red 'o') keeps a hint of brand without competing with the rest of the UI. 9 (ring) is the most ownable — also gives you a tiny standalone logomark for the app icon, share images, and favicons.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footnote">
+  <p>To swap the logo in the app, lift the chosen variant into <code>index.html</code> and <code>www/index.html</code> at the <code>.app-logo</code> span — and tell me which one. Nothing has changed in the actual app.</p>
+</footer>
+
+</body>
+</html>

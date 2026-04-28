@@ -44,15 +44,17 @@
       min-height: 100vh;
     }
 
-    /* ─── App header ──────────────────────────── */
+    /* ─── App header (fully transparent — gradient flows through) ─── */
     .app-header {
-      height: 56px;
-      background: #fff;
-      border-bottom: 1px solid var(--border);
+      height: calc(56px + env(safe-area-inset-top, 0px));
+      padding-top: env(safe-area-inset-top, 0px);
+      background: transparent;
+      border: none;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
+      padding-left: 24px;
+      padding-right: 24px;
       flex-shrink: 0;
       position: sticky;
       top: 0;
@@ -62,9 +64,13 @@
     .app-logo {
       font-size: 20px;
       font-weight: 900;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.12em;
       color: #18181b;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
+    .app-logo:active { opacity: 0.6; }
 
     .header-actions {
       display: flex;
@@ -571,8 +577,8 @@
     }
     .btn:active { transform:scale(0.97); }
 
-    .btn-primary { background: #0891b2; color: #fff; border:none; }
-    .btn-primary:hover { background: #0e7490; }
+    .btn-primary { background: var(--section-accent, #FF3B3B); color: #fff; border:none; }
+    .btn-primary:hover { filter: brightness(0.92); }
     .btn-ghost { background: transparent; color: var(--text-muted); padding: 6px 8px; }
     .btn-ghost:hover { background: var(--bg); color: var(--text); }
     .btn-danger-ghost { background: transparent; color: var(--danger); padding: 6px 8px; }
@@ -682,6 +688,185 @@
       .main { padding: 20px 16px 110px; }
       .sidebar { width: 60px; }
     }
+
+    /* ─── Floating bottom nav (mobile) ──────────── */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: max(14px, env(safe-area-inset-bottom));
+      left: 14px; right: 14px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 22px;
+      box-shadow:
+        0 8px 28px rgba(15, 15, 20, 0.10),
+        0 2px 6px rgba(15, 15, 20, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 4px;
+      z-index: 100;
+    }
+    @media (max-width: 720px) {
+      .bottom-nav { display: flex; }
+      .sidebar { display: none; }
+      .main { padding: 16px 14px 110px; }
+    }
+    body.kid-mode .bottom-nav { display: none !important; }
+    .bn-item {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 6px 0;
+      font-size: 9px;
+      font-weight: 700;
+      color: #a1a1aa;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      background: none;
+      border: none;
+      transition: color 0.15s;
+    }
+    .bn-item .bn-ico {
+      width: 22px; height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .bn-item.active { color: var(--section-accent, #FF3B3B); }
+    .bn-item.active .bn-ico { stroke-width: 2; }
+    .bn-item:active { transform: scale(0.94); }
+
+    /* ─── Per-section animated gradient backgrounds ── */
+    body {
+      transition: background 0.6s ease;
+      isolation: isolate;
+    }
+    /* Soft drifting blobs sit behind everything — fixed pseudo + a 3rd via #ambient-blob */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      width: 80vw; height: 80vw;
+      max-width: 820px; max-height: 820px;
+      min-width: 440px; min-height: 440px;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+      will-change: transform;
+      transition: background 0.6s ease;
+    }
+    body::before {
+      top: -28vw; right: -22vw;
+      animation: blob-drift-a 14s ease-in-out infinite alternate;
+    }
+    body::after {
+      bottom: -28vw; left: -22vw;
+      animation: blob-drift-b 18s ease-in-out infinite alternate;
+    }
+    #ambient-blob {
+      content: '';
+      position: fixed;
+      width: 60vw; height: 60vw;
+      max-width: 640px; max-height: 640px;
+      min-width: 320px; min-height: 320px;
+      top: 30vh; left: 30vw;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: -1;
+      pointer-events: none;
+      will-change: transform;
+      animation: blob-drift-c 22s ease-in-out infinite alternate;
+      transition: background 0.6s ease;
+    }
+    @keyframes blob-drift-a {
+      0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+      50%  { transform: translate3d(-14vw, 10vw, 0) scale(1.18) rotate(40deg); }
+      100% { transform: translate3d(-22vw, 18vw, 0) scale(1.05) rotate(80deg); }
+    }
+    @keyframes blob-drift-b {
+      0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+      50%  { transform: translate3d(18vw, -14vw, 0) scale(1.15) rotate(-40deg); }
+      100% { transform: translate3d(10vw, -22vw, 0) scale(1.22) rotate(-80deg); }
+    }
+    @keyframes blob-drift-c {
+      0%   { transform: translate3d(0, 0, 0) scale(1); }
+      33%  { transform: translate3d(12vw, -10vw, 0) scale(1.15); }
+      66%  { transform: translate3d(-8vw, 14vw, 0) scale(0.92); }
+      100% { transform: translate3d(-14vw, -8vw, 0) scale(1.1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body::before, body::after, #ambient-blob { animation: none; }
+    }
+
+    /* Section themes — base tint + animated blob colours + accent CSS vars */
+    body[data-section="today"] {
+      background: linear-gradient(180deg, #fff8f1 0%, #ffffff 60%);
+      --section-accent: #FF3B3B;
+      --section-accent-2: #f97316;
+      --section-accent-soft: rgba(255, 59, 59, 0.10);
+      --primary: #FF3B3B;
+      --primary-light: rgba(255, 59, 59, 0.10);
+    }
+    body[data-section="today"]::before  { background: rgba(255, 180, 130, 0.65); }
+    body[data-section="today"]::after   { background: rgba(255, 195, 195, 0.60); }
+    body[data-section="today"]    #ambient-blob { background: rgba(255, 220, 170, 0.45); }
+
+    body[data-section="wallet"] {
+      background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 60%);
+      --section-accent: #16a34a;
+      --section-accent-2: #65a30d;
+      --section-accent-soft: rgba(22, 163, 74, 0.10);
+      --primary: #16a34a;
+      --primary-light: rgba(22, 163, 74, 0.10);
+    }
+    body[data-section="wallet"]::before { background: rgba(134, 239, 172, 0.65); }
+    body[data-section="wallet"]::after  { background: rgba(190, 242, 100, 0.55); }
+    body[data-section="wallet"]   #ambient-blob { background: rgba(167, 243, 208, 0.50); }
+
+    body[data-section="plan"] {
+      background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 60%);
+      --section-accent: #2563eb;
+      --section-accent-2: #7c3aed;
+      --section-accent-soft: rgba(37, 99, 235, 0.10);
+      --primary: #2563eb;
+      --primary-light: rgba(37, 99, 235, 0.10);
+    }
+    body[data-section="plan"]::before   { background: rgba(170, 210, 255, 0.65); }
+    body[data-section="plan"]::after    { background: rgba(195, 220, 255, 0.65); }
+    body[data-section="plan"]     #ambient-blob { background: rgba(220, 200, 255, 0.50); }
+
+    body[data-section="home"] {
+      background: linear-gradient(180deg, #fffaf0 0%, #ffffff 60%);
+      --section-accent: #f59e0b;
+      --section-accent-2: #fb923c;
+      --section-accent-soft: rgba(245, 158, 11, 0.10);
+      --primary: #f59e0b;
+      --primary-light: rgba(245, 158, 11, 0.10);
+    }
+    body[data-section="home"]::before   { background: rgba(255, 210, 145, 0.60); }
+    body[data-section="home"]::after    { background: rgba(255, 230, 185, 0.65); }
+    body[data-section="home"]     #ambient-blob { background: rgba(255, 200, 200, 0.45); }
+
+    body[data-section="settings"] {
+      background: linear-gradient(180deg, #fafafa 0%, #ffffff 60%);
+      --section-accent: #71717a;
+      --section-accent-2: #52525b;
+      --section-accent-soft: rgba(113, 113, 122, 0.10);
+      --primary: #71717a;
+      --primary-light: rgba(113, 113, 122, 0.10);
+    }
+    body[data-section="settings"]::before { background: rgba(215, 215, 230, 0.50); }
+    body[data-section="settings"]::after  { background: rgba(235, 235, 245, 0.50); }
+    body[data-section="settings"] #ambient-blob { background: rgba(220, 230, 245, 0.40); }
 
     .surplus-banner {
       border-radius: var(--radius);
@@ -1757,6 +1942,188 @@
     .today-section-card { border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; background:var(--surface); cursor:pointer; transition:box-shadow 0.2s,transform 0.2s; }
     .today-section-card:hover { box-shadow:0 6px 20px rgba(0,0,0,0.07); transform:translateY(-2px); }
     .today-section-card:active { transform:translateY(0); }
+
+    /* ─── Today screen — redesigned (Round 2) ─── */
+    .today-greeting { margin: 0 0 14px; padding: 0 4px; }
+    .today-greeting h2 { font-size: 24px; font-weight: 900; letter-spacing: -0.02em; color: #18181b; margin: 0; }
+    .today-greeting p { font-size: 13px; color: #71717a; margin-top: 4px; line-height: 1.5; }
+
+    .today-hero {
+      border-radius: 22px;
+      padding: 22px 22px 18px;
+      background: linear-gradient(150deg, #18181b 0%, #2d1414 60%, #4a1010 100%);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(15, 15, 20, 0.18);
+    }
+    .today-hero::before {
+      content: ''; position: absolute; right: -30px; top: -30px;
+      width: 140px; height: 140px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,59,59,0.4), rgba(255,59,59,0));
+      pointer-events: none;
+    }
+    .today-hero-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; position: relative; }
+    .today-hero-num { font-size: 42px; font-weight: 900; letter-spacing: -0.03em; margin: 6px 0 0; line-height: 1.05; position: relative; }
+    .today-hero-num .small { font-size: 20px; opacity: 0.4; font-weight: 700; }
+    .today-hero-num.negative { color: #fca5a5; }
+    .today-hero-of { font-size: 12px; opacity: 0.55; margin-top: 4px; font-weight: 600; position: relative; }
+    .today-hero-bar { display: flex; gap: 2px; margin-top: 16px; height: 7px; border-radius: 99px; overflow: hidden; position: relative; }
+    .today-hero-bar > div { height: 100%; }
+    .today-hero-legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; position: relative; }
+    .today-hero-legend > div { font-size: 10px; opacity: 0.85; display: flex; align-items: center; gap: 5px; }
+    .today-hero-legend .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    .today-seclabel { padding: 16px 4px 8px; display: flex; align-items: center; justify-content: space-between; }
+    .today-seclabel .lbl { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #a1a1aa; }
+
+    .today-brief { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .brief-row {
+      display: flex; align-items: center; gap: 12px;
+      background: transparent;
+      border-radius: 16px; padding: 14px 16px;
+      border: 4px solid rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: transform 0.12s, background 0.18s, border-color 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .brief-row:active { transform: scale(0.985); }
+    .brief-row:hover { background: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.85); }
+    .brief-glyph { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .brief-glyph svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .brief-glyph.red    { background: #fee2e2; color: #dc2626; }
+    .brief-glyph.amber  { background: #fef3c7; color: #d97706; }
+    .brief-glyph.green  { background: #dcfce7; color: #16a34a; }
+    .brief-glyph.blue   { background: #dbeafe; color: #2563eb; }
+    .brief-glyph.purple { background: #f3e8ff; color: #7c3aed; }
+    .brief-glyph.grey   { background: #f4f4f5; color: #71717a; }
+    .brief-body { flex: 1; min-width: 0; }
+    .brief-body .t { font-size: 13px; font-weight: 700; color: #18181b; line-height: 1.3; }
+    .brief-body .s { font-size: 11px; color: #71717a; margin-top: 2px; line-height: 1.4; }
+    .brief-arrow { color: #d4d4d8; flex-shrink: 0; }
+
+    /* ─── Round 3 — Wallet (scoped to #tab-budget) ─── */
+    #tab-budget .summary-hero {
+      background: linear-gradient(150deg, #18181b 0%, #14271a 60%, #0d3520 100%) !important;
+      color: #fff !important;
+      border: none !important;
+      border-radius: 22px;
+      padding: 22px 24px 18px;
+      text-align: left !important;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(15, 15, 20, 0.18);
+      margin-bottom: 18px;
+    }
+    #tab-budget .summary-hero::before {
+      content: ''; position: absolute; right: -30px; top: -30px;
+      width: 140px; height: 140px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(22,163,74,0.45), rgba(22,163,74,0));
+      pointer-events: none;
+    }
+    #tab-budget .summary-hero-label { color: rgba(255,255,255,0.6) !important; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 4px !important; position: relative; }
+    #tab-budget .summary-hero-num { color: #fff !important; font-size: 38px; position: relative; }
+    #tab-budget .summary-hero-sub { color: rgba(255,255,255,0.55) !important; font-size: 11px; margin-top: 4px; position: relative; }
+    #tab-budget .summary-hero-expand { color: rgba(255,255,255,0.7) !important; font-size: 11px; margin-top: 12px; position: relative; }
+
+    #tab-budget .summary-mini {
+      background: transparent;
+      border: 4px solid rgba(255, 255, 255, 0.7);
+      border-radius: 14px;
+    }
+    #tab-budget .section {
+      background: transparent;
+      border: 4px solid rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+    }
+    #tab-budget .section-header {
+      border-bottom: 1px solid rgba(24, 24, 27, 0.06);
+    }
+    #tab-budget table { background: transparent; }
+    #tab-budget thead th { background: transparent; color: #71717a; border-bottom: 1px solid rgba(24,24,27,0.08); }
+    #tab-budget tbody tr { background: transparent; }
+    #tab-budget tbody tr + tr td { border-top: 1px solid rgba(24,24,27,0.05); }
+    #tab-budget tbody tr:hover { background: rgba(255,255,255,0.35); }
+    #tab-budget .table-wrap { background: transparent; }
+    #tab-budget .empty { background: transparent; }
+
+    /* Allocation block (Betashares-style) */
+    .alloc-section {
+      margin-bottom: 24px;
+      border: 4px solid rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      padding: 18px 16px 8px;
+      background: transparent;
+    }
+    .alloc-section .alloc-title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #71717a;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+    .alloc-bar {
+      display: flex;
+      gap: 2px;
+      height: 28px;
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 0 0 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .alloc-bar > div { height: 100%; }
+    .alloc-list { display: flex; flex-direction: column; }
+    .alloc-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 8px;
+      border-bottom: 1px solid rgba(24, 24, 27, 0.06);
+    }
+    .alloc-row:last-child { border-bottom: none; }
+    .alloc-row .tdot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .alloc-row .tdot svg {
+      width: 18px; height: 18px;
+      stroke: currentColor; stroke-width: 1.8;
+      stroke-linecap: round; stroke-linejoin: round;
+      fill: none;
+    }
+    .alloc-row .body { flex: 1; min-width: 0; }
+    .alloc-row .ticker {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: #18181b;
+      text-transform: uppercase;
+    }
+    .alloc-row .name {
+      font-size: 11px;
+      color: #71717a;
+      margin-top: 1px;
+    }
+    .alloc-row .pct {
+      font-size: 16px;
+      font-weight: 800;
+      color: #18181b;
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .alloc-row .amt {
+      font-size: 10px;
+      color: #71717a;
+      text-align: right;
+      margin-top: 2px;
+      font-weight: 600;
+    }
     .today-section-label { font-size:17px; font-weight:800; color:#0891b2; margin-bottom:6px; letter-spacing:-0.01em; }
     .today-section-sub { font-size:12px; color:var(--text-muted); line-height:1.5; }
     .today-action-cards { display:flex; flex-direction:column; gap:6px; margin-bottom:24px; }
@@ -1788,20 +2155,41 @@
     .today-quick-btn:active { transform:scale(0.97); }
 
     /* ─── Section Pills ────────────────────── */
-    .section-nav { position:sticky; top:0; z-index:20; background:var(--bg); padding:16px 0 0; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+    .section-nav { position:sticky; top:0; z-index:20; background:transparent; padding:16px 0 0; }
     .section-breadcrumb { font-size:12px; color:var(--text-muted); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
     .section-breadcrumb a { color:var(--text-muted); text-decoration:none; font-weight:600; cursor:pointer; }
     .section-breadcrumb a:hover { color:#0891b2; }
     .section-breadcrumb .sep { opacity:0.4; }
     .section-breadcrumb .current { color:var(--text); font-weight:700; }
-    .section-pills { display:flex; gap:8px; overflow-x:auto; padding:0 0 14px; scrollbar-width:none; border-bottom:1px solid var(--border); margin-bottom:20px; }
+    .section-pills-wrap { position: relative; border-bottom:1px solid rgba(24,24,27,0.06); margin-bottom:20px; }
+    .section-pills-chevron {
+      position: absolute;
+      top: 0; bottom: 14px;
+      width: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.25), 0 0 2px rgba(0,0,0,0.18);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      z-index: 5;
+    }
+    .section-pills-chevron-r { right: 0; }
+    .section-pills-chevron-l { left: 0; }
+    .section-pills-wrap.has-overflow-right .section-pills-chevron-r { opacity: 0.95; }
+    .section-pills-wrap.has-overflow-left  .section-pills-chevron-l { opacity: 0.95; }
+    .section-pills { display:flex; gap:8px; overflow-x:auto; padding:0 0 14px; scrollbar-width:none; }
     .section-pills::-webkit-scrollbar { display:none; }
-    .section-pill { padding:7px 16px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--text-muted); cursor:pointer; white-space:nowrap; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
-    .section-pill:hover { color:var(--text); }
-    .section-pill.active { background:#0891b2; color:#fff; border-color:#0891b2; }
+    .section-pill { padding:7px 16px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid rgba(255,255,255,0.7); background:transparent; color:#52525b; cursor:pointer; white-space:nowrap; transition:all 0.15s; -webkit-tap-highlight-color:transparent; }
+    .section-pill:hover { color:#18181b; border-color:rgba(255,255,255,0.95); }
+    .section-pill.active { background:var(--section-accent, #FF3B3B); color:#fff; border-color:var(--section-accent, #FF3B3B); }
 
     /* ─── Type A / Life Score ────────────── */
-    .life-score-card { border-radius:14px; padding:20px; margin-bottom:20px; border:1px solid var(--border); background:var(--surface); }
+    .life-score-card { border-radius:14px; padding:20px; margin-bottom:20px; border:4px solid rgba(255,255,255,0.7); background:transparent; }
     .life-score-header { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
     .life-score-ring { position:relative; width:64px; height:64px; flex-shrink:0; }
     .life-score-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
@@ -1815,8 +2203,8 @@
     .life-dim-fill { height:100%; border-radius:3px; transition:width 0.4s; }
     .life-dim-tip { font-size:10px; color:var(--text-muted); margin-top:2px; }
 
-    .mission-card { border-radius:14px; padding:18px 20px; margin-bottom:16px; background:linear-gradient(135deg,#0891b2,#7c3aed); color:#fff; cursor:pointer; transition:box-shadow 0.2s; }
-    .mission-card:hover { box-shadow:0 4px 16px rgba(8,145,178,0.3); }
+    .mission-card { border-radius:14px; padding:18px 20px; margin-bottom:16px; background:linear-gradient(135deg, var(--section-accent, #FF3B3B), var(--section-accent-2, #f97316)); color:#fff; cursor:pointer; transition:box-shadow 0.2s; }
+    .mission-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.18); }
     .mission-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; opacity:0.7; margin-bottom:6px; }
     .mission-title { font-size:15px; font-weight:800; margin-bottom:4px; }
     .mission-sub { font-size:12px; opacity:0.75; }
@@ -2103,7 +2491,44 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
+<body data-section="today">
+
+<!-- ─── Ambient gradient blob (third drifting blob behind everything) ── -->
+<div id="ambient-blob" aria-hidden="true"></div>
+
+<!-- ─── SVG icon defs (lucide-style outline icons) ─── -->
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V8a2 2 0 0 0-2-2H5a2 2 0 0 1 0-4h14v4"/><path d="M3 6v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-paw" viewBox="0 0 24 24"><circle cx="11" cy="4.5" r="1.8"/><circle cx="17.5" cy="7.5" r="1.8"/><circle cx="19.5" cy="14" r="1.8"/><circle cx="4.5" cy="7.5" r="1.8"/><circle cx="6.5" cy="14" r="1.8"/><path d="M8 19.5c0-2.5 1.8-4.5 4-4.5s4 2 4 4.5a2 2 0 0 1-2 2c-.7 0-1.3-.4-2-.4s-1.3.4-2 .4a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-cloud-rain" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6M8 14v6M12 16v6"/></symbol>
+    <symbol id="i-chef-hat" viewBox="0 0 24 24"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><line x1="6" y1="17" x2="18" y2="17"/></symbol>
+    <symbol id="i-clipboard-check" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M4 2v20l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2V2l-2 2-2-2-2 2-2-2-2 2-2-2-2 2Z"/><path d="M16 8H8M16 12H8M13 16H8"/></symbol>
+    <symbol id="i-palm-tree" viewBox="0 0 24 24"><path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-1 1 1h4"/><path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-3l-1-1-1 1h-3"/><path d="M9 12c-2.5 1-4.5 2.5-5 5l4-1 1 4c1-3 2.5-5 5-6"/><path d="M11 12c2.5 0 4.5 0 6 1.5"/><path d="M11 12v10"/></symbol>
+    <symbol id="i-shopping-cart" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 1.95-1.57L23 6H6"/></symbol>
+    <symbol id="i-fuel" viewBox="0 0 24 24"><line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/></symbol>
+    <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-waves" viewBox="0 0 24 24"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 17h-2a1 1 0 0 1-1-1v-3.6a3 3 0 0 1 .27-1.24l1.83-3.84A2 2 0 0 1 5.93 6h12.14a2 2 0 0 1 1.83 1.32l1.83 3.84A3 3 0 0 1 22 12.4V16a1 1 0 0 1-1 1h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  </defs>
+</svg>
 
 <!-- ─── Login overlay ────────────────────────── -->
 <div id="login-overlay">
@@ -2117,6 +2542,9 @@
   <button class="google-sign-in-btn" onclick="signInWithGoogle()">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
     Sign in with Google
+  </button>
+  <button onclick="guestMode()" style="margin-top:12px;background:none;border:1px solid #e4e4e7;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;color:#71717a;cursor:pointer;width:100%;max-width:280px">
+    Continue without sign in
   </button>
   <p id="login-error" style="color:#ef4444;font-size:13px;margin:0;display:none"></p>
 </div>
@@ -2156,7 +2584,7 @@
 
 <!-- ─── App header ────────────────────────────── -->
 <header class="app-header">
-  <span class="app-logo">t<span style="color:#DC2626">o</span>t<span style="color:#DC2626">o</span></span>
+  <span class="app-logo" onclick="activateTab('today')" role="button" aria-label="Home" tabindex="0">TOTO</span>
   <div class="header-actions">
     <button class="toto-btn" onclick="toggleTotoAssistant()" title="Ask Toto">🐕</button>
     <button class="header-icon-btn" onclick="activateTab('settings')" title="Settings">
@@ -2477,6 +2905,7 @@ function _setHouseholdOwner(uid) {
 }
 
 let _currentUser    = null;
+let _guestMode      = false;
 let _fsUnsubscribe  = null;
 let _pendingLogEntry = null;
 
@@ -2496,6 +2925,18 @@ function signInWithGoogle() {
     const el = document.getElementById('login-error');
     if (el) { el.textContent = err.message; el.style.display = ''; }
   });
+}
+
+function guestMode() {
+  _guestMode = true;
+  const overlay = document.getElementById('login-overlay');
+  if (overlay) overlay.classList.add('hidden');
+  if (!state.onboarded) {
+    showOnboarding();
+  } else {
+    renderAll();
+    handleDeviceRouting();
+  }
 }
 
 function signOutUser() {
@@ -2573,6 +3014,7 @@ function _startFirestoreSync() {
 }
 
 fbAuth.onAuthStateChanged(user => {
+  if (_guestMode && !user) return;
   _currentUser = user;
   const overlay       = document.getElementById('login-overlay');
   const headerAvatar  = document.getElementById('header-avatar');
@@ -4892,11 +5334,29 @@ function _sectionPillsHtml(sectionKey, activeTab) {
       <span class="sep">›</span>
       <span class="current">${sec.label}</span>
     </div>
-    <div class="section-pills">${sec.tabs.map(t =>
-      `<button class="section-pill${t.tab === activeTab ? ' active' : ''}" onclick="activateTab('${t.tab}')">${t.label}</button>`
-    ).join('')}</div>
+    <div class="section-pills-wrap">
+      <div class="section-pills" onscroll="_updatePillsOverflow(this.parentElement)">${sec.tabs.map(t =>
+        `<button class="section-pill${t.tab === activeTab ? ' active' : ''}" onclick="activateTab('${t.tab}')">${t.label}</button>`
+      ).join('')}</div>
+      <div class="section-pills-chevron section-pills-chevron-r" aria-hidden="true">›</div>
+      <div class="section-pills-chevron section-pills-chevron-l" aria-hidden="true">‹</div>
+    </div>
   </div>`;
 }
+
+// Show / hide the scroll-affordance chevrons based on actual overflow
+function _updatePillsOverflow(wrap) {
+  if (!wrap) return;
+  const pills = wrap.querySelector('.section-pills');
+  if (!pills) return;
+  const canRight = pills.scrollWidth - pills.scrollLeft - pills.clientWidth > 4;
+  const canLeft  = pills.scrollLeft > 4;
+  wrap.classList.toggle('has-overflow-right', canRight);
+  wrap.classList.toggle('has-overflow-left',  canLeft);
+}
+window.addEventListener('resize', () => {
+  document.querySelectorAll('.section-pills-wrap').forEach(_updatePillsOverflow);
+});
 
 function activateTab(tab) {
   if (tab === 'subscriptions') tab = 'bills';
@@ -4908,7 +5368,7 @@ function activateTab(tab) {
   if (_activeTab() === 'settings' && tab !== 'settings') _checkSettingsUnsaved(tab);
 
   // Clear all active states
-  document.querySelectorAll('.nav-item, .nav-text-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .nav-text-item, .bn-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
 
   // Activate the tab panel
@@ -4924,6 +5384,9 @@ function activateTab(tab) {
     document.querySelectorAll(`[data-tab="${tab}"]`).forEach(n => n.classList.add('active'));
   }
 
+  // Track section on body so per-section gradient backgrounds apply
+  document.body.dataset.section = section || tab;
+
   // Inject section pills into the active panel (remove all old ones first)
   if (section && panel) {
     panel.querySelectorAll('.section-nav').forEach(el => el.remove());
@@ -4935,6 +5398,8 @@ function activateTab(tab) {
       const nav = panel.querySelector('.section-nav');
       if (nav) nav.insertAdjacentHTML('afterend', bannerHtml);
     }
+    // Update pill overflow chevrons once the layout settles
+    requestAnimationFrame(() => panel.querySelectorAll('.section-pills-wrap').forEach(_updatePillsOverflow));
   }
 
   renderAll();
@@ -5667,7 +6132,7 @@ function _renderLifeScore() {
         <span class="life-dim-pct" style="color:${barColor}">${pct}%</span>
       </div>
       <div class="life-dim-bar"><div class="life-dim-fill" style="width:${pct}%;background:${barColor}"></div></div>
-      <div class="life-dim-tip">${d.tip}${d.score < 70 ? ` <span style="color:#0891b2;font-weight:700;cursor:pointer" onclick="activateTab('${d.tab}')">Fix →</span>` : ''}</div>
+      <div class="life-dim-tip">${d.tip}${d.score < 70 ? ` <span style="color:var(--section-accent,#FF3B3B);font-weight:700;cursor:pointer" onclick="activateTab('${d.tab}')">Fix →</span>` : ''}
     </div>`;
   }).join('');
 
@@ -5765,22 +6230,22 @@ function renderSetupProgress() {
   const pct     = Math.round(done / total * 100);
 
   if (done === total) {
-    return `<div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px">
+    return `<div style="background:transparent;border:1px solid rgba(22,163,74,0.28);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px;margin-bottom:16px">
       <span style="font-size:24px">🎉</span>
       <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#15803d">Setup complete!</div><div style="font-size:12px;color:#16a34a">Your household is fully configured.</div></div>
-      <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:#64748b;background:none;border:none;cursor:pointer;font-weight:600">Dismiss</button>
+      <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:#52525b;background:none;border:none;cursor:pointer;font-weight:600">Dismiss</button>
     </div>`;
   }
 
   const r = 22; const circ = 2 * Math.PI * r;
   const progressSvg = `
     <svg width="52" height="52" viewBox="0 0 52 52">
-      <circle cx="26" cy="26" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="5"/>
-      <circle cx="26" cy="26" r="${r}" fill="none" stroke="#0891b2" stroke-width="5"
+      <circle cx="26" cy="26" r="${r}" fill="none" stroke="rgba(24,24,27,0.1)" stroke-width="5"/>
+      <circle cx="26" cy="26" r="${r}" fill="none" stroke="var(--section-accent,#FF3B3B)" stroke-width="5"
         stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ - pct/100*circ).toFixed(1)}"
         stroke-linecap="round" transform="rotate(-90 26 26)"/>
     </svg>
-    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0891b2">${pct}%</div>`;
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--section-accent,#FF3B3B)">${pct}%</div>`;
 
   // ── Header (always visible, clickable to expand/collapse) ──
   const chevron = _spExpanded ? '▲' : '▼';
@@ -5792,45 +6257,45 @@ function renderSetupProgress() {
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <div style="position:relative;width:52px;height:52px">${progressSvg}</div>
-        <span style="font-size:10px;color:#94a3b8">${chevron}</span>
+        <span style="font-size:10px;color:#71717a">${chevron}</span>
       </div>
     </div>
-    <div style="background:#e2e8f0;border-radius:99px;height:5px;margin-top:14px;overflow:hidden">
-      <div style="width:${pct}%;height:100%;border-radius:99px;background:linear-gradient(90deg,#0891b2,#06b6d4)"></div>
+    <div style="background:rgba(24,24,27,0.08);border-radius:99px;height:5px;margin-top:14px;overflow:hidden">
+      <div style="width:${pct}%;height:100%;border-radius:99px;background:linear-gradient(90deg, var(--section-accent,#FF3B3B), var(--section-accent-2,#f97316))"></div>
     </div>`;
 
   if (!_spExpanded) {
-    return `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px">${header}</div>`;
+    return `<div style="background:transparent;border:4px solid rgba(255,255,255,0.7);border-radius:16px;padding:20px;margin-bottom:16px">${header}</div>`;
   }
 
   // ── Outstanding items ──
   const nextTask = todoTasks[0];
   const todoHtml = todoTasks.map(t => {
     const isNext = t === nextTask;
-    const border = isNext ? 'border:1.5px solid #0891b2;background:#ecfeff' : 'border:1px solid #e2e8f0;background:#fff';
+    const border = isNext ? 'border:4px solid var(--section-accent,#FF3B3B);background:var(--section-accent-soft,rgba(255,59,59,0.10))' : 'border:4px solid rgba(255,255,255,0.7);background:transparent';
     const clickFn = t.settingsSection
       ? `activateTab('${t.tab}');setTimeout(()=>{const el=document.getElementById('acc-${t.settingsSection || ''}');if(el&&!el.classList.contains('open')){el.querySelector('.acc-header')?.click();}el?.scrollIntoView({behavior:'smooth',block:'start'})},200)`
       : t.tab ? `activateTab('${t.tab}')` : '';
     const click = clickFn ? `onclick="${clickFn}"` : '';
     return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;${border};cursor:${t.tab?'pointer':'default'}" ${click}>
-      <div style="width:22px;height:22px;border-radius:50%;border:2px solid ${isNext?'#0891b2':'#cbd5e1'};flex-shrink:0"></div>
+      <div style="width:22px;height:22px;border-radius:50%;border:2px solid ${isNext?'var(--section-accent,#FF3B3B)':'#cbd5e1'};flex-shrink:0"></div>
       <span style="font-size:13px;flex:1;color:${isNext?'#1e293b':'#374151'};font-weight:${isNext?'500':'400'}">${t.label}</span>
-      ${t.tab ? `<span style="font-size:11px;color:${isNext?'#0891b2':'#94a3b8'};font-weight:600">Go →</span>` : ''}
+      ${t.tab ? `<span style="font-size:11px;color:${isNext?'var(--section-accent,#FF3B3B)':'#94a3b8'};font-weight:600">Go →</span>` : ''}
     </div>`;
   }).join('');
 
   // ── Done section (collapsible) ──
   const doneChevron = _spDoneExpanded ? '▲' : '▼';
   const doneHtml = doneTasks.map(t => `
-    <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:#f0fdf4">
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:transparent;border:1px solid rgba(22,163,74,0.18)">
       <div style="width:22px;height:22px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0">✓</div>
-      <span style="font-size:13px;flex:1;text-decoration:line-through;color:#94a3b8">${t.label}</span>
+      <span style="font-size:13px;flex:1;text-decoration:line-through;color:#71717a">${t.label}</span>
       <span style="font-size:11px;color:#16a34a;font-weight:600">Done</span>
     </div>`).join('');
 
   const doneSection = done > 0 ? `
-    <div style="margin-top:12px;border-top:1px solid #f1f5f9;padding-top:12px">
-      <div onclick="_spDoneExpanded=!_spDoneExpanded;_refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:8px 12px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0">
+    <div style="margin-top:12px;border-top:1px solid rgba(24,24,27,0.06);padding-top:12px">
+      <div onclick="_spDoneExpanded=!_spDoneExpanded;_refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:8px 12px;border-radius:10px;background:transparent;border:1px solid rgba(22,163,74,0.22)">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:14px">✅</span>
           <span style="font-size:13px;font-weight:700;color:#15803d">${done} task${done !== 1 ? 's' : ''} completed</span>
@@ -5841,14 +6306,69 @@ function renderSetupProgress() {
     </div>` : '';
 
   return `
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px">
+    <div style="background:transparent;border:4px solid rgba(255,255,255,0.7);border-radius:16px;padding:20px;margin-bottom:16px">
       ${header}
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">${todoHtml}</div>
       ${doneSection}
       <div style="text-align:center;margin-top:14px">
-        <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer">Dismiss · I'll do this later</button>
+        <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:#71717a;background:none;border:none;cursor:pointer">Dismiss · I'll do this later</button>
       </div>
     </div>`;
+}
+
+// Allocation bar colour palette (graduated red → amber → grey → black)
+const _ALLOC_COLORS = ['#FF3B3B', '#FF8A65', '#FFB088', '#FCD34D', '#94A3B8', '#27272a'];
+
+function _todayAllocSegments(monthData) {
+  const expenses = (monthData.expenses || [])
+    .filter(e => !e.skipped)
+    .map(e => ({ name: e.name || 'Other', amount: toMonthly(Number(e.amount) || 0, e.frequency) }))
+    .filter(e => e.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+  if (!expenses.length) return { segments: [], total: 0 };
+  const total = expenses.reduce((s, e) => s + e.amount, 0);
+  const top = expenses.slice(0, 5);
+  const other = expenses.slice(5);
+  const segments = top.map((e, i) => ({
+    name: e.name,
+    pct: (e.amount / total) * 100,
+    color: _ALLOC_COLORS[i] || '#94A3B8'
+  }));
+  if (other.length) {
+    const otherTotal = other.reduce((s, e) => s + e.amount, 0);
+    segments.push({ name: 'Other', pct: (otherTotal / total) * 100, color: _ALLOC_COLORS[5] });
+  }
+  return { segments, total };
+}
+
+function _briefIcon(card) {
+  const t = (card.title || '').toLowerCase();
+  if (t.includes('dinner') || t.includes('lunch') || t.includes('meal')) return 'i-chef-hat';
+  if (t.includes('rego') || t.includes('vehicle')) return 'i-car';
+  if (t.includes('health:')) return 'i-activity';
+  if (t.includes('over budget')) return 'i-zap';
+  if (t.includes('left in budget') || t.includes('budget')) return 'i-wallet';
+  if (t.includes('bill') || t.includes('due')) return 'i-receipt';
+  if (t.includes('expir')) return 'i-file-text';
+  if (t.includes('overdue') || t.includes('maintenance')) return 'i-clipboard-check';
+  if (card.section === 'Plan') return 'i-calendar';
+  if (card.section === 'Home') return 'i-home';
+  if (card.section === 'Wallet') return 'i-wallet';
+  return 'i-clipboard-check';
+}
+
+function _briefRow(card) {
+  const onclickAttr = card.onclick ? card.onclick : (card.tab ? `activateTab('${card.tab}')` : '');
+  const icon = _briefIcon(card);
+  const cls = ['red','amber','green','blue'].includes(card.cls) ? card.cls : 'grey';
+  return `<div class="brief-row"${onclickAttr ? ` onclick="${onclickAttr}"` : ''}>
+    <div class="brief-glyph ${cls}"><svg viewBox="0 0 24 24"><use href="#${icon}"/></svg></div>
+    <div class="brief-body">
+      <div class="t">${card.title || ''}</div>
+      ${card.sub ? `<div class="s">${card.sub}</div>` : ''}
+    </div>
+    <svg class="brief-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </div>`;
 }
 
 function renderToday() {
@@ -6071,34 +6591,50 @@ function renderToday() {
   const missionHtml = typeAOn ? _renderMissionCard() : '';
   const lifeScoreHtml = typeAOn ? _renderLifeScore() : '';
 
+  // ── Hero card data ──
+  const alloc = _todayAllocSegments(curData);
+  const heroNum = Math.round(Math.abs(surplus));
+  const heroDollars = heroNum.toLocaleString('en-AU');
+  const heroNegative = surplus < 0;
+
+  const barHtml = alloc.segments.length
+    ? alloc.segments.map(s => `<div style="background:${s.color};flex:${s.pct.toFixed(2)}"></div>`).join('')
+    : `<div style="background:rgba(255,255,255,0.15);flex:1"></div>`;
+
+  const legendHtml = alloc.segments.slice(0, 3).map(s =>
+    `<div><span class="dot" style="background:${s.color}"></span>${escHtml(s.name)} ${Math.round(s.pct)}%</div>`
+  ).join('');
+
+  const heroOfText = monthlyIncome > 0
+    ? `of ${aud(monthlyIncome)} budget · ${daysLeft} day${daysLeft === 1 ? '' : 's'} left`
+    : `${daysLeft} day${daysLeft === 1 ? '' : 's'} left in the month`;
+
+  const briefHtml = cards.length
+    ? cards.map(_briefRow).join('')
+    : `<div class="brief-row"><div class="brief-glyph green"><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></div><div class="brief-body"><div class="t">All clear</div><div class="s">Nothing needs your attention.</div></div></div>`;
+
   document.getElementById('today-content').innerHTML = `
-    <div class="today-briefing">
+    <div class="today-greeting">
       <h2>${greeting}${name ? ', ' + name : ''}</h2>
       <p id="today-briefing-text">${fallbackBrief}</p>
+    </div>
+
+    <div class="today-hero" onclick="activateTab('budget')">
+      <div class="today-hero-lbl">${heroNegative ? 'Over budget by' : 'Available this month'}</div>
+      <div class="today-hero-num${heroNegative ? ' negative' : ''}"><span class="small">$</span>${heroDollars}</div>
+      <div class="today-hero-of">${heroOfText}</div>
+      <div class="today-hero-bar">${barHtml}</div>
+      ${legendHtml ? `<div class="today-hero-legend">${legendHtml}</div>` : ''}
     </div>
 
     <div id="setup-progress-card">${renderSetupProgress()}</div>
 
     ${missionHtml}
 
-    ${notifHtml}
-
     ${lifeScoreHtml}
 
-    <div class="today-actions-grid">
-      <div class="today-section-card" onclick="activateTab('budget')">
-        <div class="today-section-label">Wallet</div>
-        <div class="today-section-sub">${walletSub}</div>
-      </div>
-      <div class="today-section-card" onclick="activateTab('planner')">
-        <div class="today-section-label">Plan</div>
-        <div class="today-section-sub">${planSub}</div>
-      </div>
-      <div class="today-section-card" onclick="activateTab('documents')">
-        <div class="today-section-label">Home</div>
-        <div class="today-section-sub">${homeSub}</div>
-      </div>
-    </div>`;
+    <div class="today-seclabel"><span class="lbl">Today's briefing</span></div>
+    <div class="today-brief">${briefHtml}</div>`;
 
   // Async AI briefing — replaces the template text if API key available
   _fetchAIBriefing(cards, surplus, daysLeft, todayMeals, health);
@@ -9335,6 +9871,71 @@ function renderExpenseGroups(expenses) {
 
 // ─────────────────────────────────────────────────
 
+// Wallet allocation helpers — group expenses by category for the Betashares-style breakdown
+function _budgetAllocByCategory(monthData) {
+  const expenses = (monthData.expenses || []).filter(e => !e.skipped);
+  if (!expenses.length) return { segments: [], total: 0 };
+  const byCategory = {};
+  expenses.forEach(e => {
+    const cat = e.category || 'Other';
+    const amt = toMonthly(Number(e.amount) || 0, e.frequency);
+    if (amt > 0) byCategory[cat] = (byCategory[cat] || 0) + amt;
+  });
+  const sorted = Object.entries(byCategory)
+    .map(([name, amount]) => ({ name, amount }))
+    .sort((a, b) => b.amount - a.amount);
+  const total = sorted.reduce((s, c) => s + c.amount, 0);
+  if (total === 0) return { segments: [], total: 0 };
+  const top = sorted.slice(0, 6);
+  const other = sorted.slice(6);
+  const palette = ['#15803d', '#16a34a', '#22c55e', '#65a30d', '#84cc16', '#a3e635', '#94A3B8'];
+  const segments = top.map((c, i) => ({
+    name: c.name,
+    amount: c.amount,
+    pct: (c.amount / total) * 100,
+    color: palette[i] || '#94A3B8'
+  }));
+  if (other.length) {
+    const otherTotal = other.reduce((s, c) => s + c.amount, 0);
+    segments.push({ name: 'Other', amount: otherTotal, pct: (otherTotal / total) * 100, color: palette[6] });
+  }
+  return { segments, total };
+}
+
+const _TICKER_OVERRIDES = {
+  'groceries':'GROC','grocery':'GROC','food':'FOOD','rent':'RENT','mortgage':'MORT',
+  'fuel':'FUEL','petrol':'FUEL','transport':'TRSP','dining':'DINE','restaurants':'DINE',
+  'eating out':'DINE','takeaway':'DINE','utilities':'UTIL','bills':'BILL','electricity':'ELEC',
+  'gas':'GAS','water':'WATR','internet':'NET','phone':'PHNE','subscriptions':'SUBS',
+  'streaming':'SUBS','insurance':'INSR','health':'HLTH','medical':'HLTH','savings':'SAVE',
+  'entertainment':'ENT','travel':'TRVL','holiday':'TRVL','school':'EDU','education':'EDU',
+  'kids':'KIDS','childcare':'KIDS','pets':'PETS','vehicle':'AUTO','car':'AUTO',
+  'household':'HSE','clothing':'CLTH','gifts':'GIFT','charity':'GIVE','other':'OTHR'
+};
+function _ticker(name) {
+  const k = (name || 'other').toLowerCase().trim();
+  if (_TICKER_OVERRIDES[k]) return _TICKER_OVERRIDES[k];
+  return (name || 'OTHR').replace(/[^A-Za-z]/g, '').toUpperCase().slice(0, 4) || 'OTHR';
+}
+function _categoryIcon(name) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('groc') || n.includes('food') || n.includes('supermarket')) return 'i-shopping-cart';
+  if (n.includes('rent') || n.includes('mortgage') || n.includes('housing') || n.includes('home loan')) return 'i-home';
+  if (n.includes('petrol') || n.includes('fuel') || n.includes('transport') || n.includes('uber') || n.includes('parking') || n.includes('toll')) return 'i-fuel';
+  if (n.includes('dining') || n.includes('restaur') || n.includes('eat') || n.includes('takeaway')) return 'i-utensils';
+  if (n.includes('utilit') || n.includes('electric') || n.includes('gas') || n.includes('water') || n.includes('internet') || n.includes('phone') || n.includes('bill')) return 'i-zap';
+  if (n.includes('subscript') || n.includes('netflix') || n.includes('spotify') || n.includes('streaming')) return 'i-receipt';
+  if (n.includes('vehicle') || n.includes('car') || n.includes('rego') || n.includes('motor') || n.includes('auto')) return 'i-car';
+  if (n.includes('health') || n.includes('medic') || n.includes('pharm') || n.includes('doctor') || n.includes('dentist')) return 'i-pill';
+  if (n.includes('insur')) return 'i-file-text';
+  if (n.includes('school') || n.includes('education')) return 'i-clipboard-check';
+  if (n.includes('kid') || n.includes('child')) return 'i-users';
+  if (n.includes('pet')) return 'i-paw';
+  if (n.includes('saving') || n.includes('invest')) return 'i-trophy';
+  if (n.includes('travel') || n.includes('holiday')) return 'i-palm-tree';
+  return 'i-receipt';
+}
+
 function renderBudget() {
   const b = state.budget;
   const { income: mi, expenses: me } = getMonthData(selectedBudgetMonth);
@@ -9365,13 +9966,11 @@ function renderBudget() {
       <button class="month-btn" onclick="nextMonth()">&#8250;</button>
     </div>`;
 
-  // ── Summary hero card ──
-  const heroColor = surplus >= 0 ? '#10b981' : '#ef4444';
-  const heroBg = surplus >= 0 ? '#ecfdf5' : '#fef2f2';
+  // ── Summary hero card (dark — picks up section accent glow) ──
   html += `
-    <div class="summary-hero" style="background:${heroBg};border:1px solid ${surplus >= 0 ? '#a7f3d0' : '#fca5a5'}" onclick="toggleBudgetDetail()">
-      <div class="summary-hero-num" style="color:${heroColor}">${aud(Math.abs(surplus))}</div>
-      <div class="summary-hero-label" style="color:${heroColor}">${surplus >= 0 ? 'monthly surplus' : 'over budget'}</div>
+    <div class="summary-hero" onclick="toggleBudgetDetail()">
+      <div class="summary-hero-label">${surplus >= 0 ? 'Monthly surplus' : 'Over budget'}</div>
+      <div class="summary-hero-num">${aud(Math.abs(surplus))}</div>
       <div class="summary-hero-sub">${aud(totalIncome)} income · ${aud(totalBudgetExpenses)} expenses</div>
       <div class="summary-hero-expand" id="budget-expand-label">${_budgetDetailOpen ? 'Hide details ▲' : 'See breakdown ▼'}</div>
     </div>`;
@@ -9388,7 +9987,7 @@ function renderBudget() {
         <div class="summary-mini-label">Budgeted</div>
       </div>
       <div class="summary-mini">
-        <div class="summary-mini-num" style="color:${totalActual > totalBudgetExpenses ? '#ef4444' : '#0891b2'}">${aud(totalActual)}</div>
+        <div class="summary-mini-num" style="color:${totalActual > totalBudgetExpenses ? '#ef4444' : '#18181b'}">${aud(totalActual)}</div>
         <div class="summary-mini-label">Actual spent</div>
       </div>
       <div class="summary-mini">
@@ -9396,6 +9995,28 @@ function renderBudget() {
         <div class="summary-mini-label">of budget used</div>
       </div>
     </div>`;
+
+  // ── Allocation breakdown (Betashares-style) ──
+  const alloc = _budgetAllocByCategory({ income: mi, expenses: me });
+  if (alloc.segments.length) {
+    const barHtml = alloc.segments.map(s => `<div style="background:${s.color};flex:${s.pct.toFixed(2)}"></div>`).join('');
+    const listHtml = alloc.segments.map(s => `<div class="alloc-row">
+      <div class="tdot" style="background:${s.color}"><svg viewBox="0 0 24 24"><use href="#${_categoryIcon(s.name)}"/></svg></div>
+      <div class="body">
+        <div class="ticker">${_ticker(s.name)}</div>
+        <div class="name">${escHtml(s.name)}</div>
+      </div>
+      <div>
+        <div class="pct">${Math.round(s.pct)}%</div>
+        <div class="amt">${aud(s.amount)}</div>
+      </div>
+    </div>`).join('');
+    html += `<div class="alloc-section">
+      <div class="alloc-title">Allocation</div>
+      <div class="alloc-bar">${barHtml}</div>
+      <div class="alloc-list">${listHtml}</div>
+    </div>`;
+  }
 
   // ── Detail panel (collapsed by default) ──
   html += `<div class="detail-panel ${_budgetDetailOpen ? 'expanded' : 'collapsed'}" id="budget-detail">`;
@@ -16134,6 +16755,30 @@ if ('serviceWorker' in navigator) {
     <button class="toto-send-btn" id="toto-send" onclick="sendTotoMessage()">Send</button>
   </div>
 </div>
+<!-- ─── Floating bottom nav (mobile only) ─────── -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bn-item" data-tab="today" onclick="activateTab('today')">
+    <svg class="bn-ico"><use href="#i-sun"/></svg>
+    <span>Today</span>
+  </button>
+  <button class="bn-item" data-tab="budget" onclick="activateTab('budget')">
+    <svg class="bn-ico"><use href="#i-wallet"/></svg>
+    <span>Wallet</span>
+  </button>
+  <button class="bn-item" data-tab="planner" onclick="activateTab('planner')">
+    <svg class="bn-ico"><use href="#i-calendar"/></svg>
+    <span>Plan</span>
+  </button>
+  <button class="bn-item" data-tab="documents" onclick="activateTab('documents')">
+    <svg class="bn-ico"><use href="#i-home"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="bn-item" data-tab="settings" onclick="activateTab('settings')">
+    <svg class="bn-ico"><use href="#i-settings"/></svg>
+    <span>Settings</span>
+  </button>
+</nav>
+
 </div><!-- end .app-body -->
 </body>
 </html>
