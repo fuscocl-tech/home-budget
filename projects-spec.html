@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Projects Spec</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:    #0d9488;
+      --teal-lt: #f0fdfa;
+      --teal-md: #ccfbf1;
+      --blue:    #0891b2;
+      --blue-lt: #f0f9ff;
+      --purple:  #7c3aed;
+      --purple-lt: #f5f3ff;
+      --amber:   #d97706;
+      --amber-lt: #fffbeb;
+      --green:   #16a34a;
+      --green-lt: #f0fdf4;
+      --red:     #dc2626;
+      --red-lt:  #fef2f2;
+      --slate:   #1e293b;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --surface: #f8fafc;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex; align-items: center; gap: 24px;
+      height: 56px; z-index: 200;
+      overflow-x: auto;
+    }
+    .nav-brand { font-weight: 700; font-size: 16px; color: var(--teal); white-space: nowrap; }
+    nav a {
+      font-size: 13px; color: var(--muted); text-decoration: none;
+      padding: 4px 0; border-bottom: 2px solid transparent;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    nav a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+
+    /* ── Layout ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 48px 24px 100px; }
+    section { margin-bottom: 64px; }
+    h1 { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 15px; margin-bottom: 52px; }
+    h2 { font-size: 21px; font-weight: 700; margin-bottom: 6px; }
+    h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: var(--slate); }
+    p  { color: #475569; font-size: 14px; margin-bottom: 12px; }
+
+    /* ── Cards ── */
+    .card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; margin-bottom: 20px;
+    }
+    .card-header {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .card-num {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--teal); color: #fff;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-header-text h3 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .card-header-text p  { color: var(--muted); font-size: 13px; margin: 0; }
+    .card-body { padding: 20px 22px; }
+
+    /* ── Pills ── */
+    .pill {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 0.02em;
+    }
+    .pill-teal   { background: var(--teal-lt); color: var(--teal); }
+    .pill-blue   { background: var(--blue-lt); color: var(--blue); }
+    .pill-purple { background: var(--purple-lt); color: var(--purple); }
+    .pill-green  { background: var(--green-lt); color: var(--green); }
+    .pill-amber  { background: var(--amber-lt); color: var(--amber); }
+    .pill-red    { background: var(--red-lt); color: var(--red); }
+    .pill-slate  { background: #f1f5f9; color: var(--muted); }
+
+    /* ── Callouts ── */
+    .callout {
+      display: flex; gap: 12px; padding: 14px 16px;
+      border-radius: 10px; margin: 16px 0; font-size: 13px;
+    }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { color: #374151; }
+    .callout-body strong { color: var(--slate); }
+    .callout.info   { background: var(--blue-lt);   border: 1px solid #bae6fd; }
+    .callout.warn   { background: var(--amber-lt);  border: 1px solid #fde68a; }
+    .callout.ok     { background: var(--green-lt);  border: 1px solid #bbf7d0; }
+    .callout.idea   { background: var(--teal-lt);   border: 1px solid var(--teal-md); }
+
+    /* ── Field grid ── */
+    .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    .fg3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 600px) { .fg, .fg3 { grid-template-columns: 1fr; } }
+    .field { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 4px; }
+    .field-value { font-size: 13px; color: #334155; font-weight: 500; }
+    .field-note  { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0; }
+    th { text-align: left; padding: 9px 12px; background: var(--surface); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    tr:last-child td { border: none; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+    /* ──────────────────────────────────────────────
+       MOCKUP SHELL  (simulates the Toto app chrome)
+    ────────────────────────────────────────────── */
+    .app-shell {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+      max-width: 640px;
+      margin: 28px auto;
+    }
+    .app-shell-bar {
+      background: linear-gradient(135deg, #0f172a, #1e3a5f);
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .app-shell-title { color: #fff; font-weight: 700; font-size: 15px; }
+    .app-shell-tabs {
+      display: flex; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto; padding: 0 16px;
+    }
+    .app-tab {
+      padding: 10px 16px; font-size: 13px; font-weight: 500;
+      color: var(--muted); white-space: nowrap; cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .app-tab.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 600; }
+    .app-body { padding: 20px; background: var(--surface); min-height: 200px; }
+
+    /* ── Project type selector ── */
+    .type-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0;
+    }
+    .type-card {
+      border: 2px solid var(--border); border-radius: 14px;
+      padding: 16px 12px; text-align: center; cursor: pointer;
+      transition: all 0.15s; background: #fff;
+    }
+    .type-card:hover { border-color: var(--teal); background: var(--teal-lt); }
+    .type-card.selected { border-color: var(--teal); background: var(--teal-lt); }
+    .type-icon { font-size: 28px; margin-bottom: 6px; }
+    .type-name { font-size: 13px; font-weight: 700; color: var(--slate); }
+    .type-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Project list card ── */
+    .proj-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .proj-card:hover { border-color: var(--teal); box-shadow: 0 4px 16px rgba(13,148,136,0.10); }
+    .proj-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .proj-card-name { font-size: 15px; font-weight: 700; color: var(--slate); }
+    .proj-card-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .proj-progress-bar { background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; margin: 8px 0; }
+    .proj-progress-fill { height: 100%; border-radius: 99px; }
+    .proj-amounts { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+    .proj-amounts strong { color: var(--slate); font-weight: 600; }
+
+    /* ── Stage timeline ── */
+    .stage-timeline { display: flex; gap: 6px; margin: 14px 0; }
+    .stage-node {
+      flex: 1; min-width: 0;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 10px 8px; cursor: pointer; transition: all 0.15s;
+      background: #fff;
+    }
+    .stage-node.paid    { background: var(--green-lt); border-color: #86efac; }
+    .stage-node.next    { background: var(--blue-lt);  border-color: var(--blue); }
+    .stage-node.overdue { background: var(--red-lt);   border-color: #fca5a5; }
+    .stage-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 6px;
+    }
+    .stage-dot.paid    { background: var(--green); }
+    .stage-dot.next    { background: var(--blue); }
+    .stage-dot.overdue { background: var(--red); }
+    .stage-dot.future  { background: #94a3b8; }
+    .stage-label { font-size: 11px; font-weight: 600; color: var(--slate); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stage-amount { font-size: 12px; font-weight: 700; color: var(--slate); margin-top: 2px; }
+    .stage-date { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+    /* ── Summary band ── */
+    .summary-band {
+      display: grid; gap: 1px; background: var(--border);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      margin: 0 -20px 20px;
+    }
+    .summary-band-inner { display: grid; }
+    .summary-cell { background: #fff; padding: 14px 20px; }
+    .summary-cell-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 4px; }
+    .summary-cell-val { font-size: 19px; font-weight: 700; }
+
+    /* ── Mockup input ── */
+    .m-input {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px; font-size: 13px;
+      color: #94a3b8; width: 100%; margin-bottom: 10px;
+    }
+    .m-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 6px; }
+    .m-btn-primary {
+      background: var(--teal); color: #fff; border: none;
+      border-radius: 10px; padding: 11px 24px; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .m-btn-secondary {
+      background: #fff; color: var(--muted); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .m-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    /* ── Template stage rows ── */
+    .tpl-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px; background: #fff;
+      border: 1px solid var(--border); margin-bottom: 6px;
+    }
+    .tpl-row-name { flex: 1; font-size: 13px; font-weight: 500; color: var(--slate); }
+    .tpl-row-pct  { font-size: 12px; color: var(--muted); width: 36px; text-align: right; }
+    .tpl-row-amt  { font-size: 13px; font-weight: 600; color: var(--slate); width: 80px; text-align: right; }
+
+    /* ── Dashboard widget ── */
+    .dash-widget {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+    }
+    .dash-widget-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+    }
+    .dash-widget-title { font-size: 14px; font-weight: 700; }
+    .dash-widget-link  { font-size: 12px; color: var(--teal); font-weight: 600; cursor: pointer; }
+    .dash-proj-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 18px; border-bottom: 1px solid #f8fafc;
+    }
+    .dash-proj-row:last-child { border: none; }
+    .dash-proj-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .dash-proj-name { font-size: 13px; font-weight: 600; color: var(--slate); }
+    .dash-proj-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .dash-proj-right { text-align: right; flex-shrink: 0; }
+    .dash-proj-pct  { font-size: 13px; font-weight: 700; color: var(--teal); }
+    .dash-proj-next { font-size: 11px; color: var(--muted); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 40px 24px;
+      border: 2px dashed var(--border); border-radius: 14px;
+      background: #fff;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .empty-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Toto</span>
+  <a href="#overview">Overview</a>
+  <a href="#model">Data Model</a>
+  <a href="#types">Project Types</a>
+  <a href="#screens">Screens</a>
+  <a href="#create">Create Flow</a>
+  <a href="#detail">Project Detail</a>
+  <a href="#dashboard">Dashboard</a>
+  <a href="#migration">Migration</a>
+</nav>
+
+<div class="container">
+
+  <h1>Projects</h1>
+  <p class="subtitle">Design specification — replacing the hardcoded "Build" tab with a generic multi-project tracker that works for any large staged commitment.</p>
+
+  <!-- ─────────────────────────── OVERVIEW -->
+  <section id="overview">
+    <h2>What's changing and why</h2>
+    <p>The current "Build" tab is a well-designed tracker for a fixed-price home construction contract — stage payments, variations, and outside extras. The problem is it's hardcoded to that single scenario and assumes every user is building a house.</p>
+
+    <div class="fg">
+      <div class="field" style="background:var(--red-lt);border-color:#fca5a5">
+        <div class="field-label" style="color:var(--red)">Current — Build tab</div>
+        <div class="field-value" style="margin-top:8px;line-height:2;font-size:13px">
+          One hardcoded project<br>
+          Stage names fixed (Slab, Frame, etc.)<br>
+          Assumes construction context<br>
+          No way to add a second project<br>
+          Irrelevant to renters / owners
+        </div>
+      </div>
+      <div class="field" style="background:var(--green-lt);border-color:#86efac">
+        <div class="field-label" style="color:var(--green)">Proposed — Projects tab</div>
+        <div class="field-value" style="margin-top:8px;line-height:2;font-size:13px">
+          Multiple projects supported<br>
+          Stage names fully customisable<br>
+          Six project type templates<br>
+          Works for any large commitment<br>
+          Relevant to every household
+        </div>
+      </div>
+    </div>
+
+    <div class="callout ok">
+      <span class="callout-icon">✅</span>
+      <span class="callout-body"><strong>What stays the same:</strong> The core data structure (stages, variations, extras) is solid and transfers directly. The visual stage timeline and table are kept. Only the hardcoded assumptions are removed.</span>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── DATA MODEL -->
+  <section id="model">
+    <h2>Data Model</h2>
+    <p>The current single <code>buildContract</code> object becomes a <code>projects[]</code> array. Each project is self-contained.</p>
+
+    <div class="card">
+      <div class="card-body">
+        <h3 style="margin-bottom:16px">Project object</h3>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>string</td><td>Unique ID</td></tr>
+            <tr><td><code>name</code></td><td>string</td><td>User-defined — "Our New Home", "Kitchen Reno", "Tesla Model Y"</td></tr>
+            <tr><td><code>type</code></td><td>enum</td><td>construction · renovation · purchase · event · investment · custom</td></tr>
+            <tr><td><code>status</code></td><td>enum</td><td>planning · active · complete · on-hold</td></tr>
+            <tr><td><code>contractValue</code></td><td>number</td><td>Original committed total (editable)</td></tr>
+            <tr><td><code>stages[]</code></td><td>array</td><td>Milestone payments — see below</td></tr>
+            <tr><td><code>variations[]</code></td><td>array</td><td>Scope/cost changes — same as current</td></tr>
+            <tr><td><code>extras[]</code></td><td>array</td><td>Outside-contract costs — same as current</td></tr>
+            <tr><td><code>notes</code></td><td>string</td><td>Free-text notes about the project</td></tr>
+            <tr><td><code>createdAt</code></td><td>date</td><td>When the project was created</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin-top:24px;margin-bottom:12px">Stage object</h3>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>id</code></td><td>number</td><td>Unique within project</td></tr>
+            <tr><td><code>name</code></td><td>string</td><td>User-defined — "Deposit", "Frame", "Final Payment"</td></tr>
+            <tr><td><code>amount</code></td><td>number</td><td>Dollar value of this stage</td></tr>
+            <tr><td><code>paid</code></td><td>boolean</td><td>Has this stage been paid?</td></tr>
+            <tr><td><code>paidDate</code></td><td>date</td><td>When it was paid</td></tr>
+            <tr><td><code>expectedDate</code></td><td>date</td><td>When payment is due</td></tr>
+            <tr><td><code>invoiceRef</code></td><td>string</td><td>Invoice or reference number</td></tr>
+            <tr><td><code>funding</code></td><td>enum</td><td>loan · cash · savings · other</td></tr>
+            <tr><td><code>notes</code></td><td>string</td><td>Optional notes</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span class="callout-body"><strong>Variations and extras</strong> keep their existing structure unchanged. They're simply moved from <code>state.buildContract</code> to <code>state.projects[i]</code> so each project has its own independent set.</span>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── PROJECT TYPES -->
+  <section id="types">
+    <h2>Project Types &amp; Templates</h2>
+    <p>Each type pre-populates a set of suggested stages when a project is created. The user can edit, rename, or delete any stage before saving — the template is a starting point, not a constraint.</p>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="type-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:28px">
+          <div class="type-card selected">
+            <div class="type-icon">🏗️</div>
+            <div class="type-name">Construction</div>
+            <div class="type-sub">Building a new home</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">🔨</div>
+            <div class="type-name">Renovation</div>
+            <div class="type-sub">Home improvement project</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">🛒</div>
+            <div class="type-name">Purchase</div>
+            <div class="type-sub">Car, boat, equipment</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">🎉</div>
+            <div class="type-name">Event</div>
+            <div class="type-sub">Wedding, holiday, party</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">📈</div>
+            <div class="type-name">Investment</div>
+            <div class="type-sub">Property, business, shares</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">⚙️</div>
+            <div class="type-name">Custom</div>
+            <div class="type-sub">Start from scratch</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Default stage names</th><th>Variations?</th><th>Extras?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pill pill-slate">🏗️ Construction</span></td>
+              <td>Deposit → Base/Slab → Frame → Lock-up → Fixing → Practical Completion</td>
+              <td>Yes — builder variations</td>
+              <td>Yes — solar, landscaping, etc.</td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-slate">🔨 Renovation</span></td>
+              <td>Deposit → Demolition → Rough-in → Fit-out → Final Payment</td>
+              <td>Yes — scope changes</td>
+              <td>Yes — appliances, fixtures</td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-slate">🛒 Purchase</span></td>
+              <td>Deposit → Balance Due on Delivery</td>
+              <td>No (hidden by default)</td>
+              <td>Yes — extras, accessories</td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-slate">🎉 Event</span></td>
+              <td>Venue Deposit → Catering Deposit → Styling → Final Payments</td>
+              <td>No (hidden by default)</td>
+              <td>Yes — on-the-day extras</td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-slate">📈 Investment</span></td>
+              <td>Due Diligence Costs → Deposit → Settlement</td>
+              <td>Yes — price adjustments</td>
+              <td>Yes — legal, stamp duty, fees</td>
+            </tr>
+            <tr>
+              <td><span class="pill pill-slate">⚙️ Custom</span></td>
+              <td>Blank — user adds all stages manually</td>
+              <td>Optional</td>
+              <td>Optional</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout idea" style="margin-top:8px">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>Showing/hiding Variations:</strong> Variations are a contract-specific concept. For Purchase and Event projects, the Variations section is hidden by default — the user can enable it from project settings if they need it.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── SCREENS OVERVIEW -->
+  <section id="screens">
+    <h2>Screens Overview</h2>
+    <div class="fg">
+      <div class="field">
+        <div class="field-label">Projects list</div>
+        <div class="field-value">All active projects with progress bars and next-due stage. Entry point to each project.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Create project</div>
+        <div class="field-value">3-step wizard: type → name + budget → review stages. Produces a ready-to-go project.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Project detail</div>
+        <div class="field-value">Summary band + stage timeline + stages table + variations + extras. One project at a time.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Dashboard widget</div>
+        <div class="field-value">Compact list of active projects with % complete and next due stage. Replaces the Build Contract widget.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── PROJECTS LIST -->
+  <section id="screens">
+    <h2>Projects List Screen</h2>
+    <p>The tab opens to a list of all projects. Each card shows the key numbers at a glance.</p>
+
+    <!-- Empty state -->
+    <h3 style="margin-bottom:10px">Empty state — no projects yet</h3>
+    <div class="app-shell" style="max-width:580px">
+      <div class="app-shell-bar">
+        <span class="app-shell-title">Projects</span>
+      </div>
+      <div class="app-shell-tabs">
+        <div class="app-tab active">All Projects</div>
+        <div class="app-tab">Active</div>
+        <div class="app-tab">Complete</div>
+      </div>
+      <div class="app-body">
+        <div class="empty-state">
+          <div class="empty-icon">📁</div>
+          <div class="empty-title">No projects yet</div>
+          <div class="empty-sub">Track any large staged commitment — a build, renovation, big purchase, or event.</div>
+          <button class="m-btn-primary">+ New project</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- With projects -->
+    <h3 style="margin-bottom:10px;margin-top:32px">With projects</h3>
+    <div class="app-shell" style="max-width:580px">
+      <div class="app-shell-bar">
+        <span class="app-shell-title">Projects</span>
+      </div>
+      <div class="app-shell-tabs">
+        <div class="app-tab active">All Projects</div>
+        <div class="app-tab">Active</div>
+        <div class="app-tab">Complete</div>
+      </div>
+      <div class="app-body">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-size:13px;color:var(--muted)">2 active projects</div>
+          <button class="m-btn-primary" style="padding:8px 16px;font-size:13px">+ New project</button>
+        </div>
+
+        <!-- Project card 1 -->
+        <div class="proj-card">
+          <div class="proj-card-top">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-size:20px">🏗️</span>
+                <span class="proj-card-name">Our New Home</span>
+                <span class="pill pill-teal" style="font-size:10px">Active</span>
+              </div>
+              <div class="proj-card-meta">Construction · 3 of 6 stages paid · Next due in 12 days</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:17px;font-weight:700;color:var(--teal)">47%</div>
+              <div style="font-size:11px;color:var(--muted)">paid</div>
+            </div>
+          </div>
+          <div class="proj-progress-bar">
+            <div class="proj-progress-fill" style="width:47%;background:linear-gradient(90deg,var(--teal),#06b6d4)"></div>
+          </div>
+          <div class="proj-amounts">
+            <span><strong>$371,000</strong> paid</span>
+            <span>of <strong>$790,000</strong> contract</span>
+            <span style="color:var(--amber)"><strong>$118,500</strong> due next</span>
+          </div>
+        </div>
+
+        <!-- Project card 2 -->
+        <div class="proj-card">
+          <div class="proj-card-top">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-size:20px">🔨</span>
+                <span class="proj-card-name">Kitchen Renovation</span>
+                <span class="pill pill-blue" style="font-size:10px">Planning</span>
+              </div>
+              <div class="proj-card-meta">Renovation · 1 of 5 stages paid · Starts in 3 weeks</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:17px;font-weight:700;color:var(--blue)">10%</div>
+              <div style="font-size:11px;color:var(--muted)">paid</div>
+            </div>
+          </div>
+          <div class="proj-progress-bar">
+            <div class="proj-progress-fill" style="width:10%;background:linear-gradient(90deg,var(--blue),#38bdf8)"></div>
+          </div>
+          <div class="proj-amounts">
+            <span><strong>$3,500</strong> paid</span>
+            <span>of <strong>$35,000</strong> budget</span>
+            <span><strong>$8,000</strong> due next</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── CREATE FLOW -->
+  <section id="create">
+    <h2>Create Project — 3-Step Wizard</h2>
+    <p>Creating a project takes three focused steps. The wizard should feel fast — under 60 seconds for a construction project with a template, under 30 seconds for a simple purchase.</p>
+
+    <!-- Step 1 -->
+    <h3 style="margin-bottom:10px">Step 1 — Choose type</h3>
+    <div class="app-shell" style="max-width:560px">
+      <div class="app-shell-bar"><span class="app-shell-title">New Project</span></div>
+      <div class="app-body">
+        <div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px">
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--teal)"></div>
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--border)"></div>
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--border)"></div>
+        </div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px">What kind of project?</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Choose a type to get a head start with suggested stages.</div>
+        <div class="type-grid">
+          <div class="type-card selected">
+            <div class="type-icon">🏗️</div>
+            <div class="type-name">Construction</div>
+            <div class="type-sub">Building a home</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">🔨</div>
+            <div class="type-name">Renovation</div>
+            <div class="type-sub">Home improvement</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">🛒</div>
+            <div class="type-name">Purchase</div>
+            <div class="type-sub">Car, boat, gear</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">🎉</div>
+            <div class="type-name">Event</div>
+            <div class="type-sub">Wedding, holiday</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">📈</div>
+            <div class="type-name">Investment</div>
+            <div class="type-sub">Property, shares</div>
+          </div>
+          <div class="type-card">
+            <div class="type-icon">⚙️</div>
+            <div class="type-name">Custom</div>
+            <div class="type-sub">Start blank</div>
+          </div>
+        </div>
+        <div class="m-footer">
+          <button class="m-btn-secondary">Cancel</button>
+          <button class="m-btn-primary">Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <h3 style="margin-bottom:10px;margin-top:32px">Step 2 — Name &amp; budget</h3>
+    <div class="app-shell" style="max-width:560px">
+      <div class="app-shell-bar"><span class="app-shell-title">New Project</span></div>
+      <div class="app-body">
+        <div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px">
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--teal)"></div>
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--teal)"></div>
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--border)"></div>
+        </div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px">Name your project</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Give it a name and set the total contract or budget value.</div>
+
+        <div class="m-label">Project name</div>
+        <div class="m-input">e.g. Our New Home</div>
+
+        <div class="m-label">Contract / budget value ($)</div>
+        <div class="m-input">790,000</div>
+
+        <div class="m-label">Status</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="padding:7px 16px;border:1.5px solid var(--border);border-radius:99px;font-size:13px;color:var(--muted)">Planning</div>
+          <div style="padding:7px 16px;border:1.5px solid var(--teal);border-radius:99px;font-size:13px;color:var(--teal);font-weight:600;background:var(--teal-lt)">Active</div>
+          <div style="padding:7px 16px;border:1.5px solid var(--border);border-radius:99px;font-size:13px;color:var(--muted)">On hold</div>
+        </div>
+
+        <div class="m-label">Notes (optional)</div>
+        <div class="m-input" style="height:64px">Builder: XYZ Homes · Contract signed April 2026</div>
+
+        <div class="m-footer">
+          <button class="m-btn-secondary">← Back</button>
+          <button class="m-btn-primary">Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <h3 style="margin-bottom:10px;margin-top:32px">Step 3 — Review stages</h3>
+    <p>Stage amounts are pre-calculated as typical percentages of the contract value, based on the project type. The user edits the amounts to match their actual contract.</p>
+
+    <div class="app-shell" style="max-width:560px">
+      <div class="app-shell-bar"><span class="app-shell-title">New Project</span></div>
+      <div class="app-body">
+        <div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px">
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--teal)"></div>
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--teal)"></div>
+          <div style="width:28px;height:5px;border-radius:99px;background:var(--teal)"></div>
+        </div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px">Review your stages</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px">We've pre-filled typical Construction stages. Adjust amounts to match your contract — they should add up to $790,000.</div>
+
+        <div class="tpl-row">
+          <span style="font-size:14px">1</span>
+          <span class="tpl-row-name">Deposit</span>
+          <span class="tpl-row-pct">5%</span>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-weight:600;width:90px;text-align:right">$39,500</div>
+        </div>
+        <div class="tpl-row">
+          <span style="font-size:14px">2</span>
+          <span class="tpl-row-name">Base / Slab</span>
+          <span class="tpl-row-pct">10%</span>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-weight:600;width:90px;text-align:right">$79,000</div>
+        </div>
+        <div class="tpl-row">
+          <span style="font-size:14px">3</span>
+          <span class="tpl-row-name">Frame</span>
+          <span class="tpl-row-pct">15%</span>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-weight:600;width:90px;text-align:right">$118,500</div>
+        </div>
+        <div class="tpl-row">
+          <span style="font-size:14px">4</span>
+          <span class="tpl-row-name">Lock-up / Enclosed</span>
+          <span class="tpl-row-pct">35%</span>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-weight:600;width:90px;text-align:right">$276,500</div>
+        </div>
+        <div class="tpl-row">
+          <span style="font-size:14px">5</span>
+          <span class="tpl-row-name">Fixing / Fitout</span>
+          <span class="tpl-row-pct">25%</span>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-weight:600;width:90px;text-align:right">$197,500</div>
+        </div>
+        <div class="tpl-row">
+          <span style="font-size:14px">6</span>
+          <span class="tpl-row-name">Practical Completion</span>
+          <span class="tpl-row-pct">10%</span>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px;font-weight:600;width:90px;text-align:right">$79,000</div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;gap:8px">
+          <div style="font-size:12px;color:var(--muted);padding:6px 0">Total: <strong style="color:var(--teal)">$790,000 ✓</strong></div>
+        </div>
+
+        <div style="text-align:center;margin:12px 0">
+          <button style="background:none;border:none;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer">+ Add a stage</button>
+        </div>
+
+        <div class="m-footer">
+          <button class="m-btn-secondary">← Back</button>
+          <button class="m-btn-primary">🎉 Create project</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout idea">
+      <span class="callout-icon">💡</span>
+      <span class="callout-body"><strong>Amount validation:</strong> Show a running total as stages are edited. If the total doesn't match the contract value, show a gentle warning ("$5,000 unaccounted for") — but don't block saving. Contracts don't always divide evenly.</span>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── PROJECT DETAIL -->
+  <section id="detail">
+    <h2>Project Detail Screen</h2>
+    <p>Tapping a project card opens the full detail view. The layout mirrors the current Build tab structure — summary band at top, visual stage timeline, then three collapsible sections below.</p>
+
+    <div class="app-shell" style="max-width:640px">
+      <div class="app-shell-bar">
+        <div style="color:#94a3b8;font-size:13px;cursor:pointer">← Projects</div>
+        <span class="app-shell-title" style="margin-left:8px">Our New Home</span>
+        <span class="pill pill-teal" style="margin-left:8px;font-size:10px">Active</span>
+        <button style="margin-left:auto;background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer">⚙️ Edit</button>
+      </div>
+
+      <div class="app-shell-tabs">
+        <div class="app-tab active">Stages</div>
+        <div class="app-tab">Variations</div>
+        <div class="app-tab">Extras</div>
+      </div>
+
+      <div class="app-body" style="padding:0">
+
+        <!-- Summary band -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)">
+          <div style="background:#fff;padding:14px 16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">Contract</div>
+            <div style="font-size:16px;font-weight:700">$790k</div>
+          </div>
+          <div style="background:#fff;padding:14px 16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">Paid</div>
+            <div style="font-size:16px;font-weight:700;color:var(--green)">$371k</div>
+          </div>
+          <div style="background:#fff;padding:14px 16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">Remaining</div>
+            <div style="font-size:16px;font-weight:700;color:var(--red)">$419k</div>
+          </div>
+          <div style="background:#fffbeb;padding:14px 16px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#92400e;margin-bottom:4px">Variations</div>
+            <div style="font-size:16px;font-weight:700;color:var(--amber)">+$12k</div>
+          </div>
+        </div>
+
+        <div style="padding:16px 20px">
+
+          <!-- Stage timeline -->
+          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Stage progress</div>
+          <div class="stage-timeline" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px">
+            <div class="stage-node paid">
+              <div class="stage-dot paid">✓</div>
+              <div class="stage-label">Deposit</div>
+              <div class="stage-amount">$39.5k</div>
+              <div class="stage-date">Mar 2</div>
+            </div>
+            <div class="stage-node paid">
+              <div class="stage-dot paid">✓</div>
+              <div class="stage-label">Slab</div>
+              <div class="stage-amount">$79k</div>
+              <div class="stage-date">Apr 14</div>
+            </div>
+            <div class="stage-node paid">
+              <div class="stage-dot paid">✓</div>
+              <div class="stage-label">Frame</div>
+              <div class="stage-amount">$118.5k</div>
+              <div class="stage-date">May 28</div>
+            </div>
+            <div class="stage-node next">
+              <div class="stage-dot next">→</div>
+              <div class="stage-label">Lock-up</div>
+              <div class="stage-amount">$276.5k</div>
+              <div class="stage-date">Due Jul 8</div>
+            </div>
+            <div class="stage-node">
+              <div class="stage-dot future">5</div>
+              <div class="stage-label">Fixing</div>
+              <div class="stage-amount">$197.5k</div>
+              <div class="stage-date" style="color:var(--border)">—</div>
+            </div>
+            <div class="stage-node">
+              <div class="stage-dot future">6</div>
+              <div class="stage-label">Completion</div>
+              <div class="stage-amount">$79k</div>
+              <div class="stage-date" style="color:var(--border)">—</div>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div style="background:var(--border);border-radius:99px;height:7px;margin:12px 0 4px;overflow:hidden">
+            <div style="width:47%;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),#06b6d4)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:20px">
+            <span>47% paid · 3 of 6 stages</span>
+            <span>Lock-up due in 12 days</span>
+          </div>
+
+          <!-- Stages table preview -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">All stages</div>
+            <button class="m-btn-primary" style="padding:6px 14px;font-size:12px">+ Stage</button>
+          </div>
+
+          <div style="background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:var(--surface);padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.04em;border-bottom:1px solid var(--border)">
+              <div>Stage</div><div>Amount</div><div>Status</div><div>Due</div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;border-bottom:1px solid #f8fafc;font-size:13px;background:var(--green-lt)">
+              <div style="font-weight:500">Deposit</div>
+              <div style="font-weight:600">$39,500</div>
+              <div><span class="pill pill-green" style="font-size:10px">Paid</span></div>
+              <div style="color:var(--muted)">Mar 2</div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;border-bottom:1px solid #f8fafc;font-size:13px;background:var(--green-lt)">
+              <div style="font-weight:500">Base / Slab</div>
+              <div style="font-weight:600">$79,000</div>
+              <div><span class="pill pill-green" style="font-size:10px">Paid</span></div>
+              <div style="color:var(--muted)">Apr 14</div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;border-bottom:1px solid #f8fafc;font-size:13px;background:var(--green-lt)">
+              <div style="font-weight:500">Frame</div>
+              <div style="font-weight:600">$118,500</div>
+              <div><span class="pill pill-green" style="font-size:10px">Paid</span></div>
+              <div style="color:var(--muted)">May 28</div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;border-bottom:1px solid #f8fafc;font-size:13px;background:var(--blue-lt)">
+              <div style="font-weight:600;color:var(--blue)">Lock-up / Enclosed</div>
+              <div style="font-weight:700;color:var(--blue)">$276,500</div>
+              <div><span class="pill pill-blue" style="font-size:10px">Due soon</span></div>
+              <div style="color:var(--amber);font-weight:600">Jul 8</div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;border-bottom:1px solid #f8fafc;font-size:13px">
+              <div style="font-weight:500;color:var(--muted)">Fixing / Fitout</div>
+              <div style="font-weight:600;color:var(--muted)">$197,500</div>
+              <div><span class="pill pill-slate" style="font-size:10px">Upcoming</span></div>
+              <div style="color:var(--muted)">—</div>
+            </div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;padding:10px 14px;font-size:13px">
+              <div style="font-weight:500;color:var(--muted)">Practical Completion</div>
+              <div style="font-weight:600;color:var(--muted)">$79,000</div>
+              <div><span class="pill pill-slate" style="font-size:10px">Upcoming</span></div>
+              <div style="color:var(--muted)">—</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="callout idea" style="max-width:640px;margin:16px auto 0">
+      <span class="callout-icon">💡</span>
+      <span class="callout-body"><strong>Tabs vs sections:</strong> For projects with few variations/extras, the tabbed layout keeps the screen clean. For power users with many rows, a long-scroll layout (like the current Build tab) is also an option — worth testing both.</span>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── DASHBOARD -->
+  <section id="dashboard">
+    <h2>Dashboard Widget</h2>
+    <p>The dashboard widget replaces the current "Build Contract" widget. When there are multiple active projects, it shows them all compactly with a "View all →" link.</p>
+
+    <div style="max-width:480px;margin:0 auto">
+      <!-- No active projects -->
+      <h3 style="margin-bottom:10px">No active projects</h3>
+      <div class="dash-widget" style="margin-bottom:24px">
+        <div class="dash-widget-header">
+          <div class="dash-widget-title">Projects</div>
+          <div class="dash-widget-link">+ New →</div>
+        </div>
+        <div style="padding:20px 18px;text-align:center;color:var(--muted);font-size:13px">
+          No active projects. Track a build, reno, or big purchase.
+        </div>
+      </div>
+
+      <!-- One active project -->
+      <h3 style="margin-bottom:10px">One active project</h3>
+      <div class="dash-widget" style="margin-bottom:24px">
+        <div class="dash-widget-header">
+          <div class="dash-widget-title">🏗️ Our New Home</div>
+          <div class="dash-widget-link">View →</div>
+        </div>
+        <div style="padding:14px 18px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px">
+            <span style="font-weight:600;color:var(--green)">$371,000 paid</span>
+            <span style="color:var(--muted)">47% of $790,000</span>
+          </div>
+          <div class="proj-progress-bar">
+            <div class="proj-progress-fill" style="width:47%;background:linear-gradient(90deg,var(--teal),#06b6d4)"></div>
+          </div>
+          <div style="font-size:12px;color:var(--amber);margin-top:8px;font-weight:500">Next: Lock-up — $276,500 due Jul 8</div>
+        </div>
+      </div>
+
+      <!-- Multiple active projects -->
+      <h3 style="margin-bottom:10px">Multiple active projects</h3>
+      <div class="dash-widget">
+        <div class="dash-widget-header">
+          <div class="dash-widget-title">Projects</div>
+          <div class="dash-widget-link">View all →</div>
+        </div>
+        <div class="dash-proj-row">
+          <div class="dash-proj-icon" style="background:var(--teal-lt)">🏗️</div>
+          <div style="flex:1;min-width:0">
+            <div class="dash-proj-name">Our New Home</div>
+            <div class="proj-progress-bar" style="margin:4px 0 2px">
+              <div class="proj-progress-fill" style="width:47%;background:linear-gradient(90deg,var(--teal),#06b6d4)"></div>
+            </div>
+            <div class="dash-proj-sub">Lock-up due Jul 8 · $276,500</div>
+          </div>
+          <div class="dash-proj-right">
+            <div class="dash-proj-pct">47%</div>
+            <div class="dash-proj-next">paid</div>
+          </div>
+        </div>
+        <div class="dash-proj-row">
+          <div class="dash-proj-icon" style="background:var(--blue-lt)">🔨</div>
+          <div style="flex:1;min-width:0">
+            <div class="dash-proj-name">Kitchen Renovation</div>
+            <div class="proj-progress-bar" style="margin:4px 0 2px">
+              <div class="proj-progress-fill" style="width:10%;background:linear-gradient(90deg,var(--blue),#38bdf8)"></div>
+            </div>
+            <div class="dash-proj-sub">Demolition due Aug 1 · $8,000</div>
+          </div>
+          <div class="dash-proj-right">
+            <div class="dash-proj-pct" style="color:var(--blue)">10%</div>
+            <div class="dash-proj-next">paid</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ─────────────────────────── MIGRATION -->
+  <section id="migration">
+    <h2>Migration from Build</h2>
+    <p>Users who already have Build data need their data migrated automatically — they should never have to re-enter anything.</p>
+
+    <div class="card">
+      <div class="card-body">
+        <h3 style="margin-bottom:12px">Migration logic (run once on load)</h3>
+        <table>
+          <thead><tr><th>Old field</th><th>Maps to</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>state.buildContract.total</code></td><td><code>projects[0].contractValue</code></td><td>Becomes the first project's contract value</td></tr>
+            <tr><td><code>state.buildContract.stages[]</code></td><td><code>projects[0].stages[]</code></td><td>Direct copy — same structure</td></tr>
+            <tr><td><code>state.buildContract.variations[]</code></td><td><code>projects[0].variations[]</code></td><td>Direct copy</td></tr>
+            <tr><td><code>state.extras[]</code></td><td><code>projects[0].extras[]</code></td><td>Direct copy</td></tr>
+            <tr><td>—</td><td><code>projects[0].name</code></td><td>Default: "My Build"</td></tr>
+            <tr><td>—</td><td><code>projects[0].type</code></td><td>Default: "construction"</td></tr>
+            <tr><td>—</td><td><code>projects[0].status</code></td><td>Default: "active"</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warn" style="margin-top:16px">
+          <span class="callout-icon">⚠️</span>
+          <span class="callout-body"><strong>Keep old keys alive briefly:</strong> Don't delete <code>state.buildContract</code> and <code>state.extras</code> immediately. Keep them for one or two releases as a fallback, then clean up. This protects users who downgrade or reload an older cached version.</span>
+        </div>
+
+        <div class="callout ok" style="margin-top:8px">
+          <span class="callout-icon">✅</span>
+          <span class="callout-body"><strong>Migration is silent:</strong> The user sees their existing build data exactly as before — just now inside a project card named "My Build". No notification or wizard needed.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px;margin-bottom:12px">What to do with Furniture &amp; Appliances</h3>
+    <p>The current data model also has <code>state.furniture[]</code> and <code>state.appliances[]</code> as separate arrays. These are logically "extras" that belong to the build project. They should be migrated into <code>projects[0].extras[]</code> with a category tag (<code>category: 'furniture'</code> / <code>'appliance'</code>) so they're visible in the Extras tab without losing their distinction.</p>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <span class="callout-body"><strong>Extras categories:</strong> Adding an optional <code>category</code> field to extras (e.g. Landscaping, Solar, Appliances, Furniture, Legal, Other) allows filtering within the Extras tab without requiring separate sub-tabs.</span>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

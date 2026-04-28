@@ -1,0 +1,2124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Onboarding Experience Spec</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      height: 56px;
+      z-index: 100;
+    }
+    .nav-brand { font-weight: 700; font-size: 16px; color: #0d9488; }
+    nav a {
+      font-size: 13px;
+      color: #64748b;
+      text-decoration: none;
+      padding: 4px 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    nav a:hover { color: #0d9488; border-bottom-color: #0d9488; }
+
+    /* ── Layout ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { color: #64748b; font-size: 15px; margin-bottom: 48px; }
+
+    h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+
+    section { margin-bottom: 56px; }
+
+    p { color: #475569; font-size: 14px; margin-bottom: 12px; }
+
+    /* ── Naming section ── */
+    .name-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .name-card {
+      background: #fff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.15s;
+    }
+    .name-card:hover { border-color: #0d9488; box-shadow: 0 4px 12px rgba(13,148,136,0.1); }
+    .name-card.recommended { border-color: #0d9488; background: #f0fdfa; }
+    .name-card .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #0d9488;
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin-bottom: 6px;
+    }
+    .name-card .word { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .name-card .desc { font-size: 12px; color: #64748b; }
+
+    /* ── Flow overview ── */
+    .flow-steps {
+      display: flex;
+      gap: 0;
+      margin: 24px 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .flow-step {
+      flex: 1;
+      min-width: 130px;
+      text-align: center;
+      position: relative;
+    }
+    .flow-step::after {
+      content: '';
+      position: absolute;
+      top: 22px;
+      right: -1px;
+      width: 50%;
+      height: 2px;
+      background: #cbd5e1;
+    }
+    .flow-step::before {
+      content: '';
+      position: absolute;
+      top: 22px;
+      left: -1px;
+      width: 50%;
+      height: 2px;
+      background: #cbd5e1;
+    }
+    .flow-step:first-child::before { display: none; }
+    .flow-step:last-child::after { display: none; }
+    .flow-dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin: 0 auto 8px;
+      position: relative;
+      z-index: 1;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+    }
+    .flow-step.active .flow-dot { background: #0d9488; border-color: #0d9488; color: #fff; font-size: 14px; font-weight: 700; }
+    .flow-step.new .flow-dot { background: #f0fdfa; border-color: #0d9488; }
+    .flow-step.optional .flow-dot { background: #fefce8; border-color: #eab308; }
+    .flow-label { font-size: 12px; font-weight: 600; color: #374151; }
+    .flow-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .flow-tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 5px;
+      border-radius: 3px;
+      margin-top: 4px;
+    }
+    .tag-existing { background: #e0f2fe; color: #0369a1; }
+    .tag-new { background: #dcfce7; color: #16a34a; }
+    .tag-optional { background: #fef9c3; color: #854d0e; }
+
+    /* ── Step cards ── */
+    .step-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .step-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid #f1f5f9;
+      background: #f8fafc;
+    }
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #0d9488;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-header-text h3 { font-size: 16px; font-weight: 700; }
+    .step-header-text p { color: #64748b; font-size: 13px; margin: 0; }
+    .step-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .pill-existing { background: #e0f2fe; color: #0369a1; }
+    .pill-new { background: #dcfce7; color: #16a34a; }
+    .pill-optional { background: #fef9c3; color: #854d0e; }
+    .pill-required { background: #fee2e2; color: #b91c1c; }
+
+    .step-body { padding: 20px 24px; }
+
+    /* ── Fields ── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0;
+    }
+    @media (max-width: 600px) { .field-grid { grid-template-columns: 1fr; } }
+
+    .field {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+    .field-value { font-size: 13px; color: #334155; font-weight: 500; }
+    .field-note { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+    /* ── Improvement callouts ── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin: 14px 0;
+      font-size: 13px;
+    }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { color: #374151; }
+    .callout-body strong { color: #1e293b; }
+    .callout.idea { background: #f0f9ff; border: 1px solid #bae6fd; }
+    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; }
+    .callout.success { background: #f0fdf4; border: 1px solid #bbf7d0; }
+
+    /* ── Member row ── */
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .member-row:last-child { border: none; }
+    .member-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ecfeff, #ccfbf1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .member-info { flex: 1; }
+    .member-name { font-size: 14px; font-weight: 600; }
+    .member-role { font-size: 12px; color: #64748b; }
+    .member-fields { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+    }
+
+    /* ── Progress mockup ── */
+    .progress-bar {
+      background: #e2e8f0;
+      border-radius: 99px;
+      height: 6px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #0d9488, #06b6d4); }
+
+    /* ── Wireframe mockup ── */
+    .mockup {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 440px;
+      margin: 20px auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    .mockup-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .mockup-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e2e8f0;
+    }
+    .mockup-dot.active { background: #0d9488; width: 20px; border-radius: 4px; }
+    .mockup-dot.done { background: #0d9488; }
+    .mockup-heading { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+    .mockup-sub { font-size: 13px; color: #64748b; text-align: center; margin-bottom: 24px; }
+    .mockup-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px; }
+    .mockup-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .mockup-option {
+      padding: 8px 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 99px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .mockup-option.selected { border-color: #0d9488; background: #f0fdfa; color: #0d9488; font-weight: 600; }
+    .mockup-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .mockup-avatar-pick {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      cursor: pointer;
+      border: 1.5px dashed #cbd5e1;
+    }
+    .mockup-field {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .mockup-footer { display: flex; justify-content: space-between; margin-top: 24px; gap: 12px; }
+    .mockup-btn-secondary {
+      padding: 10px 20px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      background: #fff;
+      cursor: pointer;
+    }
+    .mockup-btn-primary {
+      flex: 1;
+      padding: 10px 20px;
+      background: #0d9488;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── Divider ── */
+    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 40px 0; }
+
+    /* ── Collapsible sections ── */
+    .collapsible-section { margin-bottom: 16px; }
+    .section-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none;
+      padding: 16px 22px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      transition: background 0.15s, border-color 0.15s;
+      gap: 12px;
+    }
+    .section-toggle:hover { background: #f0fdfa; border-color: #0d9488; }
+    .collapsible-section.open .section-toggle {
+      border-radius: 14px 14px 0 0;
+      border-bottom-color: #f1f5f9;
+      background: #f0fdfa;
+      border-color: #0d9488;
+    }
+    .section-toggle-left { display: flex; align-items: center; gap: 14px; }
+    .section-num {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #0d9488; color: #fff;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .section-toggle-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+    .section-toggle-sub { font-size: 12px; color: #64748b; margin-top: 1px; }
+    .section-chevron {
+      font-size: 11px; color: #94a3b8; flex-shrink: 0;
+      transition: transform 0.25s ease;
+    }
+    .collapsible-section.open .section-chevron { transform: rotate(180deg); color: #0d9488; }
+    .section-body {
+      display: none;
+      border: 1px solid #0d9488;
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      background: #fff;
+      padding: 24px 24px 28px;
+    }
+    .section-body.open { display: block; }
+
+    /* ── Principles ── */
+    .principles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin: 20px 0; }
+    .principle {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .principle-icon { font-size: 24px; margin-bottom: 8px; }
+    .principle h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .principle p { font-size: 12px; color: #64748b; margin: 0; }
+
+    /* ── Data map table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #f1f5f9;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    tr:last-child td { border: none; }
+    td.mono { font-family: monospace; font-size: 12px; color: #7c3aed; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Toto</span>
+  <a href="#naming">Naming</a>
+  <a href="#principles">Principles</a>
+  <a href="#flow">Flow</a>
+  <a href="#steps">Steps</a>
+  <a href="#data-map">Data Map</a>
+  <a href="#post-onboard">Post-Onboarding</a>
+  <a href="#household-access">Access</a>
+  <a href="#setup-progress">Progress Card</a>
+  <a href="#post-todo">To-Do</a>
+  <a href="#adult-onboarding">Adult Join</a>
+  <a href="#child-onboarding">Child Join</a>
+</nav>
+
+<div class="container">
+
+  <h1>Onboarding Experience</h1>
+  <p class="subtitle">Design specification — how a new Toto user goes from first login to a fully configured household.</p>
+
+  <!-- ─────────────────────────────────────────────── NAMING -->
+  <section id="naming">
+    <h2>Section Naming — Beyond "Wallet"</h2>
+    <p>The current "Wallet" section covers Budget, Bills, Net Worth, Goals, Insights, and more — far broader than a wallet. Here are additional options beyond the first round:</p>
+
+    <div class="name-grid">
+      <div class="name-card recommended">
+        <div class="badge">Top pick</div>
+        <div class="word">💰 The Kitty</div>
+        <div class="desc">Warm, shared, household-feel. Australians say "pool the kitty" — perfect for a family app.</div>
+      </div>
+      <div class="name-card recommended">
+        <div class="badge">Top pick</div>
+        <div class="word">🪙 Dosh</div>
+        <div class="desc">Australian slang for money. Short, punchy, friendly — matches Toto's playful tone.</div>
+      </div>
+      <div class="name-card">
+        <div class="word">📊 Finances</div>
+        <div class="desc">Honest and clear, but a little corporate. Safe choice if in doubt.</div>
+      </div>
+      <div class="name-card">
+        <div class="word">🐷 Piggy</div>
+        <div class="desc">Nods to the piggy bank. Very family-friendly, fun for a household with kids.</div>
+      </div>
+      <div class="name-card">
+        <div class="word">💸 Cash Flow</div>
+        <div class="desc">Descriptive — literally what this section shows. Slightly grown-up but still approachable.</div>
+      </div>
+      <div class="name-card">
+        <div class="word">📒 Ledger</div>
+        <div class="desc">Classic accounting term. Simple and honest without trying too hard to be fun.</div>
+      </div>
+      <div class="name-card">
+        <div class="word">🏦 The Float</div>
+        <div class="desc">Banking slang — "what's in the float". Casual, slightly clever.</div>
+      </div>
+      <div class="name-card">
+        <div class="word">💼 Money Bag</div>
+        <div class="desc">Broad like the emoji suggests — covers everything financial without being specific.</div>
+      </div>
+    </div>
+
+    <div class="callout idea">
+      <span class="callout-icon">💡</span>
+      <span class="callout-body"><strong>Recommendation:</strong> "The Kitty" fits best — it implies shared household money, feels warm and familiar, and works across all ages. "Dosh" is a strong runner-up if you want something more distinctly Australian and cheeky.</span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── PRINCIPLES -->
+  <section id="principles">
+    <h2>Onboarding Principles</h2>
+    <p>Before diving into the flow, these are the design principles that should guide every decision:</p>
+
+    <div class="principles">
+      <div class="principle">
+        <div class="principle-icon">⚡</div>
+        <h4>Speed to value</h4>
+        <p>The user should see a personalised dashboard within 3 minutes. Defer everything non-essential.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">👨‍👩‍👧‍👦</div>
+        <h4>People first</h4>
+        <p>Ask who's in the household early — it shapes every other feature (kids chores, lunchbox, meals).</p>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">🎯</div>
+        <h4>Minimum required</h4>
+        <p>Only ask what Toto absolutely needs to function. Everything else can be added later from within the app.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">🪄</div>
+        <h4>Smart defaults</h4>
+        <p>Pre-fill amounts based on home situation (renting vs mortgage etc.) so users edit rather than type from scratch.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">🔁</div>
+        <h4>Always escapable</h4>
+        <p>Every step has a Skip or Back option. Never trap the user — they can complete setup from Settings later.</p>
+      </div>
+      <div class="principle">
+        <div class="principle-icon">✨</div>
+        <h4>Celebrate completion</h4>
+        <p>Finish with a moment of delight — a personalised summary screen that makes the household feel real.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── FLOW -->
+  <section id="flow">
+    <h2>Flow Overview</h2>
+    <p>The current onboarding is 3 steps. The proposed flow expands to 6 focused steps that properly capture the household and unlock every Toto feature from day one.</p>
+
+    <div class="flow-steps">
+      <div class="flow-step active">
+        <div class="flow-dot">👋</div>
+        <div class="flow-label">Welcome</div>
+        <div class="flow-sub">30 sec</div>
+        <div><span class="flow-tag tag-new">New</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">🏠</div>
+        <div class="flow-label">Household</div>
+        <div class="flow-sub">1 min</div>
+        <div><span class="flow-tag tag-existing">Improved</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">👶</div>
+        <div class="flow-label">Kids</div>
+        <div class="flow-sub">1 min</div>
+        <div><span class="flow-tag tag-new">New</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">💰</div>
+        <div class="flow-label">Income</div>
+        <div class="flow-sub">1 min</div>
+        <div><span class="flow-tag tag-existing">Existing</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">📋</div>
+        <div class="flow-label">Expenses</div>
+        <div class="flow-sub">1 min</div>
+        <div><span class="flow-tag tag-existing">Existing</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">🎉</div>
+        <div class="flow-label">All Done</div>
+        <div class="flow-sub">15 sec</div>
+        <div><span class="flow-tag tag-new">New</span></div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span class="callout-body"><strong>What's missing today:</strong> The current flow captures adult/kid counts and home type — but never collects actual names or ages for household members. This means kids' chores, lunchbox profiles, and the Kids tab all start completely empty with no connection to the household that was just configured.</span>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" style="width: 66%"></div></div>
+    <p style="text-align:center;font-size:12px;color:#94a3b8">Step 4 of 6 — example progress indicator</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── STEPS -->
+  <section id="steps">
+    <h2>Step Detail</h2>
+
+    <!-- STEP 1 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-header-text">
+          <h3>Welcome to Toto 👋</h3>
+          <p>Set the tone. One screen, no forms.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New step</span></div>
+      </div>
+      <div class="step-body">
+        <p>The first screen should feel warm, not transactional. No form fields — just a brief headline, a one-sentence promise, and a big "Let's set up your household" button.</p>
+
+        <div class="mockup">
+          <div style="text-align:center;font-size:48px;margin-bottom:16px">🏡</div>
+          <div class="mockup-heading">Welcome to Toto</div>
+          <div class="mockup-sub">Your family's financial home base.<br>Takes about 4 minutes to set up.</div>
+          <div style="margin:24px 0">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#374151">
+              <span>✅</span> Budget, bills &amp; net worth
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #f1f5f9;font-size:13px;color:#374151">
+              <span>✅</span> Meal planner &amp; lunchbox
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 0;font-size:13px;color:#374151">
+              <span>✅</span> Kids' chores &amp; rewards
+            </div>
+          </div>
+          <div class="mockup-footer">
+            <button class="mockup-btn-secondary">Skip for now</button>
+            <button class="mockup-btn-primary">Let's get started →</button>
+          </div>
+        </div>
+
+        <div class="callout success">
+          <span class="callout-icon">✅</span>
+          <span class="callout-body"><strong>Why this works:</strong> Showing the 3 feature areas immediately sets expectations. Users know what they're setting up and why each question matters.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-header-text">
+          <h3>Your Household 🏠</h3>
+          <p>Who lives here, and what's your home situation?</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-existing">Improved</span></div>
+      </div>
+      <div class="step-body">
+        <p>The current step asks for adult count, kid count, and home type — but throws away names. The improved version adds a name field for each adult, which personalises income labels, dashboard greetings, and future features.</p>
+
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">Adults</div>
+            <div class="field-value">1, 2, or 3+</div>
+            <div class="field-note">Existing — keep as chip selector</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Adult names</div>
+            <div class="field-value">e.g. "Sam", "Chris"</div>
+            <div class="field-note">New — first name only, one input per adult</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Home situation</div>
+            <div class="field-value">Renting / Mortgage / Building / Own</div>
+            <div class="field-note">Existing — drives expense presets in step 5</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Number of kids</div>
+            <div class="field-value">0 – 4+</div>
+            <div class="field-note">Existing — if > 0, step 3 (Kids) activates</div>
+          </div>
+        </div>
+
+        <div class="callout idea">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>Name collection UX:</strong> When the user selects "2 adults", two small name inputs slide in underneath. Keep them optional (placeholder: "Adult 1") so they never feel forced. Names unlock personalised income labels like "Chris's salary" as a suggested placeholder in step 4.</span>
+        </div>
+
+        <div class="mockup">
+          <div class="mockup-dots">
+            <div class="mockup-dot done"></div>
+            <div class="mockup-dot active"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+          </div>
+          <div class="mockup-heading">Your household</div>
+          <div class="mockup-sub">Tell us who's home so we can tailor Toto for you.</div>
+          <div class="mockup-label">Adults</div>
+          <div class="mockup-options">
+            <div class="mockup-option">1 adult</div>
+            <div class="mockup-option selected">2 adults</div>
+            <div class="mockup-option">3+</div>
+          </div>
+          <div class="mockup-input-row">
+            <div class="mockup-field">Adult 1 name (optional)</div>
+          </div>
+          <div class="mockup-input-row">
+            <div class="mockup-field">Adult 2 name (optional)</div>
+          </div>
+          <div class="mockup-label" style="margin-top:12px">Home situation</div>
+          <div class="mockup-options">
+            <div class="mockup-option">🏢 Renting</div>
+            <div class="mockup-option selected">🏠 Mortgage</div>
+            <div class="mockup-option">🏗️ Building</div>
+            <div class="mockup-option">✅ Own</div>
+          </div>
+          <div class="mockup-footer">
+            <button class="mockup-btn-secondary">← Back</button>
+            <button class="mockup-btn-primary">Continue →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-header-text">
+          <h3>Your Kids 👶</h3>
+          <p>Add each child so chores, lunchbox &amp; rewards work from day one.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New step</span></div>
+      </div>
+      <div class="step-body">
+        <p>This step only appears if the user selected 1+ kids in step 2. For each child, collect a name, age, and a fun emoji avatar. This data simultaneously creates the <code>kids.profiles</code> entry, the <code>lunchbox.profiles</code> entry, and the household member record — so all three features are ready to go without any duplicate setup.</p>
+
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">Name</div>
+            <div class="field-value">e.g. "Mia"</div>
+            <div class="field-note">Required — used across chores, lunchbox, rewards</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Age</div>
+            <div class="field-value">Number (years)</div>
+            <div class="field-note">Helps calibrate chore complexity suggestions</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Emoji avatar</div>
+            <div class="field-value">Picker — 🐻 🦁 🐸 🦊 etc.</div>
+            <div class="field-note">Fun, makes the kid feel real in the UI</div>
+          </div>
+        </div>
+
+        <div class="mockup">
+          <div class="mockup-dots">
+            <div class="mockup-dot done"></div>
+            <div class="mockup-dot done"></div>
+            <div class="mockup-dot active"></div>
+            <div class="mockup-dot"></div>
+            <div class="mockup-dot"></div>
+          </div>
+          <div class="mockup-heading">Your kids</div>
+          <div class="mockup-sub">We'll set up chores and lunchbox for each of them.</div>
+
+          <div style="margin-bottom:16px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:10px">Kid 1</div>
+            <div class="mockup-input-row">
+              <div class="mockup-avatar-pick">🦊</div>
+              <div class="mockup-field">Name</div>
+              <div class="mockup-field" style="max-width:70px">Age</div>
+            </div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:10px">Kid 2</div>
+            <div class="mockup-input-row">
+              <div class="mockup-avatar-pick">🐻</div>
+              <div class="mockup-field">Name</div>
+              <div class="mockup-field" style="max-width:70px">Age</div>
+            </div>
+          </div>
+
+          <div class="mockup-footer">
+            <button class="mockup-btn-secondary">← Back</button>
+            <button class="mockup-btn-primary">Continue →</button>
+          </div>
+        </div>
+
+        <div class="callout idea">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>One setup, three features:</strong> The data entered here should be written to <code>kids.profiles</code>, <code>meals.lunchbox.profiles</code>, and <code>householdProfile.members</code> simultaneously on completion. The user should never have to add the same child twice.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">4</div>
+        <div class="step-header-text">
+          <h3>Your Income 💰</h3>
+          <p>What's coming in each month?</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-existing">Existing</span></div>
+      </div>
+      <div class="step-body">
+        <p>This step is largely good as-is. The main improvement is to pre-populate the income source name placeholder using the adult names captured in step 2 — e.g. if the user entered "Chris" and "Sam", the first income row placeholder becomes "e.g. Chris's salary" and the second "e.g. Sam's salary".</p>
+
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-label">Income source name</div>
+            <div class="field-value">Free text</div>
+            <div class="field-note">Placeholder personalised with adult names from step 2</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Amount</div>
+            <div class="field-value">Dollar value</div>
+            <div class="field-note">No change from current</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Frequency</div>
+            <div class="field-value">Weekly / Fortnightly / Monthly / Annual</div>
+            <div class="field-note">Converted to monthly on save — good, keep this</div>
+          </div>
+        </div>
+
+        <div class="callout success">
+          <span class="callout-icon">✅</span>
+          <span class="callout-body"><strong>What's already good:</strong> The multi-income support and frequency conversion are well-designed. The "+ Add another income source" link is clean. No structural changes needed here.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">5</div>
+        <div class="step-header-text">
+          <h3>Your Main Expenses 📋</h3>
+          <p>Biggest regular costs — adjust to match your situation.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-existing">Existing</span></div>
+      </div>
+      <div class="step-body">
+        <p>Pre-filled based on home situation selected in step 2. User edits amounts to match reality. This step is well-conceived — the smart defaults by home type reduce the blank-page problem significantly.</p>
+
+        <div class="callout idea">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>Small improvement:</strong> Add a "skip this one" toggle per expense row so users can remove a preset that doesn't apply (e.g. no car = no transport line). Cleaner than leaving zeros.</span>
+        </div>
+
+        <div class="callout idea">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>Kids add-on:</strong> If kids were added in step 3, automatically include a "Kids activities / sport" expense row in the presets — it's a near-universal cost for families that the current presets miss.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">6</div>
+        <div class="step-header-text">
+          <h3>All Done! 🎉</h3>
+          <p>Celebrate and orient the user.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New step</span></div>
+      </div>
+      <div class="step-body">
+        <p>Don't just drop the user on the dashboard. A short "here's what we set up" confirmation screen makes the data feel real and gives the user confidence before they dive in.</p>
+
+        <div class="mockup">
+          <div style="text-align:center;font-size:48px;margin-bottom:12px">🎉</div>
+          <div class="mockup-heading">You're all set!</div>
+          <div class="mockup-sub">Here's what Toto knows about your household</div>
+
+          <div style="background:#f8fafc;border-radius:12px;padding:16px;margin:16px 0">
+            <div class="member-row">
+              <div class="member-avatar">👤</div>
+              <div class="member-info">
+                <div class="member-name">Chris &amp; Sam</div>
+                <div class="member-role">Adults · Mortgage</div>
+              </div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">🦊</div>
+              <div class="member-info">
+                <div class="member-name">Mia, age 8</div>
+                <div class="member-role">Chores &amp; lunchbox ready</div>
+              </div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">🐻</div>
+              <div class="member-info">
+                <div class="member-name">Jack, age 5</div>
+                <div class="member-role">Chores &amp; lunchbox ready</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:12px;font-size:13px;color:#374151;margin-bottom:20px">
+            <div style="flex:1;background:#f0fdf4;border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:20px;font-weight:700;color:#16a34a">$8,200</div>
+              <div style="color:#64748b;font-size:11px">monthly income</div>
+            </div>
+            <div style="flex:1;background:#fff7ed;border-radius:10px;padding:12px;text-align:center">
+              <div style="font-size:20px;font-weight:700;color:#ea580c">$5,850</div>
+              <div style="color:#64748b;font-size:11px">monthly expenses</div>
+            </div>
+          </div>
+
+          <button class="mockup-btn-primary" style="width:100%">Take me to my dashboard →</button>
+        </div>
+
+        <div class="callout success">
+          <span class="callout-icon">✅</span>
+          <span class="callout-body"><strong>Why this matters:</strong> Seeing a personalised summary with real names, numbers, and avatars makes the app feel alive immediately. It also surfaces any errors — if a number looks wrong, the user can go back and fix it before diving in.</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── DATA MAP -->
+  <section id="data-map">
+    <h2>Data Written During Onboarding</h2>
+    <p>This table shows exactly which data structures each onboarding step writes, ensuring nothing is duplicated and every feature has what it needs on first launch.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>Data Written</th>
+          <th>Storage Key</th>
+          <th>Unlocks Feature</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>2 — Household</strong></td>
+          <td>Adult count, adult names, home type</td>
+          <td class="mono">householdProfile.members[]</td>
+          <td>Household tab, income label placeholders</td>
+        </tr>
+        <tr>
+          <td><strong>3 — Kids</strong></td>
+          <td>Name, age, emoji for each child</td>
+          <td class="mono">kids.profiles[]<br>meals.lunchbox.profiles[]<br>householdProfile.members[]</td>
+          <td>Kids tab (chores/prizes), Lunchbox, Meal planner</td>
+        </tr>
+        <tr>
+          <td><strong>4 — Income</strong></td>
+          <td>Income source name, amount, frequency</td>
+          <td class="mono">budget.months[YYYY-MM].income[]</td>
+          <td>Budget, Insights, Dashboard surplus card</td>
+        </tr>
+        <tr>
+          <td><strong>5 — Expenses</strong></td>
+          <td>Expense name, amount, category</td>
+          <td class="mono">budget.months[YYYY-MM].expenses[]</td>
+          <td>Budget, Bills, Insights trend chart</td>
+        </tr>
+        <tr>
+          <td><strong>All steps</strong></td>
+          <td>Completion flag</td>
+          <td class="mono">onboarded: true</td>
+          <td>Prevents onboarding showing again</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── POST-ONBOARD -->
+  <section id="post-onboard">
+    <h2>Post-Onboarding: Next Steps</h2>
+    <p>Some things are genuinely better collected after the user has used the app. These should be surfaced as friendly prompts within the relevant section — not bolted onto onboarding.</p>
+
+    <div class="step-card">
+      <div class="step-header" style="background:#fefce8;border-bottom-color:#fef9c3">
+        <div class="step-number" style="background:#eab308">?</div>
+        <div class="step-header-text">
+          <h3>Net Worth Setup</h3>
+          <p>Assets (savings, super, property value) and liabilities (mortgage balance, car loans)</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-optional">Post-onboarding</span></div>
+      </div>
+      <div class="step-body">
+        <p>Net Worth requires detailed financial information the user may not have to hand. Show a friendly prompt banner in the Net Worth tab: <em>"Add your assets and liabilities to see your full financial picture →"</em> rather than asking during setup.</p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header" style="background:#fefce8;border-bottom-color:#fef9c3">
+        <div class="step-number" style="background:#eab308">?</div>
+        <div class="step-header-text">
+          <h3>Vehicles &amp; Documents</h3>
+          <p>Rego dates, insurance renewals, important document expiry tracking</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-optional">Post-onboarding</span></div>
+      </div>
+      <div class="step-body">
+        <p>These are high-value features but too detailed for first-run. A prompt in the Home section is sufficient: <em>"Add your vehicles and documents to get renewal reminders."</em></p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header" style="background:#fefce8;border-bottom-color:#fef9c3">
+        <div class="step-number" style="background:#eab308">?</div>
+        <div class="step-header-text">
+          <h3>Savings Goals</h3>
+          <p>Holiday fund, emergency buffer, renovation savings, etc.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-optional">Post-onboarding</span></div>
+      </div>
+      <div class="step-body">
+        <p>Goals are meaningful once the user understands their surplus. Prompt from the Goals tab after 7 days or once a surplus is established: <em>"You have $X surplus — want to set a savings goal?"</em></p>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header" style="background:#fefce8;border-bottom-color:#fef9c3">
+        <div class="step-number" style="background:#eab308">?</div>
+        <div class="step-header-text">
+          <h3>Chores &amp; Prizes</h3>
+          <p>Assigning chores to kids, setting up the rewards store</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-optional">Post-onboarding</span></div>
+      </div>
+      <div class="step-body">
+        <p>Kid profiles are created in onboarding — that's enough. Assigning specific chores and prizes is too granular for first-run. The Kids tab should open with a guided empty state that walks parents through their first chore setup.</p>
+      </div>
+    </div>
+
+    <div class="callout idea" style="margin-top:24px">
+      <span class="callout-icon">💡</span>
+      <span class="callout-body"><strong>Setup completeness indicator:</strong> A "Setup Progress" card on the dashboard combined with contextual to-do prompts inside each section is the ideal combination — discoverable without being pushy. See mock-ups below.</span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── HOUSEHOLD ACCESS -->
+  <section id="household-access">
+    <h2>Household Access &amp; Multi-User</h2>
+    <p>When a second adult or older teenager is added to the household, they should be able to access the same shared data — but the way they log in and what they see should differ by role.</p>
+
+    <h3 style="margin-top:24px;margin-bottom:12px">Adult access — invite by email</h3>
+    <p>Adults get a standard account linked to their email. The household owner sends an invite; the invitee clicks a link, sets a password, and lands on the same shared household data. Both adults see everything by default, but either can mark individual income sources as private (e.g. hide a salary from the other adult).</p>
+
+    <div class="field-grid">
+      <div class="field">
+        <div class="field-label">Role</div>
+        <div class="field-value">Owner / Member</div>
+        <div class="field-note">Owner can invite others and manage access. Member has full read/write but cannot invite or delete the household.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Invite method</div>
+        <div class="field-value">Email invite link</div>
+        <div class="field-note">Link expires after 7 days. Sent from within Household settings.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Income privacy</div>
+        <div class="field-value">Per-item toggle</div>
+        <div class="field-note">"Mark as private" hides an income line from other adults. Total is still shown in budget summary.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Shared data</div>
+        <div class="field-value">Everything else</div>
+        <div class="field-note">Budget, bills, goals, kids, meals, home — all fully shared.</div>
+      </div>
+    </div>
+
+    <div class="mockup" style="max-width:400px">
+      <div class="mockup-heading" style="font-size:17px">Invite to your household</div>
+      <div class="mockup-sub">They'll get access to your shared budget, kids &amp; home.</div>
+      <div style="margin:20px 0">
+        <div class="mockup-label">Email address</div>
+        <div class="mockup-field" style="margin-bottom:12px">partner@email.com</div>
+        <div class="mockup-label">Role</div>
+        <div class="mockup-options">
+          <div class="mockup-option selected">Member</div>
+          <div class="mockup-option">Owner</div>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;margin-top:4px">Members can view and edit everything. Owners can also manage access.</div>
+      </div>
+      <button class="mockup-btn-primary" style="width:100%">Send invite →</button>
+    </div>
+
+    <hr class="divider" style="margin:32px 0">
+
+    <h3 style="margin-bottom:12px">Child access — PIN + avatar login (under 16)</h3>
+    <p>Children don't need an email account. Instead, a parent sets up a child profile with a 4-digit PIN during onboarding or from the Kids settings. On the login screen, the child taps their avatar and enters their PIN — no typing an email, no password manager, no complexity.</p>
+
+    <div class="callout warn">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-body"><strong>Security model:</strong> Child PINs are stored as server-side hashed values tied to the household ID, not as standalone accounts. A child cannot access the household without a parent first logging in on the device and "handing it over" — or by selecting the child profile on the household's shared login screen. PINs should be rate-limited (3 attempts, then 30-second lockout).</span>
+    </div>
+
+    <div class="field-grid">
+      <div class="field">
+        <div class="field-label">Login method</div>
+        <div class="field-value">Tap avatar → enter 4-digit PIN</div>
+        <div class="field-note">No email required. Simple enough for a 6-year-old.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">PIN set by</div>
+        <div class="field-value">Parent during profile setup</div>
+        <div class="field-note">Parent can reset PIN from Kids settings at any time.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Session</div>
+        <div class="field-value">Stays logged in on device</div>
+        <div class="field-note">Child doesn't need to log in every time — session persists until parent resets or logs them out.</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Rate limiting</div>
+        <div class="field-value">3 attempts then 30s lock</div>
+        <div class="field-note">Prevents brute-forcing. Parent receives push notification after 3 failed attempts.</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px;margin-bottom:12px">What a child sees</h3>
+    <p>Children get a simplified view — bright, fun, focused on what's relevant to them. They cannot see household finances, bills, or adult income.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0">
+      <div class="field" style="background:#f0fdf4;border-color:#bbf7d0">
+        <div class="field-label" style="color:#16a34a">✅ Child can see</div>
+        <div class="field-value" style="margin-top:8px;line-height:2">
+          My chores &amp; status<br>
+          My prize store<br>
+          My savings jar<br>
+          My lunchbox this week<br>
+          Household members (names only)
+        </div>
+      </div>
+      <div class="field" style="background:#fef2f2;border-color:#fecaca">
+        <div class="field-label" style="color:#b91c1c">🚫 Child cannot see</div>
+        <div class="field-value" style="margin-top:8px;line-height:2">
+          Budget &amp; income<br>
+          Bills &amp; net worth<br>
+          Savings goals (adult)<br>
+          Home documents<br>
+          Other adults' data
+        </div>
+      </div>
+    </div>
+
+    <!-- Login screen mock-up -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0;align-items:start">
+
+      <div class="mockup" style="margin:0">
+        <div class="mockup-heading" style="font-size:16px">Who's using Toto?</div>
+        <div class="mockup-sub" style="font-size:12px">Tap your name to continue</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin:20px 0">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid #0d9488;border-radius:12px;background:#f0fdfa;cursor:pointer">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ecfeff,#ccfbf1);display:flex;align-items:center;justify-content:center;font-size:20px">👤</div>
+            <div>
+              <div style="font-size:14px;font-weight:600">Chris</div>
+              <div style="font-size:11px;color:#64748b">Owner · Email login</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid #e2e8f0;border-radius:12px;cursor:pointer">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ecfeff,#ccfbf1);display:flex;align-items:center;justify-content:center;font-size:20px">👤</div>
+            <div>
+              <div style="font-size:14px;font-weight:600">Sam</div>
+              <div style="font-size:11px;color:#64748b">Member · Email login</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid #e2e8f0;border-radius:12px;cursor:pointer">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fef9c3,#fde68a);display:flex;align-items:center;justify-content:center;font-size:20px">🦊</div>
+            <div>
+              <div style="font-size:14px;font-weight:600">Mia</div>
+              <div style="font-size:11px;color:#64748b">Kid · PIN login</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid #e2e8f0;border-radius:12px;cursor:pointer">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ede9fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:20px">🐻</div>
+            <div>
+              <div style="font-size:14px;font-weight:600">Jack</div>
+              <div style="font-size:11px;color:#64748b">Kid · PIN login</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mockup" style="margin:0">
+        <div style="text-align:center;font-size:48px;margin-bottom:12px">🦊</div>
+        <div class="mockup-heading" style="font-size:18px">Hi Mia! 👋</div>
+        <div class="mockup-sub" style="font-size:12px">Enter your PIN to continue</div>
+        <div style="display:flex;justify-content:center;gap:12px;margin:24px 0">
+          <div style="width:48px;height:56px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0d9488">●</div>
+          <div style="width:48px;height:56px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0d9488">●</div>
+          <div style="width:48px;height:56px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
+          <div style="width:48px;height:56px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:200px;margin:0 auto">
+          ${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(n => `<div style="height:44px;border:1.5px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#374151;cursor:pointer;background:#fff">${n}</div>`).join('')}
+        </div>
+        <div style="text-align:center;margin-top:16px"><a href="#" style="font-size:12px;color:#0d9488;text-decoration:none">← Switch profile</a></div>
+      </div>
+
+    </div>
+
+    <div class="callout idea">
+      <span class="callout-icon">💡</span>
+      <span class="callout-body"><strong>Over-16 option:</strong> When a household member turns 16, a parent can optionally "upgrade" their profile to a full email account, giving them access to a broader view (their own chores, savings goals, and a read-only budget summary) while still being part of the household.</span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── SETUP PROGRESS CARD -->
+  <section id="setup-progress">
+    <h2>Setup Progress Card — Dashboard Mock-up</h2>
+    <p>This card lives on the main dashboard and collapses automatically once all items are complete. It's the bridge between first-run onboarding and a fully configured household.</p>
+
+    <div class="callout idea">
+      <span class="callout-icon">💡</span>
+      <span class="callout-body"><strong>Placement:</strong> Appears at the top of the dashboard, above the Today summary cards. Once 100% complete it shrinks to a single "Setup complete ✓" banner that dismisses permanently.</span>
+    </div>
+
+    <!-- Dashboard mock-up -->
+    <div style="background:#f1f5f9;border-radius:20px;padding:20px;margin:24px 0;max-width:600px;margin-left:auto;margin-right:auto">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:12px">Dashboard</div>
+
+      <!-- Setup card -->
+      <div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #e2e8f0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#1e293b">Finish setting up Toto</div>
+            <div style="font-size:12px;color:#64748b;margin-top:2px">5 of 9 complete</div>
+          </div>
+          <div style="position:relative;width:52px;height:52px">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle cx="26" cy="26" r="22" fill="none" stroke="#e2e8f0" stroke-width="5"/>
+              <circle cx="26" cy="26" r="22" fill="none" stroke="#0d9488" stroke-width="5"
+                stroke-dasharray="138.2" stroke-dashoffset="62.2"
+                stroke-linecap="round" transform="rotate(-90 26 26)"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0d9488">56%</div>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div style="background:#e2e8f0;border-radius:99px;height:5px;margin-bottom:16px;overflow:hidden">
+          <div style="width:56%;height:100%;border-radius:99px;background:linear-gradient(90deg,#0d9488,#06b6d4)"></div>
+        </div>
+
+        <!-- Todo items -->
+        <div style="display:flex;flex-direction:column;gap:8px">
+
+          <!-- Done -->
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f0fdf4">
+            <div style="width:22px;height:22px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0">✓</div>
+            <span style="font-size:13px;color:#374151;flex:1;text-decoration:line-through;color:#94a3b8">Add your household members</span>
+            <span style="font-size:11px;color:#16a34a;font-weight:600">Done</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f0fdf4">
+            <div style="width:22px;height:22px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0">✓</div>
+            <span style="font-size:13px;color:#374151;flex:1;text-decoration:line-through;color:#94a3b8">Set up income sources</span>
+            <span style="font-size:11px;color:#16a34a;font-weight:600">Done</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f0fdf4">
+            <div style="width:22px;height:22px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0">✓</div>
+            <span style="font-size:13px;color:#374151;flex:1;text-decoration:line-through;color:#94a3b8">Add monthly expenses</span>
+            <span style="font-size:11px;color:#16a34a;font-weight:600">Done</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f0fdf4">
+            <div style="width:22px;height:22px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0">✓</div>
+            <span style="font-size:13px;color:#374151;flex:1;text-decoration:line-through;color:#94a3b8">Add kids to your household</span>
+            <span style="font-size:11px;color:#16a34a;font-weight:600">Done</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:#f0fdf4">
+            <div style="width:22px;height:22px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;flex-shrink:0">✓</div>
+            <span style="font-size:13px;color:#374151;flex:1;text-decoration:line-through;color:#94a3b8">Invite Sam to your household</span>
+            <span style="font-size:11px;color:#16a34a;font-weight:600">Done</span>
+          </div>
+
+          <!-- To do -->
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1.5px solid #0d9488;background:#f0fdfa;cursor:pointer">
+            <div style="width:22px;height:22px;border-radius:50%;border:2px solid #0d9488;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
+            <span style="font-size:13px;color:#1e293b;font-weight:500;flex:1">Set your first savings goal</span>
+            <span style="font-size:11px;color:#0d9488;font-weight:600">Go →</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;cursor:pointer">
+            <div style="width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
+            <span style="font-size:13px;color:#374151;flex:1">Add your net worth (assets &amp; debts)</span>
+            <span style="font-size:11px;color:#64748b;font-weight:600">Go →</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;cursor:pointer">
+            <div style="width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
+            <span style="font-size:13px;color:#374151;flex:1">Add your vehicles</span>
+            <span style="font-size:11px;color:#64748b;font-weight:600">Go →</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;cursor:pointer">
+            <div style="width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
+            <span style="font-size:13px;color:#374151;flex:1">Set up Mia's first chores</span>
+            <span style="font-size:11px;color:#64748b;font-weight:600">Go →</span>
+          </div>
+
+        </div>
+
+        <div style="text-align:center;margin-top:14px">
+          <a href="#" style="font-size:12px;color:#94a3b8;text-decoration:none">Dismiss · I'll do this later</a>
+        </div>
+      </div>
+
+      <!-- Rest of dashboard (placeholder) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e2e8f0">
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Monthly surplus</div>
+          <div style="font-size:22px;font-weight:700;color:#16a34a">$2,350</div>
+          <div style="font-size:11px;color:#94a3b8">18 days remaining</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:16px;border:1px solid #e2e8f0">
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">Bills due soon</div>
+          <div style="font-size:22px;font-weight:700;color:#f59e0b">2</div>
+          <div style="font-size:11px;color:#94a3b8">Next: Electricity in 3d</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:#94a3b8;text-align:center">The highlighted item (teal border) is the single recommended next action.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── POST-ONBOARD TODO -->
+  <section id="post-todo">
+    <h2>Post-Onboarding: Prompt + List Combination</h2>
+    <p>The best experience combines two things: a <strong>central to-do list</strong> (the dashboard card above) with <strong>contextual prompts</strong> inside each section. The central list is always available; the in-context prompt appears exactly when the user is already in the right place to act on it.</p>
+
+    <h3 style="margin-top:24px;margin-bottom:12px">How the combination works</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="field" style="background:#f0f9ff;border-color:#bae6fd">
+        <div class="field-label" style="color:#0369a1">📋 Central to-do list (dashboard)</div>
+        <div class="field-value" style="margin-top:8px;font-size:13px;line-height:1.8;color:#374151">
+          Always visible<br>
+          Shows all outstanding setup tasks<br>
+          Each item links directly to the right section<br>
+          Highlights the single recommended next step<br>
+          Disappears when 100% complete
+        </div>
+      </div>
+      <div class="field" style="background:#f0fdf4;border-color:#bbf7d0">
+        <div class="field-label" style="color:#16a34a">✨ Contextual prompt (in-section)</div>
+        <div class="field-value" style="margin-top:8px;font-size:13px;line-height:1.8;color:#374151">
+          Only visible inside the relevant section<br>
+          Appears as a friendly empty-state banner<br>
+          Shows when the section has no data yet<br>
+          Disappears once first item is added<br>
+          More detail than the dashboard item
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:16px">Example: Goals section — empty state prompt</h3>
+    <div style="background:#f1f5f9;border-radius:20px;padding:16px;max-width:560px;margin:0 auto 32px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:10px">Goals tab</div>
+      <!-- In-section empty state -->
+      <div style="background:#fff;border-radius:14px;padding:28px 24px;text-align:center;border:2px dashed #cbd5e1">
+        <div style="font-size:40px;margin-bottom:12px">🎯</div>
+        <div style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:6px">No goals yet</div>
+        <div style="font-size:13px;color:#64748b;margin-bottom:4px">You've got <strong style="color:#16a34a">$2,350 surplus</strong> each month.</div>
+        <div style="font-size:13px;color:#64748b;margin-bottom:20px">Put it to work — set a goal and watch your progress.</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
+          <div style="padding:8px 14px;background:#f0fdfa;border:1.5px solid #0d9488;border-radius:99px;font-size:12px;font-weight:600;color:#0d9488;cursor:pointer">🏖️ Holiday fund</div>
+          <div style="padding:8px 14px;background:#f0fdfa;border:1.5px solid #0d9488;border-radius:99px;font-size:12px;font-weight:600;color:#0d9488;cursor:pointer">🏠 Renovation</div>
+          <div style="padding:8px 14px;background:#f0fdfa;border:1.5px solid #0d9488;border-radius:99px;font-size:12px;font-weight:600;color:#0d9488;cursor:pointer">🆘 Emergency fund</div>
+          <div style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:99px;font-size:12px;color:#64748b;cursor:pointer">+ Custom goal</div>
+        </div>
+        <button style="background:#0d9488;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">Add my first goal →</button>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:16px">Example: Net Worth section — empty state prompt</h3>
+    <div style="background:#f1f5f9;border-radius:20px;padding:16px;max-width:560px;margin:0 auto 32px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:10px">Net Worth tab</div>
+      <div style="background:#fff;border-radius:14px;padding:24px;border:2px dashed #cbd5e1">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="font-size:36px">📊</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#1e293b">See your full financial picture</div>
+            <div style="font-size:13px;color:#64748b;margin-top:3px">Add what you own and what you owe to calculate your net worth.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+          <div style="background:#f0f9ff;border-radius:10px;padding:14px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#0369a1;margin-bottom:6px">What you own</div>
+            <div style="font-size:12px;color:#374151;line-height:1.8">Home value<br>Savings accounts<br>Super / investments<br>Vehicles</div>
+          </div>
+          <div style="background:#fef2f2;border-radius:10px;padding:14px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#b91c1c;margin-bottom:6px">What you owe</div>
+            <div style="font-size:12px;color:#374151;line-height:1.8">Mortgage balance<br>Car loans<br>Credit cards<br>Personal loans</div>
+          </div>
+        </div>
+        <button style="width:100%;background:#0d9488;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Start tracking net worth →</button>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:16px">Example: Kids section — chores empty state</h3>
+    <div style="background:#f1f5f9;border-radius:20px;padding:16px;max-width:560px;margin:0 auto 32px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:10px">Kids tab → Mia</div>
+      <div style="background:#fff;border-radius:14px;padding:24px;border:2px dashed #cbd5e1;text-align:center">
+        <div style="font-size:40px;margin-bottom:10px">🦊</div>
+        <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:4px">Mia has no chores yet</div>
+        <div style="font-size:13px;color:#64748b;margin-bottom:16px">Add chores to help Mia earn coins and unlock prizes.</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px">
+          <div style="padding:7px 14px;background:#fef9c3;border:1.5px solid #eab308;border-radius:99px;font-size:12px;font-weight:600;color:#854d0e;cursor:pointer">🛏️ Make bed</div>
+          <div style="padding:7px 14px;background:#fef9c3;border:1.5px solid #eab308;border-radius:99px;font-size:12px;font-weight:600;color:#854d0e;cursor:pointer">🍽️ Clear table</div>
+          <div style="padding:7px 14px;background:#fef9c3;border:1.5px solid #eab308;border-radius:99px;font-size:12px;font-weight:600;color:#854d0e;cursor:pointer">🐕 Feed pet</div>
+          <div style="padding:7px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:99px;font-size:12px;color:#64748b;cursor:pointer">+ Custom</div>
+        </div>
+        <button style="background:#eab308;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">Add Mia's first chore →</button>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:12px">Full to-do item list (all 9 items)</h3>
+    <p>These are all the items that appear in the dashboard setup card. The first 5 are completed during onboarding; the final 4 are post-onboarding tasks.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Task</th>
+          <th>Set by</th>
+          <th>Links to</th>
+          <th>Auto-complete trigger</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Add your household members</td><td>Onboarding step 2</td><td>Settings → Household</td><td>1+ adult added</td></tr>
+        <tr><td>2</td><td>Set up income sources</td><td>Onboarding step 4</td><td>Budget → Income</td><td>1+ income added</td></tr>
+        <tr><td>3</td><td>Add monthly expenses</td><td>Onboarding step 5</td><td>Budget → Expenses</td><td>1+ expense added</td></tr>
+        <tr><td>4</td><td>Add kids to your household</td><td>Onboarding step 3</td><td>Settings → Household</td><td>Only shown if kids selected</td></tr>
+        <tr><td>5</td><td>Invite [partner name] to your household</td><td>Onboarding step 6</td><td>Settings → Access</td><td>Only shown if 2+ adults</td></tr>
+        <tr><td>6</td><td>Set your first savings goal</td><td>Post-onboarding</td><td>Wallet → Goals</td><td>1+ goal added</td></tr>
+        <tr><td>7</td><td>Add your net worth</td><td>Post-onboarding</td><td>Wallet → Net Worth</td><td>1+ asset or liability added</td></tr>
+        <tr><td>8</td><td>Add your vehicles</td><td>Post-onboarding</td><td>Home → Vehicles</td><td>1+ vehicle added</td></tr>
+        <tr><td>9</td><td>Set up [kid name]'s first chores</td><td>Post-onboarding</td><td>Kids → [child name]</td><td>Only shown if kids added; 1+ chore added</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout success" style="margin-top:20px">
+      <span class="callout-icon">✅</span>
+      <span class="callout-body"><strong>Key design rule:</strong> Items 4, 5, and 9 are conditional — they only appear if the relevant household members were added. A single adult with no kids should see a clean 6-item list, not a list full of irrelevant tasks.</span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── ADULT ONBOARDING -->
+  <section id="adult-onboarding">
+    <h2>Adult Onboarding — Joining an Existing Household</h2>
+    <p>When the household owner invites a second adult, that person receives an email invite and goes through their own short onboarding. The goal is to orient them quickly — they don't need to configure anything the owner already set up, they just need to understand what they're joining and confirm their identity.</p>
+
+    <!-- Flow overview -->
+    <div class="flow-steps" style="margin-bottom:32px">
+      <div class="flow-step active">
+        <div class="flow-dot">📧</div>
+        <div class="flow-label">Email invite</div>
+        <div class="flow-sub">Click link</div>
+        <div><span class="flow-tag tag-new">Triggered by owner</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">👤</div>
+        <div class="flow-label">Create account</div>
+        <div class="flow-sub">30 sec</div>
+        <div><span class="flow-tag tag-new">New</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">🏡</div>
+        <div class="flow-label">Meet your household</div>
+        <div class="flow-sub">15 sec</div>
+        <div><span class="flow-tag tag-new">New</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">🗺️</div>
+        <div class="flow-label">Quick tour</div>
+        <div class="flow-sub">30 sec</div>
+        <div><span class="flow-tag tag-new">New</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">✅</div>
+        <div class="flow-label">Done</div>
+        <div class="flow-sub">Land on dashboard</div>
+        <div><span class="flow-tag tag-new">New</span></div>
+      </div>
+    </div>
+
+    <!-- Step A1 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">A1</div>
+        <div class="step-header-text">
+          <h3>Email Invite — Landing Page</h3>
+          <p>The first thing the invitee sees after clicking the link in their email.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New</span></div>
+      </div>
+      <div class="step-body">
+        <p>This is not a generic signup page. It is personalised to the invite — it shows the owner's name and a preview of the household so the invitee immediately understands what they're joining.</p>
+
+        <div class="mockup">
+          <div style="text-align:center;font-size:44px;margin-bottom:14px">🏡</div>
+          <div class="mockup-heading" style="font-size:18px">Chris invited you to<br>join their Toto household</div>
+          <div class="mockup-sub">You'll get shared access to budget, meals, kids, and home — everything in one place.</div>
+
+          <div style="background:#f8fafc;border-radius:12px;padding:14px 16px;margin:16px 0;border:1px solid #e2e8f0">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:10px">Your household</div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ecfeff,#ccfbf1);display:flex;align-items:center;justify-content:center;font-size:16px">👤</div>
+              <div>
+                <div style="font-size:13px;font-weight:600">Chris</div>
+                <div style="font-size:11px;color:#64748b">Owner</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#fef9c3,#fde68a);display:flex;align-items:center;justify-content:center;font-size:16px">🦊</div>
+              <div>
+                <div style="font-size:13px;font-weight:600">Mia</div>
+                <div style="font-size:11px;color:#64748b">Kid · age 8</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ede9fe,#ddd6fe);display:flex;align-items:center;justify-content:center;font-size:16px">🐻</div>
+              <div>
+                <div style="font-size:13px;font-weight:600">Jack</div>
+                <div style="font-size:11px;color:#64748b">Kid · age 5</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;color:#94a3b8;text-align:center;margin-bottom:16px">Invite sent to <strong style="color:#475569">sam@email.com</strong> · Expires in 7 days</div>
+          <button class="mockup-btn-primary" style="width:100%">Accept invite →</button>
+          <div style="text-align:center;margin-top:10px;font-size:12px;color:#94a3b8">Not you? <a href="#" style="color:#0d9488;text-decoration:none">Ignore this invite</a></div>
+        </div>
+
+        <div class="callout idea">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>Expired link handling:</strong> If the 7-day window has passed, show a clear "This invite has expired" message with a prompt to ask the owner to resend. Don't show a generic 404.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step A2 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">A2</div>
+        <div class="step-header-text">
+          <h3>Create Your Account</h3>
+          <p>Name, password — email is pre-filled from the invite.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New</span></div>
+      </div>
+      <div class="step-body">
+        <p>Keep this minimal — the email is already known from the invite, so only a display name and password are needed. Offer Sign in with Google/Apple as a faster path.</p>
+
+        <div class="mockup">
+          <div class="mockup-heading" style="font-size:17px">Create your account</div>
+          <div class="mockup-sub" style="margin-bottom:20px">You'll use this to log in to Toto.</div>
+
+          <div class="mockup-label">Your name</div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;color:#374151;margin-bottom:12px">Sam</div>
+
+          <div class="mockup-label">Email</div>
+          <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;color:#94a3b8;margin-bottom:12px;display:flex;justify-content:space-between">
+            sam@email.com <span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:99px;font-weight:600">Pre-filled ✓</span>
+          </div>
+
+          <div class="mockup-label">Password</div>
+          <div style="background:#f8fafc;border:1px solid #0d9488;border-radius:8px;padding:10px 12px;font-size:13px;color:#94a3b8;margin-bottom:6px">••••••••••</div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:20px">Minimum 8 characters</div>
+
+          <button class="mockup-btn-primary" style="width:100%;margin-bottom:12px">Create account →</button>
+
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="flex:1;height:1px;background:#e2e8f0"></div>
+            <span style="font-size:12px;color:#94a3b8">or</span>
+            <div style="flex:1;height:1px;background:#e2e8f0"></div>
+          </div>
+
+          <button style="width:100%;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;padding:10px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;margin-bottom:8px">🍎 Continue with Apple</button>
+          <button style="width:100%;border:1.5px solid #e2e8f0;background:#fff;border-radius:8px;padding:10px;font-size:13px;font-weight:600;color:#374151;cursor:pointer">🔵 Continue with Google</button>
+        </div>
+
+        <div class="callout success">
+          <span class="callout-icon">✅</span>
+          <span class="callout-body"><strong>If they already have a Toto account:</strong> Detect the email and show "Looks like you already have a Toto account — log in to accept this invite" instead of the create form. They should never end up with two accounts.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step A3 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">A3</div>
+        <div class="step-header-text">
+          <h3>Meet Your Household 🏡</h3>
+          <p>A warm welcome showing what they've just joined.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New</span></div>
+      </div>
+      <div class="step-body">
+        <p>This is the moment the invite becomes real. Show the household members, a headline number (monthly income or surplus), and one sentence about what they can access. No forms — just orientation.</p>
+
+        <div class="mockup">
+          <div style="text-align:center;font-size:40px;margin-bottom:12px">🎉</div>
+          <div class="mockup-heading" style="font-size:18px">You're in, Sam!</div>
+          <div class="mockup-sub">Welcome to Chris's Toto household.</div>
+
+          <div style="background:#f0fdfa;border-radius:12px;padding:16px;margin:16px 0;border:1px solid #ccfbf1">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#0d9488;margin-bottom:12px">Your household</div>
+            <div class="member-row">
+              <div class="member-avatar">👤</div>
+              <div class="member-info">
+                <div class="member-name">Chris</div>
+                <div class="member-role">Owner · set up the household</div>
+              </div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">👤</div>
+              <div class="member-info">
+                <div class="member-name">Sam — that's you!</div>
+                <div class="member-role">Member · just joined</div>
+              </div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar">🦊</div>
+              <div class="member-info">
+                <div class="member-name">Mia</div>
+                <div class="member-role">Kid · age 8</div>
+              </div>
+            </div>
+            <div class="member-row" style="border:none">
+              <div class="member-avatar">🐻</div>
+              <div class="member-info">
+                <div class="member-name">Jack</div>
+                <div class="member-role">Kid · age 5</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-bottom:20px">
+            <div style="flex:1;background:#f8fafc;border-radius:10px;padding:12px;text-align:center;border:1px solid #e2e8f0">
+              <div style="font-size:18px;font-weight:700;color:#16a34a">$2,350</div>
+              <div style="font-size:11px;color:#64748b">monthly surplus</div>
+            </div>
+            <div style="flex:1;background:#f8fafc;border-radius:10px;padding:12px;text-align:center;border:1px solid #e2e8f0">
+              <div style="font-size:18px;font-weight:700;color:#0d9488">5</div>
+              <div style="font-size:11px;color:#64748b">goals tracked</div>
+            </div>
+          </div>
+
+          <button class="mockup-btn-primary" style="width:100%">Take a quick tour →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step A4 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">A4</div>
+        <div class="step-header-text">
+          <h3>Quick Tour — 3 Swipe Screens</h3>
+          <p>Orient the new member to the three main areas of the app.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New</span></div>
+      </div>
+      <div class="step-body">
+        <p>Three swipeable cards — one per app section — that show the new member what they can do and where to find it. Skippable at any point.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:16px 0">
+
+          <div class="mockup" style="margin:0;padding:20px">
+            <div style="text-align:center;font-size:32px;margin-bottom:10px">💰</div>
+            <div style="font-size:14px;font-weight:700;text-align:center;margin-bottom:6px">The Kitty</div>
+            <div style="font-size:12px;color:#64748b;text-align:center;line-height:1.5">Budget, bills, goals &amp; net worth. See where the money goes each month.</div>
+            <div style="display:flex;justify-content:center;gap:4px;margin-top:14px">
+              <div style="width:18px;height:4px;border-radius:99px;background:#0d9488"></div>
+              <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
+              <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
+            </div>
+          </div>
+
+          <div class="mockup" style="margin:0;padding:20px">
+            <div style="text-align:center;font-size:32px;margin-bottom:10px">📅</div>
+            <div style="font-size:14px;font-weight:700;text-align:center;margin-bottom:6px">Plan</div>
+            <div style="font-size:12px;color:#64748b;text-align:center;line-height:1.5">Weekly planner, meal plans &amp; the kids' lunchboxes. One place for the week ahead.</div>
+            <div style="display:flex;justify-content:center;gap:4px;margin-top:14px">
+              <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
+              <div style="width:18px;height:4px;border-radius:99px;background:#0d9488"></div>
+              <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
+            </div>
+          </div>
+
+          <div class="mockup" style="margin:0;padding:20px">
+            <div style="text-align:center;font-size:32px;margin-bottom:10px">🏠</div>
+            <div style="font-size:14px;font-weight:700;text-align:center;margin-bottom:6px">Home</div>
+            <div style="font-size:12px;color:#64748b;text-align:center;line-height:1.5">Documents, vehicles &amp; maintenance reminders. Never miss a rego or warranty renewal.</div>
+            <div style="display:flex;justify-content:center;gap:4px;margin-top:14px">
+              <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
+              <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
+              <div style="width:18px;height:4px;border-radius:99px;background:#0d9488"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="callout idea">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>One action to add:</strong> After the tour, prompt the new adult to add their own income source — "Want to add your income so the budget is complete?" with a single income form. This is the one piece of data only they can provide, and it completes the household picture.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- What adults don't need to redo -->
+    <div class="callout success" style="margin-top:8px">
+      <span class="callout-icon">✅</span>
+      <span class="callout-body"><strong>What the second adult does NOT do:</strong> They don't re-configure the household, re-enter expenses, or re-add kids. All of that is already there. Their onboarding is orientation only — 4 steps, under 2 minutes.</span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ─────────────────────────────────────────────── CHILD ONBOARDING -->
+  <section id="child-onboarding">
+    <h2>Child Onboarding — First Login Experience</h2>
+    <p>A child's profile is created by a parent during household onboarding or from the Kids settings. Their "onboarding" is the moment they first tap their avatar on the login screen and set up their PIN. It must be simple enough for a 6-year-old, fun enough that they want to do it, and secure enough that a parent trusts it.</p>
+
+    <div class="callout warn">
+      <span class="callout-icon">🔒</span>
+      <span class="callout-body"><strong>Parent gate:</strong> Before a child sees the PIN setup screen for the first time, the app requires a parent to authenticate (enter their own PIN or biometric). This prevents a child from setting up their own profile without parental approval. The parent gate only appears on first setup — not on every subsequent login.</span>
+    </div>
+
+    <!-- Flow overview -->
+    <div class="flow-steps" style="margin-bottom:32px">
+      <div class="flow-step active">
+        <div class="flow-dot">👤</div>
+        <div class="flow-label">Parent approves</div>
+        <div class="flow-sub">One-time gate</div>
+        <div><span class="flow-tag tag-new">Security</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">👋</div>
+        <div class="flow-label">Hello screen</div>
+        <div class="flow-sub">10 sec</div>
+        <div><span class="flow-tag tag-new">Fun</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">🔢</div>
+        <div class="flow-label">Set PIN</div>
+        <div class="flow-sub">30 sec</div>
+        <div><span class="flow-tag tag-new">Security</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">🗺️</div>
+        <div class="flow-label">Quick tour</div>
+        <div class="flow-sub">20 sec</div>
+        <div><span class="flow-tag tag-new">Orientation</span></div>
+      </div>
+      <div class="flow-step active">
+        <div class="flow-dot">⭐</div>
+        <div class="flow-label">First chore</div>
+        <div class="flow-sub">Land on dashboard</div>
+        <div><span class="flow-tag tag-new">Engagement</span></div>
+      </div>
+    </div>
+
+    <!-- Step C1 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">C1</div>
+        <div class="step-header-text">
+          <h3>Parent Approval Gate</h3>
+          <p>Parent authenticates before the child can proceed with first-time setup.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-required">Security</span></div>
+      </div>
+      <div class="step-body">
+        <p>When a child taps their avatar for the first time (no PIN set yet), the app pauses and asks the supervising parent to confirm they're present and approve the setup. The parent enters their own PIN or uses biometric — then hands the device to the child.</p>
+
+        <div class="mockup">
+          <div style="text-align:center;font-size:44px;margin-bottom:12px">🦊</div>
+          <div class="mockup-heading" style="font-size:17px">Setting up Mia's account</div>
+          <div class="mockup-sub">A parent needs to approve this first.<br>Please enter your PIN to continue.</div>
+
+          <div style="display:flex;justify-content:center;gap:10px;margin:20px 0">
+            <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
+            <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
+            <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
+            <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
+          </div>
+
+          <div style="font-size:12px;color:#94a3b8;text-align:center;margin-bottom:14px">Enter <strong>your</strong> PIN (parent)</div>
+
+          <div style="text-align:center">
+            <button style="background:none;border:none;color:#0d9488;font-size:13px;font-weight:600;cursor:pointer">← Switch profile</button>
+          </div>
+        </div>
+
+        <div class="callout idea">
+          <span class="callout-icon">💡</span>
+          <span class="callout-body"><strong>Biometric shortcut:</strong> If the parent has Face ID or fingerprint enabled on their account, they can use that instead of the PIN — making approval faster and less disruptive to the handover moment.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step C2 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">C2</div>
+        <div class="step-header-text">
+          <h3>Hello, [Name]! 👋</h3>
+          <p>A warm, personalised welcome — fun and age-appropriate.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New</span></div>
+      </div>
+      <div class="step-body">
+        <p>Once the parent approves, the screen transitions to the child's welcome. Big emoji, their name, bright colours. No text-heavy explanation — just excitement and one button to press.</p>
+
+        <div class="mockup" style="background:linear-gradient(160deg,#f0fdfa,#ecfeff);border-color:#ccfbf1">
+          <div style="text-align:center;font-size:64px;margin-bottom:16px;animation:bounce 1s">🦊</div>
+          <div style="text-align:center;font-size:24px;font-weight:800;color:#0f172a;margin-bottom:8px">Hi Mia! 👋</div>
+          <div style="text-align:center;font-size:14px;color:#475569;margin-bottom:24px">Welcome to your Toto. Let's get you set up!</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+            <div style="display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:12px;border:1px solid #e2e8f0">
+              <span style="font-size:20px">📋</span>
+              <span style="font-size:13px;font-weight:600;color:#374151">Your chores &amp; how to earn coins</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:12px;border:1px solid #e2e8f0">
+              <span style="font-size:20px">🏆</span>
+              <span style="font-size:13px;font-weight:600;color:#374151">Prizes you can win</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:12px;border:1px solid #e2e8f0">
+              <span style="font-size:20px">🍱</span>
+              <span style="font-size:13px;font-weight:600;color:#374151">Your lunchbox this week</span>
+            </div>
+          </div>
+          <button class="mockup-btn-primary" style="width:100%;font-size:15px;padding:13px">Let's go! →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step C3 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">C3</div>
+        <div class="step-header-text">
+          <h3>Set Your PIN 🔢</h3>
+          <p>The child picks their own 4-digit secret code.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-required">Security</span></div>
+      </div>
+      <div class="step-body">
+        <p>Keep the language fun and child-friendly — "secret code" not "PIN". They enter it twice to confirm. If they mismatch, show a friendly animated prompt to try again. The PIN is hashed server-side immediately and never stored in plain text.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:16px 0;align-items:start">
+
+          <div class="mockup" style="margin:0">
+            <div style="text-align:center;font-size:32px;margin-bottom:10px">🔢</div>
+            <div class="mockup-heading" style="font-size:16px">Choose your secret code</div>
+            <div class="mockup-sub" style="font-size:12px">Pick 4 numbers only you know!</div>
+            <div style="display:flex;justify-content:center;gap:8px;margin:18px 0">
+              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+              <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc"></div>
+              <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:180px;margin:0 auto">
+              ${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(n=>`<div style="height:42px;border:1.5px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#374151;cursor:pointer;background:#fff">${n}</div>`).join('')}
+            </div>
+          </div>
+
+          <div class="mockup" style="margin:0">
+            <div style="text-align:center;font-size:32px;margin-bottom:10px">✅</div>
+            <div class="mockup-heading" style="font-size:16px">Type it again</div>
+            <div class="mockup-sub" style="font-size:12px">Just to make sure!</div>
+            <div style="display:flex;justify-content:center;gap:8px;margin:18px 0">
+              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+            </div>
+            <div style="text-align:center;margin-top:12px">
+              <div style="font-size:22px;margin-bottom:6px">🎉</div>
+              <div style="font-size:13px;font-weight:700;color:#16a34a">Secret code set!</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <span class="callout-body"><strong>Common PINs:</strong> Reject 1234, 0000, 1111 and similar trivially-guessable codes with a friendly message: "That one's too easy to guess — try something more secret!" Don't explain why in security terms; just make it playful.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step C4 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">C4</div>
+        <div class="step-header-text">
+          <h3>Quick Tour — What's in Here? 🗺️</h3>
+          <p>Three swipeable screens showing what the child's view contains.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New</span></div>
+      </div>
+      <div class="step-body">
+        <p>Large visuals, minimal text, age-appropriate language. Each screen introduces one feature area. The child can tap through quickly or swipe to skip.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin:16px 0">
+          <div class="mockup" style="margin:0;padding:18px;background:linear-gradient(160deg,#fef9c3,#fde68a)">
+            <div style="text-align:center;font-size:36px;margin-bottom:8px">⭐</div>
+            <div style="font-size:13px;font-weight:800;text-align:center;margin-bottom:6px;color:#92400e">Earn coins!</div>
+            <div style="font-size:11px;color:#78350f;text-align:center;line-height:1.5">Do your chores to collect coins. Save up for prizes!</div>
+          </div>
+          <div class="mockup" style="margin:0;padding:18px;background:linear-gradient(160deg,#ede9fe,#ddd6fe)">
+            <div style="text-align:center;font-size:36px;margin-bottom:8px">🏆</div>
+            <div style="font-size:13px;font-weight:800;text-align:center;margin-bottom:6px;color:#5b21b6">Prize store</div>
+            <div style="font-size:11px;color:#4c1d95;text-align:center;line-height:1.5">See what you can win and how many coins you need.</div>
+          </div>
+          <div class="mockup" style="margin:0;padding:18px;background:linear-gradient(160deg,#ecfeff,#cffafe)">
+            <div style="text-align:center;font-size:36px;margin-bottom:8px">🍱</div>
+            <div style="font-size:13px;font-weight:800;text-align:center;margin-bottom:6px;color:#0e7490">Lunchbox</div>
+            <div style="font-size:11px;color:#155e75;text-align:center;line-height:1.5">See what's in your lunchbox each day this week.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step C5 -->
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-number">C5</div>
+        <div class="step-header-text">
+          <h3>Land on the Child Dashboard ⭐</h3>
+          <p>The first thing the child sees when they enter their Toto.</p>
+        </div>
+        <div class="step-badge"><span class="pill pill-new">New</span></div>
+      </div>
+      <div class="step-body">
+        <p>The child's home screen is a simplified, visual-first dashboard. If a parent has already set up chores, the first chore is immediately visible and actionable — instant engagement. If no chores exist yet, a friendly prompt asks the child to ask mum or dad to add some.</p>
+
+        <div class="mockup" style="background:linear-gradient(160deg,#f0fdfa,#ecfeff);max-width:360px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fef9c3,#fde68a);display:flex;align-items:center;justify-content:center;font-size:22px">🦊</div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:#1e293b">Hey Mia! 👋</div>
+              <div style="font-size:12px;color:#64748b">You have 2 chores today</div>
+            </div>
+            <div style="margin-left:auto;text-align:right">
+              <div style="font-size:18px;font-weight:800;color:#eab308">⭐ 24</div>
+              <div style="font-size:10px;color:#64748b">coins</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:10px">Today's chores</div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border-radius:12px;margin-bottom:8px;border:1.5px solid #e2e8f0;cursor:pointer">
+            <div style="width:36px;height:36px;border-radius:50%;background:#fef9c3;display:flex;align-items:center;justify-content:center;font-size:18px">🛏️</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Make my bed</div>
+              <div style="font-size:11px;color:#64748b">+5 ⭐ coins</div>
+            </div>
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #0d9488;display:flex;align-items:center;justify-content:center;color:#0d9488;font-size:14px;cursor:pointer">✓</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f0fdf4;border-radius:12px;margin-bottom:16px;border:1.5px solid #86efac">
+            <div style="width:36px;height:36px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;font-size:18px">🍽️</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:#16a34a;text-decoration:line-through">Clear the table</div>
+              <div style="font-size:11px;color:#16a34a">Done! +3 ⭐</div>
+            </div>
+            <div style="width:28px;height:28px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px">✓</div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:10px">This week's lunchbox</div>
+          <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px">
+            ${['Mon','Tue','Wed','Thu','Fri'].map((d,i) => `<div style="min-width:54px;background:#fff;border-radius:10px;padding:8px 6px;text-align:center;border:1px solid #e2e8f0"><div style="font-size:9px;font-weight:600;color:#94a3b8;margin-bottom:4px">${d}</div><div style="font-size:16px">${['🥪','🍱','🌯','🥗','🥙'][i]}</div></div>`).join('')}
+          </div>
+        </div>
+
+        <div class="callout success" style="margin-top:16px">
+          <span class="callout-icon">✅</span>
+          <span class="callout-body"><strong>Chore completion flow for kids:</strong> When a child taps the tick on a chore, it goes to "Pending approval" — the parent gets a notification and approves it from their own dashboard. The coins appear once approved, not instantly. This keeps parents in control of the reward loop.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIN reset -->
+    <h3 style="margin-top:32px;margin-bottom:12px">PIN Reset — Parent-Controlled</h3>
+    <p>If a child forgets their PIN, a parent resets it from Settings → Household → [Child name] → Reset PIN. The parent re-authenticates with their own credentials, then the child goes through PIN setup (step C3) again. The child never resets their own PIN without parent involvement.</p>
+
+    <div class="field-grid" style="margin-top:12px">
+      <div class="field">
+        <div class="field-label">Forgotten PIN</div>
+        <div class="field-value">Parent resets from Settings</div>
+        <div class="field-note">Child cannot self-serve — always requires parent re-auth</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Failed attempts</div>
+        <div class="field-value">3 tries → 30s lockout</div>
+        <div class="field-note">After 10 total failures, PIN is locked until parent resets</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Parent notification</div>
+        <div class="field-value">Push after 3 failures</div>
+        <div class="field-note">"Someone tried to log in as Mia 3 times — was that you?"</div>
+      </div>
+      <div class="field">
+        <div class="field-label">Session length</div>
+        <div class="field-value">Stays logged in on device</div>
+        <div class="field-note">Parent can force-logout from Settings at any time</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ── Auto-wrap sections into collapsible containers ──
+  document.querySelectorAll('section[id]').forEach((section, idx) => {
+    const h2 = section.querySelector('h2');
+    if (!h2) return;
+
+    const id     = section.id;
+    const title  = h2.textContent.trim();
+    const num    = String(idx + 1).padStart(2, '0');
+
+    // Extract subtitle from first <p> after h2 if it exists
+    let sub = '';
+    const firstP = h2.nextElementSibling;
+    if (firstP && firstP.tagName === 'P') sub = firstP.textContent.trim().slice(0, 90);
+
+    // Build wrapper
+    const wrapper = document.createElement('div');
+    wrapper.className = 'collapsible-section open';
+    wrapper.id = 'wrap-' + id;
+
+    const toggle = document.createElement('div');
+    toggle.className = 'section-toggle';
+    toggle.innerHTML = `
+      <div class="section-toggle-left">
+        <div class="section-num">${num}</div>
+        <div>
+          <div class="section-toggle-title">${title}</div>
+          ${sub ? `<div class="section-toggle-sub">${sub}${sub.length >= 90 ? '…' : ''}</div>` : ''}
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>`;
+
+    const body = document.createElement('div');
+    body.className = 'section-body open';
+
+    // Move all children from section into body (skip h2 + first p if used as sub)
+    const children = Array.from(section.childNodes);
+    children.forEach(child => {
+      if (child === h2) return;
+      if (child === firstP && sub) return;
+      body.appendChild(child);
+    });
+
+    // Clear the original section and replace
+    section.innerHTML = '';
+    section.className = '';
+    section.removeAttribute('id');
+    section.style.marginBottom = '0';
+
+    wrapper.appendChild(toggle);
+    wrapper.appendChild(body);
+    section.parentNode.replaceChild(wrapper, section);
+
+    // Add anchor for nav links
+    wrapper.setAttribute('id', id);
+
+    // Toggle click
+    toggle.addEventListener('click', () => {
+      const isOpen = wrapper.classList.contains('open');
+      wrapper.classList.toggle('open', !isOpen);
+      body.classList.toggle('open', !isOpen);
+      toggle.querySelector('.section-chevron').classList.toggle('open', !isOpen);
+    });
+  });
+
+  // ── Collapse all / Expand all buttons ──
+  const ctrlBar = document.createElement('div');
+  ctrlBar.style.cssText = 'max-width:900px;margin:0 auto 20px;padding:0 24px;display:flex;gap:10px;justify-content:flex-end';
+  ctrlBar.innerHTML = `
+    <button onclick="setAll(true)"  style="font-size:12px;font-weight:600;padding:6px 14px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;cursor:pointer">Expand all</button>
+    <button onclick="setAll(false)" style="font-size:12px;font-weight:600;padding:6px 14px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;cursor:pointer">Collapse all</button>`;
+  document.querySelector('.container').prepend(ctrlBar);
+
+  window.setAll = (open) => {
+    document.querySelectorAll('.collapsible-section').forEach(w => {
+      w.classList.toggle('open', open);
+      const body = w.querySelector('.section-body');
+      const chev = w.querySelector('.section-chevron');
+      if (body) body.classList.toggle('open', open);
+      if (chev) chev.classList.toggle('open', open);
+    });
+  };
+</script>
+</body>
+</html>

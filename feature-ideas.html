@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Feature Ideas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:      #0d9488;
+      --teal-lt:   #f0fdfa;
+      --teal-bd:   #ccfbf1;
+      --slate:     #1e293b;
+      --muted:     #64748b;
+      --border:    #e2e8f0;
+      --surface:   #f8fafc;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      display: flex; align-items: center; gap: 8px;
+      height: 56px; z-index: 200; overflow-x: auto;
+    }
+    .nav-brand { font-weight: 800; font-size: 15px; color: var(--teal); white-space: nowrap; flex-shrink: 0; margin-right: 8px; }
+    nav a {
+      font-size: 12px; color: var(--muted); text-decoration: none;
+      padding: 5px 10px; border-radius: 6px;
+      transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+    }
+    nav a:hover { background: var(--teal-lt); color: var(--teal); }
+
+    /* ── Layout ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 44px 24px 100px; }
+
+    h1 { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 15px; margin-bottom: 8px; }
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--slate); }
+    p  { color: #475569; font-size: 14px; margin-bottom: 10px; }
+    p:last-child { margin-bottom: 0; }
+    ul { color: #475569; font-size: 14px; padding-left: 20px; margin-bottom: 10px; }
+    ul li { margin-bottom: 4px; }
+
+    /* ── Vision banner ── */
+    .vision {
+      background: linear-gradient(135deg, #0f172a, #1e3a5f);
+      border-radius: 16px; padding: 28px 32px; margin-bottom: 32px;
+      color: #fff;
+    }
+    .vision-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .vision-text { font-size: 20px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
+    .vision-sub { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+
+    /* ── Priority band ── */
+    .priority-band {
+      display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .priority-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 99px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid;
+    }
+    .p-now    { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+    .p-next   { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .p-later  { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
+    .p-vision { background: var(--teal-lt); color: var(--teal); border-color: var(--teal-bd); }
+
+    /* ── Ctrl bar ── */
+    .ctrl-bar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 16px; }
+    .ctrl-btn { font-size: 12px; font-weight: 600; padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 8px; background: #fff; color: var(--muted); cursor: pointer; }
+    .ctrl-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── Collapsible sections ── */
+    .collapsible-section { margin-bottom: 12px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+    .section-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none;
+      padding: 15px 20px; background: #fff; gap: 12px;
+      transition: background 0.15s;
+    }
+    .section-toggle:hover { background: var(--teal-lt); }
+    .collapsible-section.open .section-toggle { background: var(--teal-lt); border-bottom: 1px solid var(--teal-bd); }
+    .section-toggle-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .section-icon { font-size: 22px; flex-shrink: 0; }
+    .section-toggle-title { font-size: 15px; font-weight: 700; color: var(--slate); }
+    .section-toggle-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .section-toggle-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .section-chevron { font-size: 11px; color: var(--teal); transition: transform 0.25s ease; }
+    .collapsible-section.open .section-chevron { transform: rotate(180deg); }
+    .section-body { display: none; background: #fff; padding: 22px 22px 26px; }
+    .section-body.open { display: block; }
+
+    /* ── Priority tag ── */
+    .ptag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+      padding: 2px 8px; border-radius: 99px; border: 1px solid; white-space: nowrap;
+    }
+    .ptag-now    { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+    .ptag-next   { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .ptag-later  { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
+    .ptag-vision { background: var(--teal-lt); color: var(--teal); border-color: var(--teal-bd); }
+
+    /* ── Callouts ── */
+    .callout { display: flex; gap: 12px; padding: 13px 16px; border-radius: 10px; margin: 14px 0; font-size: 13px; }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { color: #374151; }
+    .callout-body strong { color: var(--slate); }
+    .callout.idea   { background: var(--teal-lt);   border: 1px solid var(--teal-bd); }
+    .callout.note   { background: #f0f9ff;           border: 1px solid #bae6fd; }
+    .callout.impact { background: #fdf4ff;           border: 1px solid #e9d5ff; }
+
+    /* ── Feature list ── */
+    .feature-list { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .feature-bullet { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .feature-text { font-size: 13px; color: #374151; }
+    .feature-text strong { color: var(--slate); }
+
+    /* ── Field grid ── */
+    .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 600px) { .fg { grid-template-columns: 1fr; } }
+    .field { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 4px; }
+    .field-value { font-size: 13px; color: #334155; }
+
+    /* ── Today screen preview ── */
+    .today-preview {
+      background: linear-gradient(160deg, #0f172a, #1e3a5f);
+      border-radius: 20px; padding: 20px;
+      max-width: 360px; margin: 20px auto;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+    }
+    .today-greeting { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .today-name { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 16px; }
+    .today-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+    }
+    .today-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    .today-card-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 13px; color: rgba(255,255,255,0.85); }
+    .today-card-row:last-child { margin: 0; }
+    .today-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Roadmap table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 14px 0; }
+    th { text-align: left; padding: 9px 12px; background: var(--surface); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    tr:last-child td { border: none; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Toto</span>
+  <a href="#vision">Vision</a>
+  <a href="#today">Today Screen</a>
+  <a href="#calendar">Calendar</a>
+  <a href="#shopping">Shopping List</a>
+  <a href="#routines">Routines</a>
+  <a href="#health">Health</a>
+  <a href="#noticeboard">Noticeboard</a>
+  <a href="#pets">Pets</a>
+  <a href="#countdowns">Countdowns</a>
+  <a href="#receipts">Receipts</a>
+  <a href="#school">School Hub</a>
+  <a href="#roadmap">Roadmap</a>
+</nav>
+
+<div class="container">
+
+  <h1>Toto — Feature Ideas</h1>
+  <p class="subtitle">Captured ideas for what Toto should become. Organised by impact on the core vision.</p>
+
+  <!-- Vision banner -->
+  <div class="vision">
+    <div class="vision-label">The vision</div>
+    <div class="vision-text">"The first application someone interacts with when they wake up."</div>
+    <div class="vision-sub">To achieve this, Toto must shift from a household <em>tracker</em> — something you open when you need to update something — to a household <em>briefing</em>: something that tells you what today looks like before the chaos starts. The features below are ordered by how directly they serve that shift.</div>
+  </div>
+
+  <!-- Priority key -->
+  <div class="priority-band">
+    <div class="priority-pill p-now">🔴 Do first — unlocks the vision</div>
+    <div class="priority-pill p-next">🟡 Do next — high daily frequency</div>
+    <div class="priority-pill p-later">🔵 Do later — high value, lower urgency</div>
+    <div class="priority-pill p-vision">🟢 Long-term — differentiating</div>
+  </div>
+
+  <div class="ctrl-bar">
+    <button class="ctrl-btn" onclick="setAll(true)">Expand all</button>
+    <button class="ctrl-btn" onclick="setAll(false)">Collapse all</button>
+  </div>
+
+  <!-- ─── THE CORE PROBLEM ─── -->
+  <div class="collapsible-section open" id="vision">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">🎯</div>
+        <div>
+          <div class="section-toggle-title">Why "first app" requires a different approach</div>
+          <div class="section-toggle-sub">The shift from tracker to morning briefing</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-now">Foundation</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Toto is currently excellent at <strong>tracking</strong> — money, tasks, home, kids. But tracking is reactive. You open it when something needs updating. That's a weekly or monthly habit, not a daily one.</p>
+
+      <p>The apps people open first thing every morning share one trait: they <strong>tell you something you need to know right now</strong>. Weather tells you how to dress. Calendar tells you what's happening today. Messages tell you what you missed. They reduce cognitive load before the day begins.</p>
+
+      <div class="fg">
+        <div class="field" style="background:#fef2f2;border-color:#fca5a5">
+          <div class="field-label" style="color:#dc2626">Toto today — reactive</div>
+          <div class="field-value" style="margin-top:6px;line-height:1.8">
+            You open it to log a bill<br>
+            You open it to check a goal<br>
+            You open it to update a chore<br>
+            <strong>Weekly or monthly habit</strong>
+          </div>
+        </div>
+        <div class="field" style="background:#f0fdf4;border-color:#bbf7d0">
+          <div class="field-label" style="color:#16a34a">Toto with vision — proactive</div>
+          <div class="field-value" style="margin-top:6px;line-height:1.8">
+            You open it to see what today holds<br>
+            You open it to check tonight's dinner<br>
+            You open it because your kids need to<br>
+            <strong>Daily — first thing every morning</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>The pattern:</strong> Every feature idea below was evaluated against one question — does it create a reason to open Toto every single morning? The features that answer yes most strongly are marked "Do first". Features that add value but wouldn't be checked daily are marked for later.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 1. TODAY SCREEN ─── -->
+  <div class="collapsible-section open" id="today">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">☀️</div>
+        <div>
+          <div class="section-toggle-title">The "Today" Screen — Morning Dashboard</div>
+          <div class="section-toggle-sub">A single screen that tells you everything you need to start the day</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-now">Do first</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>The single most important addition. One screen — personalised per adult — that digests everything relevant to <em>today</em> and surfaces it in one place. It replaces five different mental checks people currently do across five different apps in the first 10 minutes of their morning.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">🌤️</div><div class="feature-text"><strong>Weather:</strong> Temperature, conditions, and a simple note if it affects plans — "Mia has swimming, pack a towel"</div></div>
+        <div class="feature-item"><div class="feature-bullet">📅</div><div class="feature-text"><strong>Today's schedule:</strong> Everyone's appointments, school events, and activities pulled from the shared calendar</div></div>
+        <div class="feature-item"><div class="feature-bullet">🍝</div><div class="feature-text"><strong>Tonight's dinner:</strong> Pulled from the meal plan with a tap to view the recipe or shopping list</div></div>
+        <div class="feature-item"><div class="feature-bullet">📋</div><div class="feature-text"><strong>Kids' chores due today:</strong> Which kid has what outstanding — tap to open their chore view</div></div>
+        <div class="feature-item"><div class="feature-bullet">💸</div><div class="feature-text"><strong>Financial alerts:</strong> Bills due today or in the next 3 days, any budget category close to its limit</div></div>
+        <div class="feature-item"><div class="feature-bullet">⏳</div><div class="feature-text"><strong>Adult tasks with deadlines:</strong> Any task due today for either adult, without revealing private details</div></div>
+        <div class="feature-item"><div class="feature-bullet">🎉</div><div class="feature-text"><strong>Celebrations:</strong> Birthdays, anniversaries, countdowns — gives the screen a positive emotional tone</div></div>
+        <div class="feature-item"><div class="feature-bullet">⚠️</div><div class="feature-text"><strong>Gentle alerts:</strong> Vehicle rego expiring, document due for renewal, upcoming project stage payment</div></div>
+      </div>
+
+      <!-- Today screen preview -->
+      <div class="today-preview">
+        <div class="today-greeting">Thursday, 24 April</div>
+        <div class="today-name">Good morning, Chris ☀️</div>
+
+        <div class="today-card">
+          <div class="today-card-label">Weather</div>
+          <div class="today-card-row">🌤️ 22° — partly cloudy · Mia has swimming, pack a towel</div>
+        </div>
+
+        <div class="today-card">
+          <div class="today-card-label">Today's schedule</div>
+          <div class="today-card-row"><div class="today-dot" style="background:#0d9488"></div>8:45am — School drop-off</div>
+          <div class="today-card-row"><div class="today-dot" style="background:#7c3aed"></div>3:30pm — Mia swimming</div>
+          <div class="today-card-row"><div class="today-dot" style="background:#d97706"></div>6:00pm — Dinner reservation</div>
+        </div>
+
+        <div class="today-card">
+          <div class="today-card-label">Tonight's dinner</div>
+          <div class="today-card-row">🍝 Spaghetti Bolognese · 2 items to grab</div>
+        </div>
+
+        <div class="today-card">
+          <div class="today-card-label">Alerts</div>
+          <div class="today-card-row"><div class="today-dot" style="background:#dc2626"></div>Electricity bill due today — $210</div>
+          <div class="today-card-row"><div class="today-dot" style="background:#d97706"></div>Mia has 2 chores outstanding</div>
+          <div class="today-card-row"><div class="today-dot" style="background:#0d9488"></div>57 days until Bali 🌴</div>
+        </div>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>This is the entry point.</strong> Every other feature idea in this document feeds content into the Today screen. Build this first, even with placeholder sections, so users have a reason to open Toto every morning from day one. The other features fill it in over time.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2. CALENDAR ─── -->
+  <div class="collapsible-section open" id="calendar">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">📅</div>
+        <div>
+          <div class="section-toggle-title">Shared Family Calendar</div>
+          <div class="section-toggle-sub">The most glaring gap — without this, people will always open their phone calendar first</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-now">Do first</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Toto has a planner but not a true shared family calendar. This is the most significant missing feature given the vision. A shared calendar is the backbone of household coordination — it's what everyone needs to see every single morning.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">👨‍👩‍👧‍👦</div><div class="feature-text"><strong>Per-person colour coding:</strong> Each household member has a colour — overlay everyone's events to see where the day gets complex</div></div>
+        <div class="feature-item"><div class="feature-bullet">🔄</div><div class="feature-text"><strong>Two-way sync with phone calendar:</strong> Import from Google Calendar and Apple Calendar so users don't have to re-enter what's already there</div></div>
+        <div class="feature-item"><div class="feature-bullet">🏫</div><div class="feature-text"><strong>School term dates:</strong> Add the school calendar so term breaks, pupil-free days, and events are visible to both adults automatically</div></div>
+        <div class="feature-item"><div class="feature-bullet">🔁</div><div class="feature-text"><strong>Recurring events:</strong> Weekly sport, fortnightly piano lesson, monthly date night — set once, appears every time</div></div>
+        <div class="feature-item"><div class="feature-bullet">☀️</div><div class="feature-text"><strong>Feeds the Today screen:</strong> Today's events pull directly from this calendar — it's the source of truth for the morning briefing</div></div>
+        <div class="feature-item"><div class="feature-bullet">💸</div><div class="feature-text"><strong>Budget-aware events:</strong> Tag an event with a cost estimate ("Mia's school camp — $180") so it shows in the financial forecast</div></div>
+      </div>
+
+      <div class="callout note">
+        <span class="callout-icon">ℹ️</span>
+        <span class="callout-body"><strong>Why this can't be skipped:</strong> Without a shared calendar, the Today screen has no schedule data. Without a schedule, Toto can't be a morning app — people will always open their phone calendar first, which means Toto is never first. The calendar and the Today screen are co-dependent.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 3. SHOPPING LIST ─── -->
+  <div class="collapsible-section open" id="shopping">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">🛒</div>
+        <div>
+          <div class="section-toggle-title">Shared Shopping List</div>
+          <div class="section-toggle-sub">The highest-frequency daily touchpoint in any household</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-now">Do first</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>A real-time shared shopping list is one of the most frequent daily interactions in any household. Right now Toto has a shopping list buried inside Meals but it's tied to the meal plan. A standalone, always-accessible list — available from the Today screen and the nav — would create a daily reason to open Toto even when nothing financial is happening.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">⚡</div><div class="feature-text"><strong>Quick-add from anywhere:</strong> Add "milk" in two taps from the Today screen, without navigating to Meals</div></div>
+        <div class="feature-item"><div class="feature-bullet">🍝</div><div class="feature-text"><strong>Auto-populate from meal plan:</strong> When tonight's dinner is set, the missing ingredients are automatically added to the list</div></div>
+        <div class="feature-item"><div class="feature-bullet">🔄</div><div class="feature-text"><strong>Real-time sync:</strong> Both adults see additions and tick-offs instantly — no more "I already got that" moments</div></div>
+        <div class="feature-item"><div class="feature-bullet">🏪</div><div class="feature-text"><strong>Aisle grouping:</strong> Group items by supermarket section (produce, dairy, bakery) to speed up the shop</div></div>
+        <div class="feature-item"><div class="feature-bullet">📋</div><div class="feature-text"><strong>Saved favourites:</strong> Items bought regularly appear as quick-add suggestions — "the usual" list auto-loads</div></div>
+        <div class="feature-item"><div class="feature-bullet">💰</div><div class="feature-text"><strong>Estimated total:</strong> Optional price estimates per item give a rough trolley total before checkout</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 4. ROUTINES ─── -->
+  <div class="collapsible-section open" id="routines">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">⏰</div>
+        <div>
+          <div class="section-toggle-title">Morning &amp; Evening Routines</div>
+          <div class="section-toggle-sub">Checklists that reset daily — especially for chaotic school mornings</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-now">Do first</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>School mornings are chaotic. A routine checklist that resets each day and is shared between both adults would be checked every single morning without fail. This is perhaps the purest expression of the "first app you open" vision — it literally helps you get out the door.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">🎒</div><div class="feature-text"><strong>Per-child school morning checklist:</strong> Lunch packed, bag packed, signed permission form in bag, sports gear, instrument — customisable per child, resets every school day</div></div>
+        <div class="feature-item"><div class="feature-bullet">👩‍💼</div><div class="feature-text"><strong>Adult morning routine:</strong> Personal checklist — "take medication", "check emails before 9am", "school payment due today" — private per adult</div></div>
+        <div class="feature-item"><div class="feature-bullet">🌙</div><div class="feature-text"><strong>Evening routine:</strong> "Pack tomorrow's lunches", "check tomorrow's schedule", "put bins out" — prompts at a set time each evening</div></div>
+        <div class="feature-item"><div class="feature-bullet">📅</div><div class="feature-text"><strong>Day-aware variations:</strong> Monday routine vs Friday routine can differ — "Music on Thursdays, pack recorder"</div></div>
+        <div class="feature-item"><div class="feature-bullet">🔔</div><div class="feature-text"><strong>Leave-time alert:</strong> "School starts at 8:45 — leave in 12 minutes" calculated from home address and school location</div></div>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Why this drives the morning habit:</strong> A parent who opens Toto to tick off the school morning checklist is opening it every single day. Once that habit exists, the Today screen, shopping list, and everything else gets seen daily for free.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5. HEALTH ─── -->
+  <div class="collapsible-section open" id="health">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">🏥</div>
+        <div>
+          <div class="section-toggle-title">Health &amp; Medical Hub</div>
+          <div class="section-toggle-sub">Family health records, medication reminders, and appointment tracking</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-next">Do next</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Families have a surprising amount of health admin — immunisation schedules, prescription refills, GP appointments, allergy records, insurance details. This information currently lives across a GP's patient portal, a notes app, the fridge, and memory. Centralising it in Toto would be genuinely useful and creates morning engagement through medication reminders.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">💊</div><div class="feature-text"><strong>Medication reminders:</strong> Daily push notifications for prescriptions, vitamins, or supplements — morning reminders drive daily app opens</div></div>
+        <div class="feature-item"><div class="feature-bullet">💉</div><div class="feature-text"><strong>Vaccination records:</strong> Per-person immunisation history with due-date reminders for next scheduled vaccines</div></div>
+        <div class="feature-item"><div class="feature-bullet">🩺</div><div class="feature-text"><strong>Appointment tracker:</strong> GP, dentist, specialist visits stored per person and fed into the shared calendar</div></div>
+        <div class="feature-item"><div class="feature-bullet">🚨</div><div class="feature-text"><strong>Allergy &amp; condition records:</strong> Quick-reference card per family member — critical for school camps, emergencies, new carers</div></div>
+        <div class="feature-item"><div class="feature-bullet">🔁</div><div class="feature-text"><strong>Prescription refill reminders:</strong> "Riley's asthma puffer is almost due for a refill" based on days supply entered at fill time</div></div>
+        <div class="feature-item"><div class="feature-bullet">📋</div><div class="feature-text"><strong>Linked to Home documents:</strong> Health insurance card, Medicare card, and private health details stored in the existing Documents section</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 6. NOTICEBOARD ─── -->
+  <div class="collapsible-section open" id="noticeboard">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">📌</div>
+        <div>
+          <div class="section-toggle-title">Family Noticeboard / Message Thread</div>
+          <div class="section-toggle-sub">Household communication in one place, separate from personal messages</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-next">Do next</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Household logistics currently pollute personal message threads. "Can you grab bread", "Don't forget Mia has swimming", "I paid the electricity" — these messages matter to the whole household but get lost in individual chats. A dedicated family thread keeps household communication visible to everyone who needs it, with a shared record.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">💬</div><div class="feature-text"><strong>Household thread:</strong> A single shared message thread for all adults — not a replacement for iMessage, but a dedicated household channel</div></div>
+        <div class="feature-item"><div class="feature-bullet">📌</div><div class="feature-text"><strong>Pinned notes:</strong> Important messages can be pinned to the top — "School is closed Friday", "Don't forget Sam's birthday dinner Saturday"</div></div>
+        <div class="feature-item"><div class="feature-bullet">⚡</div><div class="feature-text"><strong>Quick reactions:</strong> Thumbs up / thumbs down / 👀 reactions so you can acknowledge without a full reply</div></div>
+        <div class="feature-item"><div class="feature-bullet">🔗</div><div class="feature-text"><strong>Linked to Toto items:</strong> Share a bill, a chore, or an event directly into the thread — "This week's budget is tight, see here →"</div></div>
+        <div class="feature-item"><div class="feature-bullet">👶</div><div class="feature-text"><strong>Kid-visible announcements:</strong> Optionally push a pinned note to kids' Today screens — "Family movie night tonight 🍿"</div></div>
+      </div>
+
+      <div class="callout note">
+        <span class="callout-icon">ℹ️</span>
+        <span class="callout-body"><strong>Scope note:</strong> This should be a simple notice board, not a full chat app. The value is in the dedicated context — household messages that don't get buried in personal threads — not in feature parity with WhatsApp.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 7. PETS ─── -->
+  <div class="collapsible-section open" id="pets">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">🐾</div>
+        <div>
+          <div class="section-toggle-title">Pet Management</div>
+          <div class="section-toggle-sub">Vet records, medication, and care reminders for family pets</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-next">Do next</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Most families with children also have pets. Pets have their own admin — vet appointments, flea and worming schedules, medication, grooming, insurance. Currently completely absent from Toto. A Pets section under Home would be immediately relevant to a large portion of the target audience and creates recurring reminders that bring people back to the app.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">🐶</div><div class="feature-text"><strong>Pet profiles:</strong> Name, breed, date of birth, microchip number, insurance details — one card per pet</div></div>
+        <div class="feature-item"><div class="feature-bullet">💊</div><div class="feature-text"><strong>Medication &amp; treatment reminders:</strong> Monthly flea and worming schedules with push reminders — drives regular app opens</div></div>
+        <div class="feature-item"><div class="feature-bullet">🩺</div><div class="feature-text"><strong>Vet appointment history:</strong> Log of visits, vaccinations, and next due dates — linked to the shared calendar</div></div>
+        <div class="feature-item"><div class="feature-bullet">📋</div><div class="feature-text"><strong>Care notes:</strong> Feeding schedule, dietary requirements, emergency vet contact — accessible to babysitters and pet sitters</div></div>
+        <div class="feature-item"><div class="feature-bullet">💰</div><div class="feature-text"><strong>Pet costs tracked:</strong> Vet bills, food, grooming logged as a budget category — surfaces the true cost of pet ownership</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 8. COUNTDOWNS ─── -->
+  <div class="collapsible-section open" id="countdowns">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">🎉</div>
+        <div>
+          <div class="section-toggle-title">Countdowns &amp; Celebrations</div>
+          <div class="section-toggle-sub">Emotional engagement — Toto should feel good to open, not just informative</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-next">Do next</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Toto should feel good to open, not just informative. A countdowns feature on the Today screen gives it a positive emotional tone in the morning. "57 days until Bali 🌴" alongside the bills and chores changes how the app feels to start your day. Over time it becomes a place that makes you feel excited about your life, not just managed by it.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">🌴</div><div class="feature-text"><strong>Holiday countdown:</strong> Linked to a calendar event — "57 days until Bali". The savings goal for that holiday can be linked too</div></div>
+        <div class="feature-item"><div class="feature-bullet">🎂</div><div class="feature-text"><strong>Birthday reminders:</strong> Family birthdays surfaced 7 days ahead on the Today screen — never forget a birthday again</div></div>
+        <div class="feature-item"><div class="feature-bullet">💍</div><div class="feature-text"><strong>Anniversaries:</strong> Wedding anniversary, dating anniversary — quietly noted on the Today screen the morning of</div></div>
+        <div class="feature-item"><div class="feature-bullet">🏆</div><div class="feature-text"><strong>Milestone celebrations:</strong> When a savings goal is hit, a project stage is paid, or a budget category stays green for a month — a small celebration moment</div></div>
+        <div class="feature-item"><div class="feature-bullet">🗓️</div><div class="feature-text"><strong>Family bucket list:</strong> A list of things the family wants to do — "Great Barrier Reef", "camping trip", "learn to ski". Tick them off as they happen</div></div>
+      </div>
+
+      <div class="callout impact">
+        <span class="callout-icon">✨</span>
+        <span class="callout-body"><strong>Why this matters for the vision:</strong> People open Instagram and TikTok first thing because those apps make them feel something. Toto needs to compete with that emotional pull. Countdowns and celebrations give the app a positive, forward-looking energy that purely functional apps lack. It's the difference between a tool and something you actually want to open.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 9. RECEIPTS ─── -->
+  <div class="collapsible-section open" id="receipts">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">📷</div>
+        <div>
+          <div class="section-toggle-title">Receipt Capture &amp; Real-Time Spending</div>
+          <div class="section-toggle-sub">Close the gap between tracked and actual — without manual entry</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-later">Do later</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Currently, actuals have to be entered manually or imported via CSV. This creates a lag between reality and the budget — and a budget you don't trust is a budget you stop checking. Camera-based receipt capture or bank feed integration would close that gap and make the Insights section genuinely reliable.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">📸</div><div class="feature-text"><strong>Camera receipt scan:</strong> Point the camera at a receipt, AI extracts the merchant, total, and date, and suggests the right budget category</div></div>
+        <div class="feature-item"><div class="feature-bullet">🏦</div><div class="feature-text"><strong>Bank feed integration:</strong> Connect a bank account (read-only) to automatically import and categorise transactions — the gold standard for real-time budgeting</div></div>
+        <div class="feature-item"><div class="feature-bullet">🔔</div><div class="feature-text"><strong>Spend alerts:</strong> "You've spent 80% of your dining-out budget with 12 days left" — proactive, not retrospective</div></div>
+        <div class="feature-item"><div class="feature-bullet">🤖</div><div class="feature-text"><strong>Smart categorisation:</strong> Learn from corrections over time — if you always move "Woolworths" from Groceries to Household, it remembers</div></div>
+        <div class="feature-item"><div class="feature-bullet">📊</div><div class="feature-text"><strong>Subscription detection:</strong> Automatically flag recurring charges and surface unused subscriptions — "You haven't used this in 3 months"</div></div>
+      </div>
+
+      <div class="callout note">
+        <span class="callout-icon">ℹ️</span>
+        <span class="callout-body"><strong>Why later:</strong> Bank feed integration requires open banking compliance, security infrastructure, and bank partnerships — significant engineering and legal lift. Receipt capture is simpler and can ship first as a bridge. Both are high-value; neither is quick to build correctly.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 10. SCHOOL HUB ─── -->
+  <div class="collapsible-section open" id="school">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">🏫</div>
+        <div>
+          <div class="section-toggle-title">School &amp; Activity Hub</div>
+          <div class="section-toggle-sub">Permission slips, homework due dates, sports schedules — all in one place</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-later">Do later</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>Parents currently manage school life across a school app, email, a physical calendar on the fridge, and memory. Consolidating even a portion of this into Toto would create daily engagement from both parents — and potentially from older kids managing their own homework.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">📝</div><div class="feature-text"><strong>Permission slip tracker:</strong> Log permission forms with due dates — "Riley's excursion form due Thursday" on the Today screen</div></div>
+        <div class="feature-item"><div class="feature-bullet">📚</div><div class="feature-text"><strong>Homework tracker:</strong> Per-child homework log with subject, due date, and done/not-done status — older kids can manage their own</div></div>
+        <div class="feature-item"><div class="feature-bullet">⚽</div><div class="feature-text"><strong>Sports &amp; activity schedule:</strong> Training times, game days, required gear per activity — feeds directly into the shared calendar</div></div>
+        <div class="feature-item"><div class="feature-bullet">🏫</div><div class="feature-text"><strong>School term calendar:</strong> Import school term dates so holidays, pupil-free days, and report days are visible to both parents</div></div>
+        <div class="feature-item"><div class="feature-bullet">💰</div><div class="feature-text"><strong>School cost tracker:</strong> Excursions, sport fees, book lists, uniforms — log and track school costs as a budget category</div></div>
+        <div class="feature-item"><div class="feature-bullet">📖</div><div class="feature-text"><strong>Reading log:</strong> For younger kids — track minutes read per day, tied to the chores/rewards system</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 11. LONG TERM ─── -->
+  <div class="collapsible-section open" id="roadmap">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-icon">🚀</div>
+        <div>
+          <div class="section-toggle-title">Long-Term Vision Features</div>
+          <div class="section-toggle-sub">Differentiating ideas that would make Toto genuinely unique</div>
+        </div>
+      </div>
+      <div class="section-toggle-right">
+        <span class="ptag ptag-vision">Long-term</span>
+        <span class="section-chevron open">▼</span>
+      </div>
+    </div>
+    <div class="section-body open">
+      <p>These features are further out but represent what could make Toto genuinely different from anything else on the market — the features that would make it impossible to replace.</p>
+
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-bullet">🤖</div><div class="feature-text"><strong>AI household advisor:</strong> "Based on your spending this month, you're on track to overspend on dining out by $200. Want to adjust your meal plan?" — proactive, personalised suggestions rather than passive reporting</div></div>
+        <div class="feature-item"><div class="feature-bullet">🏦</div><div class="feature-text"><strong>Bank feed integration:</strong> Read-only connection to transaction feeds that auto-categorises spending and makes the budget real-time</div></div>
+        <div class="feature-item"><div class="feature-bullet">📱</div><div class="feature-text"><strong>Smart home integration:</strong> Connect to Google Home / Apple Home — "Leave for school in 10 minutes" triggered from the morning routine checklist</div></div>
+        <div class="feature-item"><div class="feature-bullet">🌍</div><div class="feature-text"><strong>Environmental tracking:</strong> Household energy usage, water consumption, recycling habits — for families who care about sustainability alongside finances</div></div>
+        <div class="feature-item"><div class="feature-bullet">📸</div><div class="feature-text"><strong>Family memory / journal:</strong> A private photo and note timeline of family moments — "On this day last year" — that makes Toto feel like a family record, not just a management tool</div></div>
+        <div class="feature-item"><div class="feature-bullet">🤝</div><div class="feature-text"><strong>Trusted contacts network:</strong> Share a child's allergy card or emergency contacts with school, grandparents, or a babysitter — controlled sharing without giving full household access</div></div>
+        <div class="feature-item"><div class="feature-bullet">💳</div><div class="feature-text"><strong>Kids' pocket money &amp; bank account:</strong> Connect a kids' bank account (or virtual card) so chore earnings translate to real money, not just in-app points</div></div>
+      </div>
+
+      <div class="callout impact">
+        <span class="callout-icon">✨</span>
+        <span class="callout-body"><strong>The long-term vision in one sentence:</strong> Toto becomes the operating system for family life — the single source of truth for time, money, health, home, and relationships. Not a collection of features, but a platform that makes the whole household run better.</span>
+      </div>
+
+      <div class="sep" style="height:1px;background:var(--border);margin:24px 0"></div>
+
+      <h3 style="margin-bottom:14px">Suggested build order</h3>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Feature</th><th>Why this order</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Today screen (shell)</td><td>Entry point for everything — even with placeholder sections, it trains the daily habit</td><td><span class="ptag ptag-now">Do first</span></td></tr>
+          <tr><td>2</td><td>Shared family calendar</td><td>Today screen needs schedule data to be useful — these are co-dependent</td><td><span class="ptag ptag-now">Do first</span></td></tr>
+          <tr><td>3</td><td>Morning routines</td><td>Highest daily-open frequency of any feature — guaranteed morning engagement</td><td><span class="ptag ptag-now">Do first</span></td></tr>
+          <tr><td>4</td><td>Shared shopping list</td><td>Daily use, simple to build, immediate value — fills the Today screen with live data</td><td><span class="ptag ptag-now">Do first</span></td></tr>
+          <tr><td>5</td><td>Countdowns &amp; celebrations</td><td>Emotional layer — makes the Today screen feel rewarding, not just functional</td><td><span class="ptag ptag-next">Do next</span></td></tr>
+          <tr><td>6</td><td>Family noticeboard</td><td>Communication hub drives daily returns even when nothing else needs doing</td><td><span class="ptag ptag-next">Do next</span></td></tr>
+          <tr><td>7</td><td>Health &amp; medications</td><td>Medication reminders are a guaranteed daily open for affected households</td><td><span class="ptag ptag-next">Do next</span></td></tr>
+          <tr><td>8</td><td>Pet management</td><td>High relevance for a large portion of the target audience — low build complexity</td><td><span class="ptag ptag-next">Do next</span></td></tr>
+          <tr><td>9</td><td>School &amp; activity hub</td><td>High engagement but requires more scope — do after daily habits are established</td><td><span class="ptag ptag-later">Do later</span></td></tr>
+          <tr><td>10</td><td>Receipt capture</td><td>Valuable but technically complex — do after the core daily loop is working</td><td><span class="ptag ptag-later">Do later</span></td></tr>
+          <tr><td>11</td><td>Bank feed integration</td><td>Highest value long-term but requires compliance infrastructure — plan early, build later</td><td><span class="ptag ptag-vision">Long-term</span></td></tr>
+          <tr><td>12</td><td>AI household advisor</td><td>Needs rich data history to be accurate — comes after the data layer is mature</td><td><span class="ptag ptag-vision">Long-term</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.section-toggle').forEach(t => {
+    t.addEventListener('click', () => {
+      const s = t.closest('.collapsible-section');
+      const body = s.querySelector('.section-body');
+      const chev = s.querySelector('.section-chevron');
+      const open = s.classList.toggle('open');
+      body.classList.toggle('open', open);
+      chev.classList.toggle('open', open);
+    });
+  });
+
+  window.setAll = open => {
+    document.querySelectorAll('.collapsible-section').forEach(s => {
+      s.classList.toggle('open', open);
+      s.querySelector('.section-body')?.classList.toggle('open', open);
+      s.querySelector('.section-chevron')?.classList.toggle('open', open);
+    });
+  };
+</script>
+
+</body>
+</html>
