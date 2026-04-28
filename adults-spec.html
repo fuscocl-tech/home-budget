@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Adults Feature Spec</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple:    #7c3aed;
+      --purple-md: #8b5cf6;
+      --purple-lt: #f5f3ff;
+      --purple-bd: #ddd6fe;
+      --teal:      #0d9488;
+      --teal-lt:   #f0fdfa;
+      --green:     #16a34a;
+      --green-lt:  #f0fdf4;
+      --red:       #dc2626;
+      --red-lt:    #fef2f2;
+      --amber:     #d97706;
+      --amber-lt:  #fffbeb;
+      --slate:     #1e293b;
+      --muted:     #64748b;
+      --border:    #e2e8f0;
+      --surface:   #f8fafc;
+      --white:     #ffffff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    nav {
+      position: sticky; top: 0;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      display: flex; align-items: center; gap: 20px;
+      height: 56px; z-index: 200; overflow-x: auto;
+    }
+    .nav-brand { font-weight: 800; font-size: 15px; color: var(--purple); white-space: nowrap; flex-shrink: 0; }
+    nav a { font-size: 13px; color: var(--muted); text-decoration: none; padding: 4px 0; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+    nav a:hover { color: var(--purple); border-bottom-color: var(--purple); }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 44px 24px 100px; }
+
+    h1 { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 15px; margin-bottom: 16px; }
+    h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    p  { color: #475569; font-size: 14px; margin-bottom: 12px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    /* ── Collapsible sections ── */
+    .collapsible-section { margin-bottom: 14px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+    .section-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none;
+      padding: 16px 22px; background: #fff; gap: 12px;
+      transition: background 0.15s;
+    }
+    .section-toggle:hover { background: var(--purple-lt); }
+    .collapsible-section.open .section-toggle { background: var(--purple-lt); border-bottom: 1px solid var(--purple-bd); }
+    .section-toggle-left { display: flex; align-items: center; gap: 14px; }
+    .section-num {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--purple); color: #fff;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .section-toggle-title { font-size: 15px; font-weight: 700; color: var(--slate); }
+    .section-toggle-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .section-chevron { font-size: 11px; color: var(--purple); flex-shrink: 0; transition: transform 0.25s ease; }
+    .collapsible-section.open .section-chevron { transform: rotate(180deg); }
+    .section-body { display: none; background: #fff; padding: 24px; }
+    .section-body.open { display: block; }
+
+    /* ── Ctrl bar ── */
+    .ctrl-bar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 20px; }
+    .ctrl-btn { font-size: 12px; font-weight: 600; padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 8px; background: #fff; color: var(--muted); cursor: pointer; }
+    .ctrl-btn:hover { border-color: var(--purple); color: var(--purple); }
+
+    /* ── Cards ── */
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 18px; }
+    .card-header { padding: 16px 20px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .card-body { padding: 18px 20px; }
+    .step-num {
+      display: inline-flex; width: 30px; height: 30px; border-radius: 50%;
+      background: var(--purple); color: #fff; font-size: 12px; font-weight: 700;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    /* ── Callouts ── */
+    .callout { display: flex; gap: 12px; padding: 13px 16px; border-radius: 10px; margin: 14px 0; font-size: 13px; }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { color: #374151; }
+    .callout-body strong { color: var(--slate); }
+    .callout.info   { background: var(--purple-lt); border: 1px solid var(--purple-bd); }
+    .callout.warn   { background: var(--amber-lt);  border: 1px solid #fde68a; }
+    .callout.ok     { background: var(--green-lt);  border: 1px solid #bbf7d0; }
+    .callout.lock   { background: #fdf4ff;           border: 1px solid #e9d5ff; }
+
+    /* ── Pills ── */
+    .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; }
+    .pill-purple { background: var(--purple-lt); color: var(--purple); }
+    .pill-green  { background: var(--green-lt);  color: var(--green); }
+    .pill-amber  { background: var(--amber-lt);  color: var(--amber); }
+    .pill-red    { background: var(--red-lt);    color: var(--red); }
+    .pill-lock   { background: #fdf4ff; color: #9333ea; border: 1px solid #e9d5ff; }
+    .pill-open   { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; }
+
+    /* ── Field grid ── */
+    .fg  { display: grid; grid-template-columns: 1fr 1fr;     gap: 12px; margin: 14px 0; }
+    .fg3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 600px) { .fg, .fg3 { grid-template-columns: 1fr; } }
+    .field { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 4px; }
+    .field-value { font-size: 13px; color: #334155; font-weight: 500; }
+    .field-note  { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+    th { text-align: left; padding: 9px 12px; background: var(--surface); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    tr:last-child td { border: none; }
+    code { font-family: monospace; font-size: 12px; color: var(--purple); background: var(--purple-lt); padding: 1px 5px; border-radius: 4px; }
+
+    /* ──────────────────────────────────────────
+       APP SHELL MOCKUP
+    ────────────────────────────────────────── */
+    .app-shell {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 10px 36px rgba(0,0,0,0.09);
+      max-width: 580px; margin: 24px auto;
+    }
+    .app-bar {
+      background: linear-gradient(135deg, #4c1d95, #7c3aed);
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .app-bar-title { color: #fff; font-weight: 700; font-size: 15px; }
+    .app-bar-badge {
+      background: rgba(255,255,255,0.2); color: #fff;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 99px; margin-left: auto;
+    }
+    .app-tabs {
+      display: flex; background: var(--surface);
+      border-bottom: 1px solid var(--border); overflow-x: auto; padding: 0 14px;
+    }
+    .app-tab {
+      padding: 10px 14px; font-size: 13px; font-weight: 500;
+      color: var(--muted); white-space: nowrap; cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .app-tab.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 700; }
+    .app-body { padding: 18px; background: var(--surface); }
+
+    /* ── Task row ── */
+    .task-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 14px; background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 8px; cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .task-row:hover { border-color: var(--purple); }
+    .task-row.private { border-left: 3px solid #9333ea; }
+    .task-emoji { font-size: 22px; flex-shrink: 0; }
+    .task-name { font-size: 13px; font-weight: 600; color: var(--slate); }
+    .task-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .task-right { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .task-points { font-size: 14px; font-weight: 700; color: var(--purple); }
+    .task-tick {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid var(--purple); display: flex; align-items: center; justify-content: center;
+      color: var(--purple); font-size: 14px; cursor: pointer; transition: all 0.15s;
+    }
+    .task-tick.done { background: var(--green); border-color: var(--green); color: #fff; }
+    .task-tick.pending { background: var(--amber-lt); border-color: var(--amber); color: var(--amber); }
+
+    /* ── Prize card ── */
+    .prize-card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 8px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .prize-card:hover { border-color: var(--purple); box-shadow: 0 4px 12px rgba(124,58,237,0.1); }
+    .prize-card.private { border-left: 3px solid #9333ea; }
+    .prize-card.affordable { border-color: var(--green); background: var(--green-lt); }
+    .prize-emoji { font-size: 28px; flex-shrink: 0; }
+    .prize-name { font-size: 13px; font-weight: 700; color: var(--slate); }
+    .prize-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .prize-cost { font-size: 14px; font-weight: 700; color: var(--purple); }
+    .prize-btn {
+      padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      border: none; cursor: pointer;
+    }
+    .prize-btn.can { background: var(--purple); color: #fff; }
+    .prize-btn.cannot { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── Toggle switch ── */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid #f8fafc;
+    }
+    .toggle-row:last-child { border: none; }
+    .toggle-label { font-size: 13px; font-weight: 500; color: var(--slate); }
+    .toggle-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .toggle-switch {
+      width: 44px; height: 24px; border-radius: 99px;
+      display: flex; align-items: center; padding: 2px;
+      cursor: pointer; flex-shrink: 0; transition: background 0.2s;
+    }
+    .toggle-switch.on { background: var(--purple); justify-content: flex-end; }
+    .toggle-switch.off { background: #cbd5e1; justify-content: flex-start; }
+    .toggle-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+
+    /* ── Flow steps ── */
+    .flow { display: flex; gap: 0; margin: 20px 0; overflow-x: auto; padding-bottom: 6px; }
+    .flow-step { flex: 1; min-width: 110px; text-align: center; position: relative; }
+    .flow-step::before, .flow-step::after { content: ''; position: absolute; top: 21px; height: 2px; background: #cbd5e1; width: 50%; }
+    .flow-step::before { left: 0; }
+    .flow-step::after  { right: 0; }
+    .flow-step:first-child::before, .flow-step:last-child::after { display: none; }
+    .flow-dot { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin: 0 auto 8px; position: relative; z-index: 1; background: #fff; border: 2px solid #cbd5e1; }
+    .flow-step.on .flow-dot { background: var(--purple); border-color: var(--purple); }
+    .flow-label { font-size: 12px; font-weight: 600; color: var(--slate); }
+    .flow-sub { font-size: 11px; color: #94a3b8; }
+
+    /* ── Example walkthrough ── */
+    .example-step {
+      display: flex; gap: 14px; padding: 16px;
+      border-radius: 12px; background: #fff; border: 1px solid var(--border);
+      margin-bottom: 10px; align-items: flex-start;
+    }
+    .example-step-num {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .example-step-body { flex: 1; }
+    .example-step-title { font-size: 13px; font-weight: 700; color: var(--slate); margin-bottom: 3px; }
+    .example-step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .example-who { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-bottom: 6px; display: inline-block; }
+    .who-sam  { background: #fce7f3; color: #be185d; }
+    .who-chris { background: #dbeafe; color: #1d4ed8; }
+    .who-system { background: #f1f5f9; color: var(--muted); }
+
+    /* ── Point balance ── */
+    .balance-card {
+      background: linear-gradient(135deg, #4c1d95, #7c3aed);
+      border-radius: 14px; padding: 20px; color: #fff; margin-bottom: 16px;
+    }
+    .balance-label { font-size: 12px; font-weight: 600; opacity: 0.7; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .balance-value { font-size: 36px; font-weight: 800; }
+    .balance-sub { font-size: 12px; opacity: 0.6; margin-top: 4px; }
+
+    /* ── Separator ── */
+    .sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── Lock indicator ── */
+    .lock-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 600; color: #9333ea;
+      background: #fdf4ff; border: 1px solid #e9d5ff;
+      padding: 2px 7px; border-radius: 99px;
+    }
+
+    /* ── Mockup input ── */
+    .m-input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #94a3b8; width: 100%; margin-bottom: 10px; }
+    .m-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 6px; display: block; }
+    .m-btn-primary { background: var(--purple); color: #fff; border: none; border-radius: 10px; padding: 11px 24px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .m-btn-ghost   { background: #fff; color: var(--muted); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .m-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+    /* ── Emoji picker row ── */
+    .emoji-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .emoji-pick { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1.5px solid var(--border); cursor: pointer; background: #fff; }
+    .emoji-pick.selected { border-color: var(--purple); background: var(--purple-lt); }
+
+    /* ── Notification ── */
+    .notif {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 12px 14px; background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; margin-bottom: 8px;
+    }
+    .notif-icon { font-size: 22px; flex-shrink: 0; }
+    .notif-title { font-size: 13px; font-weight: 600; color: var(--slate); }
+    .notif-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .notif-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .notif-approve { background: var(--purple); color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .notif-reject { background: #fff; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+    /* ── Dashboard widget ── */
+    .dash-widget { background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .dash-widget-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--border); }
+    .dash-widget-title { font-size: 14px; font-weight: 700; }
+    .dash-widget-link { font-size: 12px; color: var(--purple); font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Toto — Adults</span>
+  <a href="#overview">Overview</a>
+  <a href="#separation">Separation</a>
+  <a href="#model">Data Model</a>
+  <a href="#privacy">Privacy</a>
+  <a href="#screens">Screens</a>
+  <a href="#create-task">Create Task</a>
+  <a href="#create-prize">Create Prize</a>
+  <a href="#approvals">Approvals</a>
+  <a href="#walkthrough">Walkthrough</a>
+  <a href="#dashboard">Dashboard</a>
+  <a href="#notifications">Notifications</a>
+</nav>
+
+<div class="container">
+
+  <h1>Adults</h1>
+  <p class="subtitle">Design specification — a task, chore and prize system for adults. Mirrors the kids system but adds privacy, bidirectional assignment, and adult-appropriate UX. Completely separate data and UI from the Kids section.</p>
+
+  <div class="ctrl-bar">
+    <button class="ctrl-btn" onclick="setAll(true)">Expand all</button>
+    <button class="ctrl-btn" onclick="setAll(false)">Collapse all</button>
+  </div>
+
+  <!-- ─── 1. OVERVIEW ─── -->
+  <div class="collapsible-section open" id="overview">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">01</div>
+        <div>
+          <div class="section-toggle-title">Overview — What is this feature?</div>
+          <div class="section-toggle-sub">Why adults need their own task and reward system</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+      <p>The Kids section already lets parents assign chores, set prizes, and track points for their children. The Adults section applies the same mechanic to the adults in the household — giving partners a fun, gamified way to assign tasks to each other and reward completion.</p>
+
+      <div class="fg">
+        <div class="field" style="background:var(--purple-lt);border-color:var(--purple-bd)">
+          <div class="field-label" style="color:var(--purple)">The core idea</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.8;color:#374151">
+            Either adult can create a task and assign it to the other.<br>
+            Either adult can create a prize and attach it to that task.<br>
+            Tasks and prizes can be <strong>private</strong> — visible only to the assignee, not shared with the whole household.
+          </div>
+        </div>
+        <div class="field" style="background:#fdf4ff;border-color:#e9d5ff">
+          <div class="field-label" style="color:#9333ea">The motivating example</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.8;color:#374151">
+            Sam wants Chris to clean out the shed.<br>
+            Sam creates the task and adds a private prize.<br>
+            Chris sees the task and the prize — nobody else does.<br>
+            Chris completes the task, Sam approves, Chris redeems.
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Why this is valuable:</strong> Household tasks between partners often carry friction — nagging, resentment, imbalance. A lighthearted points system with meaningful (and sometimes playful) rewards reframes chores as a fun exchange rather than a source of conflict. The privacy feature is essential: it allows adults to attach intimate or personal prizes without those showing up in a shared family view.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2. SEPARATION FROM KIDS ─── -->
+  <div class="collapsible-section open" id="separation">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">02</div>
+        <div>
+          <div class="section-toggle-title">Separation from Kids</div>
+          <div class="section-toggle-sub">Why adults and kids must be completely isolated</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+      <p>Adults and kids must be fully isolated — separate data, separate UI, separate point balances. There must be zero risk of adult content appearing in the kids view or vice versa.</p>
+
+      <div class="fg">
+        <div class="field" style="background:var(--green-lt);border-color:#bbf7d0">
+          <div class="field-label" style="color:var(--green)">Kids section</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.9">
+            Accessed by children with PIN<br>
+            Currency: <strong>Coins ⭐</strong><br>
+            Prizes: appropriate for children<br>
+            Assigned by: parents only<br>
+            Data key: <code>state.kids</code>
+          </div>
+        </div>
+        <div class="field" style="background:var(--purple-lt);border-color:var(--purple-bd)">
+          <div class="field-label" style="color:var(--purple)">Adults section</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.9">
+            Accessed by adults with email/PIN<br>
+            Currency: <strong>Points 💜</strong><br>
+            Prizes: can be private / intimate<br>
+            Assigned by: any adult to any adult<br>
+            Data key: <code>state.adults</code>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout lock">
+        <span class="callout-icon">🔒</span>
+        <span class="callout-body"><strong>Hard rule:</strong> The Adults section is never accessible from a child session. It does not appear in the navigation, its data is not fetched, and its API endpoints reject requests from child-authenticated sessions. A child with a PIN can never stumble into adult content.</span>
+      </div>
+
+      <table>
+        <thead><tr><th>Property</th><th>Kids</th><th>Adults</th></tr></thead>
+        <tbody>
+          <tr><td>Currency name</td><td>Coins ⭐</td><td>Points 💜</td></tr>
+          <tr><td>Currency isolation</td><td>Per-kid balance</td><td>Per-adult balance</td></tr>
+          <tr><td>Assigned by</td><td>Any adult</td><td>Any adult (to another adult)</td></tr>
+          <tr><td>Privacy toggle</td><td>No</td><td>Yes — per task and per prize</td></tr>
+          <tr><td>Visible to children</td><td>Yes (own only)</td><td>Never</td></tr>
+          <tr><td>Approval direction</td><td>Parent approves child</td><td>Assignor approves assignee</td></tr>
+          <tr><td>Storage key</td><td><code>state.kids</code></td><td><code>state.adults</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── 3. DATA MODEL ─── -->
+  <div class="collapsible-section open" id="model">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">03</div>
+        <div>
+          <div class="section-toggle-title">Data Model</div>
+          <div class="section-toggle-sub">state.adults structure, fields and relationships</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+      <p>The <code>state.adults</code> object mirrors <code>state.kids</code> structurally, with two additions: <code>assignedBy</code> on every item, and a <code>private</code> boolean flag.</p>
+
+      <h3>Top-level structure</h3>
+      <table>
+        <thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>state.adults.tasks[]</code></td><td>array</td><td>All tasks created by any adult</td></tr>
+          <tr><td><code>state.adults.prizes[]</code></td><td>array</td><td>All prizes created by any adult</td></tr>
+          <tr><td><code>state.adults.completions[]</code></td><td>array</td><td>Task completion requests and approvals</td></tr>
+          <tr><td><code>state.adults.redemptions[]</code></td><td>array</td><td>Prize redemption requests and approvals</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:20px">Task object</h3>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>string</td><td>Unique ID</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Task name — "Clean out the shed"</td></tr>
+          <tr><td><code>emoji</code></td><td>string</td><td>Visual identifier — 🏚️</td></tr>
+          <tr><td><code>points</code></td><td>number</td><td>Points earned on approval</td></tr>
+          <tr><td><code>assignedTo</code></td><td>memberId</td><td>Which adult this task belongs to</td></tr>
+          <tr><td><code>assignedBy</code></td><td>memberId</td><td>Which adult created this task</td></tr>
+          <tr><td><code>private</code></td><td>boolean</td><td>If true, only visible to assignedTo and assignedBy</td></tr>
+          <tr><td><code>frequency</code></td><td>enum</td><td>once · daily · weekly · monthly</td></tr>
+          <tr><td><code>dueDate</code></td><td>date</td><td>Optional deadline</td></tr>
+          <tr><td><code>notes</code></td><td>string</td><td>Optional instructions</td></tr>
+          <tr><td><code>linkedPrizeId</code></td><td>string?</td><td>Optional — ties a specific prize to this task</td></tr>
+          <tr><td><code>createdAt</code></td><td>timestamp</td><td>When created</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:20px">Prize object</h3>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>string</td><td>Unique ID</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Prize name — "Sexy time 😏"</td></tr>
+          <tr><td><code>emoji</code></td><td>string</td><td>Visual — 😏 🍷 🎮 🧖</td></tr>
+          <tr><td><code>pointCost</code></td><td>number</td><td>Points required to redeem</td></tr>
+          <tr><td><code>assignedTo</code></td><td>memberId</td><td>Who can see and redeem this prize</td></tr>
+          <tr><td><code>assignedBy</code></td><td>memberId</td><td>Who created this prize</td></tr>
+          <tr><td><code>private</code></td><td>boolean</td><td>If true, hidden from all other adults</td></tr>
+          <tr><td><code>description</code></td><td>string</td><td>Optional detail shown to assignee only</td></tr>
+          <tr><td><code>active</code></td><td>boolean</td><td>Creator can deactivate without deleting</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info" style="margin-top:8px">
+        <span class="callout-icon">🔗</span>
+        <span class="callout-body"><strong>linkedPrizeId:</strong> A task can optionally be linked to a specific prize. When the task is completed and approved, the prize is automatically shown as redeemable — making the reward feel directly tied to the effort. This is the clearest expression of "do this, get that".</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 4. PRIVACY MODEL ─── -->
+  <div class="collapsible-section open" id="privacy">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">04</div>
+        <div>
+          <div class="section-toggle-title">Privacy Model</div>
+          <div class="section-toggle-sub">Exactly who sees what, and when</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+      <p>Privacy is the defining feature of the Adults section. The rules are simple and consistent — no exceptions.</p>
+
+      <h3 style="margin-bottom:12px">Visibility rules</h3>
+      <table>
+        <thead><tr><th>Viewer</th><th>Private task/prize</th><th>Public task/prize</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Assignee</strong> (person who has to do it)</td><td>✅ Visible — it's theirs to action</td><td>✅ Visible</td></tr>
+          <tr><td><strong>Assignor</strong> (person who created it)</td><td>✅ Visible — they created it</td><td>✅ Visible</td></tr>
+          <tr><td><strong>Any other adult</strong></td><td>🚫 Hidden completely</td><td>✅ Visible</td></tr>
+          <tr><td><strong>Any child</strong></td><td>🚫 Hidden — adults section not accessible</td><td>🚫 Hidden</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top:24px;margin-bottom:12px">Privacy default</h3>
+      <div class="fg">
+        <div class="field" style="background:#fdf4ff;border-color:#e9d5ff">
+          <div class="field-label" style="color:#9333ea">Tasks — default: Public</div>
+          <div class="field-value" style="font-size:13px;margin-top:6px;color:#374151">Most tasks are mundane household jobs. Defaulting to public means either adult can see what's outstanding without needing to opt in. The creator flips to private only when needed.</div>
+        </div>
+        <div class="field" style="background:#fdf4ff;border-color:#e9d5ff">
+          <div class="field-label" style="color:#9333ea">Prizes — default: Private</div>
+          <div class="field-value" style="font-size:13px;margin-top:6px;color:#374151">Prizes carry far more personal weight. Defaulting to private protects the creator's intent. They opt in to public only for innocuous prizes like "takeaway night" or "choose the movie".</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:24px;margin-bottom:12px">Privacy in the UI</h3>
+      <p>Private items are marked with a <span class="lock-badge">🔒 Private</span> badge visible only to the assignee and assignor. To every other user the item simply doesn't exist — no placeholder, no "hidden item" indicator, nothing that implies something is concealed.</p>
+
+      <div class="callout warn">
+        <span class="callout-icon">⚠️</span>
+        <span class="callout-body"><strong>Storage caveat:</strong> Toto currently uses <code>localStorage</code> for persistence. This means all data — including private items — exists in the browser's local storage and could be read by a technically sophisticated user inspecting the device. For a production release, private items should be server-encrypted with per-user keys so that only the authorised member's session can decrypt them. This is a future-state requirement; the UI design is correct regardless.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 5. SCREENS ─── -->
+  <div class="collapsible-section open" id="screens">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">05</div>
+        <div>
+          <div class="section-toggle-title">Screen Overview &amp; My Tasks View</div>
+          <div class="section-toggle-sub">Tab structure and the main "My Tasks" screen</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+
+      <p>The Adults section lives as a top-level tab in Toto's navigation, alongside Kids. It has four sub-tabs, each scoped to the currently authenticated adult.</p>
+
+      <div class="fg" style="margin-bottom:24px">
+        <div class="field"><div class="field-label">My Tasks</div><div class="field-value">Tasks assigned TO me. This is what I need to do and earn points for.</div></div>
+        <div class="field"><div class="field-label">I've Set</div><div class="field-value">Tasks and prizes I've created for my partner. Pending approvals live here.</div></div>
+        <div class="field"><div class="field-label">Prize Store</div><div class="field-value">Prizes I can redeem with my current point balance. Private prizes mixed in seamlessly.</div></div>
+        <div class="field"><div class="field-label">Overview</div><div class="field-value">Household summary — point balances, pending actions for both adults (visible to all adults).</div></div>
+      </div>
+
+      <!-- My Tasks mockup -->
+      <h3 style="margin-bottom:12px">My Tasks — Chris's view</h3>
+      <div class="app-shell">
+        <div class="app-bar">
+          <span style="font-size:22px">💜</span>
+          <span class="app-bar-title">Adults</span>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+            <span style="color:rgba(255,255,255,0.7);font-size:12px">Hi, Chris</span>
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px">👤</div>
+          </div>
+        </div>
+        <div class="app-tabs">
+          <div class="app-tab active">My Tasks</div>
+          <div class="app-tab">I've Set</div>
+          <div class="app-tab">Prize Store</div>
+          <div class="app-tab">Overview</div>
+        </div>
+        <div class="app-body">
+
+          <!-- Balance -->
+          <div class="balance-card">
+            <div class="balance-label">My points</div>
+            <div class="balance-value">320 💜</div>
+            <div class="balance-sub">Earned 500 · Spent 180 · 2 prizes within reach</div>
+          </div>
+
+          <!-- Task list -->
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:10px">Outstanding (2)</div>
+
+          <div class="task-row private">
+            <div class="task-emoji">🏚️</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                <span class="task-name">Clean out the shed</span>
+                <span class="lock-badge">🔒 Private</span>
+              </div>
+              <div class="task-meta">Set by Sam · No due date · Once</div>
+            </div>
+            <div class="task-right">
+              <div class="task-points">+200 💜</div>
+              <div class="task-tick">✓</div>
+            </div>
+          </div>
+
+          <div class="task-row">
+            <div class="task-emoji">🚗</div>
+            <div style="flex:1;min-width:0">
+              <div class="task-name" style="margin-bottom:2px">Service the car</div>
+              <div class="task-meta">Set by Sam · Due 30 Jun · Once</div>
+            </div>
+            <div class="task-right">
+              <div class="task-points">+50 💜</div>
+              <div class="task-tick">✓</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin:14px 0 10px">Pending approval (1)</div>
+
+          <div class="task-row">
+            <div class="task-emoji">🛒</div>
+            <div style="flex:1;min-width:0">
+              <div class="task-name" style="margin-bottom:2px">Weekly grocery run</div>
+              <div class="task-meta">Marked done · Waiting for Sam to approve</div>
+            </div>
+            <div class="task-right">
+              <div class="task-points">+30 💜</div>
+              <div class="task-tick pending">⏳</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin:14px 0 10px">Completed this week (1)</div>
+
+          <div class="task-row" style="opacity:0.55">
+            <div class="task-emoji">🍽️</div>
+            <div style="flex:1;min-width:0">
+              <div class="task-name" style="margin-bottom:2px;text-decoration:line-through">Cook dinner Mon–Wed</div>
+              <div class="task-meta">Approved by Sam · +40 💜 earned</div>
+            </div>
+            <div class="task-right">
+              <div class="task-tick done">✓</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- I've Set mockup -->
+      <h3 style="margin-top:28px;margin-bottom:12px">I've Set — Sam's view (tasks Sam created for Chris)</h3>
+      <div class="app-shell">
+        <div class="app-bar">
+          <span style="font-size:22px">💜</span>
+          <span class="app-bar-title">Adults</span>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+            <span style="color:rgba(255,255,255,0.7);font-size:12px">Hi, Sam</span>
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px">👤</div>
+          </div>
+        </div>
+        <div class="app-tabs">
+          <div class="app-tab">My Tasks</div>
+          <div class="app-tab active">I've Set</div>
+          <div class="app-tab">Prize Store</div>
+          <div class="app-tab">Overview</div>
+        </div>
+        <div class="app-body">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div style="font-size:13px;font-weight:600;color:var(--slate)">Tasks for Chris</div>
+            <button class="m-btn-primary" style="padding:7px 14px;font-size:12px">+ New task</button>
+          </div>
+
+          <!-- Pending approval banner -->
+          <div style="background:#fdf4ff;border:1.5px solid #e9d5ff;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:22px">⏳</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#7c3aed">1 task waiting for your approval</div>
+              <div style="font-size:12px;color:#9333ea">Chris marked "Weekly grocery run" as done</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:6px">
+              <button class="notif-approve">Approve</button>
+              <button class="notif-reject">Reject</button>
+            </div>
+          </div>
+
+          <div class="task-row private">
+            <div class="task-emoji">🏚️</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                <span class="task-name">Clean out the shed</span>
+                <span class="lock-badge">🔒 Private</span>
+              </div>
+              <div class="task-meta">Assigned to Chris · +200 💜 · Outstanding</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:6px">
+              <button style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;color:var(--muted)">✏️ Edit</button>
+              <button style="font-size:11px;padding:4px 10px;border:1px solid #fca5a5;border-radius:6px;background:#fff;cursor:pointer;color:var(--red)">🗑</button>
+            </div>
+          </div>
+
+          <div class="task-row">
+            <div class="task-emoji">🚗</div>
+            <div style="flex:1;min-width:0">
+              <div class="task-name" style="margin-bottom:2px">Service the car</div>
+              <div class="task-meta">Assigned to Chris · +50 💜 · Due 30 Jun</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:6px">
+              <button style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;color:var(--muted)">✏️ Edit</button>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:600;color:var(--slate)">Prizes for Chris</div>
+            <button class="m-btn-primary" style="padding:7px 14px;font-size:12px">+ New prize</button>
+          </div>
+
+          <div class="prize-card private">
+            <div class="prize-emoji">😏</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                <span class="prize-name">Sexy time</span>
+                <span class="lock-badge">🔒 Private</span>
+              </div>
+              <div class="prize-desc">For Chris · 200 💜 · Active</div>
+            </div>
+            <div style="display:flex;gap:6px;margin-left:auto">
+              <button style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;color:var(--muted)">✏️</button>
+              <button style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;color:var(--muted)">Pause</button>
+            </div>
+          </div>
+
+          <div class="prize-card">
+            <div class="prize-emoji">🍕</div>
+            <div style="flex:1;min-width:0">
+              <div class="prize-name" style="margin-bottom:2px">Pizza night — Chris picks</div>
+              <div class="prize-desc">For Chris · 30 💜 · Active <span class="pill-open pill">Public</span></div>
+            </div>
+            <div style="display:flex;gap:6px;margin-left:auto">
+              <button style="font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;color:var(--muted)">✏️</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 6. PRIZE STORE ─── -->
+  <div class="collapsible-section open" id="create-task">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">06</div>
+        <div>
+          <div class="section-toggle-title">Prize Store &amp; Create Task</div>
+          <div class="section-toggle-sub">What the assignee sees in the store, and the task creation form</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+
+      <h3 style="margin-bottom:12px">Prize Store — Chris's view</h3>
+      <p>The Prize Store shows only prizes available to Chris (either public prizes, or private prizes created for him). Prizes created for Sam — even if public — are not shown here, because they're redeemable only by Sam.</p>
+
+      <div class="app-shell">
+        <div class="app-bar">
+          <span style="font-size:22px">💜</span>
+          <span class="app-bar-title">Prize Store</span>
+          <div class="app-bar-badge">320 💜 available</div>
+        </div>
+        <div class="app-body">
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:10px">Within reach (2)</div>
+
+          <div class="prize-card affordable private">
+            <div class="prize-emoji">😏</div>
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                <span class="prize-name">Sexy time</span>
+                <span class="lock-badge">🔒 Private</span>
+              </div>
+              <div class="prize-desc">200 💜 · You have enough!</div>
+            </div>
+            <button class="prize-btn can">Redeem</button>
+          </div>
+
+          <div class="prize-card affordable">
+            <div class="prize-emoji">🍕</div>
+            <div style="flex:1;min-width:0">
+              <div class="prize-name" style="margin-bottom:2px">Pizza night — Chris picks</div>
+              <div class="prize-desc">30 💜 · You have enough!</div>
+            </div>
+            <button class="prize-btn can">Redeem</button>
+          </div>
+
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin:14px 0 10px">Saving up for (1)</div>
+
+          <div class="prize-card" style="opacity:0.7">
+            <div class="prize-emoji">🎮</div>
+            <div style="flex:1;min-width:0">
+              <div class="prize-name" style="margin-bottom:2px">Game night — no interruptions</div>
+              <div class="prize-desc">500 💜 · Need 180 more points</div>
+            </div>
+            <button class="prize-btn cannot">180 more needed</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="sep" style="margin:28px 0"></div>
+
+      <!-- Create Task form -->
+      <h3 style="margin-bottom:12px">Create Task — form design</h3>
+      <p>Sam creates a task for Chris. The form is focused — emoji, name, points, frequency, and the privacy toggle. The assign-to field is pre-set to the other adult (since in a 2-adult household there's only one choice).</p>
+
+      <div class="app-shell">
+        <div class="app-bar"><span class="app-bar-title">New Task</span></div>
+        <div class="app-body" style="background:#fff">
+
+          <div class="m-label">Emoji</div>
+          <div class="emoji-row">
+            <div class="emoji-pick selected">🏚️</div>
+            <div class="emoji-pick">🚗</div>
+            <div class="emoji-pick">🛒</div>
+            <div class="emoji-pick">🍳</div>
+            <div class="emoji-pick">🌿</div>
+            <div class="emoji-pick">🔧</div>
+            <div class="emoji-pick">🐕</div>
+            <div class="emoji-pick">+</div>
+          </div>
+
+          <div class="m-label">Task name</div>
+          <div class="m-input" style="color:#1e293b">Clean out the shed</div>
+
+          <div class="fg">
+            <div>
+              <div class="m-label">Points reward</div>
+              <div class="m-input" style="color:#1e293b">200 💜</div>
+            </div>
+            <div>
+              <div class="m-label">Assign to</div>
+              <div class="m-input" style="color:#1e293b">Chris</div>
+            </div>
+          </div>
+
+          <div class="fg">
+            <div>
+              <div class="m-label">Frequency</div>
+              <div class="m-input" style="color:#1e293b">Once</div>
+            </div>
+            <div>
+              <div class="m-label">Due date (optional)</div>
+              <div class="m-input">No due date</div>
+            </div>
+          </div>
+
+          <div class="m-label">Link a prize (optional)</div>
+          <div class="m-input" style="color:#1e293b">😏 Sexy time — 200 💜</div>
+
+          <div class="m-label">Notes (optional)</div>
+          <div class="m-input" style="height:52px">Everything out, bins emptied, floor swept.</div>
+
+          <!-- Privacy toggle -->
+          <div style="background:#fdf4ff;border:1.5px solid #e9d5ff;border-radius:12px;padding:14px 16px;margin:6px 0 16px">
+            <div class="toggle-row" style="padding:0;border:none">
+              <div>
+                <div class="toggle-label">🔒 Private task</div>
+                <div class="toggle-sub">Only visible to you and Chris. Hidden from all other adults.</div>
+              </div>
+              <div class="toggle-switch on"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+
+          <div class="m-footer">
+            <button class="m-btn-ghost">Cancel</button>
+            <button class="m-btn-primary">Create task →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 7. CREATE PRIZE ─── -->
+  <div class="collapsible-section open" id="create-prize">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">07</div>
+        <div>
+          <div class="section-toggle-title">Create Prize</div>
+          <div class="section-toggle-sub">Prize creation form with privacy defaulting to ON</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+
+      <p>Prize creation is almost identical to task creation, but with two key differences: the privacy toggle defaults to <strong>ON</strong> (private), and there's a "Description" field that is only ever shown to the assignee — Sam can write something personal there without it appearing anywhere else.</p>
+
+      <div class="app-shell">
+        <div class="app-bar"><span class="app-bar-title">New Prize</span></div>
+        <div class="app-body" style="background:#fff">
+
+          <div class="m-label">Emoji</div>
+          <div class="emoji-row">
+            <div class="emoji-pick selected">😏</div>
+            <div class="emoji-pick">🍷</div>
+            <div class="emoji-pick">🧖</div>
+            <div class="emoji-pick">🎮</div>
+            <div class="emoji-pick">🍕</div>
+            <div class="emoji-pick">🎬</div>
+            <div class="emoji-pick">🛁</div>
+            <div class="emoji-pick">+</div>
+          </div>
+
+          <div class="m-label">Prize name</div>
+          <div class="m-input" style="color:#1e293b">Sexy time</div>
+
+          <div class="fg">
+            <div>
+              <div class="m-label">Point cost</div>
+              <div class="m-input" style="color:#1e293b">200 💜</div>
+            </div>
+            <div>
+              <div class="m-label">For</div>
+              <div class="m-input" style="color:#1e293b">Chris</div>
+            </div>
+          </div>
+
+          <div class="m-label">Description (only shown to Chris)</div>
+          <div class="m-input" style="height:52px;color:#1e293b">You pick the time, I'll make it worth it. 😘</div>
+
+          <!-- Privacy toggle — ON by default for prizes -->
+          <div style="background:#fdf4ff;border:1.5px solid #e9d5ff;border-radius:12px;padding:14px 16px;margin:6px 0 8px">
+            <div class="toggle-row" style="padding:0;border:none">
+              <div>
+                <div class="toggle-label">🔒 Private prize</div>
+                <div class="toggle-sub">Only Chris can see this. On by default for prizes.</div>
+              </div>
+              <div class="toggle-switch on"><div class="toggle-thumb"></div></div>
+            </div>
+          </div>
+
+          <div style="font-size:12px;color:#9333ea;padding:8px 4px 14px">
+            💡 Toggle off to make this prize visible to all adults — e.g. "Pizza night" or "Choose the movie".
+          </div>
+
+          <div class="m-footer">
+            <button class="m-btn-ghost">Cancel</button>
+            <button class="m-btn-primary">Create prize →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 8. APPROVALS ─── -->
+  <div class="collapsible-section open" id="approvals">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">08</div>
+        <div>
+          <div class="section-toggle-title">Approval Flow</div>
+          <div class="section-toggle-sub">Task completion and prize redemption approval steps</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+
+      <div class="flow">
+        <div class="flow-step on">
+          <div class="flow-dot">✅</div>
+          <div class="flow-label">Assignee marks done</div>
+          <div class="flow-sub">Taps tick on task</div>
+        </div>
+        <div class="flow-step on">
+          <div class="flow-dot">⏳</div>
+          <div class="flow-label">Pending approval</div>
+          <div class="flow-sub">Task turns amber</div>
+        </div>
+        <div class="flow-step on">
+          <div class="flow-dot">🔔</div>
+          <div class="flow-label">Assignor notified</div>
+          <div class="flow-sub">Push + badge</div>
+        </div>
+        <div class="flow-step on">
+          <div class="flow-dot">👍</div>
+          <div class="flow-label">Assignor approves</div>
+          <div class="flow-sub">Or rejects</div>
+        </div>
+        <div class="flow-step on">
+          <div class="flow-dot">💜</div>
+          <div class="flow-label">Points land</div>
+          <div class="flow-sub">Balance updates</div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <div>
+          <h3 style="margin-bottom:10px">Task approval</h3>
+          <div class="notif">
+            <div class="notif-icon">🏚️</div>
+            <div>
+              <div class="notif-title">Chris completed "Clean out the shed"</div>
+              <div class="notif-sub">Waiting for your approval · +200 💜</div>
+              <div class="notif-actions">
+                <button class="notif-approve">Approve ✓</button>
+                <button class="notif-reject">Reject ✗</button>
+              </div>
+            </div>
+          </div>
+          <div class="callout info" style="margin-top:4px">
+            <span class="callout-icon">💡</span>
+            <span class="callout-body">On approval, if the task has a <code>linkedPrizeId</code>, the prize is immediately highlighted in Chris's Prize Store as "Just unlocked!"</span>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom:10px">Prize redemption</h3>
+          <div class="notif">
+            <div class="notif-icon">😏</div>
+            <div>
+              <div class="notif-title">Chris wants to redeem "Sexy time"</div>
+              <div class="notif-sub">200 💜 · Private prize · Tap to review</div>
+              <div class="notif-actions">
+                <button class="notif-approve">Approve ✓</button>
+                <button class="notif-reject">Not yet ✗</button>
+              </div>
+            </div>
+          </div>
+          <div class="callout warn" style="margin-top:4px">
+            <span class="callout-icon">⚠️</span>
+            <span class="callout-body">The notification content for private prizes shows only the prize name — no description. The full description is only visible inside the app to the assignee.</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px;margin-bottom:10px">Rejection flow</h3>
+      <p>If the assignor rejects a task completion, the task returns to "Outstanding" with an optional reason message. The assignee gets a notification: <em>"Sam said: 'The shed floor wasn't swept — give it another go 😄'"</em>. Points are not awarded. The assignee can re-submit after re-doing the task.</p>
+
+      <table>
+        <thead><tr><th>Action</th><th>Points effect</th><th>Notification sent to</th></tr></thead>
+        <tbody>
+          <tr><td>Task marked done</td><td>None yet</td><td>Assignor — approval request</td></tr>
+          <tr><td>Task approved</td><td>+points to assignee</td><td>Assignee — "Points added!"</td></tr>
+          <tr><td>Task rejected</td><td>None</td><td>Assignee — rejection reason</td></tr>
+          <tr><td>Prize redeemed</td><td>-points from assignee (on approval)</td><td>Assignor — redemption request</td></tr>
+          <tr><td>Redemption approved</td><td>-points deducted</td><td>Assignee — "Enjoy! 🎉"</td></tr>
+          <tr><td>Redemption rejected</td><td>None</td><td>Assignee — "Not yet" message</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── 9. END-TO-END WALKTHROUGH ─── -->
+  <div class="collapsible-section open" id="walkthrough">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">09</div>
+        <div>
+          <div class="section-toggle-title">End-to-End Walkthrough — The Shed Example</div>
+          <div class="section-toggle-sub">Sam, Chris, and the shed: full flow from creation to redemption</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+      <p>This is the exact scenario from the brief, traced step by step through the system.</p>
+
+      <div class="example-step">
+        <div class="example-step-num">1</div>
+        <div class="example-step-body">
+          <div class="example-who who-sam">Sam</div>
+          <div class="example-step-title">Creates the prize first</div>
+          <div class="example-step-desc">Sam opens Adults → I've Set → New Prize. Enters emoji 😏, name "Sexy time", point cost 200, assigns to Chris, adds a private description, and leaves privacy ON. Saves.</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">2</div>
+        <div class="example-step-body">
+          <div class="example-who who-sam">Sam</div>
+          <div class="example-step-title">Creates the task, linked to the prize</div>
+          <div class="example-step-desc">Sam opens New Task. Enters emoji 🏚️, name "Clean out the shed", points 200, assigns to Chris, sets frequency to Once, and links to the "Sexy time" prize. Enables the private toggle. Saves.</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">3</div>
+        <div class="example-step-body">
+          <div class="example-who who-system">System</div>
+          <div class="example-step-title">Data written, privacy enforced</div>
+          <div class="example-step-desc">Both the task and the prize are stored with <code>private: true</code>, <code>assignedTo: chris</code>, <code>assignedBy: sam</code>. They do not appear in any other adult's view. If there were a third adult in the household, they would see nothing.</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">4</div>
+        <div class="example-step-body">
+          <div class="example-who who-chris">Chris</div>
+          <div class="example-step-title">Logs in and sees the task</div>
+          <div class="example-step-desc">Chris opens Adults → My Tasks. He sees "🏚️ Clean out the shed" with a 🔒 Private badge and "+200 💜". The linked prize name is shown as a teaser: "Complete this to unlock 😏 Sexy time". Sam's prize description is not shown yet — only after redemption.</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">5</div>
+        <div class="example-step-body">
+          <div class="example-who who-chris">Chris</div>
+          <div class="example-step-title">Does the task and marks it complete</div>
+          <div class="example-step-desc">Chris cleans the shed. In the app, he taps the ✓ on "Clean out the shed". The task moves to Pending Approval and turns amber.</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">6</div>
+        <div class="example-step-body">
+          <div class="example-who who-system">System</div>
+          <div class="example-step-title">Approval request sent to Sam</div>
+          <div class="example-step-desc">Sam receives a push notification: "Chris completed 'Clean out the shed' — approve to award 200 💜". The notification does not mention the linked prize.</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">7</div>
+        <div class="example-step-body">
+          <div class="example-who who-sam">Sam</div>
+          <div class="example-step-title">Inspects and approves</div>
+          <div class="example-step-desc">Sam opens Adults → I've Set, sees the pending approval banner, taps Approve. 200 💜 are added to Chris's balance. The linked prize "😏 Sexy time" appears in Chris's Prize Store highlighted as "Just unlocked!"</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">8</div>
+        <div class="example-step-body">
+          <div class="example-who who-chris">Chris</div>
+          <div class="example-step-title">Redeems the prize</div>
+          <div class="example-step-desc">Chris opens Prize Store, sees "😏 Sexy time" highlighted. He taps Redeem. A redemption request is sent to Sam. Chris's balance drops by 200 💜 (held pending approval, returned if rejected).</div>
+        </div>
+      </div>
+
+      <div class="example-step">
+        <div class="example-step-num">9</div>
+        <div class="example-step-body">
+          <div class="example-who who-sam">Sam</div>
+          <div class="example-step-title">Approves the redemption</div>
+          <div class="example-step-desc">Sam receives a private push notification: "Chris wants to redeem 😏 Sexy time". Sam approves. The points are finalised. Chris gets a notification: "Sam approved — enjoy! 🎉". The full prize description is now shown to Chris inside the app.</div>
+        </div>
+      </div>
+
+      <div class="callout ok" style="margin-top:8px">
+        <span class="callout-icon">✅</span>
+        <span class="callout-body"><strong>At no point</strong> did the task name "Clean out the shed", the prize name "Sexy time", or Sam's description appear in any shared household view, any child's session, or any notification visible to a third party. The entire exchange was private end-to-end.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 10. DASHBOARD WIDGET ─── -->
+  <div class="collapsible-section open" id="dashboard">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">10</div>
+        <div>
+          <div class="section-toggle-title">Dashboard Widget</div>
+          <div class="section-toggle-sub">How Adults activity surfaces on the main dashboard</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+      <p>The main dashboard shows a compact Adults widget. Critically, it must respect privacy — it never shows private task or prize names in a shared view. It shows only counts and balances.</p>
+
+      <div style="max-width:420px;margin:0 auto">
+        <div class="dash-widget">
+          <div class="dash-widget-header">
+            <div class="dash-widget-title">💜 Adults</div>
+            <div class="dash-widget-link">View →</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)">
+            <div style="background:#fff;padding:14px 18px">
+              <div style="font-size:11px;text-transform:uppercase;font-weight:600;color:#94a3b8;margin-bottom:4px">Chris's points</div>
+              <div style="font-size:20px;font-weight:800;color:var(--purple)">320 💜</div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:2px">2 tasks outstanding</div>
+            </div>
+            <div style="background:#fff;padding:14px 18px">
+              <div style="font-size:11px;text-transform:uppercase;font-weight:600;color:#94a3b8;margin-bottom:4px">Sam's points</div>
+              <div style="font-size:20px;font-weight:800;color:var(--purple)">150 💜</div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:2px">1 task outstanding</div>
+            </div>
+          </div>
+
+          <div style="padding:12px 18px;border-top:1px solid var(--border);background:#fdf4ff">
+            <div style="font-size:12px;color:#7c3aed;font-weight:600">⏳ 1 task waiting for your approval</div>
+          </div>
+        </div>
+
+        <div class="callout lock" style="margin-top:12px">
+          <span class="callout-icon">🔒</span>
+          <span class="callout-body"><strong>The widget never shows task or prize names.</strong> The "2 tasks outstanding" count includes private tasks but shows only the count — a third adult or a child glancing at the dashboard cannot infer what those tasks are.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 11. NOTIFICATIONS ─── -->
+  <div class="collapsible-section open" id="notifications">
+    <div class="section-toggle">
+      <div class="section-toggle-left">
+        <div class="section-num">11</div>
+        <div>
+          <div class="section-toggle-title">Notifications</div>
+          <div class="section-toggle-sub">Push and in-app notification rules for private and public items</div>
+        </div>
+      </div>
+      <span class="section-chevron open">▼</span>
+    </div>
+    <div class="section-body open">
+      <p>Notifications are the riskiest surface for privacy leakage. A notification visible on a lock screen could expose a private task or prize name to anyone who sees the device. The rules below prevent this.</p>
+
+      <table>
+        <thead><tr><th>Event</th><th>Recipient</th><th>Notification text (private)</th><th>Notification text (public)</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Task created for me</td>
+            <td>Assignee</td>
+            <td>"Sam set you a new private task 🔒"</td>
+            <td>"Sam set you a new task: Clean the car 🚗"</td>
+          </tr>
+          <tr>
+            <td>Task marked complete</td>
+            <td>Assignor</td>
+            <td>"Your partner completed a private task — approve it 💜"</td>
+            <td>"Chris completed 'Service the car' — approve to award 50 💜"</td>
+          </tr>
+          <tr>
+            <td>Task approved</td>
+            <td>Assignee</td>
+            <td>"Task approved — 200 💜 added to your balance!"</td>
+            <td>"Task approved — 50 💜 added! Keep it up 🎉"</td>
+          </tr>
+          <tr>
+            <td>Task rejected</td>
+            <td>Assignee</td>
+            <td>"Your task wasn't approved — open Toto for details"</td>
+            <td>"Sam sent feedback on 'Service the car' — open Toto"</td>
+          </tr>
+          <tr>
+            <td>Prize redeemed</td>
+            <td>Assignor</td>
+            <td>"Chris wants to redeem a private prize 🔒 — open Toto"</td>
+            <td>"Chris wants to redeem 'Pizza night' — approve?"</td>
+          </tr>
+          <tr>
+            <td>Redemption approved</td>
+            <td>Assignee</td>
+            <td>"Your prize was approved — enjoy! 🎉"</td>
+            <td>"'Pizza night' approved — enjoy! 🍕"</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout lock" style="margin-top:8px">
+        <span class="callout-icon">🔒</span>
+        <span class="callout-body"><strong>Lock screen rule:</strong> Private notifications use generic text only. The actual task or prize name is never included in the notification payload for private items — it only appears inside the app after the correct user has authenticated. This holds even if the device is unlocked.</span>
+      </div>
+
+      <div class="callout info" style="margin-top:8px">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Notification preference:</strong> Each adult should be able to toggle notifications for the Adults section independently — some people may prefer to check the app rather than receive push alerts for private content.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleSection(el) {
+    const section = el.closest('.collapsible-section');
+    const body = section.querySelector('.section-body');
+    const chev = section.querySelector('.section-chevron');
+    const isOpen = section.classList.contains('open');
+    section.classList.toggle('open', !isOpen);
+    body.classList.toggle('open', !isOpen);
+    chev.classList.toggle('open', !isOpen);
+  }
+  document.querySelectorAll('.section-toggle').forEach(t => t.addEventListener('click', () => toggleSection(t)));
+
+  window.setAll = open => {
+    document.querySelectorAll('.collapsible-section').forEach(s => {
+      s.classList.toggle('open', open);
+      s.querySelector('.section-body')?.classList.toggle('open', open);
+      s.querySelector('.section-chevron')?.classList.toggle('open', open);
+    });
+  };
+</script>
+</body>
+</html>

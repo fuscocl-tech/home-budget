@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Family Calendar Spec</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:    #0d9488;
+      --teal-lt: #f0fdfa;
+      --teal-bd: #ccfbf1;
+      --slate:   #1e293b;
+      --muted:   #64748b;
+      --border:  #e2e8f0;
+      --surface: #f8fafc;
+
+      /* Family member colours */
+      --chris:   #3b82f6;
+      --chris-lt:#eff6ff;
+      --sam:     #ec4899;
+      --sam-lt:  #fdf2f8;
+      --mia:     #f59e0b;
+      --mia-lt:  #fffbeb;
+      --jack:    #8b5cf6;
+      --jack-lt: #f5f3ff;
+      --family:  #0d9488;
+      --family-lt:#f0fdfa;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      display: flex; align-items: center; gap: 8px;
+      height: 56px; z-index: 200; overflow-x: auto;
+    }
+    .nav-brand { font-weight: 800; font-size: 15px; color: var(--teal); white-space: nowrap; flex-shrink: 0; margin-right: 8px; }
+    nav a { font-size: 12px; color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 6px; transition: all 0.15s; white-space: nowrap; }
+    nav a:hover { background: var(--teal-lt); color: var(--teal); }
+
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 44px 24px 100px; }
+    h1 { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--slate); }
+    p  { color: #475569; font-size: 14px; margin-bottom: 10px; }
+    p:last-child { margin-bottom: 0; }
+    ul { color: #475569; font-size: 14px; padding-left: 20px; margin-bottom: 10px; }
+    ul li { margin-bottom: 5px; }
+
+    /* ── Collapsible ── */
+    .collapsible-section { margin-bottom: 12px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+    .section-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; padding: 15px 20px; background: #fff; gap: 12px; transition: background 0.15s; }
+    .section-toggle:hover { background: var(--teal-lt); }
+    .collapsible-section.open .section-toggle { background: var(--teal-lt); border-bottom: 1px solid var(--teal-bd); }
+    .stl { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .s-icon { font-size: 22px; flex-shrink: 0; }
+    .s-title { font-size: 15px; font-weight: 700; color: var(--slate); }
+    .s-sub   { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .str { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .chev { font-size: 11px; color: var(--teal); transition: transform 0.25s; }
+    .collapsible-section.open .chev { transform: rotate(180deg); }
+    .sbody { display: none; background: #fff; padding: 24px; }
+    .sbody.open { display: block; }
+
+    /* ── Ctrl ── */
+    .ctrl-bar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 16px; }
+    .ctrl-btn { font-size: 12px; font-weight: 600; padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 8px; background: #fff; color: var(--muted); cursor: pointer; }
+    .ctrl-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── Tags ── */
+    .ptag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 2px 8px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
+    .ptag-core    { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+    .ptag-ipad    { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+    .ptag-tv      { background: #1e293b; color: #94a3b8;  border-color: #334155; }
+    .ptag-ux      { background: var(--teal-lt); color: var(--teal); border-color: var(--teal-bd); }
+
+    /* ── Callouts ── */
+    .callout { display: flex; gap: 12px; padding: 13px 16px; border-radius: 10px; margin: 14px 0; font-size: 13px; }
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { color: #374151; }
+    .callout-body strong { color: var(--slate); }
+    .callout.idea { background: var(--teal-lt); border: 1px solid var(--teal-bd); }
+    .callout.note { background: #f0f9ff; border: 1px solid #bae6fd; }
+    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; }
+
+    /* ── Field grid ── */
+    .fg  { display: grid; grid-template-columns: 1fr 1fr;     gap: 12px; margin: 14px 0; }
+    .fg3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 14px 0; }
+    @media (max-width: 660px) { .fg, .fg3 { grid-template-columns: 1fr; } }
+    .field { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .field-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; margin-bottom: 4px; }
+    .field-value { font-size: 13px; color: #334155; }
+
+    /* ── Feature list ── */
+    .flist { display: flex; flex-direction: column; gap: 7px; margin: 14px 0; }
+    .fitem { display: flex; align-items: flex-start; gap: 10px; padding: 10px 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .fbullet { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .ftext { font-size: 13px; color: #374151; }
+    .ftext strong { color: var(--slate); }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+    th { text-align: left; padding: 9px 12px; background: var(--surface); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    tr:last-child td { border: none; }
+
+    /* ──────────────────────────────────────────────
+       MEMBER LEGEND
+    ────────────────────────────────────────────── */
+    .member-legend { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+    .member-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 99px;
+      font-size: 13px; font-weight: 600; border: 2px solid;
+    }
+    .member-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* ──────────────────────────────────────────────
+       DAY VIEW CALENDAR MOCK-UP
+       8am → 7pm = 11 hours = 660 min
+       Container: 660px tall → 1px per minute
+       But we scale to 550px → ×0.833 px/min → ÷1.2
+       Simpler: 1 hour = 50px → total 550px
+    ────────────────────────────────────────────── */
+    .cal-wrap {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.10);
+      background: #fff;
+      margin: 24px auto;
+    }
+
+    /* top bar */
+    .cal-top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+    .cal-title { font-size: 17px; font-weight: 800; color: var(--slate); }
+    .cal-nav   { display: flex; gap: 6px; }
+    .cal-nav-btn {
+      width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border);
+      background: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--muted); transition: all .15s;
+    }
+    .cal-nav-btn:hover { background: var(--teal-lt); color: var(--teal); border-color: var(--teal); }
+    .cal-view-toggle { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .cal-vbtn { padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--muted); background: #fff; border: none; cursor: pointer; border-right: 1px solid var(--border); }
+    .cal-vbtn:last-child { border: none; }
+    .cal-vbtn.active { background: var(--teal); color: #fff; }
+
+    /* day-view grid */
+    .day-grid {
+      display: grid;
+      /* time axis + n member columns */
+      grid-template-columns: 48px repeat(4, 1fr);
+      overflow: hidden;
+    }
+
+    /* column headers */
+    .day-col-header {
+      padding: 12px 6px 10px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      background: #fff;
+    }
+    .day-col-header:last-child { border-right: none; }
+    .day-col-header .avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; margin: 0 auto 4px;
+    }
+    .day-col-header .name  { font-size: 12px; font-weight: 700; }
+    .day-col-header .score { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .time-header { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: #fff; }
+
+    /* scroll area */
+    .day-scroll { overflow-y: auto; max-height: 560px; position: relative; }
+
+    /* time axis column + event columns share the same row structure */
+    .day-body {
+      display: grid;
+      grid-template-columns: 48px repeat(4, 1fr);
+      position: relative;
+    }
+
+    .time-col {
+      border-right: 1px solid var(--border);
+      background: #fff;
+    }
+    .time-label {
+      height: 50px; /* 1 hour */
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding: 4px 8px 0 0;
+      font-size: 10px; font-weight: 600; color: #94a3b8;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* event column */
+    .event-col {
+      position: relative;
+      border-right: 1px solid var(--border);
+      background: #fff;
+    }
+    .event-col:last-child { border-right: none; }
+
+    /* each hour slot — creates the faint gridlines */
+    .hour-slot {
+      height: 50px;
+      border-bottom: 1px solid #f1f5f9;
+      position: relative;
+    }
+    /* half-hour dashed line */
+    .hour-slot::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 25px;
+      border-bottom: 1px dashed #f1f5f9;
+    }
+
+    /* events */
+    .cal-event {
+      position: absolute;
+      left: 3px; right: 3px;
+      border-radius: 7px;
+      padding: 4px 7px;
+      font-size: 11px;
+      font-weight: 600;
+      overflow: hidden;
+      cursor: pointer;
+      transition: filter .15s, transform .1s;
+      z-index: 2;
+    }
+    .cal-event:hover { filter: brightness(0.92); transform: scale(1.02); }
+    .cal-event .ev-time { font-size: 9px; font-weight: 500; opacity: 0.75; margin-bottom: 1px; }
+    .cal-event .ev-name { line-height: 1.2; }
+
+    /* family-wide event spans all columns — rendered differently */
+    .family-band {
+      position: absolute;
+      left: 0; right: 0;
+      z-index: 3;
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 12px;
+      font-size: 11px; font-weight: 700;
+      border-top: 2px solid var(--family);
+      border-bottom: 2px solid var(--family);
+      background: rgba(13,148,136,0.08);
+      color: var(--family);
+      pointer-events: none;
+    }
+
+    /* now indicator */
+    .now-line {
+      position: absolute;
+      left: 0; right: 0;
+      z-index: 10;
+      display: flex; align-items: center;
+      pointer-events: none;
+    }
+    .now-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ef4444; flex-shrink: 0; margin-left: -5px;
+    }
+    .now-rule { flex: 1; height: 2px; background: #ef4444; }
+
+    /* ──────────────────────────────────────────────
+       WEEK VIEW
+    ────────────────────────────────────────────── */
+    .week-grid {
+      display: grid;
+      grid-template-columns: 44px repeat(7, 1fr);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 12px;
+      margin: 16px 0;
+    }
+    .wk-day-head {
+      padding: 10px 6px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .wk-day-head:last-child { border-right: none; }
+    .wk-day-head .wkd  { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    .wk-day-head .wkn  { font-size: 16px; font-weight: 800; margin-top: 2px; }
+    .wk-day-head.today .wkn { color: #fff; background: var(--teal); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 2px auto 0; }
+    .wk-time { padding: 4px 6px; text-align: right; font-size: 10px; color: #94a3b8; font-weight: 600; border-right: 1px solid var(--border); border-bottom: 1px solid #f8fafc; background: #fff; }
+    .wk-cell {
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid #f8fafc;
+      padding: 3px 4px;
+      min-height: 28px;
+      background: #fff;
+      vertical-align: top;
+    }
+    .wk-cell:last-child { border-right: none; }
+    .wk-ev {
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .wk-cell.today-col { background: #fffbeb; }
+
+    /* ──────────────────────────────────────────────
+       MONTH VIEW
+    ────────────────────────────────────────────── */
+    .month-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .month-head { padding: 8px; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: var(--surface); border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+    .month-head:last-child { border-right: none; }
+    .month-day {
+      padding: 7px 8px 8px;
+      min-height: 72px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+      vertical-align: top;
+    }
+    .month-day:nth-child(7n) { border-right: none; }
+    .month-day.other-month { background: var(--surface); }
+    .month-day.today { background: var(--teal-lt); }
+    .month-day-num { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+    .month-day.today .month-day-num { color: var(--teal); }
+    .month-dots { display: flex; gap: 3px; flex-wrap: wrap; }
+    .mdot { width: 7px; height: 7px; border-radius: 50%; }
+    .month-ev { font-size: 10px; font-weight: 600; border-radius: 3px; padding: 1px 5px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+
+    /* ──────────────────────────────────────────────
+       TV / AMBIENT MODE
+    ────────────────────────────────────────────── */
+    .tv-display {
+      background: #0a0a0f;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+      margin: 24px auto;
+      max-width: 900px;
+      position: relative;
+      overflow: hidden;
+    }
+    .tv-display::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(13,148,136,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(59,130,246,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .tv-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .tv-date { color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+    .tv-clock { font-size: 52px; font-weight: 800; color: #fff; line-height: 1; }
+    .tv-weather { text-align: right; }
+    .tv-weather-temp { font-size: 40px; font-weight: 700; color: #fff; }
+    .tv-weather-desc { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+    .tv-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .tv-col {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 18px 16px;
+    }
+    .tv-col-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .tv-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .tv-col-name { font-size: 16px; font-weight: 800; color: #fff; }
+    .tv-col-sub  { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+    .tv-event {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border-left: 3px solid;
+    }
+    .tv-event-time { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.4); min-width: 44px; margin-top: 2px; }
+    .tv-event-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.85); line-height: 1.3; }
+    .tv-event-loc  { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+    .tv-now-label  { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 2px 6px; border-radius: 3px; margin-left: 4px; }
+
+    .tv-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 24px; padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .tv-footer-left { font-size: 12px; color: rgba(255,255,255,0.25); }
+    .tv-dinner { display: flex; align-items: center; gap: 10px; }
+    .tv-dinner-label { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: .06em; }
+    .tv-dinner-val { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.7); }
+
+    /* ──────────────────────────────────────────────
+       QUICK ADD / EVENT CREATION MOCKUP
+    ────────────────────────────────────────────── */
+    .quick-add {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+      max-width: 460px; margin: 20px auto;
+    }
+    .qa-input-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px 18px; border-bottom: 1px solid var(--border);
+    }
+    .qa-icon { font-size: 20px; flex-shrink: 0; }
+    .qa-input {
+      flex: 1; border: none; outline: none;
+      font-size: 16px; font-weight: 500; color: var(--slate);
+      background: transparent;
+    }
+    .qa-input::placeholder { color: #cbd5e1; }
+    .qa-parsed {
+      padding: 12px 18px; background: var(--teal-lt);
+      border-bottom: 1px solid var(--teal-bd);
+      font-size: 13px; color: var(--teal);
+    }
+    .qa-parsed strong { font-weight: 700; }
+    .qa-fields { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+    .qa-row { display: flex; gap: 10px; }
+    .qa-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 99px;
+      border: 1.5px solid var(--border); font-size: 13px;
+      font-weight: 500; color: var(--muted); cursor: pointer;
+      background: #fff; transition: all .15s; white-space: nowrap;
+    }
+    .qa-chip:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-lt); }
+    .qa-chip.selected { border-color: var(--chris); color: var(--chris); background: var(--chris-lt); }
+    .qa-member-chip { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px; border: 2px solid; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .qa-footer { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .qa-btn-ghost { padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); background: #fff; cursor: pointer; }
+    .qa-btn-primary { padding: 8px 20px; background: var(--teal); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+    /* ──────────────────────────────────────────────
+       GESTURE / INTERACTION GUIDE
+    ────────────────────────────────────────────── */
+    .gesture-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 14px 0; }
+    .gesture-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .gesture-icon { font-size: 28px; margin-bottom: 8px; }
+    .gesture-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .gesture-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+    /* ── Separator ── */
+    .sep { height: 1px; background: var(--border); margin: 20px 0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Toto Calendar</span>
+  <a href="#principles">Principles</a>
+  <a href="#day-view">Day View</a>
+  <a href="#week-view">Week View</a>
+  <a href="#month-view">Month View</a>
+  <a href="#tv-mode">TV / Ambient</a>
+  <a href="#create">Event Creation</a>
+  <a href="#gestures">Gestures</a>
+  <a href="#colours">Colours</a>
+  <a href="#integration">Integration</a>
+</nav>
+
+<div class="container">
+
+  <h1>Family Calendar</h1>
+  <p class="subtitle">Design specification — a shared calendar built for family life, optimised for side-by-side day view on iPad and ambient display on TV. Engagement, experience, and ease of use are the design north stars.</p>
+
+  <div class="ctrl-bar">
+    <button class="ctrl-btn" onclick="setAll(true)">Expand all</button>
+    <button class="ctrl-btn" onclick="setAll(false)">Collapse all</button>
+  </div>
+
+  <!-- ─── DESIGN PRINCIPLES ─── -->
+  <div class="collapsible-section open" id="principles">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">🎯</div>
+        <div><div class="s-title">Design Principles</div><div class="s-sub">The four rules every decision is measured against</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-core">Foundation</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <div class="fg" style="grid-template-columns:1fr 1fr 1fr 1fr">
+        <div class="field" style="background:var(--teal-lt);border-color:var(--teal-bd)">
+          <div class="field-label" style="color:var(--teal)">1 — Glanceable</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.7">You should understand today in under 3 seconds. No scanning, no hunting. The right information is immediately obvious.</div>
+        </div>
+        <div class="field" style="background:#eff6ff;border-color:#bfdbfe">
+          <div class="field-label" style="color:#2563eb">2 — Personal</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.7">Every person in the household is a first-class citizen. Their colour, their column, their events — unmistakably theirs.</div>
+        </div>
+        <div class="field" style="background:#fdf4ff;border-color:#e9d5ff">
+          <div class="field-label" style="color:#7c3aed">3 — Effortless to add</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.7">Adding an event should take under 10 seconds. Natural language, smart defaults, minimal tapping. Like Google Calendar at its best.</div>
+        </div>
+        <div class="field" style="background:#0a0a0f;border-color:#334155">
+          <div class="field-label" style="color:#64748b">4 — Beautiful on every screen</div>
+          <div class="field-value" style="margin-top:6px;font-size:13px;line-height:1.7;color:#94a3b8">Looks great on a phone, excellent on an iPad, and genuinely stunning in ambient TV mode. Not an afterthought on any device.</div>
+        </div>
+      </div>
+
+      <div class="callout idea" style="margin-top:8px">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Google Calendar as the benchmark:</strong> Google Calendar succeeds because it gets out of the way — adding events is frictionless, the visual hierarchy is clear, and it handles complex recurring events without making the user think. Toto's calendar must match that ease of use, then layer in the family-specific features that Google doesn't have: per-person columns, kids' events, shared routines, and TV ambient mode.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DAY VIEW ─── -->
+  <div class="collapsible-section open" id="day-view">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">📅</div>
+        <div><div class="s-title">Day View — Side-by-Side Columns</div><div class="s-sub">The signature view — everyone's day at once, on iPad</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-ipad">iPad primary</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <p>The side-by-side day view is Toto's defining calendar feature. Each household member gets their own column, colour-coded and named. The current time scrolls with you. Family-wide events span all columns. At a glance, you know exactly what everyone is doing and when the household's pinch-points are.</p>
+
+      <!-- Member legend -->
+      <div class="member-legend">
+        <div class="member-chip" style="background:var(--chris-lt);border-color:var(--chris);color:var(--chris)"><div class="member-dot" style="background:var(--chris)"></div>Chris</div>
+        <div class="member-chip" style="background:var(--sam-lt);border-color:var(--sam);color:var(--sam)"><div class="member-dot" style="background:var(--sam)"></div>Sam</div>
+        <div class="member-chip" style="background:var(--mia-lt);border-color:var(--mia);color:var(--mia)"><div class="member-dot" style="background:var(--mia)"></div>Mia</div>
+        <div class="member-chip" style="background:var(--jack-lt);border-color:var(--jack);color:var(--jack)"><div class="member-dot" style="background:var(--jack)"></div>Jack</div>
+        <div class="member-chip" style="background:var(--family-lt);border-color:var(--family);color:var(--family)"><div class="member-dot" style="background:var(--family)"></div>Whole family</div>
+      </div>
+
+      <!-- Day view mock-up -->
+      <div class="cal-wrap">
+
+        <!-- Top bar -->
+        <div class="cal-top-bar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="cal-nav">
+              <button class="cal-nav-btn">‹</button>
+              <button class="cal-nav-btn">›</button>
+            </div>
+            <div class="cal-title">Thursday, 24 April 2026</div>
+            <div style="background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px">Today</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="cal-view-toggle">
+              <button class="cal-vbtn active">Day</button>
+              <button class="cal-vbtn">Week</button>
+              <button class="cal-vbtn">Month</button>
+              <button class="cal-vbtn">Agenda</button>
+            </div>
+            <button style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>
+          </div>
+        </div>
+
+        <!-- Column headers -->
+        <div class="day-grid" style="border-bottom:1px solid var(--border)">
+          <div class="time-header" style="padding:10px 0"></div>
+
+          <div class="day-col-header" style="border-right:1px solid var(--border)">
+            <div class="avatar" style="background:var(--chris-lt)">👨</div>
+            <div class="name" style="color:var(--chris)">Chris</div>
+            <div class="score">3 events</div>
+          </div>
+          <div class="day-col-header" style="border-right:1px solid var(--border)">
+            <div class="avatar" style="background:var(--sam-lt)">👩</div>
+            <div class="name" style="color:var(--sam)">Sam</div>
+            <div class="score">3 events</div>
+          </div>
+          <div class="day-col-header" style="border-right:1px solid var(--border)">
+            <div class="avatar" style="background:var(--mia-lt)">🦊</div>
+            <div class="name" style="color:var(--mia)">Mia</div>
+            <div class="score">2 events</div>
+          </div>
+          <div class="day-col-header">
+            <div class="avatar" style="background:var(--jack-lt)">🐻</div>
+            <div class="name" style="color:var(--jack)">Jack</div>
+            <div class="score">2 events</div>
+          </div>
+        </div>
+
+        <!-- Scrollable body -->
+        <div class="day-scroll">
+          <div class="day-body">
+
+            <!-- Time axis -->
+            <div class="time-col">
+              <div class="time-label">8am</div>
+              <div class="time-label">9am</div>
+              <div class="time-label">10am</div>
+              <div class="time-label">11am</div>
+              <div class="time-label">12pm</div>
+              <div class="time-label">1pm</div>
+              <div class="time-label">2pm</div>
+              <div class="time-label">3pm</div>
+              <div class="time-label">4pm</div>
+              <div class="time-label">5pm</div>
+              <div class="time-label">6pm</div>
+              <div class="time-label">7pm</div>
+            </div>
+
+            <!-- Chris column -->
+            <div class="event-col">
+              <div class="hour-slot"></div><!-- 8am -->
+              <div class="hour-slot"></div><!-- 9am -->
+              <div class="hour-slot"></div><!-- 10am -->
+              <div class="hour-slot"></div><!-- 11am -->
+              <div class="hour-slot"></div><!-- 12pm -->
+              <div class="hour-slot"></div><!-- 1pm -->
+              <div class="hour-slot"></div><!-- 2pm -->
+              <div class="hour-slot"></div><!-- 3pm -->
+              <div class="hour-slot"></div><!-- 4pm -->
+              <div class="hour-slot"></div><!-- 5pm -->
+              <div class="hour-slot"></div><!-- 6pm -->
+              <div class="hour-slot"></div><!-- 7pm -->
+              <!-- School run 8:30–9:00 = top:25px h:25px -->
+              <div class="cal-event" style="top:25px;height:23px;background:var(--chris-lt);color:var(--chris);border-left:3px solid var(--chris)">
+                <div class="ev-time">8:30</div>
+                <div class="ev-name">School drop-off</div>
+              </div>
+              <!-- Work 9:00–12:00 = top:50 h:150 -->
+              <div class="cal-event" style="top:52px;height:147px;background:var(--chris-lt);color:var(--chris);border-left:3px solid var(--chris)">
+                <div class="ev-time">9:00 – 12:00</div>
+                <div class="ev-name">Work from home</div>
+              </div>
+              <!-- Lunch meeting 12:30–1:30 = top:225 h:50 -->
+              <div class="cal-event" style="top:225px;height:48px;background:var(--chris);color:#fff;border-left:3px solid #2563eb">
+                <div class="ev-time">12:30 – 1:30</div>
+                <div class="ev-name">Lunch w/ David</div>
+              </div>
+              <!-- Work 2pm-5pm = top:300 h:150 -->
+              <div class="cal-event" style="top:302px;height:147px;background:var(--chris-lt);color:var(--chris);border-left:3px solid var(--chris)">
+                <div class="ev-time">2:00 – 5:00</div>
+                <div class="ev-name">Work from home</div>
+              </div>
+            </div>
+
+            <!-- Sam column -->
+            <div class="event-col">
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <!-- School run 8:30 -->
+              <div class="cal-event" style="top:25px;height:23px;background:var(--sam-lt);color:var(--sam);border-left:3px solid var(--sam)">
+                <div class="ev-time">8:30</div>
+                <div class="ev-name">School drop-off</div>
+              </div>
+              <!-- Pilates 9:30–10:30 = top:75 h:50 -->
+              <div class="cal-event" style="top:77px;height:48px;background:var(--sam);color:#fff;border-left:3px solid #be185d">
+                <div class="ev-time">9:30 – 10:30</div>
+                <div class="ev-name">Pilates 🧘</div>
+              </div>
+              <!-- Work 11–3 = top:150 h:200 -->
+              <div class="cal-event" style="top:152px;height:97px;background:var(--sam-lt);color:var(--sam);border-left:3px solid var(--sam)">
+                <div class="ev-time">11:00 – 1:00</div>
+                <div class="ev-name">Work — office</div>
+              </div>
+              <!-- Pickup 3:00 = top:350 h:25 -->
+              <div class="cal-event" style="top:352px;height:23px;background:var(--sam);color:#fff;border-left:3px solid #be185d">
+                <div class="ev-time">3:00</div>
+                <div class="ev-name">School pickup</div>
+              </div>
+            </div>
+
+            <!-- Mia column -->
+            <div class="event-col">
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <!-- School 9–3 = top:50 h:300 -->
+              <div class="cal-event" style="top:52px;height:297px;background:var(--mia-lt);color:#92400e;border-left:3px solid var(--mia)">
+                <div class="ev-time">9:00 – 3:00</div>
+                <div class="ev-name">School</div>
+              </div>
+              <!-- Swimming 3:30–5 = top:375 h:75 -->
+              <div class="cal-event" style="top:377px;height:73px;background:var(--mia);color:#fff;border-left:3px solid #b45309">
+                <div class="ev-time">3:30 – 5:00</div>
+                <div class="ev-name">Swimming 🏊</div>
+              </div>
+            </div>
+
+            <!-- Jack column -->
+            <div class="event-col">
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <div class="hour-slot"></div>
+              <!-- Kindy 9–2 = top:50 h:250 -->
+              <div class="cal-event" style="top:52px;height:247px;background:var(--jack-lt);color:#5b21b6;border-left:3px solid var(--jack)">
+                <div class="ev-time">9:00 – 2:00</div>
+                <div class="ev-name">Kindy 🎒</div>
+              </div>
+              <!-- Soccer 4–5:30 = top:400 h:75 -->
+              <div class="cal-event" style="top:402px;height:73px;background:var(--jack);color:#fff;border-left:3px solid #6d28d9">
+                <div class="ev-time">4:00 – 5:30</div>
+                <div class="ev-name">Soccer ⚽</div>
+              </div>
+            </div>
+
+            <!-- Now line at 2:30pm = 325px from 8am (6.5h × 50px) -->
+            <div style="position:absolute;top:325px;left:48px;right:0;z-index:10;display:flex;align-items:center;pointer-events:none">
+              <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;margin-left:-5px;flex-shrink:0"></div>
+              <div style="flex:1;height:2px;background:#ef4444;opacity:0.8"></div>
+              <div style="font-size:10px;font-weight:700;color:#ef4444;padding:0 8px;background:rgba(255,255,255,0.9);border-radius:3px;white-space:nowrap">2:30pm</div>
+            </div>
+
+            <!-- Family dinner 6:30–7pm = top:525 h:25 — spans all event cols -->
+            <!-- We overlay this as an absolute band across the 4 event columns -->
+            <div style="position:absolute;left:48px;right:0;top:527px;height:48px;z-index:5;
+              background:rgba(13,148,136,0.09);
+              border-top:2px solid var(--teal);border-bottom:2px solid var(--teal);
+              display:flex;align-items:center;gap:8px;padding:0 14px;
+              font-size:12px;font-weight:700;color:var(--teal)">
+              🍝 Family dinner — 6:30pm &nbsp;·&nbsp; <span style="font-weight:400;opacity:0.7">Spaghetti bolognese</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>The red "now" line is critical:</strong> It scrolls the view to the current time on open, and provides immediate orientation — you see what's happening now and what's coming next without any mental calculation. Google Calendar does this well; Toto must too.</span>
+      </div>
+
+      <h3 style="margin-top:20px;margin-bottom:10px">What makes the day view special</h3>
+      <div class="fg3">
+        <div class="field">
+          <div class="field-label">Conflict visibility</div>
+          <div class="field-value" style="font-size:13px;margin-top:4px">When both Chris and Sam have events at 3pm, the columns make the conflict immediately obvious — no mental cross-referencing needed. "Who's doing pickup?" becomes visually self-evident.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Family events span all columns</div>
+          <div class="field-value" style="font-size:13px;margin-top:4px">Events that involve everyone — family dinner, holiday, school pick-up — display as a teal band crossing all columns. They're instantly distinguishable from individual events.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Tap any column to add</div>
+          <div class="field-value" style="font-size:13px;margin-top:4px">Tapping a time slot in Mia's column pre-fills the event as assigned to Mia at that time. Fewer taps, smarter defaults.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── WEEK VIEW ─── -->
+  <div class="collapsible-section open" id="week-view">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">🗓️</div>
+        <div><div class="s-title">Week View</div><div class="s-sub">Seven days, all family members, colour-coded at a glance</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-ipad">iPad + phone</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <p>The week view shows seven days as columns with events as coloured blocks. Multiple family members' events coexist in each day column, distinguished purely by colour. Days with heavy schedules are immediately visible.</p>
+
+      <div class="cal-wrap">
+        <div class="cal-top-bar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="cal-nav"><button class="cal-nav-btn">‹</button><button class="cal-nav-btn">›</button></div>
+            <div class="cal-title">April 2026</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="cal-view-toggle">
+              <button class="cal-vbtn">Day</button>
+              <button class="cal-vbtn active">Week</button>
+              <button class="cal-vbtn">Month</button>
+              <button class="cal-vbtn">Agenda</button>
+            </div>
+            <button style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto">
+          <div style="min-width:600px">
+          <div class="week-grid">
+            <div class="wk-day-head" style="background:var(--surface)"></div>
+            <div class="wk-day-head"><div class="wkd">Mon</div><div class="wkn">21</div></div>
+            <div class="wk-day-head"><div class="wkd">Tue</div><div class="wkn">22</div></div>
+            <div class="wk-day-head"><div class="wkd">Wed</div><div class="wkn">23</div></div>
+            <div class="wk-day-head today"><div class="wkd">Thu</div><div class="wkn">24</div></div>
+            <div class="wk-day-head"><div class="wkd">Fri</div><div class="wkn">25</div></div>
+            <div class="wk-day-head" style="color:#94a3b8"><div class="wkd">Sat</div><div class="wkn" style="color:#94a3b8">26</div></div>
+            <div class="wk-day-head" style="color:#94a3b8"><div class="wkd">Sun</div><div class="wkn" style="color:#94a3b8">27</div></div>
+
+            <!-- 9am row -->
+            <div class="wk-time">9am</div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--chris-lt);color:var(--chris)">Work WFH</div><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">School</div><div class="wk-ev" style="background:var(--jack-lt);color:#5b21b6">Kindy</div></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--chris-lt);color:var(--chris)">Office</div><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">School</div><div class="wk-ev" style="background:var(--jack-lt);color:#5b21b6">Kindy</div></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--chris-lt);color:var(--chris)">Work WFH</div><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">School</div><div class="wk-ev" style="background:var(--jack-lt);color:#5b21b6">Kindy</div></div>
+            <div class="wk-cell today-col"><div class="wk-ev" style="background:var(--chris-lt);color:var(--chris)">Work WFH</div><div class="wk-ev" style="background:var(--sam-lt);color:var(--sam)">Pilates</div><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">School</div><div class="wk-ev" style="background:var(--jack-lt);color:#5b21b6">Kindy</div></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--chris-lt);color:var(--chris)">Work WFH</div><div class="wk-ev" style="background:var(--sam-lt);color:var(--sam)">Work</div><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">School</div></div>
+            <div class="wk-cell" style="background:var(--surface)"><div class="wk-ev" style="background:#f0fdf4;color:#16a34a">Farmers market 🌿</div></div>
+            <div class="wk-cell" style="background:var(--surface)"></div>
+
+            <!-- 3pm row -->
+            <div class="wk-time">3pm</div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">Art class 🎨</div></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--jack-lt);color:#5b21b6">Soccer ⚽</div></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">Dance 💃</div></div>
+            <div class="wk-cell today-col"><div class="wk-ev" style="background:var(--mia);color:#fff">Swimming 🏊</div><div class="wk-ev" style="background:var(--jack);color:#fff">Soccer ⚽</div></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--mia-lt);color:#92400e">Music 🎵</div></div>
+            <div class="wk-cell" style="background:var(--surface)"><div class="wk-ev" style="background:var(--chris);color:#fff">Bike ride 🚴</div></div>
+            <div class="wk-cell" style="background:var(--surface)"></div>
+
+            <!-- 6pm row -->
+            <div class="wk-time">6pm</div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--family-lt);color:var(--family)">🍝 Family dinner</div></div>
+            <div class="wk-cell"></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--chris-lt);color:var(--chris)">Gym 🏋️</div></div>
+            <div class="wk-cell today-col"><div class="wk-ev" style="background:var(--family-lt);color:var(--family)">🍝 Family dinner</div></div>
+            <div class="wk-cell"><div class="wk-ev" style="background:var(--sam);color:#fff">Date night 💕</div></div>
+            <div class="wk-cell" style="background:var(--surface)"><div class="wk-ev" style="background:var(--family-lt);color:var(--family)">BBQ at Nana's</div></div>
+            <div class="wk-cell" style="background:var(--surface)"></div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Density handling:</strong> When a day has more events than fit in the cell, show the top 3 and a "+2 more" overflow chip. Tapping the day header jumps to that day's full day view.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MONTH VIEW ─── -->
+  <div class="collapsible-section open" id="month-view">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">📆</div>
+        <div><div class="s-title">Month View</div><div class="s-sub">The big picture — colour dots and key events per day</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-ux">All screens</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <p>The month view gives the household a birds-eye view of the coming weeks. Each day shows coloured dots per family member with events, making busy weeks instantly obvious without overwhelming the grid.</p>
+
+      <div class="cal-wrap" style="max-width:700px">
+        <div class="cal-top-bar">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="cal-nav"><button class="cal-nav-btn">‹</button><button class="cal-nav-btn">›</button></div>
+            <div class="cal-title">April 2026</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="cal-view-toggle">
+              <button class="cal-vbtn">Day</button>
+              <button class="cal-vbtn">Week</button>
+              <button class="cal-vbtn active">Month</button>
+              <button class="cal-vbtn">Agenda</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:16px">
+          <div class="month-grid">
+            <div class="month-head">Mon</div><div class="month-head">Tue</div><div class="month-head">Wed</div>
+            <div class="month-head">Thu</div><div class="month-head">Fri</div>
+            <div class="month-head" style="color:#94a3b8">Sat</div><div class="month-head" style="color:#94a3b8">Sun</div>
+
+            <!-- Week 1 — starts Wed 1 Apr -->
+            <div class="month-day other-month"><div class="month-day-num" style="color:#cbd5e1">31</div></div>
+            <div class="month-day other-month"><div class="month-day-num" style="color:#cbd5e1">1</div></div>
+            <div class="month-day"><div class="month-day-num">2</div><div class="month-dots"><div class="mdot" style="background:var(--chris)"></div><div class="mdot" style="background:var(--sam)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">3</div><div class="month-dots"><div class="mdot" style="background:var(--mia)"></div><div class="mdot" style="background:var(--jack)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">4</div><div class="month-ev" style="background:var(--family-lt);color:var(--family)">🌿 Market</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">5</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">6</div></div>
+
+            <!-- Week 2 -->
+            <div class="month-day"><div class="month-day-num">7</div><div class="month-dots"><div class="mdot" style="background:var(--chris)"></div><div class="mdot" style="background:var(--mia)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">8</div><div class="month-dots"><div class="mdot" style="background:var(--sam)"></div><div class="mdot" style="background:var(--jack)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">9</div><div class="month-ev" style="background:var(--chris-lt);color:var(--chris)">Dentist 🦷</div></div>
+            <div class="month-day"><div class="month-day-num">10</div><div class="month-dots"><div class="mdot" style="background:var(--mia)"></div><div class="mdot" style="background:var(--jack)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">11</div><div class="month-ev" style="background:var(--sam-lt);color:var(--sam)">Sam B'day 🎂</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">12</div><div class="month-ev" style="background:var(--family-lt);color:var(--family)">Nana's 🏡</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">13</div></div>
+
+            <!-- Week 3 -->
+            <div class="month-day"><div class="month-day-num">14</div><div class="month-dots"><div class="mdot" style="background:var(--chris)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">15</div><div class="month-dots"><div class="mdot" style="background:var(--sam)"></div><div class="mdot" style="background:var(--mia)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">16</div></div>
+            <div class="month-day"><div class="month-day-num">17</div><div class="month-dots"><div class="mdot" style="background:var(--mia)"></div><div class="mdot" style="background:var(--jack)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">18</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">19</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">20</div></div>
+
+            <!-- Week 4 — this week -->
+            <div class="month-day"><div class="month-day-num">21</div><div class="month-dots"><div class="mdot" style="background:var(--chris)"></div><div class="mdot" style="background:var(--mia)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">22</div><div class="month-dots"><div class="mdot" style="background:var(--sam)"></div><div class="mdot" style="background:var(--jack)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">23</div><div class="month-dots"><div class="mdot" style="background:var(--chris)"></div><div class="mdot" style="background:var(--mia)"></div></div></div>
+            <div class="month-day today"><div class="month-day-num">24</div><div class="month-dots"><div class="mdot" style="background:var(--chris)"></div><div class="mdot" style="background:var(--sam)"></div><div class="mdot" style="background:var(--mia)"></div><div class="mdot" style="background:var(--jack)"></div></div><div class="month-ev" style="background:var(--family-lt);color:var(--family)">🍝 Family dinner</div></div>
+            <div class="month-day"><div class="month-day-num">25</div><div class="month-ev" style="background:var(--sam);color:#fff">Date night 💕</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">26</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#94a3b8">27</div></div>
+
+            <!-- Week 5 -->
+            <div class="month-day"><div class="month-day-num">28</div><div class="month-dots"><div class="mdot" style="background:var(--chris)"></div></div></div>
+            <div class="month-day"><div class="month-day-num">29</div></div>
+            <div class="month-day"><div class="month-day-num">30</div><div class="month-ev" style="background:var(--chris-lt);color:var(--chris)">Pay day 💰</div></div>
+            <div class="month-day other-month"><div class="month-day-num" style="color:#cbd5e1">1</div></div>
+            <div class="month-day other-month"><div class="month-day-num" style="color:#cbd5e1">2</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#cbd5e1">3</div></div>
+            <div class="month-day other-month" style="background:#f8fafc"><div class="month-day-num" style="color:#cbd5e1">4</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TV / AMBIENT MODE ─── -->
+  <div class="collapsible-section open" id="tv-mode">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">📺</div>
+        <div><div class="s-title">TV &amp; Ambient Display Mode</div><div class="s-sub">The family command centre on the kitchen TV or mounted iPad</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-tv">TV · Large screen</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <p>Ambient mode is designed for a TV mounted in the kitchen or living area, or an iPad on a stand on the bench. It is a <strong>display only</strong> — no interaction required. It should look stunning, be instantly readable from across the room, and contain everything the household needs to know as they move through the morning.</p>
+
+      <div class="tv-display">
+        <!-- Header row: clock + weather -->
+        <div class="tv-header">
+          <div>
+            <div class="tv-date">Thursday, 24 April 2026</div>
+            <div class="tv-clock">7:34am</div>
+          </div>
+          <div class="tv-weather">
+            <div style="font-size:36px;margin-bottom:4px">🌤️</div>
+            <div class="tv-weather-temp">22°</div>
+            <div class="tv-weather-desc">Partly cloudy · Low 14°</div>
+          </div>
+        </div>
+
+        <!-- Family columns -->
+        <div class="tv-columns">
+
+          <!-- Chris -->
+          <div class="tv-col">
+            <div class="tv-col-header">
+              <div class="tv-avatar" style="background:rgba(59,130,246,0.15)">👨</div>
+              <div>
+                <div class="tv-col-name">Chris</div>
+                <div class="tv-col-sub">3 events today</div>
+              </div>
+            </div>
+            <div class="tv-event" style="background:rgba(59,130,246,0.08);border-color:var(--chris)">
+              <div class="tv-event-time">8:30</div>
+              <div><div class="tv-event-name">School drop-off</div></div>
+            </div>
+            <div class="tv-event" style="background:rgba(59,130,246,0.08);border-color:var(--chris)">
+              <div class="tv-event-time">9–12</div>
+              <div><div class="tv-event-name">Work from home</div></div>
+            </div>
+            <div class="tv-event" style="background:rgba(59,130,246,0.15);border-color:var(--chris)">
+              <div class="tv-event-time">12:30</div>
+              <div>
+                <div class="tv-event-name">Lunch w/ David</div>
+                <div class="tv-event-loc">Café Bello, CBD</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sam -->
+          <div class="tv-col">
+            <div class="tv-col-header">
+              <div class="tv-avatar" style="background:rgba(236,72,153,0.15)">👩</div>
+              <div>
+                <div class="tv-col-name">Sam</div>
+                <div class="tv-col-sub">3 events today</div>
+              </div>
+            </div>
+            <div class="tv-event" style="background:rgba(236,72,153,0.08);border-color:var(--sam)">
+              <div class="tv-event-time">8:30</div>
+              <div><div class="tv-event-name">School drop-off</div></div>
+            </div>
+            <div class="tv-event" style="background:rgba(236,72,153,0.15);border-color:var(--sam)">
+              <div class="tv-event-time">9:30</div>
+              <div>
+                <div class="tv-event-name">Pilates 🧘</div>
+                <div class="tv-event-loc">Fitness First</div>
+              </div>
+            </div>
+            <div class="tv-event" style="background:rgba(236,72,153,0.08);border-color:var(--sam)">
+              <div class="tv-event-time">11–1</div>
+              <div><div class="tv-event-name">Work — office</div></div>
+            </div>
+            <div class="tv-event" style="background:rgba(236,72,153,0.08);border-color:var(--sam)">
+              <div class="tv-event-time">3:00</div>
+              <div><div class="tv-event-name">School pickup 🎒</div></div>
+            </div>
+          </div>
+
+          <!-- Mia -->
+          <div class="tv-col">
+            <div class="tv-col-header">
+              <div class="tv-avatar" style="background:rgba(245,158,11,0.15)">🦊</div>
+              <div>
+                <div class="tv-col-name">Mia</div>
+                <div class="tv-col-sub">2 events today</div>
+              </div>
+            </div>
+            <div class="tv-event" style="background:rgba(245,158,11,0.08);border-color:var(--mia)">
+              <div class="tv-event-time">9–3</div>
+              <div>
+                <div class="tv-event-name">School 🏫</div>
+                <div class="tv-event-loc">St Mary's Primary</div>
+              </div>
+            </div>
+            <div class="tv-event" style="background:rgba(245,158,11,0.15);border-color:var(--mia)">
+              <div class="tv-event-time">3:30</div>
+              <div>
+                <div class="tv-event-name">Swimming 🏊</div>
+                <div class="tv-event-loc">Pack togs + towel</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Jack -->
+          <div class="tv-col">
+            <div class="tv-col-header">
+              <div class="tv-avatar" style="background:rgba(139,92,246,0.15)">🐻</div>
+              <div>
+                <div class="tv-col-name">Jack</div>
+                <div class="tv-col-sub">2 events today</div>
+              </div>
+            </div>
+            <div class="tv-event" style="background:rgba(139,92,246,0.08);border-color:var(--jack)">
+              <div class="tv-event-time">9–2</div>
+              <div>
+                <div class="tv-event-name">Kindy 🎒</div>
+                <div class="tv-event-loc">Signed form ⚠️</div>
+              </div>
+            </div>
+            <div class="tv-event" style="background:rgba(139,92,246,0.15);border-color:var(--jack)">
+              <div class="tv-event-time">4:00</div>
+              <div>
+                <div class="tv-event-name">Soccer ⚽</div>
+                <div class="tv-event-loc">Riverside Park</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer: dinner + countdown -->
+        <div class="tv-footer">
+          <div class="tv-footer-left">🍝 Tonight: Spaghetti Bolognese &nbsp;·&nbsp; Family dinner 6:30pm</div>
+          <div style="display:flex;gap:24px">
+            <div style="text-align:center">
+              <div style="font-size:22px;font-weight:800;color:rgba(255,255,255,0.7)">57</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.06em">days to Bali 🌴</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:22px;font-weight:800;color:rgba(255,255,255,0.7)">$2,350</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.06em">monthly surplus</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout note">
+        <span class="callout-icon">📺</span>
+        <span class="callout-body"><strong>Auto-activating TV mode:</strong> When Toto detects it's running on an Apple TV or a browser connected to a large display, it automatically enters ambient mode. On iPad, a "Display mode" button in the top corner locks the screen on and switches to the TV layout — useful when the iPad is on a kitchen stand.</span>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Smart refresh:</strong> TV mode refreshes every 60 seconds. Events that started show with a subtle "Now" indicator. Events in the next 30 minutes get a gentle amber highlight — "Mia's swimming starts in 20 minutes, togs packed?" — so it functions as a passive reminder system without anyone having to actively check.</span>
+      </div>
+
+      <h3 style="margin-top:20px;margin-bottom:12px">What TV mode shows vs hides</h3>
+      <div class="fg">
+        <div class="field" style="background:#f0fdf4;border-color:#bbf7d0">
+          <div class="field-label" style="color:#16a34a">Always shown</div>
+          <div class="field-value" style="font-size:13px;margin-top:6px;line-height:1.9">
+            Clock and date<br>Weather<br>Each person's events for today<br>Dinner tonight<br>Active countdowns<br>Upcoming-event highlights (next 30min)
+          </div>
+        </div>
+        <div class="field" style="background:#fef2f2;border-color:#fca5a5">
+          <div class="field-label" style="color:#dc2626">Never shown in TV mode</div>
+          <div class="field-value" style="font-size:13px;margin-top:6px;line-height:1.9">
+            Private adult tasks or prizes<br>Financial details (bills, net worth)<br>Notification badges or alerts<br>Any content requiring interaction<br>Messages or noticeboard
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EVENT CREATION ─── -->
+  <div class="collapsible-section open" id="create">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">✏️</div>
+        <div><div class="s-title">Event Creation — Frictionless by Design</div><div class="s-sub">Natural language, smart defaults, under 10 seconds</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-ux">UX priority</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <p>The single most important factor in whether people maintain a calendar is how easy it is to add events. If it takes more than 10 seconds, people default to their phone's native calendar. Toto's event creation must be the fastest in the category.</p>
+
+      <h3 style="margin-bottom:12px">Quick add — natural language</h3>
+      <div class="quick-add">
+        <div class="qa-input-row">
+          <span class="qa-icon">✏️</span>
+          <input class="qa-input" value="Mia swimming Thursday 3:30pm" readonly>
+          <span style="font-size:18px;cursor:pointer;color:#94a3b8">×</span>
+        </div>
+        <div class="qa-parsed">
+          ✨ <strong>Mia</strong> · Swimming · <strong>Thursday 24 Apr</strong> · <strong>3:30pm</strong> · Repeats weekly? <a href="#" style="color:var(--teal);font-weight:700;text-decoration:none">Set repeat</a>
+        </div>
+        <div class="qa-fields">
+          <div>
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:8px">Who's involved?</div>
+            <div class="qa-row" style="flex-wrap:wrap;gap:6px">
+              <div class="qa-member-chip" style="background:var(--mia-lt);border-color:var(--mia);color:#92400e">🦊 Mia ✓</div>
+              <div class="qa-member-chip" style="background:#fff;border-color:var(--border);color:var(--muted)">👨 Chris</div>
+              <div class="qa-member-chip" style="background:#fff;border-color:var(--border);color:var(--muted)">👩 Sam</div>
+              <div class="qa-member-chip" style="background:#fff;border-color:var(--border);color:var(--muted)">🐻 Jack</div>
+            </div>
+          </div>
+          <div class="qa-row" style="flex-wrap:wrap;gap:8px">
+            <div class="qa-chip">📍 Add location</div>
+            <div class="qa-chip">🔁 Repeat weekly</div>
+            <div class="qa-chip">🔔 Reminder</div>
+            <div class="qa-chip">📝 Notes</div>
+          </div>
+        </div>
+        <div class="qa-footer">
+          <button class="qa-btn-ghost">More options</button>
+          <button class="qa-btn-primary">Save event →</button>
+        </div>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Natural language parsing:</strong> "Mia swimming Thursday 3:30" should parse to Mia's column, Thursday, 3:30pm, with "Swimming" as the event name. "Dentist tomorrow 2pm Chris" → Chris, tomorrow, 2pm. "Family dinner Friday 7" → all members, Friday 7pm. Failures fall back gracefully to the standard form pre-filled with whatever was typed.</span>
+      </div>
+
+      <h3 style="margin-top:24px;margin-bottom:12px">Three ways to add an event</h3>
+      <div class="fg3">
+        <div class="field">
+          <div class="field-label">1 — Quick add (text)</div>
+          <div class="field-value" style="font-size:13px;margin-top:6px">Type naturally. AI parses name, time, date, and person. Fastest path — ideal for phone.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">2 — Tap a time slot</div>
+          <div class="field-value" style="font-size:13px;margin-top:6px">Tap in a person's column at a specific time. Pre-fills person and time. Just type the name and save. Ideal for iPad.</div>
+        </div>
+        <div class="field">
+          <div class="field-label">3 — Full form</div>
+          <div class="field-value" style="font-size:13px;margin-top:6px">"More options" expands to a complete event form for complex recurring events, travel time, attachments.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── GESTURES ─── -->
+  <div class="collapsible-section open" id="gestures">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">👆</div>
+        <div><div class="s-title">Gestures &amp; Interactions</div><div class="s-sub">Touch and pointer interactions that make the calendar feel native</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-ipad">iPad priority</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <div class="gesture-grid">
+        <div class="gesture-card">
+          <div class="gesture-icon">👆</div>
+          <div class="gesture-name">Tap time slot</div>
+          <div class="gesture-desc">Opens quick-add pre-filled with that person's column and time</div>
+        </div>
+        <div class="gesture-card">
+          <div class="gesture-icon">👆👆</div>
+          <div class="gesture-name">Tap event</div>
+          <div class="gesture-desc">Opens event detail — time, location, who's involved, edit button</div>
+        </div>
+        <div class="gesture-card">
+          <div class="gesture-icon">👈 👉</div>
+          <div class="gesture-name">Swipe left / right</div>
+          <div class="gesture-desc">Navigate to previous / next day (day view) or week (week view)</div>
+        </div>
+        <div class="gesture-card">
+          <div class="gesture-icon">🤏</div>
+          <div class="gesture-name">Pinch to zoom</div>
+          <div class="gesture-desc">Expand or compress the time scale — zoom in to see 30min slots, zoom out for a full-day overview</div>
+        </div>
+        <div class="gesture-card">
+          <div class="gesture-icon">👇 hold</div>
+          <div class="gesture-name">Long press event</div>
+          <div class="gesture-desc">Grab and drag to reschedule — drop on a new time to move it. Hold on empty slot to create.</div>
+        </div>
+        <div class="gesture-card">
+          <div class="gesture-icon">👆 col header</div>
+          <div class="gesture-name">Tap person's name</div>
+          <div class="gesture-desc">Toggle that person's events on/off — useful when you only want to focus on one member's schedule</div>
+        </div>
+        <div class="gesture-card">
+          <div class="gesture-icon">⬆️ pull</div>
+          <div class="gesture-name">Pull down to today</div>
+          <div class="gesture-desc">Any pull-to-refresh gesture snaps the calendar back to today's date and current time</div>
+        </div>
+        <div class="gesture-card">
+          <div class="gesture-icon">📺</div>
+          <div class="gesture-name">Two-finger tap</div>
+          <div class="gesture-desc">On iPad: toggle ambient/TV mode. Lock screen on, switch to full-screen column view.</div>
+        </div>
+      </div>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Drag to reschedule</strong> is the single most-loved gesture in Google Calendar. Users should be able to long-press any event and drag it to a new time — the event snaps to 15-minute increments. Dragging across columns changes the assigned person. This makes the calendar feel truly live and editable, not just a display.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── COLOUR SYSTEM ─── -->
+  <div class="collapsible-section open" id="colours">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">🎨</div>
+        <div><div class="s-title">Colour System &amp; Personalisation</div><div class="s-sub">How each family member gets their identity across the whole app</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-ux">Brand</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <p>Each household member is assigned a colour during onboarding. That colour is their identity across the entire app — not just the calendar. Their chore cards, their dashboard widget, their lunchbox profile, their Today screen section — all use the same colour.</p>
+
+      <table>
+        <thead><tr><th>Member</th><th>Default colour</th><th>Used in</th><th>Customisable?</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Adult 1 (Owner)</strong></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:50%;background:#3b82f6;display:inline-block"></span> Blue #3b82f6</span></td>
+            <td>Calendar events, dashboard, adults section</td>
+            <td>Yes — 12 colour options</td>
+          </tr>
+          <tr>
+            <td><strong>Adult 2</strong></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:50%;background:#ec4899;display:inline-block"></span> Pink #ec4899</span></td>
+            <td>Calendar events, dashboard, adults section</td>
+            <td>Yes — 12 colour options</td>
+          </tr>
+          <tr>
+            <td><strong>Child 1</strong></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:50%;background:#f59e0b;display:inline-block"></span> Amber #f59e0b</span></td>
+            <td>Calendar, kids chores, lunchbox, TV display</td>
+            <td>Yes — child picks during onboarding</td>
+          </tr>
+          <tr>
+            <td><strong>Child 2</strong></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:50%;background:#8b5cf6;display:inline-block"></span> Purple #8b5cf6</span></td>
+            <td>Calendar, kids chores, lunchbox, TV display</td>
+            <td>Yes — child picks during onboarding</td>
+          </tr>
+          <tr>
+            <td><strong>Whole family</strong></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:50%;background:#0d9488;display:inline-block"></span> Teal #0d9488</span></td>
+            <td>Family-wide events, spans all columns</td>
+            <td>No — Toto brand colour, always teal</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout idea">
+        <span class="callout-icon">💡</span>
+        <span class="callout-body"><strong>Colour consistency is the experience:</strong> When a child sees their amber colour on the calendar, the lunchbox, the chore card, and the TV display, the app feels coherent and personal. It's not a visual detail — it's the thread that makes Toto feel like a unified family platform rather than a collection of features.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── INTEGRATION ─── -->
+  <div class="collapsible-section open" id="integration">
+    <div class="section-toggle">
+      <div class="stl">
+        <div class="s-icon">🔗</div>
+        <div><div class="s-title">Integration with the Rest of Toto</div><div class="s-sub">How the calendar connects every other feature together</div></div>
+      </div>
+      <div class="str"><span class="ptag ptag-ux">Architecture</span><span class="chev open">▼</span></div>
+    </div>
+    <div class="sbody open">
+      <p>The calendar isn't just another section — it's the connective tissue of Toto. Done right, it makes every other feature more useful by giving it time context.</p>
+
+      <div class="flist">
+        <div class="fitem"><div class="fbullet">☀️</div><div class="ftext"><strong>Today screen:</strong> Pulls today's events from the calendar to populate the schedule section of the morning briefing. Without this connection, the Today screen can't show today's schedule.</div></div>
+        <div class="fitem"><div class="fbullet">🍝</div><div class="ftext"><strong>Meal planner:</strong> "Dinner tonight" on the TV display comes from the meal plan. When a meal is planned, an optional calendar event is created — "Family dinner 6:30pm — Spag bol". This syncs the kitchen and the schedule.</div></div>
+        <div class="fitem"><div class="fbullet">🛒</div><div class="ftext"><strong>Shopping list:</strong> When a meal event is on the calendar, the missing ingredients are surfaced in the shopping list on the day before. "Mince and pasta needed for tomorrow's dinner" appears on Wednesday's Today screen.</div></div>
+        <div class="fitem"><div class="fbullet">💰</div><div class="ftext"><strong>Budget &amp; bills:</strong> Bills with due dates create calendar events automatically. Pay day creates a calendar event. Upcoming project stage payments appear on the calendar. Financial events are colour-coded in Toto teal.</div></div>
+        <div class="fitem"><div class="fbullet">📋</div><div class="ftext"><strong>Kids' tasks:</strong> A chore with a due date appears on the child's calendar column. "Make bed — daily" shows as a recurring all-day event in their column. Seeing it on the calendar alongside school and sport gives kids a better sense of ownership over their day.</div></div>
+        <div class="fitem"><div class="fbullet">⏰</div><div class="ftext"><strong>Morning routines:</strong> Routine checklist items with times ("Lunch packed by 8:15am") appear on the family calendar for the relevant people — making routines a first-class calendar citizen, not a separate to-do list.</div></div>
+        <div class="fitem"><div class="fbullet">🚗</div><div class="ftext"><strong>Vehicle reminders:</strong> Rego expiry and insurance renewal dates from the Home section are automatically added to the family calendar — no manual entry, no surprises.</div></div>
+        <div class="fitem"><div class="fbullet">🎉</div><div class="ftext"><strong>Countdowns:</strong> A countdown event ("57 days to Bali") on the calendar shows the departure day as a family event with a 🌴 emoji — and it's the same data that feeds the countdown on the TV display and the Today screen.</div></div>
+      </div>
+
+      <div class="callout note">
+        <span class="callout-icon">ℹ️</span>
+        <span class="callout-body"><strong>External calendar sync:</strong> Google Calendar and Apple Calendar events import into Toto's calendar with a neutral grey colour, distinguishable from Toto-created events. Users can assign imported events to household members to give them a colour. Two-way sync (editing in Toto reflects in Google/Apple) is a later-phase feature — read-only import ships first.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.section-toggle').forEach(t => {
+    t.addEventListener('click', () => {
+      const s = t.closest('.collapsible-section');
+      const open = s.classList.toggle('open');
+      s.querySelector('.sbody')?.classList.toggle('open', open);
+      s.querySelector('.chev')?.classList.toggle('open', open);
+    });
+  });
+
+  window.setAll = open => {
+    document.querySelectorAll('.collapsible-section').forEach(s => {
+      s.classList.toggle('open', open);
+      s.querySelector('.sbody')?.classList.toggle('open', open);
+      s.querySelector('.chev')?.classList.toggle('open', open);
+    });
+  };
+</script>
+</body>
+</html>

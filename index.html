@@ -294,6 +294,69 @@
       flex-direction: column; gap: 18px; z-index: 9999;
     }
     #login-overlay.hidden { display: none !important; }
+
+    /* ─── Child + PIN setup overlays ───────────── */
+    #child-view-overlay.hidden,
+    #pin-setup-overlay.hidden,
+    #invite-flow-overlay.hidden { display: none !important; }
+
+    /* ─── Kid mode — restrict to kids tab only ── */
+    body.kid-mode .nav-item,
+    body.kid-mode .nav-text-item,
+    body.kid-mode .section-nav,
+    body.kid-mode .qa-fab,
+    body.kid-mode .header-sign-out,
+    body.kid-mode .toto-btn,
+    body.kid-mode button[onclick*="activateTab('settings')"] { display: none !important; }
+    body.kid-mode .sidebar { pointer-events: none; opacity: 0; }
+    #kid-mode-banner { display: none; }
+    body.kid-mode #kid-mode-banner { display: flex !important; }
+
+    /* ─── Profile selector ───────────────────── */
+    #profile-overlay {
+      position: fixed; inset: 0; background: #f8fafc;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 9990; padding: 24px;
+    }
+    #profile-overlay.hidden { display: none !important; }
+    .profile-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; border-radius: 14px;
+      border: 1.5px solid #e2e8f0; background: #fff;
+      cursor: pointer; transition: all 0.15s; width: 100%;
+    }
+    .profile-card:hover { border-color: #0891b2; background: #f0f9ff; }
+    .profile-card.active { border-color: #0891b2; background: #ecfeff; }
+    .profile-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, #ecfeff, #ccfbf1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    /* ─── PIN screen ─────────────────────────── */
+    #pin-overlay {
+      position: fixed; inset: 0; background: #f8fafc;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; z-index: 9991; padding: 24px;
+    }
+    #pin-overlay.hidden { display: none !important; }
+    .pin-dot {
+      width: 52px; height: 60px; border-radius: 12px;
+      border: 2px solid #e2e8f0; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 700; color: #0891b2;
+      transition: all 0.15s;
+    }
+    .pin-dot.filled { border-color: #0891b2; background: #ecfeff; }
+    .pin-key {
+      height: 52px; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 600; color: #1e293b;
+      cursor: pointer; background: #fff; transition: all 0.12s;
+      user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .pin-key:active { background: #e2e8f0; transform: scale(0.94); }
+    .pin-key.empty { border-color: transparent; background: transparent; cursor: default; }
     .google-sign-in-btn {
       display: flex; align-items: center; gap: 12px;
       background: #fff; color: #3c4043; border: none;
@@ -616,7 +679,7 @@
     @media (max-width: 720px) {
       .budget-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
-      .main { padding: 20px 16px; }
+      .main { padding: 20px 16px 110px; }
       .sidebar { width: 60px; }
     }
 
@@ -1179,7 +1242,7 @@
     .ob-dot.done { background: rgba(255,255,255,0.6); }
     .ob-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
     .ob-subtitle { font-size: 14px; opacity: 0.8; }
-    .ob-body { padding: 28px 32px; }
+    .ob-body { padding: 28px 32px; overflow-y: auto; max-height: calc(100vh - 260px); }
     .ob-label { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: block; }
     .ob-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .ob-option { padding: 9px 18px; border: 2px solid var(--border); border-radius: 99px; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.15s; background: #fff; }
@@ -1190,8 +1253,9 @@
     .ob-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none; transition: border-color 0.15s; }
     .ob-input:focus { border-color: #0891b2; }
     .ob-input-label { font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
-    .ob-expense-row { display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    .ob-expense-row { display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
     .ob-expense-row:last-child { border-bottom: none; }
+    .ob-expense-row.skipped { opacity: 0.45; }
     .ob-expense-name { font-size: 13px; font-weight: 600; }
     .ob-expense-cat  { font-size: 11px; color: #94a3b8; }
     .ob-add-link { font-size: 13px; color: #0891b2; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; margin-top: 4px; }
@@ -1200,6 +1264,30 @@
     .ob-back:hover { color: #64748b; }
     .ob-next { background: #0891b2; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
     .ob-next:hover { background: #0e7490; }
+    /* ─── Custom Select ──────────────────────── */
+    .cs-wrap { position: relative; }
+    .cs-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 14px; background: #fff; cursor: pointer; user-select: none; color: var(--text); text-align: left; transition: border-color 0.15s; }
+    .cs-trigger:hover, .cs-trigger:focus { border-color: #0891b2; outline: none; }
+    .cs-trigger .cs-chevron { font-size: 10px; color: #94a3b8; flex-shrink: 0; transition: transform 0.15s; }
+    .cs-trigger.open .cs-chevron { transform: rotate(180deg); color: #0891b2; }
+    .cs-dropdown { position: fixed; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.14); z-index: 9999; overflow-y: auto; max-height: 260px; }
+    .cs-option { padding: 11px 16px; font-size: 14px; cursor: pointer; color: var(--text); transition: background 0.1s; }
+    .cs-option:hover { background: #f0f9ff; color: #0891b2; }
+    .cs-option.cs-selected { background: #ecfeff; color: #0891b2; font-weight: 600; }
+
+    .ob-kid-row { display: grid; grid-template-columns: 52px 1fr 75px; gap: 10px; align-items: end; }
+    .ob-emoji-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px dashed #cbd5e1; background: #f1f5f9; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; }
+    .ob-emoji-btn:hover { border-color: #0891b2; }
+    .ob-emoji-picker { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; }
+    .ob-emoji-picker button { font-size: 22px; background: none; border: 1.5px solid transparent; cursor: pointer; padding: 4px 6px; border-radius: 6px; line-height: 1; }
+    .ob-emoji-picker button:hover { background: #e2e8f0; }
+    .ob-skip-toggle { font-size: 11px; color: #94a3b8; cursor: pointer; background: none; border: none; padding: 0; font-weight: 600; margin-top: 4px; display: block; text-align: right; }
+    .ob-skip-toggle:hover { color: #64748b; }
+    .ob-welcome-feature { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #374151; }
+    .ob-welcome-feature:last-child { border-bottom: none; }
+    .ob-summary-member { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    .ob-summary-member:last-child { border-bottom: none; }
+    .ob-summary-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg,#ecfeff,#ccfbf1); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 
     /* ─── Dashboard upgrade ───────────────────── */
     .db-hero-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
@@ -1700,7 +1788,7 @@
     .today-quick-btn:active { transform:scale(0.97); }
 
     /* ─── Section Pills ────────────────────── */
-    .section-nav { position:sticky; top:56px; z-index:20; background:var(--bg); padding:16px 0 0; }
+    .section-nav { position:sticky; top:0; z-index:20; background:var(--bg); padding:16px 0 0; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
     .section-breadcrumb { font-size:12px; color:var(--text-muted); margin-bottom:8px; display:flex; align-items:center; gap:4px; }
     .section-breadcrumb a { color:var(--text-muted); text-decoration:none; font-weight:600; cursor:pointer; }
     .section-breadcrumb a:hover { color:#0891b2; }
@@ -2019,13 +2107,46 @@
 
 <!-- ─── Login overlay ────────────────────────── -->
 <div id="login-overlay">
+  <div id="login-invite-banner" style="display:none;background:#f0fdfa;border:1px solid #ccfbf1;border-radius:12px;padding:14px 16px;margin-bottom:20px;text-align:center;max-width:320px">
+    <div style="font-size:24px;margin-bottom:6px">🏡</div>
+    <div style="font-size:14px;font-weight:700;color:#0d9488;margin-bottom:4px" id="login-invite-title">You've been invited!</div>
+    <div style="font-size:12px;color:#64748b">Sign in with Google to accept the invite and join the household.</div>
+  </div>
   <h1 style="color:#1e293b;font-size:32px;font-weight:800;letter-spacing:0.08em;margin:0">TOTO</h1>
-  <p style="color:#64748b;font-size:14px;margin:0">Sign in to access your family budget</p>
+  <p style="color:#64748b;font-size:14px;margin:0" id="login-tagline">Sign in to access your family budget</p>
   <button class="google-sign-in-btn" onclick="signInWithGoogle()">
     <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
     Sign in with Google
   </button>
   <p id="login-error" style="color:#ef4444;font-size:13px;margin:0;display:none"></p>
+</div>
+
+<!-- ─── Profile selector ─────────────────────── -->
+<div id="profile-overlay" class="hidden">
+  <div style="width:100%;max-width:400px">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:32px;font-weight:800;letter-spacing:0.06em;color:#1e293b;margin-bottom:6px">TOTO</div>
+      <div id="profile-overlay-title" style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:4px">Who uses this device?</div>
+      <div id="profile-overlay-sub" style="font-size:13px;color:#64748b">Set it once and the app opens straight to the right view.</div>
+    </div>
+    <div id="profile-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div style="text-align:center;margin-top:20px">
+      <button onclick="showDeviceSetup()" id="change-device-btn" style="display:none;font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer">Change device assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PIN entry ──────────────────────────────── -->
+<div id="pin-overlay" class="hidden">
+  <div style="width:100%;max-width:320px;text-align:center">
+    <div id="pin-avatar" style="font-size:52px;margin-bottom:12px"></div>
+    <div id="pin-greeting" style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:6px"></div>
+    <div id="pin-sub" style="font-size:13px;color:#64748b;margin-bottom:28px">Enter your PIN to continue</div>
+    <div id="pin-dots" style="display:flex;justify-content:center;gap:10px;margin-bottom:28px"></div>
+    <div id="pin-error" style="font-size:13px;color:#ef4444;min-height:18px;margin-bottom:12px"></div>
+    <div id="pin-pad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 24px"></div>
+    <button onclick="showProfileSelector()" style="font-size:13px;color:#0891b2;background:none;border:none;cursor:pointer;font-weight:600">← Switch profile</button>
+  </div>
 </div>
 
 <!-- ─── Onboarding overlay ───────────────────── -->
@@ -2043,12 +2164,52 @@
         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </button>
+    <button id="header-switch-profile" onclick="switchProfile()" style="display:none;font-size:12px;font-weight:600;color:#0891b2;background:none;border:1.5px solid #0891b2;border-radius:99px;padding:5px 12px;cursor:pointer">Switch</button>
     <img id="header-avatar" class="header-avatar" src="" alt="">
     <button id="header-sign-out" class="header-sign-out" onclick="signOutUser()">Sign out</button>
   </div>
 </header>
 
 <!-- ─── App body ──────────────────────────────── -->
+<!-- ─── Invite flow (A1→A4, full-screen) ─────────────────── -->
+<div id="invite-flow-overlay" class="hidden" style="position:fixed;inset:0;background:#f8fafc;z-index:5500;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center">
+  <div id="invite-flow-content" style="max-width:480px;width:100%;padding:40px 24px 80px"></div>
+</div>
+
+<!-- ─── Child view (full-screen, sits on top of adult app) ── -->
+<div id="child-view-overlay" class="hidden" style="position:fixed;inset:0;background:#f0f9ff;z-index:6000;overflow-y:auto;flex-direction:column">
+  <div style="background:#0891b2;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="cv-avatar" style="font-size:28px"></span>
+      <div>
+        <div id="cv-name" style="font-size:16px;font-weight:700;color:#fff"></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.75)">Your dashboard</div>
+      </div>
+    </div>
+    <button onclick="exitChildView()" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:99px;padding:6px 14px;color:#fff;cursor:pointer">👨‍👩‍👧 Parent</button>
+  </div>
+  <div id="cv-content" style="flex:1;padding:20px;max-width:520px;margin:0 auto;width:100%"></div>
+</div>
+
+<!-- ─── PIN setup (full-screen, uses same pad as login) ─── -->
+<div id="pin-setup-overlay" class="hidden" style="position:fixed;inset:0;background:#f8fafc;z-index:6100;align-items:center;justify-content:center;flex-direction:column;padding:24px">
+  <div style="width:100%;max-width:320px;text-align:center">
+    <div id="pso-avatar" style="font-size:52px;margin-bottom:12px"></div>
+    <div id="pso-title" style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:6px"></div>
+    <div id="pso-sub" style="font-size:13px;color:#64748b;margin-bottom:28px"></div>
+    <div id="pso-dots" style="display:flex;justify-content:center;gap:10px;margin-bottom:16px"></div>
+    <div id="pso-error" style="font-size:13px;color:#ef4444;min-height:18px;margin-bottom:12px"></div>
+    <div id="pso-pad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 24px"></div>
+    <button onclick="closePinSetupOverlay()" style="font-size:13px;color:#94a3b8;background:none;border:none;cursor:pointer">Cancel</button>
+  </div>
+</div>
+
+<!-- Kid mode banner — shown via CSS class on body -->
+<div id="kid-mode-banner" style="background:#fef9c3;border-bottom:1px solid #fde68a;padding:10px 20px;align-items:center;justify-content:space-between;font-size:13px;color:#854d0e;font-weight:600;position:sticky;top:56px;z-index:30;gap:12px">
+  <span id="kid-banner-label">Kid's view</span>
+  <button onclick="switchProfile()" style="font-size:12px;font-weight:700;color:#854d0e;background:none;border:1.5px solid #d97706;border-radius:99px;padding:5px 14px;cursor:pointer;flex-shrink:0">👨‍👩‍👧 Parent access</button>
+</div>
+
 <div class="app-body">
 
 <!-- ─── Sidebar ───────────────────────────────── -->
@@ -2286,11 +2447,37 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const fbAuth = firebase.auth();
+const fbAuth  = firebase.auth();
 const fbStore = firebase.firestore();
 
-let _currentUser = null;
-let _fsUnsubscribe = null;
+// ── Per-household Firestore path ──────────────────────────────────────────
+// Each household's data lives at families/{ownerUID}.
+// The owner's UID is stored in localStorage so invited members always sync
+// to the right household even after signing out and back in.
+const HOUSEHOLD_OWNER_KEY    = 'toto_household_owner';
+const PENDING_HOUSEHOLD_KEY  = 'toto_pending_household'; // set from invite URL
+
+function _getHouseholdOwnerUID() {
+  // Invited member arriving via link: pending household takes priority
+  return sessionStorage.getItem(PENDING_HOUSEHOLD_KEY)
+      || localStorage.getItem(HOUSEHOLD_OWNER_KEY)
+      || _currentUser?.uid
+      || null;
+}
+
+function _getHouseholdDocRef() {
+  const ownerUID = _getHouseholdOwnerUID();
+  if (!ownerUID) return null;
+  return fbStore.collection('families').doc(ownerUID);
+}
+
+function _setHouseholdOwner(uid) {
+  localStorage.setItem(HOUSEHOLD_OWNER_KEY, uid);
+  sessionStorage.removeItem(PENDING_HOUSEHOLD_KEY);
+}
+
+let _currentUser    = null;
+let _fsUnsubscribe  = null;
 let _pendingLogEntry = null;
 
 function logActivity(action, detail) {
@@ -2313,6 +2500,10 @@ function signInWithGoogle() {
 
 function signOutUser() {
   if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
+  _deviceRoutingDone = false;
+  _activeProfile = null;
+  clearKidSession();
+  // Do NOT clear HOUSEHOLD_OWNER_KEY — invited members need it on next login
   fbAuth.signOut();
 }
 
@@ -2331,19 +2522,48 @@ function _applyMigrations(d) {
 
 function _startFirestoreSync() {
   if (_fsUnsubscribe) _fsUnsubscribe();
-  _fsUnsubscribe = fbStore.collection('family').doc('shared').onSnapshot(snap => {
+
+  // If this user has no stored household owner yet, they are the owner
+  if (!localStorage.getItem(HOUSEHOLD_OWNER_KEY) && !sessionStorage.getItem(PENDING_HOUSEHOLD_KEY)) {
+    _setHouseholdOwner(_currentUser.uid);
+  }
+
+  const docRef = _getHouseholdDocRef();
+  if (!docRef) { console.error('No household doc ref'); return; }
+
+  _fsUnsubscribe = docRef.onSnapshot(async snap => {
     if (snap.exists) {
       const d = _applyMigrations(snap.data());
       Object.assign(state, d);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } else {
-      // First user to sign in: push local data up to Firestore
-      fbStore.collection('family').doc('shared').set(state);
+      // New household — check if there's legacy data to migrate from family/shared
+      const legacy = await fbStore.collection('family').doc('shared').get().catch(() => null);
+      if (legacy && legacy.exists) {
+        const d = _applyMigrations(legacy.data());
+        Object.assign(state, d);
+        docRef.set(state).catch(() => {});
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } else {
+        // Genuinely new user: push local state up
+        docRef.set(state).catch(() => {});
+      }
     }
     refreshReceiptCounts().then(() => {
       _autoCreateRecurringEvents();
       renderAll();
-      if (!state.onboarded) showOnboarding();
+      if (!state.onboarded) {
+        showOnboarding();
+      } else {
+        const pendingToken    = sessionStorage.getItem(_PENDING_INVITE_KEY);
+        const postInviteToken = sessionStorage.getItem('toto_post_invite_action');
+        if (pendingToken || postInviteToken) {
+          sessionStorage.removeItem('toto_post_invite_action');
+          _handlePendingInvite();
+        } else {
+          handleDeviceRouting();
+        }
+      }
     });
   }, err => {
     console.error('Firestore sync error:', err);
@@ -2368,6 +2588,13 @@ fbAuth.onAuthStateChanged(user => {
     if (headerAvatar)  headerAvatar.style.display = 'none';
     if (headerSignOut) headerSignOut.style.display = 'none';
     if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
+    const pendingToken = sessionStorage.getItem(_PENDING_INVITE_KEY);
+    const banner  = document.getElementById('login-invite-banner');
+    const tagline = document.getElementById('login-tagline');
+    if (pendingToken && banner) {
+      banner.style.display = 'block';
+      if (tagline) tagline.style.display = 'none';
+    }
   }
 });
 
@@ -2378,6 +2605,95 @@ fbAuth.onAuthStateChanged(user => {
 const STORAGE_KEY = 'home_finance_v1';
 
 // ── Security: HTML escaping for user-generated content ──
+// ─── Custom Select Component ───────────────────────
+let _csActive = null;
+const _csStore = {};
+
+function customSelect(id, options, value, onChange) {
+  _csStore[id] = { options, value, onChange };
+  const label = (options.find(o => (o.value ?? o) === value) || options[0]);
+  const labelText = label?.label ?? label?.value ?? label ?? '';
+  return `<div class="cs-wrap">
+    <button type="button" class="cs-trigger" id="cs-${id}" onclick="event.stopPropagation();_csOpen('${id}',this)">
+      <span id="cs-label-${id}">${escHtml(String(labelText))}</span>
+      <span class="cs-chevron">▼</span>
+    </button>
+  </div>`;
+}
+
+function _csOpen(id, triggerEl) {
+  if (_csActive) { _csActive.remove(); _csActive = null; document.querySelectorAll('.cs-trigger.open').forEach(el => el.classList.remove('open')); }
+  const store = _csStore[id];
+  if (!store) return;
+  triggerEl.classList.add('open');
+  const rect = triggerEl.getBoundingClientRect();
+  const dd = document.createElement('div');
+  dd.className = 'cs-dropdown';
+  dd.style.left  = rect.left + 'px';
+  dd.style.width = Math.max(rect.width, 180) + 'px';
+  const spaceBelow = window.innerHeight - rect.bottom - 8;
+  const spaceAbove = rect.top - 8;
+  const listH = Math.min(260, store.options.length * 43);
+  dd.style.top = (spaceBelow >= listH || spaceBelow >= spaceAbove)
+    ? (rect.bottom + 4) + 'px'
+    : Math.max(8, rect.top - listH - 4) + 'px';
+  store.options.forEach(opt => {
+    const val   = opt.value ?? opt;
+    const label = opt.label ?? opt.value ?? opt;
+    const el = document.createElement('div');
+    el.className = 'cs-option' + (val === store.value ? ' cs-selected' : '');
+    el.textContent = label;
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      store.value = val;
+      const labelEl = document.getElementById('cs-label-' + id);
+      if (labelEl) labelEl.textContent = label;
+      store.onChange(val);
+      dd.remove(); _csActive = null;
+      triggerEl.classList.remove('open');
+    });
+    dd.appendChild(el);
+  });
+  document.body.appendChild(dd);
+  _csActive = dd;
+}
+
+document.addEventListener('click', () => {
+  if (_csActive) { _csActive.remove(); _csActive = null; document.querySelectorAll('.cs-trigger.open').forEach(el => el.classList.remove('open')); }
+});
+
+// Auto-upgrade all .form-select elements in a container
+function upgradeSelects(container) {
+  if (!container) return;
+  container.querySelectorAll('select.form-select:not(.cs-upgraded)').forEach(sel => {
+    sel.classList.add('cs-upgraded');
+    const csId = (sel.id || ('cs' + Math.random().toString(36).slice(2, 7))) + '__cs';
+    const options = Array.from(sel.options).map(o => ({ value: o.value, label: o.text }));
+    const currentVal = sel.value || options[0]?.value || '';
+    // Hide native select but keep it in DOM so save functions can still read .value
+    sel.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden';
+    const wrap = document.createElement('div');
+    wrap.className = 'cs-wrap';
+    wrap.innerHTML = customSelect(csId, options, currentVal, val => {
+      sel.value = val;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    sel.parentNode.insertBefore(wrap, sel);
+  });
+}
+
+// Single observer — upgrades selects in any modal the moment it opens
+(function () {
+  const overlay = document.getElementById('modal-overlay');
+  if (!overlay) return;
+  new MutationObserver(() => {
+    if (!overlay.classList.contains('hidden')) {
+      upgradeSelects(document.getElementById('modal-body'));
+    }
+  }).observe(overlay, { attributes: true, attributeFilter: ['class'] });
+})();
+// ───────────────────────────────────────────────────
+
 function escHtml(str) {
   if (str == null) return '';
   return String(str)
@@ -2441,11 +2757,14 @@ const DEFAULT_DATA = {
   documents: [],
   maintenance: [],
   onboarded: false,
+  setupProgressDismissed: false,
   activityLog: [],
   householdProfile: {
     members: [{ role: 'adult', age: null }, { role: 'adult', age: null }],
     pets: [],
-    cars: 1
+    cars: 1,
+    invites: [],
+    authorizedUsers: []
   },
   expenseCategories: ['Mortgage / Rent', 'Insurance', 'Utilities', 'Groceries', 'Transport', 'Childcare / Education', 'Health', 'Entertainment', 'Subscriptions', 'Dining Out', 'Clothing', 'Personal Care', 'Savings / Investment', 'Other'],
   incomeCategories: ['Salary', 'Freelance / Contract', 'Rental Income', 'Government / Benefits', 'Investment', 'Other'],
@@ -2493,6 +2812,12 @@ function loadData() {
     if (!d.kids.prizes)      d.kids.prizes      = [];
     if (!d.kids.completions) d.kids.completions = [];
     if (!d.kids.redemptions) d.kids.redemptions = [];
+    // Deduplicate kids.profiles by name (keeps last entry which has the most data)
+    const _seenKidNames = new Map();
+    d.kids.profiles.forEach(k => { if (k.name) _seenKidNames.set(k.name.toLowerCase(), k); });
+    if (_seenKidNames.size < d.kids.profiles.length) {
+      d.kids.profiles = Array.from(_seenKidNames.values());
+    }
     if (!d.furniture) d.furniture = [];
     if (!d.appliances) d.appliances = [];
     if (!d.activityLog) d.activityLog = [];
@@ -2513,6 +2838,26 @@ function loadData() {
     }
     if (!d.householdProfile.pets)  d.householdProfile.pets = [];
     if (d.householdProfile.cars === undefined) d.householdProfile.cars = 1;
+    if (!d.householdProfile.invites) d.householdProfile.invites = [];
+    if (!d.householdProfile.authorizedUsers) d.householdProfile.authorizedUsers = [];
+    // Migrate: backfill member names from kids.profiles and income sources
+    (d.householdProfile.members || []).forEach((m, i) => {
+      if (m.name) return; // already has a name
+      if (m.role === 'child') {
+        // Try to match by index into kids.profiles
+        const kp = (d.kids?.profiles || [])[i - (d.householdProfile.members||[]).filter((x,j)=>j<i&&x.role==='adult').length];
+        if (kp?.name) { m.name = kp.name; if (!m.age && kp.age) m.age = kp.age; if (!m.emoji && kp.emoji) m.emoji = kp.emoji; }
+      } else {
+        // Try to infer adult name from income source (e.g. "Robert's salary" → "Robert")
+        const incomes = (d.budget?.income || []);
+        const adultIdx = (d.householdProfile.members||[]).filter((x,j)=>j<i&&x.role==='adult').length;
+        const inc = incomes[adultIdx];
+        if (inc?.name) {
+          const match = inc.name.match(/^([^'\s]+)'s\s/i) || inc.name.match(/^([^'\s]+)\s/);
+          if (match) m.name = match[1];
+        }
+      }
+    });
     if (!d.meals) d.meals = { plan: {}, shopping: [] };
     if (!d.meals.plan) d.meals.plan = {};
     if (!d.meals.shopping) d.meals.shopping = [];
@@ -2564,11 +2909,995 @@ function saveData(data) {
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   if (_currentUser) {
-    fbStore.collection('family').doc('shared').set(data).catch(err => {
+    const _docRef = _getHouseholdDocRef();
+    if (_docRef) _docRef.set(data).catch(err => {
       console.error('Firestore save error:', err);
     });
   }
 }
+
+// ─── Household Access ──────────────────────────────
+// ─── Device Registration Model ─────────────────────
+const DEVICE_KEY      = 'toto_device_profile';  // 'adult' | 'shared' | kidId
+const KID_SESSION_KEY = 'toto_kid_session';      // kidId persisted so kid stays logged in
+
+let _activeProfile      = null;  // null = adult, or { id, name, emoji, role:'child' }
+let _deviceRoutingDone  = false; // prevent re-running on every Firestore update
+let _pinAttempts        = 0;
+let _pinLockUntil       = 0;
+let _pinBuffer          = '';
+let _pinTargetId        = null;
+
+function getDeviceProfile()      { return localStorage.getItem(DEVICE_KEY); }
+function setDeviceProfile(val)   { localStorage.setItem(DEVICE_KEY, val); }
+function clearDeviceProfile()    { localStorage.removeItem(DEVICE_KEY); }
+function getKidSession()         { return localStorage.getItem(KID_SESSION_KEY); }
+function setKidSession(kidId)    { localStorage.setItem(KID_SESSION_KEY, kidId); }
+function clearKidSession()       { localStorage.removeItem(KID_SESSION_KEY); }
+
+async function _hashPin(pin) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('toto-pin-' + pin));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Called after Firestore loads — runs only once per sign-in session.
+function handleDeviceRouting() {
+  if (_deviceRoutingDone) return;
+  if (!state.onboarded) return;
+  _deviceRoutingDone = true;
+  const device = getDeviceProfile();
+
+  if (!device) { showDeviceSetup(); return; }
+
+  if (device === 'adult') {
+    _activeProfile = null;
+    _updateSwitchBtn();
+    return; // straight into app — renderAll already called by Firestore callback
+  }
+
+  if (device === 'shared') {
+    showProfileSelector();
+    return;
+  }
+
+  // It's a specific kid's device
+  const kid = (state.kids?.profiles || []).find(k => k.id === device);
+  if (!kid) { clearDeviceProfile(); showDeviceSetup(); return; }
+
+  // If they already logged in this session, skip PIN
+  if (String(getKidSession()) === String(kid.id)) {
+    _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+    _applyActiveProfile();
+    return;
+  }
+
+  // Need PIN (or go straight in if no PIN set)
+  if (kid.pinHash) {
+    _pinTargetId = kid.id;
+    _pinBuffer   = '';
+    _pinAttempts = 0;
+    _showPinScreen(kid);
+  } else {
+    _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+    setKidSession(kid.id);
+    _applyActiveProfile();
+  }
+}
+
+// "Who uses this device?" — shown once per device
+function showDeviceSetup() {
+  const members = state.householdProfile?.members || [];
+  const adults  = members.filter(m => m.role === 'adult' && m.name);
+  const kids    = state.kids?.profiles || [];
+
+  let rows = '';
+
+  // Always show an Adult option
+  const adultLabel = adults.length ? adults.map(a => a.name).join(' / ') : 'Adult';
+  rows += `<div class="profile-card" onclick="assignDevice('adult')">
+    <div class="profile-avatar">👤</div>
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:700;color:#1e293b">${escHtml(adultLabel)}</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px">Adult — opens straight to the full app</div>
+    </div>
+  </div>`;
+
+  kids.forEach(kid => {
+    rows += `<div class="profile-card" onclick="assignDevice('${kid.id}')">
+      <div class="profile-avatar">${escHtml(kid.emoji||'😊')}</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:#1e293b">${escHtml(kid.name)}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">Kid's device — ${kid.pinHash ? 'requires PIN to open' : 'no PIN set yet'}</div>
+      </div>
+    </div>`;
+  });
+
+  if (!kids.length) {
+    rows += `<div style="padding:12px 16px;background:#fef9c3;border-radius:10px;font-size:13px;color:#854d0e">No kids set up yet. Add kids in the Kids tab first, then assign a device.</div>`;
+  }
+
+  rows += `<div class="profile-card" onclick="assignDevice('shared')" style="border-style:dashed">
+    <div class="profile-avatar">👨‍👩‍👧‍👦</div>
+    <div style="flex:1">
+      <div style="font-size:15px;font-weight:700;color:#1e293b">Everyone (shared)</div>
+      <div style="font-size:12px;color:#64748b;margin-top:2px">Shows profile picker every time the app opens</div>
+    </div>
+  </div>`;
+
+  document.getElementById('profile-list').innerHTML = rows;
+  document.getElementById('profile-overlay-title').textContent = 'Who uses this device?';
+  document.getElementById('profile-overlay-sub').textContent   = 'Set it once — the app will open straight to the right view. You can change this any time in Settings.';
+  document.getElementById('profile-overlay').classList.remove('hidden');
+}
+
+function assignDevice(val) {
+  setDeviceProfile(val);
+  _deviceRoutingDone = true; // prevent auto-routing from overriding this choice
+  document.getElementById('profile-overlay').classList.add('hidden');
+
+  if (val === 'adult') {
+    _activeProfile = null;
+    _updateSwitchBtn();
+    renderAll();
+  } else if (val === 'shared') {
+    showProfileSelector();
+  } else {
+    // Kid device — go to PIN or straight in
+    const kid = (state.kids?.profiles || []).find(k => k.id === val);
+    if (!kid) {
+      // Kid deleted since assignment — fall back to adult view
+      _activeProfile = null;
+      _applyChildNav();
+      renderAll();
+      return;
+    }
+    if (kid.pinHash) {
+      _pinTargetId = kid.id; _pinBuffer = ''; _pinAttempts = 0;
+      _showPinScreen(kid);
+    } else {
+      _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+      setKidSession(kid.id);
+      _applyActiveProfile();
+    }
+  }
+}
+
+// Shared-device profile picker (shown each time on shared devices)
+function showProfileSelector() {
+  document.getElementById('pin-overlay').classList.add('hidden');
+  const members = state.householdProfile?.members || [];
+  const adults  = members.filter(m => m.role === 'adult' && m.name);
+  const kids    = state.kids?.profiles || [];
+
+  let rows = '';
+  adults.forEach((m, i) => {
+    rows += `<div class="profile-card" onclick="_pickAdult()">
+      <div class="profile-avatar">👤</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:#1e293b">${escHtml(m.name)}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">${i===0?'Owner':'Member'} · Adult</div>
+      </div>
+      <div style="font-size:12px;color:#0891b2;font-weight:600">Enter →</div>
+    </div>`;
+  });
+  kids.forEach(kid => {
+    rows += `<div class="profile-card" onclick="_pickKid('${kid.id}')">
+      <div class="profile-avatar">${escHtml(kid.emoji||'😊')}</div>
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:700;color:#1e293b">${escHtml(kid.name)}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">Kid · ${kid.pinHash?'PIN login':'Tap to enter'}</div>
+      </div>
+      <div style="font-size:12px;color:#0891b2;font-weight:600">${kid.pinHash?'PIN →':'Enter →'}</div>
+    </div>`;
+  });
+
+  document.getElementById('profile-list').innerHTML = rows;
+  document.getElementById('profile-overlay-title').textContent = "Who's using Toto?";
+  document.getElementById('profile-overlay-sub').textContent   = 'Tap your name to continue';
+  document.getElementById('profile-overlay').classList.remove('hidden');
+}
+
+function _pickAdult() {
+  _activeProfile = null;
+  clearKidSession();
+  document.getElementById('profile-overlay').classList.add('hidden');
+  _applyActiveProfile();
+}
+
+function _pickKid(kidId) {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (!kid) return;
+  if (kid.pinHash) {
+    _pinTargetId = kidId; _pinBuffer = ''; _pinAttempts = 0;
+    _showPinScreen(kid);
+  } else {
+    _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+    setKidSession(kid.id);
+    document.getElementById('profile-overlay').classList.add('hidden');
+    _applyActiveProfile();
+  }
+}
+
+function _showPinScreen(kid) {
+  document.getElementById('profile-overlay').classList.add('hidden');
+  document.getElementById('pin-avatar').textContent    = kid.emoji || '😊';
+  document.getElementById('pin-greeting').textContent  = `Hi ${kid.name}! 👋`;
+  document.getElementById('pin-sub').textContent       = 'Enter your PIN to continue';
+  document.getElementById('pin-error').textContent     = '';
+  _renderPinDots();
+  _renderPinPad();
+  document.getElementById('pin-overlay').classList.remove('hidden');
+}
+
+function _renderPinDots() {
+  const el = document.getElementById('pin-dots');
+  if (!el) return;
+  el.innerHTML = [0,1,2,3].map(i =>
+    `<div class="pin-dot ${i < _pinBuffer.length ? 'filled' : ''}">${i < _pinBuffer.length ? '●' : ''}</div>`
+  ).join('');
+}
+
+function _renderPinPad() {
+  const el = document.getElementById('pin-pad');
+  if (!el) return;
+  const now = Date.now();
+  const locked = now < _pinLockUntil;
+  if (locked) {
+    const secs = Math.ceil((_pinLockUntil - now) / 1000);
+    document.getElementById('pin-error').textContent = `Too many attempts — try again in ${secs}s`;
+    el.innerHTML = '';
+    setTimeout(_renderPinPad, 1000);
+    return;
+  }
+  el.innerHTML = [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k =>
+    k === '' ? `<div class="pin-key empty"></div>`
+             : `<div class="pin-key" onclick="_pinKey('${k}')">${k}</div>`
+  ).join('');
+}
+
+function _pinKey(k) {
+  if (Date.now() < _pinLockUntil) return;
+  if (k === '⌫') { _pinBuffer = _pinBuffer.slice(0,-1); _renderPinDots(); return; }
+  if (_pinBuffer.length >= 4) return;
+  _pinBuffer += k;
+  _renderPinDots();
+  if (_pinBuffer.length === 4) _verifyPin();
+}
+
+async function _verifyPin() {
+  const kid = (state.kids?.profiles || []).find(k => k.id === _pinTargetId);
+  if (!kid) return;
+  const hash = await _hashPin(_pinBuffer);
+  if (hash === kid.pinHash) {
+    _pinAttempts = 0;
+    _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+    setKidSession(kid.id);
+    document.getElementById('pin-overlay').classList.add('hidden');
+    _applyActiveProfile();
+  } else {
+    _pinAttempts++;
+    _pinBuffer = '';
+    _renderPinDots();
+    if (_pinAttempts >= 3) {
+      _pinLockUntil = Date.now() + 30000;
+      _renderPinPad();
+    } else {
+      document.getElementById('pin-error').textContent =
+        `Incorrect PIN (${3 - _pinAttempts} attempt${3 - _pinAttempts !== 1 ? 's' : ''} left)`;
+    }
+  }
+}
+
+function _updateSwitchBtn() {
+  const btn = document.getElementById('header-switch-profile');
+  if (!btn) return;
+  const device = getDeviceProfile();
+  // Show switch button on kid devices (so parent can take over) and shared devices
+  btn.style.display = (device && device !== 'adult') ? '' : 'none';
+}
+
+function _applyActiveProfile() {
+  _updateSwitchBtn();
+  _applyChildNav();
+  if (_activeProfile?.role === 'child') {
+    window.kidsView = _activeProfile.id;
+    activateTab('kids');
+  } else {
+    // Restore all nav items when switching back to adult
+    document.querySelectorAll('.nav-item, .nav-text-item').forEach(el => el.style.display = '');
+  }
+  renderAll();
+}
+
+function _applyChildNav() {
+  const isKid = _activeProfile?.role === 'child';
+  document.body.classList.toggle('kid-mode', isKid);
+
+  const label = document.getElementById('kid-banner-label');
+  if (label && isKid) {
+    label.textContent = `${_activeProfile.emoji || '😊'} ${_activeProfile.name}'s view`;
+  }
+
+  const device = getDeviceProfile();
+  const switchBtn = document.getElementById('header-switch-profile');
+  if (switchBtn) {
+    const show = device && device !== 'adult';
+    switchBtn.style.display = show ? '' : 'none';
+    if (show) {
+      if (isKid) {
+        switchBtn.textContent = '👨‍👩‍👧 Parent';
+      } else {
+        const kid = (state.kids?.profiles || []).find(k => k.id === device);
+        switchBtn.textContent = kid ? `Back to ${kid.name}` : 'Switch';
+      }
+    }
+  }
+}
+
+// "Switch" — two-way toggle depending on current state
+function switchProfile() {
+  const device = getDeviceProfile();
+
+  if (_activeProfile?.role === 'child') {
+    // Currently in kid mode → give parent temporary access
+    clearKidSession();
+    _activeProfile = null;
+    _applyChildNav();
+    renderAll();
+  } else {
+    // Currently in adult mode → hand back to the assigned profile
+    if (device === 'shared') {
+      showProfileSelector();
+    } else if (device && device !== 'adult') {
+      const kid = (state.kids?.profiles || []).find(k => k.id === device);
+      if (kid) {
+        if (kid.pinHash) {
+          _pinTargetId = kid.id;
+          _pinBuffer = '';
+          _pinAttempts = 0;
+          _showPinScreen(kid);
+        } else {
+          _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+          setKidSession(kid.id);
+          _applyActiveProfile();
+        }
+      }
+    }
+  }
+}
+
+async function setKidPin(kidId, pin) {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (!kid || pin.length !== 4) return;
+  kid.pinHash = await _hashPin(pin);
+  saveData(state);
+}
+
+function clearKidPin(kidId) {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (!kid) return;
+  delete kid.pinHash;
+  saveData(state);
+}
+
+// ── Child View ────────────────────────────────────────
+function showChildView(kidId) {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (!kid) return;
+  const k = state.kids;
+  const bal = kidBalance(k, kid.id);
+  const myChores = k.chores.filter(c => c.assignedTo === kid.id || c.assignedTo === 'all');
+  const pending  = k.completions.filter(c => c.kidId === kid.id && c.status === 'pending');
+  const prizes   = k.prizes;
+
+  document.getElementById('cv-avatar').textContent = kid.emoji || '😊';
+  document.getElementById('cv-name').textContent   = kid.name;
+
+  let html = '';
+
+  // Points balance
+  html += `<div style="background:#fff;border-radius:16px;padding:20px;text-align:center;margin-bottom:16px;border:2px solid #e0f2fe">
+    <div style="font-size:44px;font-weight:800;color:#0891b2">${bal}</div>
+    <div style="font-size:14px;color:#64748b;font-weight:600">⭐ points</div>
+  </div>`;
+
+  // Chores
+  html += `<div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #e2e8f0">
+    <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:14px">📋 My Chores</div>`;
+  if (!myChores.length) {
+    html += `<div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px">No chores yet!</div>`;
+  } else {
+    myChores.forEach(ch => {
+      const done = pending.some(p => p.choreId === ch.id);
+      html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <span style="font-size:22px">${ch.emoji || '📋'}</span>
+        <div style="flex:1"><div style="font-size:14px;font-weight:600">${escHtml(ch.name)}</div><div style="font-size:12px;color:#64748b">⭐ ${ch.points} · ${ch.frequency}</div></div>
+        ${done ? `<span style="background:#fef9c3;color:#854d0e;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px">Waiting</span>`
+                : `<button onclick="markChoreChildView('${kid.id}','${ch.id}')" style="background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">Done ✓</button>`}
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  // Prize store
+  if (prizes.length) {
+    html += `<div style="background:#fff;border-radius:16px;padding:20px;border:1px solid #e2e8f0">
+      <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:14px">🎁 Prize Store</div>`;
+    prizes.forEach(pr => {
+      const canAfford = bal >= pr.pointCost;
+      html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <span style="font-size:24px">${pr.emoji || '🎁'}</span>
+        <div style="flex:1"><div style="font-size:14px;font-weight:600">${escHtml(pr.name)}</div><div style="font-size:12px;color:#64748b">⭐ ${pr.pointCost} points</div></div>
+        <button ${canAfford ? `onclick="redeemPrizeChildView('${kid.id}','${pr.id}')"` : 'disabled'} style="background:${canAfford?'#eab308':'#e2e8f0'};color:${canAfford?'#fff':'#94a3b8'};border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:${canAfford?'pointer':'default'}">
+          ${canAfford ? 'Redeem' : 'Not enough'}
+        </button>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('cv-content').innerHTML = html;
+
+  const ov = document.getElementById('child-view-overlay');
+  ov.style.display = 'flex';
+  ov.classList.remove('hidden');
+}
+
+function exitChildView() {
+  const ov = document.getElementById('child-view-overlay');
+  ov.classList.add('hidden');
+  ov.style.display = '';
+  _activeProfile = null;
+  clearKidSession();
+}
+
+function markChoreChildView(kidId, choreId) {
+  const existing = state.kids.completions.find(c => c.kidId === kidId && c.choreId === choreId && c.status === 'pending');
+  if (existing) return;
+  state.kids.completions.push({ id: uid(), kidId, choreId, status: 'pending', ts: new Date().toISOString() });
+  saveData(state);
+  showChildView(kidId);
+}
+
+function redeemPrizeChildView(kidId, prizeId) {
+  state.kids.redemptions.push({ id: uid(), kidId, prizeId, status: 'pending', ts: new Date().toISOString() });
+  saveData(state);
+  showChildView(kidId);
+}
+
+function switchToKidMode(kidId) {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (!kid) return;
+  _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+  setKidSession(kid.id);
+  showChildView(kidId);
+}
+
+// ──────────────────────────────────────────────────────
+// ── Household Invite System (A1–A4) ──────────────────
+// ──────────────────────────────────────────────────────
+let _inviteRole    = 'member';
+let _inviteToken   = null;  // token being shown after generation
+let _inviteJourneyInv = null; // invite object being processed by the joinee
+
+function _setInviteRole(role) {
+  _inviteRole = role;
+  const mBtn = document.getElementById('inv-role-member');
+  const oBtn = document.getElementById('inv-role-owner');
+  if (!mBtn || !oBtn) return;
+  if (role === 'member') {
+    mBtn.style.borderColor = '#0d9488'; mBtn.style.background = '#f0fdfa'; mBtn.style.color = '#0d9488';
+    oBtn.style.borderColor = 'var(--border)'; oBtn.style.background = 'var(--surface)'; oBtn.style.color = 'var(--text-muted)';
+  } else {
+    oBtn.style.borderColor = '#0d9488'; oBtn.style.background = '#f0fdfa'; oBtn.style.color = '#0d9488';
+    mBtn.style.borderColor = 'var(--border)'; mBtn.style.background = 'var(--surface)'; mBtn.style.color = 'var(--text-muted)';
+  }
+}
+
+function generateInvite(memberIdx, memberName) {
+  const emailEl = document.getElementById('inv-email');
+  const email   = emailEl ? emailEl.value.trim() : '';
+  const inviterName = (state.householdProfile.members || []).find(m => m.role === 'adult')?.name || 'Someone';
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const inv = {
+    id: uid(),
+    email,
+    role: _inviteRole,
+    inviterName,
+    memberName: memberName || null,
+    memberIdx:  memberIdx  != null ? memberIdx : null,
+    createdAt: new Date().toISOString(),
+    expiresAt,
+    status: 'pending'
+  };
+  if (!state.householdProfile.invites) state.householdProfile.invites = [];
+  state.householdProfile.invites.push(inv);
+  saveData(state);
+  _inviteToken = inv.id;
+  const link = _getInviteUrl(inv.id);
+  const linkWrap = document.getElementById('invite-link-wrap');
+  const formWrap = document.getElementById('invite-form-wrap');
+  const disp     = document.getElementById('invite-link-display');
+  if (linkWrap) { linkWrap.dataset.invEmail = email; linkWrap.dataset.invToken = inv.id; linkWrap.style.display = 'block'; }
+  if (formWrap) formWrap.style.display = 'none';
+  if (disp)     disp.textContent = link;
+}
+
+function inviteMember(memberIdx) {
+  const m = (state.householdProfile.members || [])[memberIdx];
+  if (!m) return;
+  const inviterName = (state.householdProfile.members || []).find((mb, i) => mb.role === 'adult' && i === 0)?.name || 'Someone';
+  const expiresAt   = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const inv = {
+    id: uid(),
+    email: '',
+    role: 'member',
+    inviterName,
+    memberName: m.name || null,
+    memberIdx,
+    createdAt: new Date().toISOString(),
+    expiresAt,
+    status: 'pending'
+  };
+  if (!state.householdProfile.invites) state.householdProfile.invites = [];
+  state.householdProfile.invites.push(inv);
+  saveData(state);
+  // Show a modal/sheet with the link
+  const link = _getInviteUrl(inv.id);
+  const name  = escHtml(m.name || 'this person');
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:24px';
+  modal.innerHTML = `<div style="background:#fff;border-radius:16px;padding:24px;max-width:400px;width:100%">
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px">Invite ${name} 🔗</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:16px">Share this link with ${name}. It expires in 7 days.</div>
+    <div style="font-size:12px;word-break:break-all;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:14px">${link}</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button onclick="navigator.clipboard.writeText('${link}').then(()=>{this.textContent='✓ Copied!';setTimeout(()=>this.textContent='📋 Copy link',2000)})"
+        style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:13px;font-weight:600;cursor:pointer">📋 Copy link</button>
+      <button onclick="window.open('mailto:?subject=Join+my+Toto+household&body=Hi!+I\\'ve+invited+you+to+join+my+Toto+household.+Click+here+to+accept:+${encodeURIComponent(link)}','_blank')"
+        style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:13px;font-weight:600;cursor:pointer">✉️ Email</button>
+    </div>
+    <button onclick="this.closest('div[style*=\"position:fixed\"]').remove();renderSettings()"
+      style="width:100%;padding:10px;border:none;border-radius:8px;background:#0d9488;color:#fff;font-size:14px;font-weight:700;cursor:pointer">Done</button>
+  </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) { modal.remove(); renderSettings(); } });
+}
+
+function _ensureKidProfileAndPin(name) {
+  if (!name) return;
+  let kidProfile = (state.kids?.profiles || []).find(k => k.name && k.name.toLowerCase() === name.toLowerCase());
+  if (!kidProfile) {
+    if (!state.kids) state.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
+    const member = (state.householdProfile.members || []).find(m => m.name && m.name.toLowerCase() === name.toLowerCase());
+    const id = nextId(state.kids.profiles);
+    kidProfile = { id, name, age: member?.age || null, emoji: member?.emoji || '🧒' };
+    state.kids.profiles.push(kidProfile);
+    if (!state.meals?.lunchbox?.profiles) { if (!state.meals) state.meals = {}; if (!state.meals.lunchbox) state.meals.lunchbox = { profiles: [] }; }
+    state.meals.lunchbox.profiles.push({ id, name, emoji: kidProfile.emoji });
+    saveData(state);
+  }
+  openPinSetup(kidProfile.id);
+}
+
+function _copyInviteLinkForMember(token) {
+  navigator.clipboard.writeText(_getInviteUrl(token)).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function _getInviteUrl(token) {
+  const ownerUID = _getHouseholdOwnerUID() || '';
+  return window.location.origin + window.location.pathname + '?invite=' + token + '&h=' + ownerUID;
+}
+
+function copyInviteLink() {
+  const token = document.getElementById('invite-link-wrap')?.dataset.invToken || _inviteToken;
+  if (!token) return;
+  navigator.clipboard.writeText(_getInviteUrl(token)).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function sendInviteEmail() {
+  const wrap  = document.getElementById('invite-link-wrap');
+  const token = wrap?.dataset.invToken || _inviteToken;
+  const email = wrap?.dataset.invEmail || '';
+  if (!token) return;
+  const inv = (state.householdProfile.invites || []).find(i => i.id === token);
+  const inviterName = inv?.inviterName || 'Your partner';
+  const link = _getInviteUrl(token);
+  const subject = encodeURIComponent(`${inviterName} invited you to join their Toto household`);
+  const body = encodeURIComponent(`Hi,\n\n${inviterName} has invited you to join their Toto household — a shared family finance and planning app.\n\nClick the link below to accept the invite (expires in 7 days):\n\n${link}\n\nSee you there!`);
+  window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+}
+
+function revokeInvite(inviteId) {
+  if (!confirm('Revoke this invite link?')) return;
+  const inv = (state.householdProfile.invites || []).find(i => i.id === inviteId);
+  if (inv) inv.status = 'revoked';
+  saveData(state);
+  renderSettings();
+}
+
+// ── Invite landing (called on app load if ?invite= in URL) ──
+const _PENDING_INVITE_KEY = 'toto_pending_invite';
+
+function _checkInviteOnLoad() {
+  const params      = new URLSearchParams(window.location.search);
+  const token       = params.get('invite');
+  const householdH  = params.get('h');
+  if (!token) return;
+  sessionStorage.setItem(_PENDING_INVITE_KEY, token);
+  if (householdH) sessionStorage.setItem(PENDING_HOUSEHOLD_KEY, householdH);
+  // Strip params from URL so refresh doesn't re-trigger
+  window.history.replaceState({}, '', window.location.pathname + window.location.hash);
+}
+
+function _handlePendingInvite() {
+  const token = sessionStorage.getItem(_PENDING_INVITE_KEY);
+  if (!token) return;
+  const inv = (state.householdProfile.invites || []).find(i => i.id === token);
+  if (!inv) {
+    sessionStorage.removeItem(_PENDING_INVITE_KEY);
+    return;
+  }
+  if (inv.status !== 'pending' || new Date(inv.expiresAt) < new Date()) {
+    sessionStorage.removeItem(_PENDING_INVITE_KEY);
+    _showInviteExpired(inv);
+    return;
+  }
+  sessionStorage.removeItem(_PENDING_INVITE_KEY);
+  _inviteJourneyInv = inv;
+  _showInviteA1(inv);
+}
+
+function _showInviteA1(inv) {
+  const members = state.householdProfile.members || [];
+  const adults  = members.filter(m => m.role === 'adult');
+  const kids    = members.filter(m => m.role === 'child');
+  const surplus = (() => {
+    const now = new Date();
+    const key = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const m = getOrCreateMonthData(key);
+    const inc = (m.income || []).reduce((s,i) => s + toMonthly(Number(i.amount)||0, i.frequency), 0);
+    const exp = (m.expenses || []).filter(e => !e.skipped).reduce((s,e) => s + toMonthly(Number(e.amount)||0, e.frequency), 0);
+    return inc - exp;
+  })();
+
+  const membersHtml = [
+    ...adults.map(m => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ecfeff,#ccfbf1);display:flex;align-items:center;justify-content:center;font-size:20px">👤</div>
+        <div><div style="font-size:14px;font-weight:600">${escHtml(m.name || 'Adult')}</div><div style="font-size:12px;color:#64748b">Adult · Owner</div></div>
+      </div>`),
+    ...kids.map(m => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fef9c3,#fde68a);display:flex;align-items:center;justify-content:center;font-size:20px">${m.emoji || '🧒'}</div>
+        <div><div style="font-size:14px;font-weight:600">${escHtml(m.name || 'Kid')}</div><div style="font-size:12px;color:#64748b">Kid · age ${m.age || '?'}</div></div>
+      </div>`)
+  ].join('');
+
+  const html = `
+    <div style="text-align:center;font-size:56px;margin-bottom:20px;margin-top:8px">🏡</div>
+    <div style="font-size:22px;font-weight:800;color:#1e293b;text-align:center;margin-bottom:6px;line-height:1.3">${escHtml(inv.inviterName || 'Someone')} invited you to join their Toto household</div>
+    <div style="font-size:14px;color:#64748b;text-align:center;margin-bottom:28px">You'll get shared access to budget, meals, kids &amp; home — everything in one place.</div>
+
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:12px">Your household</div>
+      ${membersHtml}
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
+        <div style="width:40px;height:40px;border-radius:50%;border:2px dashed #0d9488;display:flex;align-items:center;justify-content:center;font-size:20px;color:#0d9488">+</div>
+        <div><div style="font-size:14px;font-weight:600;color:#0d9488">You — joining now</div><div style="font-size:12px;color:#64748b">New member</div></div>
+      </div>
+    </div>
+
+    ${surplus !== 0 ? `
+    <div style="display:flex;gap:12px;margin-bottom:20px">
+      <div style="flex:1;background:#f0fdf4;border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:#16a34a">$${Math.abs(surplus).toLocaleString()}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">monthly ${surplus >= 0 ? 'surplus' : 'deficit'}</div>
+      </div>
+    </div>` : ''}
+
+    ${inv.email ? `<div style="font-size:12px;color:#94a3b8;text-align:center;margin-bottom:16px">Invite sent to <strong style="color:#475569">${escHtml(inv.email)}</strong> · Expires ${new Date(inv.expiresAt).toLocaleDateString()}</div>` : ''}
+
+    <button onclick="_acceptInviteAndContinue()" style="width:100%;background:#0d9488;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px">Accept invite →</button>
+    <div style="text-align:center"><a href="#" onclick="event.preventDefault();_dismissInviteFlow()" style="font-size:13px;color:#94a3b8;text-decoration:none">Not you? Ignore this invite</a></div>
+  `;
+
+  _renderInviteFlow(html);
+}
+
+function _showInviteA3() {
+  const inv = _inviteJourneyInv;
+  const userName = _currentUser?.displayName?.split(' ')[0] || 'there';
+  const members  = state.householdProfile.members || [];
+  const adults   = members.filter(m => m.role === 'adult');
+  const kids     = members.filter(m => m.role === 'child');
+  const surplus  = (() => {
+    const now = new Date();
+    const key = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const m = getOrCreateMonthData(key);
+    const inc = (m.income || []).reduce((s,i) => s + toMonthly(Number(i.amount)||0, i.frequency), 0);
+    const exp = (m.expenses || []).filter(e => !e.skipped).reduce((s,e) => s + toMonthly(Number(e.amount)||0, e.frequency), 0);
+    return inc - exp;
+  })();
+  const goals = (state.goals || []).length;
+
+  const membersHtml = [
+    ...adults.map((m, idx) => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ecfeff,#ccfbf1);display:flex;align-items:center;justify-content:center;font-size:20px">👤</div>
+        <div>
+          <div style="font-size:14px;font-weight:600">${escHtml(m.name || 'Adult')}${idx === adults.length - 1 ? ' — <span style="color:#0d9488">that\'s you!</span>' : ''}</div>
+          <div style="font-size:12px;color:#64748b">${idx === 0 ? 'Owner · set up the household' : 'Member · just joined'}</div>
+        </div>
+      </div>`),
+    ...kids.map(m => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fef9c3,#fde68a);display:flex;align-items:center;justify-content:center;font-size:20px">${m.emoji || '🧒'}</div>
+        <div><div style="font-size:14px;font-weight:600">${escHtml(m.name || 'Kid')}</div><div style="font-size:12px;color:#64748b">Kid · age ${m.age || '?'}</div></div>
+      </div>`)
+  ].join('');
+
+  const html = `
+    <div style="text-align:center;font-size:56px;margin-bottom:12px;margin-top:8px">🎉</div>
+    <div style="font-size:24px;font-weight:800;color:#1e293b;text-align:center;margin-bottom:6px">You're in, ${escHtml(userName)}!</div>
+    <div style="font-size:14px;color:#64748b;text-align:center;margin-bottom:24px">Welcome to ${escHtml(inv?.inviterName || 'the')}'s Toto household.</div>
+
+    <div style="background:#f0fdfa;border:1px solid #ccfbf1;border-radius:16px;padding:20px;margin-bottom:20px">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#0d9488;margin-bottom:10px">Your household</div>
+      ${membersHtml}
+    </div>
+
+    <div style="display:flex;gap:12px;margin-bottom:24px">
+      ${surplus !== 0 ? `<div style="flex:1;background:#f8fafc;border-radius:12px;padding:14px;text-align:center;border:1px solid #e2e8f0"><div style="font-size:20px;font-weight:700;color:#16a34a">$${Math.abs(surplus).toLocaleString()}</div><div style="font-size:11px;color:#64748b">monthly ${surplus >= 0 ? 'surplus' : 'deficit'}</div></div>` : ''}
+      ${goals > 0 ? `<div style="flex:1;background:#f8fafc;border-radius:12px;padding:14px;text-align:center;border:1px solid #e2e8f0"><div style="font-size:20px;font-weight:700;color:#0d9488">${goals}</div><div style="font-size:11px;color:#64748b">goal${goals !== 1 ? 's' : ''} tracked</div></div>` : ''}
+    </div>
+
+    <button onclick="_showInviteA4()" style="width:100%;background:#0d9488;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer">Take a quick tour →</button>
+  `;
+  _renderInviteFlow(html);
+}
+
+let _inviteTourSlide = 0;
+const _TOUR_SLIDES = [
+  { emoji: '💰', title: 'The Kitty', desc: 'Budget, bills, goals & net worth. See where the money goes each month.' },
+  { emoji: '📅', title: 'Plan', desc: 'Weekly planner, meal plans & the kids\' lunchboxes. One place for the week ahead.' },
+  { emoji: '🏠', title: 'Home', desc: 'Documents, vehicles & maintenance reminders. Never miss a rego or warranty renewal.' },
+];
+
+function _showInviteA4() {
+  _inviteTourSlide = 0;
+  _renderTourSlide();
+}
+
+function _renderTourSlide() {
+  const slide = _TOUR_SLIDES[_inviteTourSlide];
+  const dotsHtml = _TOUR_SLIDES.map((_, i) =>
+    `<div style="width:${i===_inviteTourSlide?20:8}px;height:8px;border-radius:99px;background:${i===_inviteTourSlide?'#0d9488':'#e2e8f0'};transition:all .2s"></div>`
+  ).join('');
+
+  const isLast = _inviteTourSlide === _TOUR_SLIDES.length - 1;
+
+  const html = `
+    <div style="margin-top:12px">
+      <div style="text-align:center;font-size:64px;margin-bottom:16px">${slide.emoji}</div>
+      <div style="font-size:22px;font-weight:800;color:#1e293b;text-align:center;margin-bottom:10px">${slide.title}</div>
+      <div style="font-size:15px;color:#64748b;text-align:center;margin-bottom:32px;line-height:1.6">${slide.desc}</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:32px">${dotsHtml}</div>
+      <button onclick="${isLast ? '_showInviteIncomePrompt()' : '_inviteTourSlide++;_renderTourSlide()'}"
+        style="width:100%;background:#0d9488;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px">
+        ${isLast ? 'Done →' : 'Next →'}
+      </button>
+      ${!isLast ? `<button onclick="_showInviteIncomePrompt()" style="width:100%;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px;padding:8px">Skip tour</button>` : ''}
+    </div>
+  `;
+  _renderInviteFlow(html);
+}
+
+function _showInviteIncomePrompt() {
+  const html = `
+    <div style="text-align:center;margin-top:12px">
+      <div style="font-size:56px;margin-bottom:16px">💰</div>
+      <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:8px">One last thing</div>
+      <div style="font-size:14px;color:#64748b;margin-bottom:24px;line-height:1.6">Want to add your income so the budget is complete? This is the one thing only you can fill in.</div>
+
+      <div id="invite-income-form" style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:20px;text-align:left">
+        <div style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:12px">Your income source</div>
+        <input id="inv-inc-name" type="text" placeholder="e.g. My salary" class="form-input" style="width:100%;margin-bottom:10px">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <input id="inv-inc-amount" type="number" placeholder="Amount $" class="form-input" style="flex:1">
+          <select id="inv-inc-freq" class="form-select" style="flex:1">
+            <option>Monthly</option>
+            <option>Fortnightly</option>
+            <option>Weekly</option>
+            <option>Annual</option>
+          </select>
+        </div>
+        <button onclick="_saveInviteIncome()" style="width:100%;background:#0d9488;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer">Add income &amp; go to dashboard →</button>
+      </div>
+
+      <button onclick="_finishInviteJourney()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:13px">Skip — I'll add it later</button>
+    </div>
+  `;
+  _renderInviteFlow(html);
+}
+
+function _saveInviteIncome() {
+  const name   = document.getElementById('inv-inc-name')?.value.trim() || '';
+  const amount = parseFloat(document.getElementById('inv-inc-amount')?.value) || 0;
+  const freq   = document.getElementById('inv-inc-freq')?.value || 'Monthly';
+  if (name || amount) {
+    if (!state.budget.income) state.budget.income = [];
+    state.budget.income.push({ id: nextId(state.budget.income), name, amount, frequency: freq });
+    saveData(state);
+  }
+  _finishInviteJourney();
+}
+
+function _acceptInviteAndContinue() {
+  const inv = _inviteJourneyInv;
+  if (!_currentUser) {
+    // Need to sign in first — store intent and trigger Google sign-in
+    sessionStorage.setItem('toto_post_invite_action', inv?.id || '');
+    signInWithGoogle();
+    return;
+  }
+  _recordInviteAcceptance(inv);
+  _showInviteA3();
+}
+
+function _recordInviteAcceptance(inv) {
+  if (!inv) return;
+  inv.status = 'accepted';
+  const user = _currentUser;
+
+  // Persist which household this member belongs to
+  const ownerUID = _getHouseholdOwnerUID();
+  if (ownerUID) _setHouseholdOwner(ownerUID);
+
+  if (!state.householdProfile.authorizedUsers) state.householdProfile.authorizedUsers = [];
+  const already = state.householdProfile.authorizedUsers.some(u => u.uid === user.uid);
+  if (!already) {
+    state.householdProfile.authorizedUsers.push({
+      uid: user.uid,
+      name: user.displayName || '',
+      email: user.email || '',
+      role: inv.role || 'member',
+      joinedAt: new Date().toISOString()
+    });
+  }
+  // Add to household members list if not already there by first name
+  const members   = state.householdProfile.members || [];
+  const firstName = (user.displayName || '').split(' ')[0];
+  if (firstName && !members.some(m => m.name === firstName)) {
+    state.householdProfile.members.push({ role: 'adult', name: firstName, age: null });
+  }
+  saveData(state);
+}
+
+function _finishInviteJourney() {
+  _inviteJourneyInv = null;
+  _dismissInviteFlow();
+  renderAll();
+  handleDeviceRouting();
+}
+
+function _showInviteExpired(inv) {
+  const html = `
+    <div style="text-align:center;margin-top:40px">
+      <div style="font-size:56px;margin-bottom:16px">⏰</div>
+      <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:8px">This invite has expired</div>
+      <div style="font-size:14px;color:#64748b;margin-bottom:24px">The 7-day window has passed. Ask ${escHtml(inv?.inviterName || 'the household owner')} to send a new invite link.</div>
+      <button onclick="_dismissInviteFlow()" style="background:#0d9488;color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer">OK</button>
+    </div>
+  `;
+  _renderInviteFlow(html);
+}
+
+function _renderInviteFlow(html) {
+  document.getElementById('invite-flow-content').innerHTML = html;
+  const ov = document.getElementById('invite-flow-overlay');
+  ov.classList.remove('hidden');
+  ov.style.display = 'flex';
+  ov.scrollTop = 0;
+}
+
+function _dismissInviteFlow() {
+  const ov = document.getElementById('invite-flow-overlay');
+  ov.classList.add('hidden');
+  ov.style.display = '';
+}
+
+// ── PIN Setup (full-screen pad) ───────────────────────
+let _psoKidId   = null;
+let _psoStep    = 'enter';   // 'enter' | 'confirm'
+let _psoFirst   = '';
+let _psoBuf     = '';
+
+function openPinSetup(kidId) {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (!kid) return;
+  _psoKidId = kidId;
+  _psoStep  = 'enter';
+  _psoFirst = '';
+  _psoBuf   = '';
+  document.getElementById('pso-avatar').textContent = kid.emoji || '😊';
+  _renderPsoStep(kid);
+  const psov = document.getElementById('pin-setup-overlay');
+  psov.style.display = 'flex';
+  psov.classList.remove('hidden');
+}
+
+function closePinSetupOverlay() {
+  const el = document.getElementById('pin-setup-overlay');
+  el.classList.add('hidden');
+  el.style.display = '';
+  _psoKidId = null;
+}
+
+function _renderPsoStep(kid) {
+  const k = kid || (state.kids?.profiles || []).find(k => k.id === _psoKidId);
+  if (!k) return;
+  document.getElementById('pso-title').textContent = _psoStep === 'enter' ? `Set PIN for ${k.name}` : 'Confirm PIN';
+  document.getElementById('pso-sub').textContent   = _psoStep === 'enter' ? 'Choose a 4-digit PIN' : 'Enter the same PIN again';
+  document.getElementById('pso-error').textContent = '';
+  _renderPsoDots();
+  _renderPsoPad();
+}
+
+function _renderPsoDots() {
+  const el = document.getElementById('pso-dots');
+  if (!el) return;
+  el.innerHTML = [0,1,2,3].map(i =>
+    `<div class="pin-dot ${i < _psoBuf.length ? 'filled' : ''}">${i < _psoBuf.length ? '●' : ''}</div>`
+  ).join('');
+}
+
+function _renderPsoPad() {
+  const el = document.getElementById('pso-pad');
+  if (!el) return;
+  el.innerHTML = [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k =>
+    k === '' ? `<div class="pin-key empty"></div>`
+             : `<div class="pin-key" onclick="_psoKey('${k}')">${k}</div>`
+  ).join('');
+}
+
+function _psoKey(k) {
+  if (k === '⌫') { _psoBuf = _psoBuf.slice(0,-1); _renderPsoDots(); return; }
+  if (_psoBuf.length >= 4) return;
+  _psoBuf += k;
+  _renderPsoDots();
+  if (_psoBuf.length === 4) _psoSubmit();
+}
+
+async function _psoSubmit() {
+  if (_psoStep === 'enter') {
+    _psoFirst = _psoBuf;
+    _psoBuf   = '';
+    _psoStep  = 'confirm';
+    _renderPsoStep();
+  } else {
+    if (_psoBuf !== _psoFirst) {
+      document.getElementById('pso-error').textContent = 'PINs don\'t match — try again';
+      _psoBuf = ''; _psoFirst = ''; _psoStep = 'enter';
+      _renderPsoStep();
+      return;
+    }
+    await setKidPin(_psoKidId, _psoBuf);
+    closePinSetupOverlay();
+    renderKids();
+  }
+}
+// ───────────────────────────────────────────────────
 
 // ─── Per-month budget helpers ──────────────────────
 function getMonthData(monthStr) {
@@ -2645,9 +3974,10 @@ function doScopeAll() {
 }
 
 let state = loadData();
+_checkInviteOnLoad(); // run immediately on script parse — strips ?invite= from URL
 let selectedBudgetMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
 let budgetViewMode = 'grouped'; // 'grouped' | 'table'
-let _settingsOpen = new Set(['ai']); // accordion open sections
+let _settingsOpen = new Set(['ai', 'household']); // accordion open sections
 let _billsSubsFilter = 'all'; // 'all' | 'bills' | 'subs'
 
 // ─── Mini date picker ─────────────────────────────
@@ -4383,6 +5713,144 @@ function _renderMissionCard() {
   </div>`;
 }
 
+function setupProgressTasks() {
+  const curData = getMonthData(selectedBudgetMonth);
+  const members = state.householdProfile?.members || [];
+  const adults  = members.filter(m => m.role === 'adult');
+  const kids    = members.filter(m => m.role === 'child');
+  const tasks   = [];
+
+  tasks.push({ id:'members',  label:'Add your household members',     done: adults.length > 0,                                                    tab: null });
+  tasks.push({ id:'income',   label:'Set up income sources',          done: (curData.income||[]).length > 0,                                       tab: 'budget' });
+  tasks.push({ id:'expenses', label:'Add monthly expenses',           done: (curData.expenses||[]).length > 0,                                     tab: 'budget' });
+
+  if (kids.length > 0)
+    tasks.push({ id:'kids',   label:'Add kids to your household',     done: true,                                                                  tab: null });
+
+  if (adults.length >= 2) {
+    const partnerName = adults[1]?.name || 'your partner';
+    const inviteDone  = (state.householdProfile.authorizedUsers || []).length > 0 ||
+                        (state.householdProfile.invites || []).some(i => i.status === 'accepted');
+    tasks.push({ id:'invite', label:`Invite ${partnerName} to your household`, done: inviteDone, tab: 'settings', settingsSection: 'household-access' });
+  }
+
+  tasks.push({ id:'goals',    label:'Set your first savings goal',    done: (state.goals||[]).length > 0,                                          tab: 'goals' });
+  tasks.push({ id:'networth', label:'Add your net worth (assets & debts)', done: (state.netWorth?.assets||[]).length > 0 || (state.netWorth?.liabilities||[]).length > 0, tab: 'networth' });
+  tasks.push({ id:'vehicles', label:'Add your vehicles',              done: (state.vehicles||[]).length > 0,                                       tab: 'vehicles' });
+
+  if (kids.length > 0) {
+    const kidName = kids[0]?.name || 'your child';
+    tasks.push({ id:'chores', label:`Set up ${escHtml(kidName)}'s first chores`, done: (state.kids?.chores||[]).length > 0,                        tab: 'kids' });
+  }
+
+  return tasks;
+}
+
+let _spExpanded    = false;
+let _spDoneExpanded = false;
+
+function _refreshSetupProgress() {
+  const el = document.getElementById('setup-progress-card');
+  if (el) el.innerHTML = renderSetupProgress();
+}
+
+function renderSetupProgress() {
+  if (state.setupProgressDismissed) return '';
+
+  const tasks   = setupProgressTasks();
+  const doneTasks  = tasks.filter(t => t.done);
+  const todoTasks  = tasks.filter(t => !t.done);
+  const done    = doneTasks.length;
+  const total   = tasks.length;
+  const pct     = Math.round(done / total * 100);
+
+  if (done === total) {
+    return `<div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:12px">
+      <span style="font-size:24px">🎉</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#15803d">Setup complete!</div><div style="font-size:12px;color:#16a34a">Your household is fully configured.</div></div>
+      <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:#64748b;background:none;border:none;cursor:pointer;font-weight:600">Dismiss</button>
+    </div>`;
+  }
+
+  const r = 22; const circ = 2 * Math.PI * r;
+  const progressSvg = `
+    <svg width="52" height="52" viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="5"/>
+      <circle cx="26" cy="26" r="${r}" fill="none" stroke="#0891b2" stroke-width="5"
+        stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ - pct/100*circ).toFixed(1)}"
+        stroke-linecap="round" transform="rotate(-90 26 26)"/>
+    </svg>
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0891b2">${pct}%</div>`;
+
+  // ── Header (always visible, clickable to expand/collapse) ──
+  const chevron = _spExpanded ? '▲' : '▼';
+  const header = `
+    <div onclick="_spExpanded=!_spExpanded;_refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#1e293b">Finish setting up Toto</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">${done} of ${total} complete</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="position:relative;width:52px;height:52px">${progressSvg}</div>
+        <span style="font-size:10px;color:#94a3b8">${chevron}</span>
+      </div>
+    </div>
+    <div style="background:#e2e8f0;border-radius:99px;height:5px;margin-top:14px;overflow:hidden">
+      <div style="width:${pct}%;height:100%;border-radius:99px;background:linear-gradient(90deg,#0891b2,#06b6d4)"></div>
+    </div>`;
+
+  if (!_spExpanded) {
+    return `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px">${header}</div>`;
+  }
+
+  // ── Outstanding items ──
+  const nextTask = todoTasks[0];
+  const todoHtml = todoTasks.map(t => {
+    const isNext = t === nextTask;
+    const border = isNext ? 'border:1.5px solid #0891b2;background:#ecfeff' : 'border:1px solid #e2e8f0;background:#fff';
+    const clickFn = t.settingsSection
+      ? `activateTab('${t.tab}');setTimeout(()=>{const el=document.getElementById('acc-${t.settingsSection || ''}');if(el&&!el.classList.contains('open')){el.querySelector('.acc-header')?.click();}el?.scrollIntoView({behavior:'smooth',block:'start'})},200)`
+      : t.tab ? `activateTab('${t.tab}')` : '';
+    const click = clickFn ? `onclick="${clickFn}"` : '';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;${border};cursor:${t.tab?'pointer':'default'}" ${click}>
+      <div style="width:22px;height:22px;border-radius:50%;border:2px solid ${isNext?'#0891b2':'#cbd5e1'};flex-shrink:0"></div>
+      <span style="font-size:13px;flex:1;color:${isNext?'#1e293b':'#374151'};font-weight:${isNext?'500':'400'}">${t.label}</span>
+      ${t.tab ? `<span style="font-size:11px;color:${isNext?'#0891b2':'#94a3b8'};font-weight:600">Go →</span>` : ''}
+    </div>`;
+  }).join('');
+
+  // ── Done section (collapsible) ──
+  const doneChevron = _spDoneExpanded ? '▲' : '▼';
+  const doneHtml = doneTasks.map(t => `
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;background:#f0fdf4">
+      <div style="width:22px;height:22px;border-radius:50%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0">✓</div>
+      <span style="font-size:13px;flex:1;text-decoration:line-through;color:#94a3b8">${t.label}</span>
+      <span style="font-size:11px;color:#16a34a;font-weight:600">Done</span>
+    </div>`).join('');
+
+  const doneSection = done > 0 ? `
+    <div style="margin-top:12px;border-top:1px solid #f1f5f9;padding-top:12px">
+      <div onclick="_spDoneExpanded=!_spDoneExpanded;_refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;padding:8px 12px;border-radius:10px;background:#f0fdf4;border:1px solid #bbf7d0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:14px">✅</span>
+          <span style="font-size:13px;font-weight:700;color:#15803d">${done} task${done !== 1 ? 's' : ''} completed</span>
+        </div>
+        <span style="font-size:10px;color:#16a34a">${doneChevron}</span>
+      </div>
+      ${_spDoneExpanded ? `<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${doneHtml}</div>` : ''}
+    </div>` : '';
+
+  return `
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px">
+      ${header}
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">${todoHtml}</div>
+      ${doneSection}
+      <div style="text-align:center;margin-top:14px">
+        <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:#94a3b8;background:none;border:none;cursor:pointer">Dismiss · I'll do this later</button>
+      </div>
+    </div>`;
+}
+
 function renderToday() {
   const today = new Date();
   const curData = getMonthData(selectedBudgetMonth);
@@ -4608,6 +6076,8 @@ function renderToday() {
       <h2>${greeting}${name ? ', ' + name : ''}</h2>
       <p id="today-briefing-text">${fallbackBrief}</p>
     </div>
+
+    <div id="setup-progress-card">${renderSetupProgress()}</div>
 
     ${missionHtml}
 
@@ -5476,7 +6946,31 @@ function renderGoals() {
   </div>`;
 
   if (grouped.length === 0) {
-    html += `<div class="empty"><div class="empty-icon">🎯</div>No goals yet. Set a spending limit, savings target, or income goal.</div>`;
+    const curData = getMonthData(selectedBudgetMonth);
+    const surplus = monthlyTotal(curData.income) - monthlyTotal(curData.expenses);
+    const surplusHtml = surplus > 0
+      ? `<div style="font-size:14px;color:#64748b;margin-bottom:4px">You have <strong style="color:#16a34a">${aud(surplus)}</strong> surplus each month.</div>
+         <div style="font-size:13px;color:#64748b;margin-bottom:20px">Put it to work — set a goal and watch your progress.</div>`
+      : `<div style="font-size:13px;color:#64748b;margin-bottom:20px">Set a goal and start working towards it.</div>`;
+    const quickGoals = [
+      { emoji:'🏖️', label:'Holiday fund' },
+      { emoji:'🏠', label:'Renovation' },
+      { emoji:'🆘', label:'Emergency fund' },
+    ];
+    const chips = quickGoals.map(g =>
+      `<button onclick="openAddGoal()" style="padding:8px 14px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:99px;font-size:12px;font-weight:600;color:#0891b2;cursor:pointer">${g.emoji} ${g.label}</button>`
+    ).join('');
+    html += `
+      <div style="background:#fff;border:2px dashed #cbd5e1;border-radius:16px;padding:36px 24px;text-align:center;margin-top:8px">
+        <div style="font-size:44px;margin-bottom:14px">🎯</div>
+        <div style="font-size:17px;font-weight:700;color:#1e293b;margin-bottom:8px">No goals yet</div>
+        ${surplusHtml}
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
+          ${chips}
+          <button onclick="openAddGoal()" style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:99px;font-size:12px;color:#64748b;cursor:pointer">+ Custom goal</button>
+        </div>
+        <button onclick="openAddGoal()" style="background:#0891b2;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer">Add my first goal →</button>
+      </div>`;
   } else {
     grouped.forEach(g => {
       const typeInfo = GOAL_TYPES.find(t => t.value === g.type) || GOAL_TYPES[0];
@@ -6104,15 +7598,32 @@ function addHouseholdMember(role) {
   _markSettingsDirty(); renderSettings();
 }
 function removeHouseholdMember(idx) {
+  const m = state.householdProfile.members[idx];
+  if (!m) return;
+  const label = m.name || (m.role === 'child' ? 'this child' : 'this adult');
+  if (!confirm(`Remove ${label} from the household?\n\nThis cannot be undone.`)) return;
+  // Also clean up kids.profiles if this is a named child
+  if (m.role === 'child' && m.name) {
+    const kid = (state.kids?.profiles || []).find(k => k.name === m.name);
+    if (kid) {
+      state.kids.profiles    = state.kids.profiles.filter(k => k.id !== kid.id);
+      state.kids.chores      = state.kids.chores.filter(c => c.assignedTo !== kid.id);
+      state.kids.completions = state.kids.completions.filter(c => c.kidId !== kid.id);
+      state.kids.redemptions = state.kids.redemptions.filter(r => r.kidId !== kid.id);
+      if (state.meals?.lunchbox?.profiles)
+        state.meals.lunchbox.profiles = state.meals.lunchbox.profiles.filter(p => p.id !== kid.id);
+      if (String(getDeviceProfile()) === String(kid.id)) setDeviceProfile('adult');
+    }
+  }
   state.householdProfile.members.splice(idx, 1);
-  _markSettingsDirty(); renderSettings();
+  saveData(state); renderAll();
 }
 function updateMember(idx, field, value) {
   const m = state.householdProfile.members[idx];
   if (!m) return;
   m[field] = value;
   _markSettingsDirty();
-  if (field === 'role') renderSettings();
+  if (field === 'role' || field === 'name') renderSettings();
 }
 function addPet(type) {
   state.householdProfile.pets.push({ type: type||'dog', name: '' });
@@ -7358,36 +8869,140 @@ function renderSettings() {
         </div>
         ${rawData ? `<button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">Show raw localStorage data</button>
           <pre style="display:none;margin-top:8px;background:var(--surface2);padding:12px;border-radius:8px;font-size:11px;overflow:auto;max-height:200px;white-space:pre-wrap;word-break:break-all">${rawData.replace(/</g,'&lt;')}</pre>` : ''}
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:600;color:var(--danger);margin-bottom:4px">Danger zone</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Permanently deletes all household data from this device and the cloud. Cannot be undone.</div>
+          <button class="btn btn-sm" style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-weight:600" onclick="resetAllData()">Reset all data…</button>
+        </div>
       </div>`) +
 
-    acc('household', 'Household Profile', 'Used to calculate budget benchmarks in the Insights page', `
-      <div class="section-body">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-weight:600;font-size:13px">Household Members</span>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('adult')">+ Adult</button>
-            <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('child')">+ Child</button>
-          </div>
-        </div>
-        ${(state.householdProfile.members||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No members added yet.</p>` : ''}
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
-          ${(state.householdProfile.members||[]).map((m,i) => `
-          <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
-            <span style="font-size:20px;width:28px;text-align:center">${m.role === 'child' ? '👶' : '🧑'}</span>
-            <select class="form-select" style="width:110px" onchange="updateMember(${i},'role',this.value)">
-              <option value="adult"${m.role==='adult'?' selected':''}>Adult</option>
-              <option value="child"${m.role==='child'?' selected':''}>Child</option>
-            </select>
-            <div style="display:flex;align-items:center;gap:8px">
-              <input type="number" class="form-input" style="width:80px" placeholder="Age" min="0" max="120"
-                value="${m.age !== null && m.age !== undefined ? m.age : ''}"
-                onchange="updateMember(${i},'age', this.value===''?null:parseInt(this.value))">
-              <span style="color:var(--text-muted);font-size:13px;white-space:nowrap">yrs old</span>
+    (() => {
+      const _members     = state.householdProfile.members || [];
+      const _invites     = state.householdProfile.invites || [];
+      const _authedUsers = state.householdProfile.authorizedUsers || [];
+      const _petIcons    = petIcons;
+
+      const memberCards = _members.map((m, i) => {
+        const isAdult = m.role === 'adult';
+        const isOwner = isAdult && i === 0;
+        const avatar  = m.emoji || (isAdult ? '🧑' : '🧒');
+        const label   = isOwner ? 'Owner' : isAdult ? 'Adult' : 'Child';
+        const labelBg = isOwner ? '#fef9c3' : isAdult ? '#e0f2fe' : '#f0fdf4';
+        const labelCol= isOwner ? '#854d0e' : isAdult ? '#0369a1' : '#16a34a';
+
+        // ── Access status for this member ──
+        let accessHtml = '';
+        if (isAdult) {
+          if (isOwner) {
+            accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0">
+              <span style="font-size:16px">✅</span>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:#16a34a">Google login · Owner</div>
+                <div style="font-size:11px;color:#64748b">Full access · Set up this household</div>
+              </div>
+            </div>`;
+          } else {
+            // Check if this adult has joined via invite
+            const joined = _authedUsers.find(u => u.name && m.name && u.name.toLowerCase().includes(m.name.toLowerCase().split(' ')[0]));
+            // Check for a pending invite for this member
+            const pending = _invites.find(inv => inv.memberName === m.name && inv.status === 'pending' && new Date(inv.expiresAt) > new Date());
+            const accepted = _invites.find(inv => inv.memberName === m.name && inv.status === 'accepted');
+
+            if (joined || accepted) {
+              accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0">
+                <span style="font-size:16px">✅</span>
+                <div style="flex:1">
+                  <div style="font-size:12px;font-weight:600;color:#16a34a">Google login · Member</div>
+                  <div style="font-size:11px;color:#64748b">${escHtml((joined||{}).email || 'Joined via invite')}</div>
+                </div>
+              </div>`;
+            } else if (pending) {
+              const expiry = new Date(pending.expiresAt).toLocaleDateString();
+              accessHtml = `<div style="padding:10px 12px;background:#fef9c3;border-radius:8px;border:1px solid #fde68a">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span style="font-size:16px">⏳</span>
+                  <div style="flex:1">
+                    <div style="font-size:12px;font-weight:600;color:#854d0e">Invite pending</div>
+                    <div style="font-size:11px;color:#78350f">Expires ${expiry}${pending.email ? ' · ' + escHtml(pending.email) : ''}</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button onclick="event.stopPropagation();_copyInviteLinkForMember('${pending.id}')" style="flex:1;padding:6px;border:1px solid #fde68a;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#854d0e;cursor:pointer">📋 Copy link</button>
+                  <button onclick="event.stopPropagation();revokeInvite('${pending.id}')" style="padding:6px 10px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#ef4444;cursor:pointer">Revoke</button>
+                </div>
+              </div>`;
+            } else {
+              accessHtml = `<div style="padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                  <span style="font-size:16px">🔗</span>
+                  <div style="flex:1">
+                    <div style="font-size:12px;font-weight:600;color:var(--text)">No app access yet</div>
+                    <div style="font-size:11px;color:var(--text-muted)">Send an invite link so ${escHtml(m.name || 'this person')} can join</div>
+                  </div>
+                </div>
+                <button onclick="event.stopPropagation();inviteMember(${i})" class="btn btn-primary btn-sm" style="width:100%">Invite to join →</button>
+              </div>`;
+            }
+          }
+        } else {
+          // Child — PIN access
+          const kidProfile = (state.kids?.profiles || []).find(k => k.name && m.name && k.name.toLowerCase() === m.name.toLowerCase());
+          const hasPin  = !!(kidProfile?.pinHash);
+          const hasName = !!(m.name && m.name.trim());
+
+          if (!hasName) {
+            accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+              <span style="font-size:16px">🔢</span>
+              <div style="font-size:12px;color:var(--text-muted)">Enter a name above to enable PIN login</div>
+            </div>`;
+          } else if (!kidProfile) {
+            accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+              <span style="font-size:16px">🔢</span>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:var(--text)">PIN login · Not set up</div>
+                <div style="font-size:11px;color:var(--text-muted)">Save changes first, then set a PIN for ${escHtml(m.name)}</div>
+              </div>
+              <button onclick="event.stopPropagation();_ensureKidProfileAndPin('${escAttr(m.name)}')" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">Set PIN</button>
+            </div>`;
+          } else {
+            accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${hasPin?'#f0fdf4':'var(--surface2)'};border-radius:8px;border:1px solid ${hasPin?'#bbf7d0':'var(--border)'}">
+              <span style="font-size:16px">🔢</span>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:${hasPin?'#16a34a':'var(--text)'}">PIN login · ${hasPin ? 'Set up ✓' : 'Not set up'}</div>
+                <div style="font-size:11px;color:var(--text-muted)">${hasPin ? 'PIN is active — tap to change it' : 'Set a PIN so ' + escHtml(m.name) + ' can log in'}</div>
+              </div>
+              <button onclick="event.stopPropagation();openPinSetup(${kidProfile.id})" style="padding:6px 10px;border:1px solid ${hasPin?'#bbf7d0':'var(--border)'};border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">${hasPin ? 'Change' : 'Set PIN'}</button>
+            </div>`;
+          }
+        }
+
+        return `
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+            <div style="width:42px;height:42px;border-radius:50%;background:${isAdult?'linear-gradient(135deg,#ecfeff,#ccfbf1)':'linear-gradient(135deg,#fef9c3,#fde68a)'};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${avatar}</div>
+            <div style="flex:1;min-width:0">
+              <input type="text" maxlength="50" class="form-input" style="font-weight:600;font-size:14px;width:100%;color:var(--text);padding:4px 8px;border-radius:6px"
+                placeholder="Enter name…"
+                value="${escAttr(m.name || '')}"
+                onchange="updateMember(${i},'name',this.value)">
+              <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:99px;background:${labelBg};color:${labelCol};flex-shrink:0">${label}</span>
+                <span style="font-size:12px;color:var(--text-muted);flex-shrink:0">·</span>
+                <input type="number" class="form-input" style="width:52px;font-size:12px;padding:2px 6px;border-radius:6px"
+                  placeholder="Age" min="0" max="120"
+                  value="${m.age !== null && m.age !== undefined ? m.age : ''}"
+                  onchange="updateMember(${i},'age',this.value===''?null:parseInt(this.value))">
+                <span style="font-size:12px;color:var(--text-muted);flex-shrink:0">yrs</span>
+              </div>
             </div>
-            <button onclick="removeHouseholdMember(${i})" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--danger);font-size:20px;line-height:1;padding:0 4px;opacity:0.7" title="Remove">&times;</button>
-          </div>`).join('')}
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <button onclick="removeHouseholdMember(${i})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;padding:4px;opacity:.6;flex-shrink:0" title="Remove from household">&times;</button>
+          </div>
+          <div style="padding:0 16px 14px">${accessHtml}</div>
+        </div>`;
+      }).join('');
+
+      const petsHtml = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <span style="font-weight:600;font-size:13px">Pets</span>
           <div style="display:flex;gap:6px">
             <button class="btn btn-ghost btn-sm" onclick="addPet('dog')">+ Dog</button>
@@ -7398,29 +9013,47 @@ function renderSettings() {
         ${(state.householdProfile.pets||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No pets added.</p>` : ''}
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
           ${(state.householdProfile.pets||[]).map((p,i) => {
-            const petIcon = petIcons[p.type] || '🐾';
-            return `
-          <div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
-            <span style="font-size:20px;width:28px;text-align:center">${petIcon}</span>
-            <select class="form-select" style="width:110px" onchange="updatePet(${i},'type',this.value);renderSettings()">
-              <option value="dog"${p.type==='dog'?' selected':''}>Dog</option>
-              <option value="cat"${p.type==='cat'?' selected':''}>Cat</option>
-              <option value="bird"${p.type==='bird'?' selected':''}>Bird</option>
-              <option value="other"${p.type==='other'?' selected':''}>Other</option>
-            </select>
-            <input type="text" maxlength="200" class="form-input" style="flex:1;min-width:120px" placeholder="Name (optional)"
-              value="${(p.name||'').replace(/"/g,'&quot;')}"
-              oninput="updatePet(${i},'name',this.value)">
-            <button onclick="removePet(${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:20px;line-height:1;padding:0 4px;opacity:0.7" title="Remove">&times;</button>
-          </div>`; }).join('')}
+            const petIcon = _petIcons[p.type] || '🐾';
+            return `<div style="display:flex;align-items:center;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px">
+              <span style="font-size:20px;width:28px;text-align:center">${petIcon}</span>
+              <select class="form-select" style="width:110px" onchange="updatePet(${i},'type',this.value);renderSettings()">
+                <option value="dog"${p.type==='dog'?' selected':''}>Dog</option>
+                <option value="cat"${p.type==='cat'?' selected':''}>Cat</option>
+                <option value="bird"${p.type==='bird'?' selected':''}>Bird</option>
+                <option value="other"${p.type==='other'?' selected':''}>Other</option>
+              </select>
+              <input type="text" maxlength="200" class="form-input" style="flex:1;min-width:120px" placeholder="Name (optional)"
+                value="${(p.name||'').replace(/"/g,'&quot;')}"
+                oninput="updatePet(${i},'name',this.value)">
+              <button onclick="removePet(${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:20px;line-height:1;padding:0 4px;opacity:0.7" title="Remove">&times;</button>
+            </div>`;
+          }).join('')}
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:20px">🚗</span>
           <input type="number" class="form-input" style="width:90px" min="0" max="20"
             value="${state.householdProfile.cars||0}" onchange="updateCars(parseInt(this.value)||0)">
           <span style="color:var(--text-muted);font-size:13px">vehicle(s) registered to this household</span>
-        </div>
-      </div>`) +
+        </div>`;
+
+      return acc('household', '🏠 Household', 'People, pets, and access for everyone in your home', `
+        <div class="section-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <span style="font-weight:600;font-size:13px">Members</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('adult')">+ Adult</button>
+              <button class="btn btn-ghost btn-sm" onclick="addHouseholdMember('child')">+ Child</button>
+            </div>
+          </div>
+          ${_members.length === 0 ? `<p style="color:var(--text-muted);font-size:13px;margin-bottom:16px">No members yet.</p>` : ''}
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+            ${memberCards}
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px">
+            ${petsHtml}
+          </div>
+        </div>`);
+    })() +
 
     acc('cats', 'Expense &amp; Income Categories', 'Manage categories available in dropdowns', `
       <div class="section-body">
@@ -7495,6 +9128,40 @@ function renderSettings() {
       </div>`) +
   '';
 
+  // Setup checklist section
+  html += acc('setup-checklist', '✅ Setup Checklist', 'The setup progress card shown on your dashboard',
+    `<div class="section-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">Show on dashboard</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:2px">${state.setupProgressDismissed ? 'Currently hidden' : 'Currently visible'}</div>
+        </div>
+        <button onclick="event.stopPropagation();state.setupProgressDismissed=${!state.setupProgressDismissed};saveData(state);_refreshSetupProgress();renderSettings()" class="btn btn-secondary btn-sm">
+          ${state.setupProgressDismissed ? 'Show again' : 'Hide'}
+        </button>
+      </div>
+    </div>`);
+
+  // Device profile section
+  const device = getDeviceProfile();
+  const deviceKids = state.kids?.profiles || [];
+  const deviceLabel = !device ? 'Not configured'
+    : device === 'adult' ? 'Adult — opens straight to the full app'
+    : device === 'shared' ? 'Shared — shows profile picker on open'
+    : (deviceKids.find(k => k.id === device)?.name || 'Unknown') + ' — kid device';
+
+  html += acc('this-device', '📱 This Device', `Assigned to: ${deviceLabel}`,
+    `<div class="section-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">Assigned to</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:2px">${escHtml(deviceLabel)}</div>
+        </div>
+        <button onclick="event.stopPropagation();showDeviceSetup()" class="btn btn-secondary btn-sm">Change</button>
+      </div>
+    </div>`);
+
+
   html += `<div class="settings-save-bar" id="settings-save-bar" style="display:${_settingsDirty ? 'flex' : 'none'}">
     <div class="unsaved-dot"></div>
     <div class="unsaved-text">Unsaved changes</div>
@@ -7503,6 +9170,22 @@ function renderSettings() {
   </div>`;
 
   document.getElementById('settings-content').innerHTML = html;
+}
+
+function resetAllData() {
+  if (!confirm('This will permanently delete ALL household data — budget, kids, goals, everything — from this device and the cloud.\n\nThis cannot be undone. Are you sure?')) return;
+  if (!confirm('Last chance. All data will be gone. Continue?')) return;
+  // Clear Firestore document
+  if (_currentUser && fbStore) {
+    const _resetDocRef = _getHouseholdDocRef();
+    if (_resetDocRef) _resetDocRef.delete().catch(() => {});
+  }
+  // Clear local storage (both data and household pointer)
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(HOUSEHOLD_OWNER_KEY);
+  // Sign out and reload — will trigger fresh onboarding
+  if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
+  fbAuth.signOut().then(() => { window.location.reload(); });
 }
 
 function exportData() {
@@ -7914,7 +9597,9 @@ function openModal(title, bodyHtml, onSave) {
     <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
     <button class="btn btn-primary" id="modal-save-btn">Save</button>
   `;
-  document.getElementById('modal-save-btn').addEventListener('click', onSave);
+  // Use onclick to avoid listener accumulation across multiple openModal calls
+  window._modalSaveHandler = onSave;
+  document.getElementById('modal-save-btn').onclick = () => window._modalSaveHandler?.();
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
 
@@ -9282,10 +10967,29 @@ function renderVehicles() {
 
   if (vehicles.length === 0) {
     document.getElementById('vehicles-content').innerHTML = `
-      <div class="empty" style="margin-top:24px">
-        <div class="empty-icon">🚗</div>
-        <p>No vehicles yet. Add your car to track rego, insurance and services.</p>
-        <button class="btn btn-primary" style="margin-top:12px" onclick="openVehicleForm()">+ Add Vehicle</button>
+      <div style="background:#fff;border:2px dashed #cbd5e1;border-radius:16px;padding:36px 24px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="font-size:40px">🚗</div>
+          <div>
+            <div style="font-size:17px;font-weight:700;color:#1e293b">No vehicles yet</div>
+            <div style="font-size:13px;color:#64748b;margin-top:4px">Track rego, insurance and service reminders — never miss a renewal.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">
+          <div style="background:#f0f9ff;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">📋</div>
+            <div style="font-size:11px;font-weight:600;color:#374151">Rego tracking</div>
+          </div>
+          <div style="background:#f0fdf4;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🛡️</div>
+            <div style="font-size:11px;font-weight:600;color:#374151">Insurance</div>
+          </div>
+          <div style="background:#fef9c3;border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:20px;margin-bottom:4px">🔧</div>
+            <div style="font-size:11px;font-weight:600;color:#374151">Services</div>
+          </div>
+        </div>
+        <button onclick="openVehicleForm()" style="width:100%;background:#0891b2;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">Add your first vehicle →</button>
       </div>`;
     return;
   }
@@ -11028,10 +12732,8 @@ function _activeTab() {
 }
 
 function renderAll() {
-  // Always render the Today screen (needs fresh data from all sources)
+  _applyChildNav();
   safeRender(renderToday);
-
-  // Only render the active tab
   const active = _activeTab();
   const fns = _TAB_RENDERERS[active];
   if (fns) fns.forEach(fn => safeRender(fn));
@@ -11107,18 +12809,25 @@ function renderKidsOverview(k) {
     const myChores = k.chores.filter(c => c.assignedTo === kid.id || c.assignedTo === 'all').length;
     const pending = k.completions.filter(c => c.kidId === kid.id && c.status === 'pending').length;
     html += `
-      <div class="kid-card" onclick="kidsView='${kid.id}';renderKids()">
-        <button onclick="event.stopPropagation();openEditKidModal('${kid.id}')" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:14px;padding:2px 5px;border-radius:4px" title="Edit">✏️</button>
-        <div class="kid-avatar">${kid.emoji}</div>
-        <div class="kid-name">${escHtml(kid.name)}</div>
-        <div class="kid-points">${bal}</div>
-        <div class="kid-points-label">⭐ points</div>
-        <div style="display:flex;gap:10px;font-size:12px;color:#64748b;margin-top:4px">
-          <span>📋 ${myChores}</span>
-          ${pending ? `<span style="color:#f59e0b;font-weight:600">⏳ ${pending}</span>` : ''}
-          ${kid.savings ? `<span style="color:#0891b2">💰 $${kid.savings.toFixed(0)}</span>` : ''}
+      <div class="kid-card" style="cursor:default">
+        <button onclick="openEditKidModal('${kid.id}')" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:14px;padding:2px 5px;border-radius:4px" title="Edit">✏️</button>
+        <div onclick="kidsView='${kid.id}';renderKids()" style="cursor:pointer">
+          <div class="kid-avatar">${kid.emoji}</div>
+          <div class="kid-name">${escHtml(kid.name)}</div>
+          <div class="kid-points">${bal}</div>
+          <div class="kid-points-label">⭐ points</div>
+          <div style="display:flex;gap:10px;font-size:12px;color:#64748b;margin-top:4px">
+            <span>📋 ${myChores}</span>
+            ${pending ? `<span style="color:#f59e0b;font-weight:600">⏳ ${pending}</span>` : ''}
+            ${kid.savings ? `<span style="color:#0891b2">💰 $${kid.savings.toFixed(0)}</span>` : ''}
+          </div>
         </div>
-        <div style="width:100%;margin-top:10px;padding:7px;background:#ecfeff;border-radius:8px;font-size:12px;color:#0891b2;font-weight:600;text-align:center">Switch to ${escHtml(kid.name)}'s view →</div>
+        <button onclick="switchToKidMode('${kid.id}')" style="width:100%;margin-top:10px;padding:8px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:8px;font-size:12px;color:#0891b2;font-weight:600;cursor:pointer">
+          Switch to ${escHtml(kid.name)}'s view →
+        </button>
+        <button onclick="openPinSetup('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:${kid.pinHash?'#f0fdf4':'#fffbeb'};border:1px solid ${kid.pinHash?'#bbf7d0':'#fde68a'};border-radius:8px;font-size:12px;color:${kid.pinHash?'#15803d':'#854d0e'};font-weight:600;cursor:pointer">
+          ${kid.pinHash ? '🔒 PIN set — change' : '🔓 Set PIN for login'}
+        </button>
       </div>`;
   });
   html += `</div>`;
@@ -11130,7 +12839,30 @@ function renderChoreMgmt(k) {
     <span style="font-size:15px;font-weight:600">All Chores</span>
     <button class="btn btn-primary btn-sm" onclick="openChoreModal()">+ Add Chore</button>
   </div>`;
-  if (!k.chores.length) return html + `<div class="empty"><div class="empty-icon">📋</div><p>No chores yet</p></div>`;
+  if (!k.chores.length) {
+    const firstKid = k.profiles[0];
+    const kidName = firstKid?.name || 'your child';
+    const kidEmoji = firstKid?.emoji || '👦';
+    const suggestions = [
+      { emoji:'🛏️', label:'Make bed' },
+      { emoji:'🍽️', label:'Clear table' },
+      { emoji:'🐕', label:'Feed pet' },
+    ];
+    const chips = suggestions.map(s =>
+      `<button onclick="openChoreModal()" style="padding:7px 14px;background:#fef9c3;border:1.5px solid #eab308;border-radius:99px;font-size:12px;font-weight:600;color:#854d0e;cursor:pointer">${s.emoji} ${s.label}</button>`
+    ).join('');
+    return html + `
+      <div style="background:#fff;border:2px dashed #cbd5e1;border-radius:16px;padding:36px 24px;text-align:center;margin-top:8px">
+        <div style="font-size:44px;margin-bottom:10px">${kidEmoji}</div>
+        <div style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:6px">${escHtml(kidName)} has no chores yet</div>
+        <div style="font-size:13px;color:#64748b;margin-bottom:18px">Add chores to help ${escHtml(kidName)} earn coins and unlock prizes.</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
+          ${chips}
+          <button onclick="openChoreModal()" style="padding:7px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:99px;font-size:12px;color:#64748b;cursor:pointer">+ Custom</button>
+        </div>
+        <button onclick="openChoreModal()" style="background:#eab308;color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer">Add first chore →</button>
+      </div>`;
+  }
   k.chores.forEach(ch => {
     const who = ch.assignedTo === 'all' ? 'All kids' : (k.profiles.find(p => p.id === ch.assignedTo)?.name || '?');
     html += `<div class="chore-item">
@@ -11326,7 +13058,7 @@ function pickedEmoji(fallback) {
 // ── Modals ─────────────────────────────────────────
 function openAddKidModal() { openEditKidModal(null); }
 function openEditKidModal(id) {
-  const kid = id ? state.kids.profiles.find(p => p.id === id) : null;
+  const kid = id ? state.kids.profiles.find(p => String(p.id) === String(id)) : null;
   document.getElementById('modal-title').textContent = kid ? 'Edit Kid' : 'Add Kid';
   document.getElementById('modal-body').innerHTML = `
     ${id ? `<input type="hidden" id="k-id" value="${id}">` : ''}
@@ -11343,12 +13075,23 @@ function saveKid() {
   const age  = parseInt(document.getElementById('k-age').value) || null;
   const emoji = pickedEmoji('😊');
   const id = document.getElementById('k-id')?.value;
-  if (id) { const k = state.kids.profiles.find(p => p.id === id); if (k) Object.assign(k, {name, emoji, age}); }
+  if (id) { const k = state.kids.profiles.find(p => String(p.id) === String(id)); if (k) Object.assign(k, {name, emoji, age}); }
   else state.kids.profiles.push({ id: uid(), name, emoji, age, savings: 0 });
   saveData(state); closeModal(); renderKids();
 }
 function deleteKid(id) {
-  state.kids.profiles = state.kids.profiles.filter(p => p.id !== id);
+  const kid = state.kids.profiles.find(p => String(p.id) === String(id));
+  if (!kid) return;
+  if (!confirm(`Remove ${kid.name} from this household?\n\nThis will permanently delete their chores, prizes and points history. This cannot be undone.`)) return;
+  state.kids.profiles     = state.kids.profiles.filter(p => p.id !== id);
+  state.kids.chores       = state.kids.chores.filter(c => c.assignedTo !== id);
+  state.kids.completions  = state.kids.completions.filter(c => c.kidId !== id);
+  state.kids.redemptions  = state.kids.redemptions.filter(r => r.kidId !== id);
+  if (state.meals?.lunchbox?.profiles) {
+    state.meals.lunchbox.profiles = state.meals.lunchbox.profiles.filter(p => p.id !== id);
+  }
+  // If this device was assigned to the deleted kid, reset to adult
+  if (getDeviceProfile() === id) { setDeviceProfile('adult'); }
   saveData(state); closeModal(); kidsView = 'parent'; renderKids();
 }
 
@@ -11382,7 +13125,7 @@ function saveChore() {
 }
 
 function openPrizeModal(id) {
-  const pr = id ? state.kids.prizes.find(p => p.id === id) : null;
+  const pr = id ? state.kids.prizes.find(p => String(p.id) === String(id)) : null;
   document.getElementById('modal-title').textContent = pr ? 'Edit Prize' : 'Add Prize';
   document.getElementById('modal-body').innerHTML = `
     ${id ? `<input type="hidden" id="p-id" value="${id}">` : ''}
@@ -11691,6 +13434,40 @@ function renderNetWorth() {
     changeHtml = `<span class="${cls}">${sign}${fmtNW(diff)}</span> vs last snapshot`;
   }
 
+  if (!assets.length && !liabs.length) {
+    el.innerHTML = `
+      <div style="background:#fff;border:2px dashed #cbd5e1;border-radius:16px;padding:36px 24px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="font-size:40px">📊</div>
+          <div>
+            <div style="font-size:17px;font-weight:700;color:#1e293b">See your full financial picture</div>
+            <div style="font-size:13px;color:#64748b;margin-top:4px">Add what you own and what you owe to calculate your net worth.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+          <div style="background:#f0f9ff;border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px">
+            <span style="font-size:22px">🏦</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#0369a1;margin-bottom:4px">What you own</div>
+              <div style="font-size:12px;color:#374151">Home value · Savings · Super / investments · Vehicles</div>
+            </div>
+          </div>
+          <div style="background:#fef2f2;border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px">
+            <span style="font-size:22px">💳</span>
+            <div>
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#b91c1c;margin-bottom:4px">What you owe</div>
+              <div style="font-size:12px;color:#374151">Mortgage balance · Car loans · Credit cards · Personal loans</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button onclick="openNWModal('asset')" style="flex:1;background:#0891b2;color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">+ Add an asset</button>
+          <button onclick="openNWModal('liability')" style="flex:1;background:#fff;color:#0891b2;border:1.5px solid #0891b2;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer">+ Add a liability</button>
+        </div>
+      </div>`;
+    return;
+  }
+
   el.innerHTML = `
     <div class="nw-hero">
       <div class="nw-hero-label">Net Worth</div>
@@ -11732,67 +13509,6 @@ function renderNetWorth() {
       <button class="nw-snapshot-btn" onclick="saveNWSnapshot()">Save snapshot</button>
     </div>
 
-    <!-- Item modal -->
-    <div id="nw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
-      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
-        <h3 id="nw-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px"></h3>
-        <input type="hidden" id="nw-edit-id">
-        <input type="hidden" id="nw-edit-type">
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
-            <input id="nw-name" type="text" maxlength="200" placeholder="e.g. Home, Super, Credit card" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Category</label>
-            <select id="nw-cat" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none;background:#fff"></select>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Value ($)</label>
-            <input id="nw-value" type="number" max="99999999" min="0" step="100" placeholder="0" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-          </div>
-          <div id="nw-debt-fields" style="display:none;flex-direction:column;gap:14px">
-            <div style="border-top:1px solid var(--border);padding-top:14px;font-size:12px;font-weight:600;color:#64748b;letter-spacing:0.04em;text-transform:uppercase">Debt details (optional)</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Interest rate (% p.a.)</label>
-                <input id="nw-rate" type="number" min="0" max="100" step="0.1" placeholder="e.g. 6.5" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-              </div>
-              <div>
-                <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Monthly repayment ($)</label>
-                <input id="nw-payment" type="number" max="99999999" min="0" step="50" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
-          <button class="btn-outline" onclick="closeNWModal()">Cancel</button>
-          <button class="btn-primary" onclick="saveNWItem()">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Target modal -->
-    <div id="nw-target-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
-      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
-        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Set your target</h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:20px">What net worth do you want to reach, and by when?</p>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Target net worth ($)</label>
-            <input id="nw-t-amount" type="number" max="99999999" min="0" step="10000" placeholder="e.g. 1000000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">By year</label>
-            <input id="nw-t-year" type="number" min="2025" max="2099" step="1" placeholder="e.g. 2040" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
-          <button class="btn-outline" onclick="closeNWTargetModal()">Cancel</button>
-          <button class="btn-primary" onclick="saveNWTarget()">Save target</button>
-        </div>
-      </div>
-    </div>
   `;
 }
 
@@ -11997,7 +13713,73 @@ function renderNWTrend(snaps) {
 }
 
 let _nwModalType = 'asset';
+function _ensureNWModals() {
+  if (document.getElementById('nw-modal')) return;
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div id="nw-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <h3 id="nw-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px"></h3>
+        <input type="hidden" id="nw-edit-id">
+        <input type="hidden" id="nw-edit-type">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
+            <input id="nw-name" type="text" maxlength="200" placeholder="e.g. Home, Super, Credit card" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Category</label>
+            <div id="nw-cat-wrap"></div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Value ($)</label>
+            <input id="nw-value" type="number" max="99999999" min="0" step="100" placeholder="0" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+          <div id="nw-debt-fields" style="display:none;flex-direction:column;gap:14px">
+            <div style="border-top:1px solid var(--border);padding-top:14px;font-size:12px;font-weight:600;color:#64748b;letter-spacing:0.04em;text-transform:uppercase">Debt details (optional)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Interest rate (% p.a.)</label>
+                <input id="nw-rate" type="number" min="0" max="100" step="0.1" placeholder="e.g. 6.5" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Monthly repayment ($)</label>
+                <input id="nw-payment" type="number" max="99999999" min="0" step="50" placeholder="e.g. 2000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+          <button class="btn-outline" onclick="closeNWModal()">Cancel</button>
+          <button class="btn-primary" onclick="saveNWItem()">Save</button>
+        </div>
+      </div>
+    </div>
+    <div id="nw-target-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
+      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px">Set your target</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:20px">What net worth do you want to reach, and by when?</p>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Target net worth ($)</label>
+            <input id="nw-t-amount" type="number" max="99999999" min="0" step="10000" placeholder="e.g. 1000000" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">By year</label>
+            <input id="nw-t-year" type="number" min="2025" max="2099" step="1" placeholder="e.g. 2040" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none">
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
+          <button class="btn-outline" onclick="closeNWTargetModal()">Cancel</button>
+          <button class="btn-primary" onclick="saveNWTarget()">Save target</button>
+        </div>
+      </div>
+    </div>`;
+  while (div.firstChild) document.body.appendChild(div.firstChild);
+}
+
 function openNWModal(type, id) {
+  _ensureNWModals();
   _nwModalType = type;
   const nw    = state.netWorth;
   const list  = type === 'asset' ? nw.assets : nw.liabilities;
@@ -12012,8 +13794,9 @@ function openNWModal(type, id) {
   document.getElementById('nw-value').value   = item ? item.value : '';
   document.getElementById('nw-rate').value    = (item && item.rate) ? item.rate : '';
   document.getElementById('nw-payment').value = (item && item.monthlyPayment) ? item.monthlyPayment : '';
-  const catSel = document.getElementById('nw-cat');
-  catSel.innerHTML = cats.map(c => `<option value="${c}" ${item && item.category===c?'selected':''}>${c}</option>`).join('');
+  const selectedCat = (item?.category) || cats[0];
+  const catWrap = document.getElementById('nw-cat-wrap');
+  if (catWrap) catWrap.innerHTML = customSelect('nw-cat', cats, selectedCat, val => { _csStore['nw-cat'].value = val; });
   const debtFields = document.getElementById('nw-debt-fields');
   if (debtFields) debtFields.style.display = type === 'liability' ? 'flex' : 'none';
   modal.style.display = 'flex';
@@ -12025,7 +13808,7 @@ function closeNWModal() {
 function saveNWItem() {
   const name    = document.getElementById('nw-name').value.trim();
   const value   = parseFloat(document.getElementById('nw-value').value);
-  const cat     = document.getElementById('nw-cat').value;
+  const cat     = _csStore['nw-cat']?.value || '';
   const type    = document.getElementById('nw-edit-type').value;
   const id      = document.getElementById('nw-edit-id').value;
   const rate    = parseFloat(document.getElementById('nw-rate').value) || 0;
@@ -12101,41 +13884,131 @@ const OB_EXPENSE_PRESETS = {
 
 let _ob = {
   step: 1,
-  adults: 2, kids: 0, homeType: 'mortgage',
+  adults: 2, adultNames: ['',''], adultAges: ['',''],
+  kids: 0, kidProfiles: [],
+  homeType: 'mortgage',
   incomes: [{ name: '', amount: '', frequency: 'Monthly' }],
-  expenses: []
+  expenses: [],
+  _emojiPickerOpen: null
 };
 
+function obStepSequence() {
+  return _ob.kids > 0 ? [1,2,3,4,5,6] : [1,2,4,5,6];
+}
+function obStepPosition() {
+  return obStepSequence().indexOf(_ob.step);
+}
+
 function showOnboarding() {
-  _ob = { step: 1, adults: 2, kids: 0, homeType: 'mortgage',
-    incomes: [{ name: '', amount: '', frequency: 'Monthly' }], expenses: [] };
-  const ov = document.getElementById('onboarding-overlay');
-  ov.style.display = 'flex';
+  _ob = {
+    step: 1,
+    adults: 2, adultNames: ['',''], adultAges: ['',''],
+    kids: 0, kidProfiles: [],
+    homeType: 'mortgage',
+    incomes: [{ name: '', amount: '', frequency: 'Monthly' }],
+    expenses: [],
+    _emojiPickerOpen: null
+  };
+  document.getElementById('onboarding-overlay').style.display = 'flex';
   renderObStep();
 }
 function hideOnboarding() {
   document.getElementById('onboarding-overlay').style.display = 'none';
 }
 
+function obSetAdults(n) {
+  _ob.adults = n;
+  while (_ob.adultNames.length < n) _ob.adultNames.push('');
+  _ob.adultNames = _ob.adultNames.slice(0, n);
+  while (_ob.adultAges.length < n) _ob.adultAges.push('');
+  _ob.adultAges = _ob.adultAges.slice(0, n);
+  renderObStep();
+}
+
+function obSetKids(n) {
+  _ob.kids = n;
+  if (_ob.kidProfiles.length > n) _ob.kidProfiles = _ob.kidProfiles.slice(0, n);
+  renderObStep();
+}
+
+function obToggleEmojiPicker(i) {
+  _ob._emojiPickerOpen = _ob._emojiPickerOpen === i ? null : i;
+  renderObStep();
+}
+
+function obPickEmoji(kidIdx, emoji) {
+  _ob.kidProfiles[kidIdx].emoji = emoji;
+  _ob._emojiPickerOpen = null;
+  renderObStep();
+}
+
+function obToggleExpenseSkip(i) {
+  _ob.expenses[i].skipped = !_ob.expenses[i].skipped;
+  renderObStep();
+}
+
 function renderObStep() {
   const card = document.getElementById('onboarding-card');
+  const seq  = obStepSequence();
+  const pos  = obStepPosition();
   const step = _ob.step;
-  const dots = [1,2,3].map(i =>
-    `<div class="ob-dot ${i < step ? 'done' : i === step ? 'active' : ''}"></div>`).join('');
 
-  const titles = ['', 'Your household', 'Your income', 'Your main expenses'];
-  const subs   = ['', 'Tell us a bit about your family so we can tailor Toto for you.',
-    'What\'s coming in each month?', 'What are your biggest regular costs? Adjust the amounts to match your situation.'];
+  const dots = seq.map((s, i) =>
+    `<div class="ob-dot ${i < pos ? 'done' : i === pos ? 'active' : ''}"></div>`
+  ).join('');
 
-  let body = '';
+  let headerContent = '';
+  let bodyContent   = '';
+  let footerContent = '';
 
+  /* ── Step 1: Welcome ─────────────────────────── */
   if (step === 1) {
+    headerContent = `
+      <div style="text-align:center;font-size:52px;margin-bottom:16px">🏡</div>
+      <div class="ob-title" style="text-align:center">Welcome to Toto</div>
+      <div class="ob-subtitle" style="text-align:center">Your personal assistant for life.<br>Takes about 4 minutes to set up.</div>`;
+
+    bodyContent = `
+      <div class="ob-welcome-feature"><span>✅</span> Budget, bills &amp; net worth</div>
+      <div class="ob-welcome-feature"><span>✅</span> Meal planner &amp; lunchbox</div>
+      <div class="ob-welcome-feature"><span>✅</span> Kids' chores &amp; rewards</div>`;
+
+    footerContent = `
+      <button class="ob-back" onclick="obSkip()">Skip setup</button>
+      <button class="ob-next" onclick="obNext()">Let's get started →</button>`;
+
+  /* ── Step 2: Household ───────────────────────── */
+  } else if (step === 2) {
+    headerContent = `
+      <div class="ob-step-dots">${dots}</div>
+      <div class="ob-title">Your household 🏠</div>
+      <div class="ob-subtitle">Tell us who's home so we can tailor Toto for you.</div>`;
+
     const adultOpts = [1,2,3].map(n =>
-      `<button class="ob-option ${_ob.adults===n?'selected':''}" onclick="_ob.adults=${n};renderObStep()">${n} adult${n>1?'s':''}</button>`).join('');
+      `<button class="ob-option ${_ob.adults===n?'selected':''}" onclick="obSetAdults(${n})">${n} adult${n>1?'s':''}</button>`
+    ).join('');
+
+    const nameInputs = _ob.adultNames.map((name, i) => `
+      <div style="display:grid;grid-template-columns:1fr 90px;gap:8px;margin-bottom:10px">
+        <div>
+          <div class="ob-input-label">Adult ${i+1} name</div>
+          <input class="ob-input" placeholder="${i===0?'e.g. Chris':'e.g. Sam'}" value="${escAttr(name)}"
+            oninput="_ob.adultNames[${i}]=this.value"
+            style="${_ob._nameError&&!name.trim()?'border-color:#ef4444':''}" required>
+          ${_ob._nameError&&!name.trim() ? `<div style="font-size:11px;color:#ef4444;margin-top:3px">Please enter a name</div>` : ''}
+        </div>
+        <div>
+          <div class="ob-input-label">Age (optional)</div>
+          <input class="ob-input" type="number" min="18" max="99" placeholder="Age" value="${escAttr(String(_ob.adultAges[i]||''))}"
+            oninput="_ob.adultAges[${i}]=this.value">
+        </div>
+      </div>`).join('');
+
     const kidOpts = [0,1,2,3,'4+'].map(n => {
       const val = n === '4+' ? 4 : n;
-      return `<button class="ob-option ${_ob.kids===val?'selected':''}" onclick="_ob.kids=${val};renderObStep()">${n === 0 ? 'No kids' : n + (n===1?' kid':' kids')}</button>`;
+      return `<button class="ob-option ${_ob.kids===val?'selected':''}" onclick="obSetKids(${val})">${n===0?'No kids':n+(n===1?' kid':' kids')}</button>`;
     }).join('');
+
     const homeOpts = [
       { val:'renting',  label:'🏢 Renting' },
       { val:'mortgage', label:'🏠 Mortgage' },
@@ -12143,115 +14016,314 @@ function renderObStep() {
       { val:'own',      label:'✅ Own outright' },
     ].map(o => `<button class="ob-option ${_ob.homeType===o.val?'selected':''}" onclick="_ob.homeType='${o.val}';renderObStep()">${o.label}</button>`).join('');
 
-    body = `
+    bodyContent = `
       <span class="ob-label">Adults in your household</span>
       <div class="ob-options">${adultOpts}</div>
+      ${nameInputs}
+      <span class="ob-label" style="margin-top:4px">Home situation</span>
+      <div class="ob-options">${homeOpts}</div>
       <span class="ob-label">Kids</span>
-      <div class="ob-options">${kidOpts}</div>
-      <span class="ob-label">Home situation</span>
-      <div class="ob-options" style="margin-bottom:0">${homeOpts}</div>`;
+      <div class="ob-options" style="margin-bottom:0">${kidOpts}</div>`;
 
-  } else if (step === 2) {
+    footerContent = `
+      <button class="ob-back" onclick="obBack()">← Back</button>
+      <button class="ob-next" onclick="obNext()">Continue →</button>`;
+
+  /* ── Step 3: Kids ────────────────────────────── */
+  } else if (step === 3) {
+    if (_ob.kidProfiles.length < _ob.kids) {
+      _ob.kidProfiles = Array.from({length: _ob.kids}, (_, i) =>
+        _ob.kidProfiles[i] || { name: '', age: '', emoji: KID_EMOJIS[i % KID_EMOJIS.length] }
+      );
+    }
+
+    headerContent = `
+      <div class="ob-step-dots">${dots}</div>
+      <div class="ob-title">Your kids 👶</div>
+      <div class="ob-subtitle">We'll set up chores and lunchbox for each of them.</div>`;
+
+    const kidRows = _ob.kidProfiles.map((kid, i) => {
+      const pickerHtml = _ob._emojiPickerOpen === i ? `
+        <div class="ob-emoji-picker">
+          ${KID_EMOJIS.map(e => `<button onclick="obPickEmoji(${i},'${e}')">${e}</button>`).join('')}
+        </div>` : '';
+      return `
+        <div style="margin-bottom:20px">
+          <div class="ob-input-label" style="margin-bottom:8px">Kid ${i+1}</div>
+          ${pickerHtml}
+          <div class="ob-kid-row">
+            <button class="ob-emoji-btn" onclick="obToggleEmojiPicker(${i})" title="Pick emoji">${escHtml(kid.emoji)}</button>
+            <div>
+              <div class="ob-input-label">Name</div>
+              <input class="ob-input" placeholder="Name" value="${escAttr(kid.name)}"
+                oninput="_ob.kidProfiles[${i}].name=this.value">
+            </div>
+            <div>
+              <div class="ob-input-label">Age</div>
+              <input class="ob-input" type="number" min="0" max="17" placeholder="Age" value="${escAttr(String(kid.age))}"
+                oninput="_ob.kidProfiles[${i}].age=this.value">
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    bodyContent = kidRows + `
+      <button class="ob-add-link" onclick="_ob.kidProfiles.push({name:'',age:'',emoji:KID_EMOJIS[_ob.kidProfiles.length%KID_EMOJIS.length]});renderObStep()">+ Add a child</button>`;
+
+    footerContent = `
+      <button class="ob-back" onclick="obBack()">← Back</button>
+      <button class="ob-next" onclick="obNext()">Continue →</button>`;
+
+  /* ── Step 4: Income ──────────────────────────── */
+  } else if (step === 4) {
+    headerContent = `
+      <div class="ob-step-dots">${dots}</div>
+      <div class="ob-title">Your income 💰</div>
+      <div class="ob-subtitle">What's coming in each month?</div>`;
+
     const freqs = ['Weekly','Fortnightly','Monthly','Annual'];
-    const inputStyle = 'class="ob-input"';
-    const rows = _ob.incomes.map((inc, i) => `
-      <div class="ob-input-row">
-        <div>
-          <div class="ob-input-label">Income source</div>
-          <input ${inputStyle} placeholder="e.g. Chris's salary" value="${escAttr(inc.name)}"
-            oninput="_ob.incomes[${i}].name=this.value">
-        </div>
-        <div>
-          <div class="ob-input-label">Amount ($)</div>
-          <input ${inputStyle} type="number" max="99999999" min="0" placeholder="0" value="${inc.amount}"
-            oninput="_ob.incomes[${i}].amount=this.value">
-        </div>
-        <div>
-          <div class="ob-input-label">Frequency</div>
-          <select class="ob-input" onchange="_ob.incomes[${i}].frequency=this.value">
-            ${freqs.map(f=>`<option value="${f}" ${inc.frequency===f?'selected':''}>${f}</option>`).join('')}
-          </select>
-        </div>
-      </div>`).join('');
+    const rows = _ob.incomes.map((inc, i) => {
+      const ph = _ob.adultNames[i] ? `${_ob.adultNames[i]}'s salary` : (i === 0 ? 'e.g. Salary' : 'e.g. Partner salary');
+      const freqPills = freqs.map(f =>
+        `<button class="ob-option ${inc.frequency===f?'selected':''}" style="padding:6px 14px;font-size:12px"
+          onclick="_ob.incomes[${i}].frequency='${f}';renderObStep()">${f}</button>`
+      ).join('');
+      return `
+        <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
+          <div style="margin-bottom:10px">
+            <div class="ob-input-label">Income source</div>
+            <input class="ob-input" placeholder="${escAttr(ph)}" value="${escAttr(inc.name)}"
+              oninput="_ob.incomes[${i}].name=this.value">
+          </div>
+          <div style="margin-bottom:10px">
+            <div class="ob-input-label">Amount ($)</div>
+            <input class="ob-input" type="number" max="99999999" min="0" placeholder="0" value="${inc.amount}"
+              oninput="_ob.incomes[${i}].amount=this.value">
+          </div>
+          <div>
+            <div class="ob-input-label">Frequency</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">${freqPills}</div>
+          </div>
+        </div>`;
+    }).join('');
 
-    body = `
+    bodyContent = `
       ${rows}
       ${_ob.incomes.length < 4 ? `<button class="ob-add-link" onclick="_ob.incomes.push({name:'',amount:'',frequency:'Monthly'});renderObStep()">+ Add another income source</button>` : ''}`;
 
-  } else if (step === 3) {
+    footerContent = `
+      <button class="ob-back" onclick="obBack()">← Back</button>
+      <button class="ob-next" onclick="obNext()">Continue →</button>`;
+
+  /* ── Step 5: Expenses ────────────────────────── */
+  } else if (step === 5) {
     if (!_ob.expenses.length) {
-      _ob.expenses = OB_EXPENSE_PRESETS[_ob.homeType].map(e => ({ ...e }));
+      _ob.expenses = OB_EXPENSE_PRESETS[_ob.homeType].map(e => ({ ...e, skipped: false }));
+      if (_ob.kids > 0) {
+        _ob.expenses.push({ name: 'Kids activities / sport', category: 'Childcare / Education', amount: 300, skipped: false });
+      }
     }
+
+    headerContent = `
+      <div class="ob-step-dots">${dots}</div>
+      <div class="ob-title">Your main expenses 📋</div>
+      <div class="ob-subtitle">Biggest regular costs — adjust to match your situation.</div>`;
+
     const rows = _ob.expenses.map((exp, i) => `
-      <div class="ob-expense-row">
+      <div class="ob-expense-row ${exp.skipped ? 'skipped' : ''}">
         <div>
           <div class="ob-expense-name">${escHtml(exp.name)}</div>
           <div class="ob-expense-cat">${exp.category}</div>
         </div>
-        <input class="ob-input" type="number" max="99999999" min="0" placeholder="0" value="${exp.amount}"
-          oninput="_ob.expenses[${i}].amount=parseFloat(this.value)||0" style="text-align:right">
+        <div>
+          <input class="ob-input" type="number" max="99999999" min="0" placeholder="0" value="${exp.amount}"
+            oninput="_ob.expenses[${i}].amount=parseFloat(this.value)||0"
+            style="text-align:right" ${exp.skipped ? 'disabled' : ''}>
+          <button class="ob-skip-toggle" onclick="obToggleExpenseSkip(${i})">
+            ${exp.skipped ? '+ Include' : '✕ Skip this'}
+          </button>
+        </div>
       </div>`).join('');
 
-    body = `
-      <p style="font-size:13px;color:#64748b;margin-bottom:16px">These are monthly amounts — adjust them to match your actual spending.</p>
+    bodyContent = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <p style="font-size:13px;color:#64748b;margin:0">Monthly amounts — adjust to match your actual spending.</p>
+        <button class="ob-add-link" onclick="obSkipExpenses()" style="white-space:nowrap;margin-left:12px">Add this later</button>
+      </div>
       ${rows}`;
+
+    footerContent = `
+      <button class="ob-back" onclick="obBack()">← Back</button>
+      <button class="ob-next" onclick="obNext()">Continue →</button>`;
+
+  /* ── Step 6: All Done ────────────────────────── */
+  } else if (step === 6) {
+    const monthlyIncome = _ob.incomes.reduce((s, inc) => {
+      const amt = parseFloat(inc.amount) || 0;
+      if (!amt) return s;
+      const m = inc.frequency === 'Weekly' ? amt*52/12
+              : inc.frequency === 'Fortnightly' ? amt*26/12
+              : inc.frequency === 'Annual' ? amt/12 : amt;
+      return s + m;
+    }, 0);
+
+    const monthlyExpenses = _ob.expenses
+      .filter(e => !e.skipped)
+      .reduce((s, e) => s + (parseFloat(e.amount)||0), 0);
+
+    const namedAdults = _ob.adultNames.filter(n => n);
+    const adultsDisplay = namedAdults.length > 0
+      ? namedAdults.join(' & ')
+      : `${_ob.adults} adult${_ob.adults > 1 ? 's' : ''}`;
+
+    const homeLabel = { renting:'Renting', mortgage:'Mortgage', building:'Building', own:'Own outright' }[_ob.homeType] || '';
+
+    const memberRows = [`
+      <div class="ob-summary-member">
+        <div class="ob-summary-avatar">👤</div>
+        <div>
+          <div style="font-size:14px;font-weight:600">${escHtml(adultsDisplay)}</div>
+          <div style="font-size:12px;color:#64748b">Adults · ${homeLabel}</div>
+        </div>
+      </div>`];
+
+    _ob.kidProfiles.forEach(kid => {
+      if (!kid.name) return;
+      memberRows.push(`
+        <div class="ob-summary-member">
+          <div class="ob-summary-avatar">${escHtml(kid.emoji)}</div>
+          <div>
+            <div style="font-size:14px;font-weight:600">${escHtml(kid.name)}${kid.age ? `, age ${kid.age}` : ''}</div>
+            <div style="font-size:12px;color:#64748b">Chores &amp; lunchbox ready</div>
+          </div>
+        </div>`);
+    });
+
+    headerContent = `
+      <div style="text-align:center;font-size:48px;margin-bottom:12px">🎉</div>
+      <div class="ob-title" style="text-align:center">You're all set!</div>
+      <div class="ob-subtitle" style="text-align:center">Here's what Toto knows about your household</div>`;
+
+    bodyContent = `
+      <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #e2e8f0">
+        ${memberRows.join('')}
+      </div>
+      <div style="display:flex;gap:12px">
+        <div style="flex:1;background:#f0fdf4;border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#16a34a">$${Math.round(monthlyIncome).toLocaleString()}</div>
+          <div style="color:#64748b;font-size:11px">monthly income</div>
+        </div>
+        <div style="flex:1;background:#fff7ed;border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:700;color:#ea580c">$${Math.round(monthlyExpenses).toLocaleString()}</div>
+          <div style="color:#64748b;font-size:11px">monthly expenses</div>
+        </div>
+      </div>`;
+
+    footerContent = `
+      <button class="ob-back" onclick="obBack()">← Back</button>
+      <button class="ob-next" onclick="obFinish()">Take me to my dashboard →</button>`;
   }
 
   card.innerHTML = `
-    <div class="ob-header">
-      <div class="ob-step-dots">${dots}</div>
-      <div class="ob-title">${titles[step]}</div>
-      <div class="ob-subtitle">${subs[step]}</div>
-    </div>
-    <div class="ob-body">${body}</div>
-    <div class="ob-footer">
-      ${step > 1
-        ? `<button class="ob-back" onclick="obBack()">← Back</button>`
-        : `<button class="ob-back" onclick="obSkip()">Skip setup</button>`}
-      <button class="ob-next" onclick="obNext()">
-        ${step === 3 ? '🎉 Let\'s go!' : 'Continue →'}
-      </button>
-    </div>`;
+    <div class="ob-header">${headerContent}</div>
+    <div class="ob-body">${bodyContent}</div>
+    <div class="ob-footer">${footerContent}</div>`;
 }
 
 function obNext() {
-  if (_ob.step === 3) { obFinish(); return; }
-  _ob.step++;
-  // Pre-load expenses when arriving at step 3
-  if (_ob.step === 3 && !_ob.expenses.length) {
-    _ob.expenses = OB_EXPENSE_PRESETS[_ob.homeType].map(e => ({ ...e }));
+  const seq = obStepSequence();
+  const pos = obStepPosition();
+  if (pos >= seq.length - 1) { obFinish(); return; }
+
+  // Validate adult names on step 2
+  if (_ob.step === 2) {
+    const missing = _ob.adultNames.some(n => !n.trim());
+    if (missing) { _ob._nameError = true; renderObStep(); return; }
+    _ob._nameError = false;
   }
+
+  const nextStep = seq[pos + 1];
+
+  if (nextStep === 3) {
+    _ob.kidProfiles = Array.from({length: _ob.kids}, (_, i) =>
+      _ob.kidProfiles[i] || { name: '', age: '', emoji: KID_EMOJIS[i % KID_EMOJIS.length] }
+    );
+  }
+
+  if (nextStep === 5 && !_ob.expenses.length) {
+    _ob.expenses = OB_EXPENSE_PRESETS[_ob.homeType].map(e => ({ ...e, skipped: false }));
+    if (_ob.kids > 0) {
+      _ob.expenses.push({ name: 'Kids activities / sport', category: 'Childcare / Education', amount: 300, skipped: false });
+    }
+  }
+
+  _ob.step = nextStep;
   renderObStep();
 }
-function obBack() { _ob.step--; renderObStep(); }
+
+function obBack() {
+  const seq = obStepSequence();
+  const pos = obStepPosition();
+  if (pos <= 0) return;
+  _ob.step = seq[pos - 1];
+  renderObStep();
+}
+
 function obSkip() {
   state.onboarded = true;
   saveData(state);
   hideOnboarding();
 }
 
+function obSkipExpenses() {
+  _ob.expenses = [];
+  const seq = obStepSequence();
+  const pos = obStepPosition();
+  _ob.step = seq[pos + 1];
+  renderObStep();
+}
+
 function obFinish() {
-  // Save household profile
+  // Save household profile members
   state.householdProfile.members = [];
-  for (let i = 0; i < _ob.adults; i++) state.householdProfile.members.push({ role: 'adult', age: null });
-  for (let i = 0; i < _ob.kids; i++) state.householdProfile.members.push({ role: 'child', age: null });
+  for (let i = 0; i < _ob.adults; i++) {
+    state.householdProfile.members.push({ role: 'adult', name: _ob.adultNames[i] || '', age: _ob.adultAges[i] ? parseInt(_ob.adultAges[i]) : null });
+  }
+
+  // Save kid profiles to household, kids.profiles, and lunchbox
+  if (!state.kids) state.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
+  if (!state.meals) state.meals = {};
+  if (!state.meals.lunchbox) state.meals.lunchbox = { profiles: [] };
+  if (!state.meals.lunchbox.profiles) state.meals.lunchbox.profiles = [];
+
+  // Clear existing kid profiles/lunchbox so re-running onboarding doesn't stack duplicates
+  state.kids.profiles = [];
+  state.meals.lunchbox.profiles = [];
+  _ob.kidProfiles.forEach(kid => {
+    state.householdProfile.members.push({ role: 'child', name: kid.name, age: kid.age ? parseInt(kid.age) : null, emoji: kid.emoji });
+    if (!kid.name) return;
+    const id = nextId(state.kids.profiles);
+    state.kids.profiles.push({ id, name: kid.name, age: kid.age ? parseInt(kid.age) : null, emoji: kid.emoji });
+    state.meals.lunchbox.profiles.push({ id, name: kid.name, emoji: kid.emoji });
+  });
+
+  state.householdProfile.homeType = _ob.homeType;
 
   // Save income to current month budget
   const mb = ensureMonthOverride(selectedBudgetMonth);
   _ob.incomes.forEach((inc, i) => {
     const amount = parseFloat(inc.amount);
-    if (!inc.name || !amount) return;
-    // Convert to monthly
-    const monthly = inc.frequency === 'Weekly' ? amount * 52/12
-                  : inc.frequency === 'Fortnightly' ? amount * 26/12
-                  : inc.frequency === 'Annual' ? amount / 12
-                  : amount;
-    mb.income.push({ id: nextId(mb.income), name: inc.name || `Income ${i+1}`, amount: monthly, frequency: 'monthly', category: 'Salary' });
+    if (!amount) return;
+    const monthly = inc.frequency === 'Weekly' ? amount*52/12
+                  : inc.frequency === 'Fortnightly' ? amount*26/12
+                  : inc.frequency === 'Annual' ? amount/12 : amount;
+    const name = inc.name || (_ob.adultNames[i] ? `${_ob.adultNames[i]}'s salary` : `Income ${i+1}`);
+    mb.income.push({ id: nextId(mb.income), name, amount: monthly, frequency: 'monthly', category: 'Salary' });
   });
 
-  // Save expenses
+  // Save expenses (excluding skipped)
   _ob.expenses.forEach(exp => {
-    if (!exp.amount) return;
+    if (exp.skipped || !exp.amount) return;
     mb.expenses.push({ id: nextId(mb.expenses), name: exp.name, amount: exp.amount, frequency: 'monthly', category: exp.category, recurring: true });
   });
 
