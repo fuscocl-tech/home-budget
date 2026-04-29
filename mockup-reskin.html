@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toto — Reskin Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    background: #ECEAF5;
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+
+  .page-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #18181B;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .page-sub {
+    text-align: center;
+    font-size: 13px;
+    color: #A1A1AA;
+    margin-bottom: 52px;
+  }
+
+  .screens {
+    display: flex;
+    gap: 36px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+
+  .screen-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .screen-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #A1A1AA;
+  }
+
+  /* Phone shell */
+  .phone {
+    width: 320px;
+    height: 693px;
+    border-radius: 48px;
+    border: 1.5px solid #D4D0E8;
+    overflow: hidden;
+    position: relative;
+    background: #FAFAF8;
+    box-shadow:
+      0 0 0 6px rgba(255,255,255,0.6),
+      0 24px 64px rgba(91,76,245,0.13),
+      0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  /* Status bar overlay — sits above the iframe */
+  .status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    padding: 14px 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 10;
+    pointer-events: none;
+    background: transparent;
+  }
+
+  .status-time {
+    font-size: 13px;
+    font-weight: 600;
+    color: #18181B;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+
+  .status-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  /* The iframe fills the phone — top padding accounts for status bar */
+  .phone iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    /* Scale the desktop app down to fit the 320px phone width.
+       The app is designed at ~420px mobile width, so we scale to fit. */
+    transform-origin: top left;
+  }
+
+  .note {
+    max-width: 700px;
+    margin: 56px auto 0;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #E8E6F0;
+    padding: 24px 28px;
+  }
+
+  .note-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #18181B;
+    margin-bottom: 10px;
+  }
+
+  .note p {
+    font-size: 13px;
+    color: #A1A1AA;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .note p:last-child { margin-bottom: 0; }
+
+  .token-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .token-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FAFAF8;
+    border: 1px solid #E8E6F0;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #18181B;
+  }
+
+  .token-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">Toto — 2028 Reskin</div>
+<div class="page-sub">Real app screens with the new design system applied</div>
+
+<div class="screens">
+
+  <!-- TODAY -->
+  <div class="screen-col">
+    <div class="screen-label">Today</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/>
+            <rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/>
+            <rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 2.5C10.5 2.5 12.7 3.6 14.2 5.3" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+            <path d="M8 5C9.8 5 11.4 5.8 12.5 7.1" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+            <path d="M8 7.5C9 7.5 10 7.9 10.7 8.7" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <circle cx="8" cy="11" r="1" fill="#18181B"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/>
+            <rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/>
+            <path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#18181B" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+      <iframe
+        id="frame-today"
+        src="index.html?reskin=1&tab=today"
+        title="Today tab"
+        sandbox="allow-scripts allow-same-origin allow-forms"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- WALLET -->
+  <div class="screen-col">
+    <div class="screen-label">Wallet</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+      <iframe
+        id="frame-wallet"
+        src="index.html?reskin=1&tab=budget"
+        title="Wallet tab"
+        sandbox="allow-scripts allow-same-origin allow-forms"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- PLAN -->
+  <div class="screen-col">
+    <div class="screen-label">Plan</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+      <iframe
+        id="frame-plan"
+        src="index.html?reskin=1&tab=planner"
+        title="Plan tab"
+        sandbox="allow-scripts allow-same-origin allow-forms"
+      ></iframe>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen-col">
+    <div class="screen-label">Home</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+      <iframe
+        id="frame-home"
+        src="index.html?reskin=1&tab=documents"
+        title="Home tab"
+        sandbox="allow-scripts allow-same-origin allow-forms"
+      ></iframe>
+    </div>
+  </div>
+
+</div><!-- /screens -->
+
+<!-- Design token reference -->
+<div class="note">
+  <div class="note-title">Design tokens applied</div>
+  <p>CSS variables and class overrides from <code>reskin.css</code> are injected into each frame on load. The real app renders its own data — only colours, typography, radius, and spacing are changed.</p>
+  <div class="token-row">
+    <div class="token-chip"><div class="token-swatch" style="background:#5B4CF5"></div>#5B4CF5 Primary</div>
+    <div class="token-chip"><div class="token-swatch" style="background:#FAFAF8;border:1px solid #E8E6F0"></div>#FAFAF8 App BG</div>
+    <div class="token-chip"><div class="token-swatch" style="background:#18181B"></div>#18181B Text</div>
+    <div class="token-chip"><div class="token-swatch" style="background:#F59E0B"></div>#F59E0B Work/Amber</div>
+    <div class="token-chip"><div class="token-swatch" style="background:#7C3AED"></div>#7C3AED Study</div>
+    <div class="token-chip"><div class="token-swatch" style="background:#F43F5E"></div>#F43F5E Social/Danger</div>
+    <div class="token-chip"><div class="token-swatch" style="background:#10B981"></div>#10B981 Family/Success</div>
+    <div class="token-chip"><div class="token-swatch" style="background:#E8E6F0"></div>#E8E6F0 Border</div>
+    <div class="token-chip" style="font-family:monospace">Border-radius: 16–24px</div>
+    <div class="token-chip" style="font-family:monospace">SF Pro Display stack</div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'home_finance_v1';
+
+// Ensure a minimal onboarded state exists in localStorage so the
+// iframes skip the onboarding flow and jump straight to the app.
+function ensureAppState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      // Write a minimal bootstrapped state so the app renders without onboarding
+      const minimal = {
+        onboarded: true,
+        settings: { notifStyle: 'focus-timeline' },
+        budget: { income: [], expenses: [], actuals: {}, months: {} },
+        goals: [], bills: [], vehicles: [], documents: [],
+        maintenance: [], planner: { events: [] },
+        meals: { plan: {} }, subscriptions: [],
+        netWorth: { assets: [], liabilities: [], snapshots: [] },
+        buildContract: { total: 0, stages: [], variations: [] },
+        kids: { allowances: [], completions: [], redemptions: [] }
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(minimal));
+    } else {
+      // Make sure onboarded=true so we don't get the setup wizard
+      const d = JSON.parse(raw);
+      if (!d.onboarded) {
+        d.onboarded = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+      }
+    }
+  } catch(e) {}
+}
+
+function injectReskinAndNav(iframe) {
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    const win = iframe.contentWindow;
+    const tabParam = new URL(iframe.src, location.href).searchParams.get('tab');
+
+    // Inject reskin CSS if not already present
+    if (!doc.querySelector('link[href="reskin.css"]')) {
+      const link = doc.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'reskin.css';
+      doc.head.appendChild(link);
+    }
+
+    // Dismiss any overlays and navigate to the right tab
+    const loginOverlay = doc.getElementById('login-overlay');
+    const profileOverlay = doc.getElementById('profile-overlay');
+    const pinOverlay = doc.getElementById('pin-overlay');
+    const onboardingOverlay = doc.getElementById('onboarding-overlay');
+
+    if (loginOverlay && !loginOverlay.classList.contains('hidden')) {
+      if (win.guestMode) { win.guestMode(); }
+      else { loginOverlay.classList.add('hidden'); }
+    }
+    if (profileOverlay) profileOverlay.classList.add('hidden');
+    if (pinOverlay) pinOverlay.classList.add('hidden');
+    if (onboardingOverlay) onboardingOverlay.style.display = 'none';
+
+    // Navigate to tab
+    if (tabParam && win.activateTab) {
+      win.activateTab(tabParam);
+    }
+
+    // Hide sidebar (force mobile layout)
+    const sidebar = doc.getElementById('sidebar');
+    if (sidebar) sidebar.style.display = 'none';
+
+    // Scroll main back to top
+    const main = doc.querySelector('.main');
+    if (main) main.scrollTop = 0;
+
+  } catch(e) {
+    console.warn('inject error:', e);
+  }
+}
+
+// Ensure state before iframes load
+ensureAppState();
+
+document.querySelectorAll('iframe').forEach(iframe => {
+  iframe.addEventListener('load', () => {
+    // First pass — fast
+    setTimeout(() => injectReskinAndNav(iframe), 400);
+    // Second pass — after app may have re-rendered
+    setTimeout(() => injectReskinAndNav(iframe), 1500);
+    // Third pass — belt and braces
+    setTimeout(() => injectReskinAndNav(iframe), 3000);
+  });
+});
+</script>
+</body>
+</html>

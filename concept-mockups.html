@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toto — Design Concept Mockups</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    background: #ECEAF5;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #18181B;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #A1A1AA;
+    margin-bottom: 48px;
+  }
+  .screens-row {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .screen-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .screen-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #A1A1AA;
+  }
+
+  /* ── Phone shell ── */
+  .phone {
+    width: 320px;
+    min-height: 693px;
+    background: #FAFAF8;
+    border-radius: 48px;
+    border: 1.5px solid #E8E6F0;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 64px rgba(91,76,245,0.10), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    height: 44px;
+    padding: 14px 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    background: transparent;
+  }
+  .status-time {
+    font-size: 13px;
+    font-weight: 600;
+    color: #18181B;
+    font-variant-numeric: tabular-nums;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .status-icons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  /* ── Scroll content area ── */
+  .phone-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 90px;
+    scrollbar-width: none;
+  }
+  .phone-scroll::-webkit-scrollbar { display: none; }
+
+  /* ── HEADER ── */
+  .phone-header {
+    padding: 14px 24px 0;
+  }
+  .header-date {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: #A1A1AA;
+    margin-bottom: 4px;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .header-greeting {
+    font-size: 34px;
+    font-weight: 700;
+    color: #18181B;
+    letter-spacing: -1px;
+    line-height: 1.08;
+  }
+  .avatar {
+    width: 46px;
+    height: 46px;
+    background: #5B4CF5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #F0EEFF;
+    border: 0.5px solid #D4CFFE;
+    border-radius: 20px;
+    padding: 5px 11px;
+    margin-top: 10px;
+  }
+  .ai-badge-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: #5B4CF5;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Week strip ── */
+  .week-strip {
+    margin: 18px 20px 0;
+    background: #F2F1F8;
+    border-radius: 26px;
+    padding: 10px 6px;
+    display: flex;
+    gap: 0;
+  }
+  .day-item {
+    flex: 1;
+    text-align: center;
+    padding: 7px 3px;
+    border-radius: 16px;
+    cursor: pointer;
+  }
+  .day-item.today {
+    background: #5B4CF5;
+  }
+  .day-initial {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #A8A6C0;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .day-item.today .day-initial { color: #A89DF7; }
+  .day-number {
+    font-size: 18px;
+    font-weight: 500;
+    color: #C4C2D4;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+  .day-item.today .day-number { font-weight: 700; color: #fff; }
+  .day-item.past .day-number { color: #A8A6C0; }
+  .day-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    margin: 4px auto 0;
+    background: #E8E6F5;
+  }
+  .day-item.today .day-dot { background: rgba(255,255,255,0.5); }
+  .day-item.past .day-dot { background: #C4C2D4; }
+  .day-item.has-activity .day-dot { background: #C4C2D4; }
+
+  /* ── Stats row ── */
+  .stats-row {
+    margin: 12px 20px 0;
+    display: flex;
+    gap: 10px;
+  }
+  .stat-card {
+    flex: 1;
+    border-radius: 22px;
+    padding: 16px;
+  }
+  .stat-card.upcoming { background: #EEEAFF; }
+  .stat-card.completed { background: #ECFDF5; }
+  .stat-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .stat-card.upcoming .stat-label { color: #7B6FD4; }
+  .stat-card.completed .stat-label { color: #10B981; }
+  .stat-number-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .stat-number {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat-card.upcoming .stat-number { color: #3730A3; }
+  .stat-card.completed .stat-number { color: #065F46; }
+  .stat-sub {
+    font-size: 12px;
+  }
+  .stat-card.upcoming .stat-sub { color: #8B80D4; }
+  .stat-card.completed .stat-sub { color: #34D399; }
+
+  /* ── Life areas ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 0;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #18181B;
+  }
+  .section-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: #5B4CF5;
+  }
+  .life-grid {
+    padding: 10px 20px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .life-card {
+    border-radius: 24px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .life-card.work    { background: #FFF8EC; border: 1px solid #FDE9B0; }
+  .life-card.study   { background: #F5F0FF; border: 1px solid #DDD6FE; }
+  .life-card.social  { background: #FFF1F3; border: 1px solid #FECDD3; }
+  .life-card.family  { background: #EDFFF6; border: 1px solid #A7F3D0; }
+  .life-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .life-icon-box {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .life-card.work   .life-icon-box { background: #F59E0B; }
+  .life-card.study  .life-icon-box { background: #7C3AED; }
+  .life-card.social .life-icon-box { background: #F43F5E; }
+  .life-card.family .life-icon-box { background: #10B981; }
+  .life-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .life-card.work   .life-label { color: #78350F; }
+  .life-card.study  .life-label { color: #4C1D95; }
+  .life-card.social .life-label { color: #881337; }
+  .life-card.family .life-label { color: #064E3B; }
+  .life-count {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    line-height: 1;
+  }
+  .life-card.work   .life-count { color: #78350F; }
+  .life-card.study  .life-count { color: #4C1D95; }
+  .life-card.social .life-count { color: #881337; }
+  .life-card.family .life-count { color: #064E3B; }
+  .life-sub {
+    font-size: 11px;
+  }
+  .life-card.work   .life-sub { color: #B45309; }
+  .life-card.study  .life-sub { color: #5B21B6; }
+  .life-card.social .life-sub { color: #BE123C; }
+  .life-card.family .life-sub { color: #065F46; }
+
+  /* ── Arc ring SVG ── */
+  .arc-ring { transform: rotate(-90deg); }
+  .arc-track { fill: none; stroke-width: 4; stroke-linecap: round; }
+  .arc-progress { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 82; }
+
+  /* ── Tasks ── */
+  .tasks-section { padding: 16px 24px 0; }
+  .tasks-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+  .add-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #5B4CF5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .task-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 0.5px solid #F0EFF8;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .checkbox.done { background: #5B4CF5; }
+  .checkbox.pending-work { border: 2px solid #DDD6FE; }
+  .checkbox.pending-social { border: 2px solid #FECDD3; }
+  .checkbox.pending-family { border: 2px solid #A7F3D0; }
+  .task-text { flex: 1; }
+  .task-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #18181B;
+    line-height: 1.3;
+  }
+  .task-title.done {
+    color: #A1A1AA;
+    text-decoration: line-through;
+  }
+  .task-sub {
+    font-size: 11px;
+    color: #A1A1AA;
+    margin-top: 2px;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .task-sub.done { color: #D4D4D8; }
+  .chip {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    border-radius: 8px;
+    padding: 3px 8px;
+    text-transform: uppercase;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .chip.work   { background: #FEF3C7; color: #92400E; }
+  .chip.social { background: #FFF1F3; color: #BE123C; }
+  .chip.family { background: #EDFFF6; color: #065F46; }
+  .chip.study  { background: #F5F0FF; color: #4C1D95; }
+
+  /* ── Intelligence card ── */
+  .intel-card {
+    margin: 12px 20px 0;
+    background: #18181B;
+    border-radius: 26px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .intel-icon {
+    width: 46px;
+    height: 46px;
+    background: #2A2A36;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .intel-content { flex: 1; }
+  .intel-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+  }
+  .intel-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #7C3AED;
+  }
+  .intel-badge-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #52525B;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .intel-body {
+    font-size: 14px;
+    font-weight: 500;
+    color: #FAFAFA;
+    line-height: 1.4;
+  }
+  .intel-chevron { flex-shrink: 0; }
+
+  /* ── Floating nav ── */
+  .floating-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 20px 22px;
+    display: flex;
+    justify-content: center;
+    background: transparent;
+  }
+  .nav-pill {
+    background: #FFFFFF;
+    border: 0.5px solid #E8E6F0;
+    border-radius: 32px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+  .nav-item-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 0 10px;
+    cursor: pointer;
+  }
+  .nav-item-pill.active svg { stroke: #5B4CF5; }
+  .nav-item-pill.active .nav-label { color: #5B4CF5; font-weight: 600; }
+  .nav-item-pill svg { stroke: #C4C2D4; }
+  .nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: #C4C2D4;
+  }
+  .nav-fab {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #5B4CF5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(91,76,245,0.35);
+  }
+
+  /* ─────── WALLET SCREEN ─────── */
+  .wallet-header {
+    padding: 14px 24px 0;
+  }
+  .balance-card {
+    margin: 16px 20px 0;
+    background: #5B4CF5;
+    border-radius: 24px;
+    padding: 22px;
+    color: #fff;
+  }
+  .balance-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    font-family: 'SF Mono', ui-monospace, monospace;
+    margin-bottom: 6px;
+  }
+  .balance-amount {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .balance-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+  }
+  .balance-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .balance-col { flex: 1; }
+  .balance-col-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    font-family: 'SF Mono', ui-monospace, monospace;
+    margin-bottom: 3px;
+  }
+  .balance-col-val {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .balance-col-val.red { color: #FCA5A5; }
+  .quick-actions {
+    display: flex;
+    gap: 10px;
+    margin: 12px 20px 0;
+  }
+  .qa-btn {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #E8E6F0;
+    border-radius: 16px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .qa-btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: #EEEAFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .qa-btn-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #18181B;
+  }
+  .transaction-list { padding: 16px 20px 0; }
+  .tx-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 0.5px solid #F0EFF8;
+  }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .tx-icon.food   { background: #FFF8EC; }
+  .tx-icon.health { background: #F5F0FF; }
+  .tx-icon.car    { background: #FFF1F3; }
+  .tx-icon.shop   { background: #EDFFF6; }
+  .tx-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #18181B;
+    flex: 1;
+  }
+  .tx-sub {
+    font-size: 11px;
+    color: #A1A1AA;
+    margin-top: 2px;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .tx-amount {
+    font-size: 14px;
+    font-weight: 600;
+    color: #18181B;
+    font-variant-numeric: tabular-nums;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .tx-amount.expense { color: #EF4444; }
+  .tx-amount.income  { color: #10B981; }
+
+  /* ─────── PLAN SCREEN ─────── */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px 0;
+  }
+  .month-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #18181B;
+    letter-spacing: -0.5px;
+  }
+  .month-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #F2F1F8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .mini-cal {
+    margin: 12px 20px 0;
+    background: #fff;
+    border-radius: 24px;
+    padding: 16px;
+    border: 1px solid #E8E6F0;
+  }
+  .cal-days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+  }
+  .cal-day-init {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: #A1A1AA;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cal-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: #18181B;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .cal-cell.muted { color: #D4D4D8; }
+  .cal-cell.today { background: #5B4CF5; color: #fff; font-weight: 700; }
+  .cal-cell.has-dot { position: relative; }
+  .cal-cell.has-dot::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #5B4CF5;
+  }
+  .plan-events { padding: 16px 20px 0; }
+  .event-row {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 0.5px solid #F0EFF8;
+    align-items: flex-start;
+  }
+  .event-row:last-child { border-bottom: none; }
+  .event-time {
+    font-size: 11px;
+    font-weight: 600;
+    color: #A1A1AA;
+    font-family: 'SF Mono', ui-monospace, monospace;
+    width: 38px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+  .event-bar {
+    width: 3px;
+    border-radius: 2px;
+    align-self: stretch;
+    flex-shrink: 0;
+    min-height: 36px;
+  }
+  .event-bar.work   { background: #F59E0B; }
+  .event-bar.study  { background: #7C3AED; }
+  .event-bar.social { background: #F43F5E; }
+  .event-bar.family { background: #10B981; }
+  .event-content { flex: 1; }
+  .event-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #18181B;
+    margin-bottom: 3px;
+  }
+  .event-meta {
+    font-size: 11px;
+    color: #A1A1AA;
+  }
+
+  /* ─────── HOME SCREEN ─────── */
+  .home-hero {
+    margin: 12px 20px 0;
+    background: linear-gradient(135deg, #5B4CF5 0%, #7C3AED 100%);
+    border-radius: 24px;
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .home-hero-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    font-family: 'SF Mono', ui-monospace, monospace;
+    margin-bottom: 6px;
+  }
+  .home-hero-val {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+  .home-hero-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 2px;
+  }
+  .home-hero-badge {
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 8px 12px;
+    text-align: center;
+  }
+  .home-hero-badge-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .home-hero-badge-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    font-family: 'SF Mono', ui-monospace, monospace;
+  }
+  .home-grid {
+    padding: 10px 20px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .home-card {
+    background: #fff;
+    border: 1px solid #E8E6F0;
+    border-radius: 20px;
+    padding: 16px;
+  }
+  .home-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: #EEEAFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .home-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #18181B;
+    margin-bottom: 3px;
+  }
+  .home-card-sub {
+    font-size: 11px;
+    color: #A1A1AA;
+  }
+  .home-card-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: #18181B;
+    letter-spacing: -0.5px;
+    margin-top: 6px;
+  }
+
+  /* ─────── SETTINGS SCREEN ─────── */
+  .settings-profile {
+    margin: 12px 20px 0;
+    background: #fff;
+    border-radius: 24px;
+    padding: 20px;
+    border: 1px solid #E8E6F0;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .profile-avatar-lg {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #5B4CF5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+  .profile-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #18181B;
+    margin-bottom: 2px;
+  }
+  .profile-email {
+    font-size: 12px;
+    color: #A1A1AA;
+  }
+  .settings-group {
+    margin: 14px 20px 0;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid #E8E6F0;
+    overflow: hidden;
+  }
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 0.5px solid #F0EFF8;
+    cursor: pointer;
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .settings-row-label {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #18181B;
+  }
+  .settings-row-sub {
+    font-size: 12px;
+    color: #A1A1AA;
+    margin-top: 1px;
+  }
+
+  /* sparkline */
+  .sparkline { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<h1>Toto — 2028 Design Concept</h1>
+<p class="subtitle">Main screens restyled to the new design specification</p>
+
+<div class="screens-row">
+
+  <!-- ═══════════════════ TODAY ═══════════════════ -->
+  <div class="screen-wrap">
+    <div class="screen-label">Today</div>
+    <div class="phone">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/>
+            <rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/>
+            <rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/>
+          </svg>
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 2.5C10.5 2.5 12.7 3.6 14.2 5.3" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+            <path d="M8 5C9.8 5 11.4 5.8 12.5 7.1" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+            <path d="M8 7.5C9 7.5 10 7.9 10.7 8.7" stroke="#18181B" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <circle cx="8" cy="11" r="1" fill="#18181B"/>
+          </svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/>
+            <rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/>
+            <path d="M23 4.5V7.5C23.8 7.2 24.5 6.5 24.5 6C24.5 5.5 23.8 4.8 23 4.5Z" fill="#18181B" opacity="0.4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="phone-scroll">
+        <!-- Header -->
+        <div class="phone-header">
+          <div class="header-date">Wednesday, April 29</div>
+          <div class="header-row">
+            <div>
+              <div class="header-greeting">Good<br>morning</div>
+              <div class="ai-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="2" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span class="ai-badge-text">3 things need attention</span>
+              </div>
+            </div>
+            <div class="avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week strip -->
+        <div class="week-strip">
+          <div class="day-item past has-activity">
+            <div class="day-initial">M</div>
+            <div class="day-number">23</div>
+            <div class="day-dot"></div>
+          </div>
+          <div class="day-item past">
+            <div class="day-initial">T</div>
+            <div class="day-number">24</div>
+            <div class="day-dot"></div>
+          </div>
+          <div class="day-item past has-activity">
+            <div class="day-initial">W</div>
+            <div class="day-number">25</div>
+            <div class="day-dot"></div>
+          </div>
+          <div class="day-item past">
+            <div class="day-initial">T</div>
+            <div class="day-number">26</div>
+            <div class="day-dot"></div>
+          </div>
+          <div class="day-item past has-activity">
+            <div class="day-initial">F</div>
+            <div class="day-number">27</div>
+            <div class="day-dot"></div>
+          </div>
+          <div class="day-item past">
+            <div class="day-initial">S</div>
+            <div class="day-number">28</div>
+            <div class="day-dot"></div>
+          </div>
+          <div class="day-item today">
+            <div class="day-initial">S</div>
+            <div class="day-number">29</div>
+            <div class="day-dot"></div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+          <div class="stat-card upcoming">
+            <div class="stat-label">Upcoming</div>
+            <div class="stat-number-row">
+              <span class="stat-number">5</span>
+              <svg class="sparkline" width="38" height="18" viewBox="0 0 38 18" fill="none">
+                <polyline points="0,14 8,10 16,12 24,6 32,8 38,4" stroke="#5B4CF5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+              </svg>
+            </div>
+            <div class="stat-sub">this week</div>
+          </div>
+          <div class="stat-card completed">
+            <div class="stat-label">Completed</div>
+            <div class="stat-number-row">
+              <span class="stat-number">12</span>
+              <svg class="sparkline" width="38" height="18" viewBox="0 0 38 18" fill="none">
+                <polyline points="0,14 8,11 16,9 24,7 32,5 38,3" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+              </svg>
+            </div>
+            <div class="stat-sub">this month</div>
+          </div>
+        </div>
+
+        <!-- Life areas -->
+        <div class="section-header">
+          <span class="section-title">Life areas</span>
+          <span class="section-link">See all</span>
+        </div>
+        <div class="life-grid">
+          <!-- Work -->
+          <div class="life-card work">
+            <div class="life-card-top">
+              <div class="life-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+              </div>
+              <svg class="arc-ring" width="34" height="34" viewBox="0 0 34 34">
+                <circle class="arc-track" cx="17" cy="17" r="13" stroke="#FDE9B0"/>
+                <circle class="arc-progress" cx="17" cy="17" r="13" stroke="#F59E0B" stroke-dashoffset="62"/>
+              </svg>
+            </div>
+            <div class="life-label">Work</div>
+            <div class="life-count">4</div>
+            <div class="life-sub">tasks pending</div>
+          </div>
+          <!-- Study -->
+          <div class="life-card study">
+            <div class="life-card-top">
+              <div class="life-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/></svg>
+              </div>
+              <svg class="arc-ring" width="34" height="34" viewBox="0 0 34 34">
+                <circle class="arc-track" cx="17" cy="17" r="13" stroke="#DDD6FE"/>
+                <circle class="arc-progress" cx="17" cy="17" r="13" stroke="#7C3AED" stroke-dashoffset="45"/>
+              </svg>
+            </div>
+            <div class="life-label">Study</div>
+            <div class="life-count">2</div>
+            <div class="life-sub">tasks pending</div>
+          </div>
+          <!-- Social -->
+          <div class="life-card social">
+            <div class="life-card-top">
+              <div class="life-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <svg class="arc-ring" width="34" height="34" viewBox="0 0 34 34">
+                <circle class="arc-track" cx="17" cy="17" r="13" stroke="#FECDD3"/>
+                <circle class="arc-progress" cx="17" cy="17" r="13" stroke="#F43F5E" stroke-dashoffset="25"/>
+              </svg>
+            </div>
+            <div class="life-label">Social</div>
+            <div class="life-count">3</div>
+            <div class="life-sub">tasks pending</div>
+          </div>
+          <!-- Family -->
+          <div class="life-card family">
+            <div class="life-card-top">
+              <div class="life-icon-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <svg class="arc-ring" width="34" height="34" viewBox="0 0 34 34">
+                <circle class="arc-track" cx="17" cy="17" r="13" stroke="#A7F3D0"/>
+                <circle class="arc-progress" cx="17" cy="17" r="13" stroke="#10B981" stroke-dashoffset="71"/>
+              </svg>
+            </div>
+            <div class="life-label">Family</div>
+            <div class="life-count">1</div>
+            <div class="life-sub">tasks pending</div>
+          </div>
+        </div>
+
+        <!-- Today's tasks -->
+        <div class="tasks-section">
+          <div class="tasks-header">
+            <span class="section-title">Today</span>
+            <div class="add-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox done">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="task-text">
+              <div class="task-title done">Team standup</div>
+              <div class="task-sub done">9:00 AM</div>
+            </div>
+            <div class="chip work">Work</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox pending-work"></div>
+            <div class="task-text">
+              <div class="task-title">Finish Q2 report</div>
+              <div class="task-sub">2:00 PM · Work</div>
+            </div>
+            <div class="chip work">Work</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox pending-social"></div>
+            <div class="task-text">
+              <div class="task-title">Call Mum</div>
+              <div class="task-sub">4:30 PM</div>
+            </div>
+            <div class="chip social">Social</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox pending-family"></div>
+            <div class="task-text">
+              <div class="task-title">Grocery run</div>
+              <div class="task-sub">6:00 PM</div>
+            </div>
+            <div class="chip family">Family</div>
+          </div>
+        </div>
+
+        <!-- Intelligence card -->
+        <div class="intel-card">
+          <div class="intel-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="intel-content">
+            <div class="intel-badge">
+              <div class="intel-dot"></div>
+              <span class="intel-badge-label">Toto Intelligence</span>
+            </div>
+            <div class="intel-body">Mother's Day in 11 days — you usually plan a week before</div>
+          </div>
+          <div class="intel-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating nav -->
+      <div class="floating-nav">
+        <div class="nav-pill">
+          <div class="nav-item-pill active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span class="nav-label">Today</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span class="nav-label">Plan</span>
+          </div>
+          <div class="nav-fab">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            </svg>
+            <span class="nav-label">Wallet</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span class="nav-label">Me</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ WALLET ═══════════════════ -->
+  <div class="screen-wrap">
+    <div class="screen-label">Wallet</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+
+      <div class="phone-scroll">
+        <div class="wallet-header">
+          <div class="header-date">Wednesday, April 29</div>
+          <div class="header-row">
+            <div class="header-greeting">Wallet</div>
+            <div class="avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Balance card -->
+        <div class="balance-card">
+          <div class="balance-label">Monthly Balance</div>
+          <div class="balance-amount">$4,280</div>
+          <div class="balance-sub">April 2026</div>
+          <div class="balance-row">
+            <div class="balance-col">
+              <div class="balance-col-label">Income</div>
+              <div class="balance-col-val">$8,500</div>
+            </div>
+            <div class="balance-col">
+              <div class="balance-col-label">Spent</div>
+              <div class="balance-col-val red">$4,220</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="quick-actions">
+          <div class="qa-btn">
+            <div class="qa-btn-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <span class="qa-btn-label">Add</span>
+          </div>
+          <div class="qa-btn">
+            <div class="qa-btn-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <span class="qa-btn-label">Insights</span>
+          </div>
+          <div class="qa-btn">
+            <div class="qa-btn-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><path d="M4 2v20l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2V2l-2 2-2-2-2 2-2-2-2 2-2-2-2 2Z"/><path d="M16 8H8M16 12H8M13 16H8"/></svg>
+            </div>
+            <span class="qa-btn-label">Bills</span>
+          </div>
+          <div class="qa-btn">
+            <div class="qa-btn-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <span class="qa-btn-label">Goals</span>
+          </div>
+        </div>
+
+        <!-- Transactions -->
+        <div class="section-header">
+          <span class="section-title">Recent</span>
+          <span class="section-link">See all</span>
+        </div>
+        <div class="transaction-list">
+          <div class="tx-row">
+            <div class="tx-icon food">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="tx-name">Woolworths</div>
+              <div class="tx-sub">Today · Groceries</div>
+            </div>
+            <div class="tx-amount expense">−$94.50</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon health">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="tx-name">Chemist Warehouse</div>
+              <div class="tx-sub">Yesterday · Health</div>
+            </div>
+            <div class="tx-amount expense">−$32.00</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon car">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="1.6" stroke-linecap="round"><path d="M5 17h-2a1 1 0 0 1-1-1v-3.6a3 3 0 0 1 .27-1.24l1.83-3.84A2 2 0 0 1 5.93 6h12.14a2 2 0 0 1 1.83 1.32l1.83 3.84A3 3 0 0 1 22 12.4V16a1 1 0 0 1-1 1h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="tx-name">BP Fuel</div>
+              <div class="tx-sub">Mon 27 · Transport</div>
+            </div>
+            <div class="tx-amount expense">−$78.40</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon shop">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.6" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 1.95-1.57L23 6H6"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="tx-name">Salary</div>
+              <div class="tx-sub">Mon 27 · Income</div>
+            </div>
+            <div class="tx-amount income">+$4,250</div>
+          </div>
+        </div>
+
+        <!-- Intelligence card -->
+        <div class="intel-card">
+          <div class="intel-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="intel-content">
+            <div class="intel-badge">
+              <div class="intel-dot"></div>
+              <span class="intel-badge-label">Toto Intelligence</span>
+            </div>
+            <div class="intel-body">Groceries 18% over budget — $44 left for the month</div>
+          </div>
+          <div class="intel-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating nav -->
+      <div class="floating-nav">
+        <div class="nav-pill">
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="nav-label">Today</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="nav-label">Plan</span>
+          </div>
+          <div class="nav-fab">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="nav-item-pill active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            <span class="nav-label">Wallet</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="nav-label">Me</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ PLAN ═══════════════════ -->
+  <div class="screen-wrap">
+    <div class="screen-label">Plan</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+
+      <div class="phone-scroll">
+        <!-- Month nav -->
+        <div class="month-nav">
+          <div class="month-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18181B" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </div>
+          <div class="month-title">April 2026</div>
+          <div class="month-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18181B" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <!-- Mini calendar -->
+        <div class="mini-cal">
+          <div class="cal-days-header">
+            <div class="cal-day-init">M</div><div class="cal-day-init">T</div><div class="cal-day-init">W</div>
+            <div class="cal-day-init">T</div><div class="cal-day-init">F</div><div class="cal-day-init">S</div><div class="cal-day-init">S</div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-cell muted">31</div>
+            <div class="cal-cell">1</div><div class="cal-cell has-dot">2</div><div class="cal-cell">3</div>
+            <div class="cal-cell has-dot">4</div><div class="cal-cell">5</div><div class="cal-cell">6</div>
+            <div class="cal-cell">7</div><div class="cal-cell">8</div><div class="cal-cell has-dot">9</div>
+            <div class="cal-cell">10</div><div class="cal-cell">11</div><div class="cal-cell">12</div><div class="cal-cell has-dot">13</div>
+            <div class="cal-cell">14</div><div class="cal-cell">15</div><div class="cal-cell">16</div>
+            <div class="cal-cell has-dot">17</div><div class="cal-cell">18</div><div class="cal-cell">19</div><div class="cal-cell">20</div>
+            <div class="cal-cell">21</div><div class="cal-cell has-dot">22</div><div class="cal-cell">23</div>
+            <div class="cal-cell">24</div><div class="cal-cell">25</div><div class="cal-cell">26</div><div class="cal-cell has-dot">27</div>
+            <div class="cal-cell">28</div><div class="cal-cell today">29</div><div class="cal-cell">30</div>
+            <div class="cal-cell muted">1</div><div class="cal-cell muted">2</div><div class="cal-cell muted">3</div><div class="cal-cell muted">4</div>
+          </div>
+        </div>
+
+        <!-- Stats for plan -->
+        <div class="stats-row">
+          <div class="stat-card upcoming">
+            <div class="stat-label">This Week</div>
+            <div class="stat-number-row">
+              <span class="stat-number">8</span>
+              <svg class="sparkline" width="38" height="18" viewBox="0 0 38 18" fill="none"><polyline points="0,12 8,8 16,10 24,5 32,7 38,3" stroke="#5B4CF5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/></svg>
+            </div>
+            <div class="stat-sub">events scheduled</div>
+          </div>
+          <div class="stat-card completed">
+            <div class="stat-label">Done</div>
+            <div class="stat-number-row">
+              <span class="stat-number">6</span>
+              <svg class="sparkline" width="38" height="18" viewBox="0 0 38 18" fill="none"><polyline points="0,14 8,11 16,9 24,7 32,5 38,3" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/></svg>
+            </div>
+            <div class="stat-sub">this week</div>
+          </div>
+        </div>
+
+        <!-- Events today -->
+        <div class="section-header">
+          <span class="section-title">Today, Apr 29</span>
+          <div class="add-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="plan-events" style="padding-top:10px">
+          <div class="event-row">
+            <div class="event-time">9:00</div>
+            <div class="event-bar work"></div>
+            <div class="event-content">
+              <div class="event-name">Team standup</div>
+              <div class="event-meta">30 min · Work</div>
+            </div>
+            <div class="chip work">Work</div>
+          </div>
+          <div class="event-row">
+            <div class="event-time">11:30</div>
+            <div class="event-bar study"></div>
+            <div class="event-content">
+              <div class="event-name">Study session</div>
+              <div class="event-meta">90 min · Study</div>
+            </div>
+            <div class="chip study">Study</div>
+          </div>
+          <div class="event-row">
+            <div class="event-time">2:00</div>
+            <div class="event-bar work"></div>
+            <div class="event-content">
+              <div class="event-name">Q2 report review</div>
+              <div class="event-meta">1 hr · Work</div>
+            </div>
+            <div class="chip work">Work</div>
+          </div>
+          <div class="event-row">
+            <div class="event-time">6:30</div>
+            <div class="event-bar social"></div>
+            <div class="event-content">
+              <div class="event-name">Dinner with friends</div>
+              <div class="event-meta">2 hr · Social</div>
+            </div>
+            <div class="chip social">Social</div>
+          </div>
+          <div class="event-row">
+            <div class="event-time">8:00</div>
+            <div class="event-bar family"></div>
+            <div class="event-content">
+              <div class="event-name">Family movie night</div>
+              <div class="event-meta">Family</div>
+            </div>
+            <div class="chip family">Family</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating nav -->
+      <div class="floating-nav">
+        <div class="nav-pill">
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="nav-label">Today</span>
+          </div>
+          <div class="nav-item-pill active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="nav-label">Plan</span>
+          </div>
+          <div class="nav-fab">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            <span class="nav-label">Wallet</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="nav-label">Me</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ HOME ═══════════════════ -->
+  <div class="screen-wrap">
+    <div class="screen-label">Home</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+
+      <div class="phone-scroll">
+        <div class="wallet-header">
+          <div class="header-date">Wednesday, April 29</div>
+          <div class="header-row">
+            <div class="header-greeting">Home</div>
+            <div class="avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero -->
+        <div class="home-hero">
+          <div>
+            <div class="home-hero-label">Household</div>
+            <div class="home-hero-val">Gentilcore</div>
+            <div class="home-hero-sub">3 members · Sydney, NSW</div>
+          </div>
+          <div class="home-hero-badge">
+            <div class="home-hero-badge-val">✓</div>
+            <div class="home-hero-badge-label">All good</div>
+          </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="section-header" style="margin-top:4px">
+          <span class="section-title">Quick access</span>
+          <span class="section-link">See all</span>
+        </div>
+        <div class="home-grid">
+          <div class="home-card">
+            <div class="home-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><path d="M4 2v20l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2V2l-2 2-2-2-2 2-2-2-2 2-2-2-2 2Z"/><path d="M16 8H8M16 12H8M13 16H8"/></svg>
+            </div>
+            <div class="home-card-title">Documents</div>
+            <div class="home-card-sub">Insurance, rates</div>
+            <div class="home-card-val">12</div>
+          </div>
+          <div class="home-card">
+            <div class="home-card-icon" style="background:#ECFDF5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="m9 14 2 2 4-4"/></svg>
+            </div>
+            <div class="home-card-title">Maintenance</div>
+            <div class="home-card-sub">Service tasks</div>
+            <div class="home-card-val" style="color:#10B981">3 due</div>
+          </div>
+          <div class="home-card">
+            <div class="home-card-icon" style="background:#FFF8EC">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"><path d="M5 17h-2a1 1 0 0 1-1-1v-3.6a3 3 0 0 1 .27-1.24l1.83-3.84A2 2 0 0 1 5.93 6h12.14a2 2 0 0 1 1.83 1.32l1.83 3.84A3 3 0 0 1 22 12.4V16a1 1 0 0 1-1 1h-2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+            </div>
+            <div class="home-card-title">Vehicles</div>
+            <div class="home-card-sub">Rego, service</div>
+            <div class="home-card-val">2</div>
+          </div>
+          <div class="home-card">
+            <div class="home-card-icon" style="background:#FFF1F3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="1.8" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+            </div>
+            <div class="home-card-title">Meals</div>
+            <div class="home-card-sub">Meal planner</div>
+            <div class="home-card-val">5 days</div>
+          </div>
+        </div>
+
+        <!-- Tasks in home -->
+        <div class="tasks-section">
+          <div class="tasks-header" style="margin-bottom:4px">
+            <span class="section-title">Upcoming tasks</span>
+            <span class="section-link">See all</span>
+          </div>
+          <div class="task-row">
+            <div class="checkbox pending-family"></div>
+            <div class="task-text">
+              <div class="task-title">Car service due</div>
+              <div class="task-sub">May 3 · Vehicles</div>
+            </div>
+            <div class="chip family">Family</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox pending-work"></div>
+            <div class="task-text">
+              <div class="task-title">Renew home insurance</div>
+              <div class="task-sub">May 10 · Documents</div>
+            </div>
+            <div class="chip work">Work</div>
+          </div>
+          <div class="task-row">
+            <div class="checkbox pending-social"></div>
+            <div class="task-text">
+              <div class="task-title">Replace smoke alarm battery</div>
+              <div class="task-sub">May 12 · Maintenance</div>
+            </div>
+            <div class="chip social">Urgent</div>
+          </div>
+        </div>
+
+        <!-- Intelligence -->
+        <div class="intel-card">
+          <div class="intel-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="intel-content">
+            <div class="intel-badge">
+              <div class="intel-dot"></div>
+              <span class="intel-badge-label">Toto Intelligence</span>
+            </div>
+            <div class="intel-body">Rates notice arrived — $2,380 due June 1</div>
+          </div>
+          <div class="intel-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating nav -->
+      <div class="floating-nav">
+        <div class="nav-pill">
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="nav-label">Today</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="nav-label">Plan</span>
+          </div>
+          <div class="nav-fab">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="nav-item-pill active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="nav-label">Home</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="nav-label">Me</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ ME / SETTINGS ═══════════════════ -->
+  <div class="screen-wrap">
+    <div class="screen-label">Me</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity="0.35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#18181B" opacity="0.65"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+
+      <div class="phone-scroll">
+        <div class="wallet-header">
+          <div class="header-date">Wednesday, April 29</div>
+          <div class="header-row">
+            <div class="header-greeting">Me</div>
+            <div class="avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile card -->
+        <div class="settings-profile">
+          <div class="profile-avatar-lg">👤</div>
+          <div>
+            <div class="profile-name">Robert G.</div>
+            <div class="profile-email">gentilcore.robert@gmail.com</div>
+            <div style="margin-top:6px">
+              <span class="chip work" style="font-size:10px">Admin</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats mini -->
+        <div class="stats-row">
+          <div class="stat-card upcoming">
+            <div class="stat-label">Streak</div>
+            <div class="stat-number-row">
+              <span class="stat-number">14</span>
+            </div>
+            <div class="stat-sub">days active</div>
+          </div>
+          <div class="stat-card completed">
+            <div class="stat-label">Total done</div>
+            <div class="stat-number-row">
+              <span class="stat-number">87</span>
+            </div>
+            <div class="stat-sub">this month</div>
+          </div>
+        </div>
+
+        <!-- Settings groups -->
+        <div class="section-header">
+          <span class="section-title">Account</span>
+        </div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#EEEAFF">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="settings-row-label">Profiles</div>
+              <div class="settings-row-sub">3 household members</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4D4D8" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#FFF8EC">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="settings-row-label">Notifications</div>
+              <div class="settings-row-sub">Reminders, alerts</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4D4D8" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#ECFDF5">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="settings-row-label">Export data</div>
+              <div class="settings-row-sub">Backup as JSON</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4D4D8" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <span class="section-title">Appearance</span>
+        </div>
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#F5F0FF">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="settings-row-label">Theme</div>
+              <div class="settings-row-sub">Light · Purple accent</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4D4D8" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="settings-row">
+            <div class="settings-row-icon" style="background:#FFF1F3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div style="flex:1">
+              <div class="settings-row-label">Category colours</div>
+              <div class="settings-row-sub">Work, Study, Social, Family</div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4D4D8" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <!-- Sign out -->
+        <div style="padding:16px 20px 0">
+          <button style="width:100%;background:#FFF1F3;border:1px solid #FECDD3;border-radius:16px;padding:14px;font-size:14px;font-weight:600;color:#BE123C;cursor:pointer;font-family:inherit">
+            Sign out
+          </button>
+        </div>
+      </div>
+
+      <!-- Floating nav -->
+      <div class="floating-nav">
+        <div class="nav-pill">
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="nav-label">Today</span>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span class="nav-label">Plan</span>
+          </div>
+          <div class="nav-fab">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+          <div class="nav-item-pill">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="nav-label">Home</span>
+          </div>
+          <div class="nav-item-pill active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="nav-label">Me</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end screens-row -->
+
+<!-- Token legend -->
+<div style="max-width:680px;margin:60px auto 0;background:#fff;border-radius:24px;border:1px solid #E8E6F0;padding:28px 32px">
+  <div style="font-size:16px;font-weight:700;color:#18181B;margin-bottom:20px">Design Token Reference</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#5B4CF5"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">Primary</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#5B4CF5</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#FAFAF8;border:1px solid #E8E6F0"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">App BG</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#FAFAF8</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#18181B"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">Text primary</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#18181B</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#F59E0B"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">Work</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#F59E0B</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#7C3AED"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">Study</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#7C3AED</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#F43F5E"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">Social</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#F43F5E</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#10B981"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">Family</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#10B981</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="width:100%;height:36px;border-radius:10px;background:#ECEAF5;border:1px solid #E8E6F0"></div>
+      <div style="font-size:11px;font-weight:600;color:#18181B">Outer BG</div>
+      <div style="font-size:10px;font-family:monospace;color:#A1A1AA">#ECEAF5</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
