@@ -1,0 +1,551 @@
+/*
+  Toto 2028 Reskin — applies the new design spec over the existing component tree.
+  Injected via ?reskin=1 query param (see mockup-reskin.html).
+*/
+
+/* ── Design tokens ─────────────────────────────────────── */
+:root {
+  --bg:              #FAFAF8;
+  --surface:         #FFFFFF;
+  --surface2:        #F2F1F8;
+  --primary:         #5B4CF5;
+  --primary-light:   #EEEAFF;
+  --primary-border:  #DDD6FE;
+  --primary-muted:   #A89DF7;
+  --text:            #18181B;
+  --text-muted:      #A1A1AA;
+  --text-tertiary:   #D4D4D8;
+  --border:          #E8E6F0;
+  --success:         #10B981;
+  --success-light:   #ECFDF5;
+  --warning:         #F59E0B;
+  --warning-light:   #FFF8EC;
+  --danger:          #EF4444;
+  --danger-light:    #FFF1F3;
+  --radius:          16px;
+  --outer-bg:        #ECEAF5;
+}
+
+/* ── Base ──────────────────────────────────────────────── */
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* Kill the coloured gradient blobs */
+body::before, body::after, #ambient-blob {
+  display: none !important;
+}
+
+/* Section backgrounds → flat warm white */
+body[data-section] {
+  background: var(--bg) !important;
+}
+
+/* ── App header ─────────────────────────────────────────── */
+.app-header {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+  backdrop-filter: none !important;
+}
+
+.app-logo {
+  color: var(--primary) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+}
+
+.header-icon-btn, .toto-btn {
+  color: var(--text) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+}
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar, .icon-col {
+  background: #18181B !important;
+}
+
+.nav-item { border-radius: 12px !important; }
+.nav-item.active {
+  background: rgba(91,76,245,0.25) !important;
+  color: #A89DF7 !important;
+}
+.nav-item:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* ── Bottom nav ─────────────────────────────────────────── */
+.bottom-nav {
+  background: rgba(255,255,255,0.85) !important;
+  border: 0.5px solid var(--border) !important;
+  border-radius: 32px !important;
+  left: 20px !important;
+  right: 20px !important;
+  bottom: 16px !important;
+  height: auto !important;
+  padding: 10px 14px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+}
+
+.bn-item {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  color: #C4C2D4 !important;
+  gap: 3px !important;
+}
+
+.bn-item.active {
+  color: var(--primary) !important;
+}
+
+.bn-item.active .bn-ico {
+  stroke: var(--primary) !important;
+}
+
+/* FAB */
+.qa-fab {
+  background: var(--primary) !important;
+  box-shadow: 0 4px 12px rgba(91,76,245,0.35) !important;
+  border-radius: 50% !important;
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 22px !important;
+}
+
+/* ── Main content area ──────────────────────────────────── */
+.main {
+  background: transparent !important;
+}
+
+/* ── TODAY screen ───────────────────────────────────────── */
+.today-greeting h2 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.8px !important;
+  color: var(--text) !important;
+}
+
+.today-greeting p {
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+}
+
+.today-hero {
+  background: var(--primary) !important;
+  border-radius: 24px !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(91,76,245,0.25) !important;
+}
+
+.today-hero::before { display: none !important; }
+
+.today-hero-lbl {
+  font-family: 'SF Mono', ui-monospace, monospace !important;
+  letter-spacing: 0.8px !important;
+  font-size: 10px !important;
+  opacity: 0.7 !important;
+}
+
+.today-hero-num {
+  font-size: 38px !important;
+  font-weight: 700 !important;
+  letter-spacing: -1.5px !important;
+}
+
+.today-seclabel .lbl {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  color: var(--text-muted) !important;
+  font-family: 'SF Mono', ui-monospace, monospace !important;
+}
+
+/* Brief rows */
+.brief-row {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  padding: 12px 14px !important;
+  backdrop-filter: none !important;
+}
+
+.brief-row:hover {
+  background: var(--surface) !important;
+  border-color: var(--primary-border) !important;
+}
+
+.brief-glyph { border-radius: 12px !important; }
+.brief-glyph.red    { background: #FFF1F3 !important; color: #F43F5E !important; }
+.brief-glyph.amber  { background: #FFF8EC !important; color: #F59E0B !important; }
+.brief-glyph.green  { background: var(--success-light) !important; color: var(--success) !important; }
+.brief-glyph.blue   { background: var(--primary-light) !important; color: var(--primary) !important; }
+
+.brief-body .t { color: var(--text) !important; font-weight: 600 !important; }
+.brief-body .s { color: var(--text-muted) !important; }
+
+/* Today notification cards */
+.notif-focus {
+  border-radius: 20px !important;
+  border: 1px solid var(--border) !important;
+}
+
+.notif-focus.urgent {
+  background: #FFF1F3 !important;
+  border-color: #FECDD3 !important;
+}
+
+.notif-focus.warning {
+  background: #FFF8EC !important;
+  border-color: #FDE9B0 !important;
+}
+
+.notif-focus.clear {
+  background: var(--success-light) !important;
+  border-color: #A7F3D0 !important;
+}
+
+.notif-focus-btn {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* ── BUDGET / WALLET screen ──────────────────────────────── */
+.summary-hero {
+  background: var(--primary) !important;
+  border-radius: 24px !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(91,76,245,0.20) !important;
+}
+
+.summary-hero::before { display: none !important; }
+
+.summary-mini-grid {
+  gap: 10px !important;
+}
+
+.summary-mini {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 18px !important;
+}
+
+.summary-mini-num { font-weight: 700 !important; }
+
+/* Month picker */
+.month-picker {
+  gap: 12px !important;
+}
+
+.month-btn {
+  background: var(--surface2) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  font-size: 18px !important;
+  color: var(--text) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.month-picker-label {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: var(--text) !important;
+  letter-spacing: -0.5px !important;
+}
+
+/* Allocation bar */
+.alloc-section {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+  padding: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+.alloc-bar {
+  border-radius: 99px !important;
+  overflow: hidden !important;
+  height: 8px !important;
+}
+
+.alloc-row { border-radius: 10px !important; }
+
+.tdot {
+  border-radius: 10px !important;
+}
+
+/* ── SECTION cards (general) ───────────────────────────── */
+.section {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+  padding: 18px !important;
+}
+
+.section-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+  letter-spacing: -0.2px !important;
+}
+
+.section-subtitle {
+  font-size: 12px !important;
+  color: var(--text-muted) !important;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--primary) !important;
+  border-radius: 12px !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+
+.btn-secondary {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  color: var(--text) !important;
+}
+
+.btn {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+/* ── Forms / inputs ─────────────────────────────────────── */
+.form-input, .form-select, input[type="text"], input[type="number"],
+input[type="date"], input[type="email"], select, textarea {
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-family: inherit !important;
+}
+
+.form-input:focus, .form-select:focus, input:focus, select:focus, textarea:focus {
+  border-color: var(--primary) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(91,76,245,0.12) !important;
+}
+
+/* ── Tables ──────────────────────────────────────────────── */
+table { border-radius: 12px !important; overflow: hidden !important; }
+
+th {
+  background: var(--surface2) !important;
+  color: var(--text-muted) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  font-family: 'SF Mono', ui-monospace, monospace !important;
+}
+
+td {
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+tr:last-child td { border-bottom: none !important; }
+
+/* ── Modal ───────────────────────────────────────────────── */
+.modal {
+  border-radius: 28px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.18) !important;
+  overflow: hidden !important;
+}
+
+.modal-header {
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 18px 20px !important;
+}
+
+.modal-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: var(--text) !important;
+}
+
+.modal-close {
+  color: var(--text-muted) !important;
+  background: var(--surface2) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+/* ── Quick-add sheet ─────────────────────────────────────── */
+.qa-sheet {
+  border-radius: 28px 28px 0 0 !important;
+  border: 1px solid var(--border) !important;
+  border-bottom: none !important;
+  background: var(--surface) !important;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.10) !important;
+}
+
+/* ── Page headers ────────────────────────────────────────── */
+.page-header h1 {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.8px !important;
+  color: var(--text) !important;
+}
+
+.page-header p {
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+}
+
+/* ── Planner ─────────────────────────────────────────────── */
+.pl-week-strip {
+  background: var(--surface2) !important;
+  border-radius: 24px !important;
+  border: none !important;
+}
+
+.pl-week-day {
+  border-radius: 14px !important;
+}
+
+.pl-week-day.selected, .pl-week-day.today-wk.selected {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.pl-week-day.today-wk {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+}
+
+.pl-week-day:hover {
+  background: var(--primary-light) !important;
+}
+
+/* Planner event items */
+.pl-event {
+  border-radius: 14px !important;
+  border-left-width: 3px !important;
+}
+
+/* ── Documents / cards ───────────────────────────────────── */
+.doc-card, .vehicle-card, .goal-card, .bill-row, .sub-row {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 18px !important;
+}
+
+/* ── Health score / grade badges ─────────────────────────── */
+.health-grade-badge {
+  border-radius: 10px !important;
+}
+
+/* ── Section nav pills ───────────────────────────────────── */
+.section-nav {
+  background: var(--surface2) !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--border) !important;
+  padding: 4px !important;
+  gap: 2px !important;
+}
+
+.section-nav button {
+  border-radius: 10px !important;
+  font-weight: 500 !important;
+  color: var(--text-muted) !important;
+}
+
+.section-nav button.active {
+  background: var(--surface) !important;
+  color: var(--primary) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important;
+}
+
+/* ── Settings ─────────────────────────────────────────────── */
+#tab-settings .section {
+  border-radius: 20px !important;
+}
+
+/* ── Category colours → spec colours ─────────────────────── */
+/* We keep semantic danger=red, success=green, warning=amber */
+/* The section accents remap to the spec category palette */
+body[data-section="today"]    { --section-accent: #F43F5E; }
+body[data-section="wallet"]   { --section-accent: #10B981; }
+body[data-section="plan"]     { --section-accent: #5B4CF5; }
+body[data-section="home"]     { --section-accent: #F59E0B; }
+body[data-section="settings"] { --section-accent: #A1A1AA; }
+
+/* ── Login overlay ───────────────────────────────────────── */
+#login-overlay {
+  background: var(--bg) !important;
+}
+
+#login-overlay h1 {
+  color: var(--primary) !important;
+  font-size: 36px !important;
+  letter-spacing: 0.1em !important;
+}
+
+.google-sign-in-btn {
+  border-radius: 14px !important;
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+
+/* ── Scrollbars ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ── Misc ────────────────────────────────────────────────── */
+.badge, .tag-pill {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 10px !important;
+}
+
+/* Progress bars */
+progress, .progress-bar {
+  border-radius: 99px !important;
+  overflow: hidden !important;
+}
+
+/* Chips / category labels */
+[class*="cat-chip"], [class*="category-chip"] {
+  border-radius: 8px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Kill old box-shadows, replace with cleaner version */
+.section, .summary-hero, .today-hero, .brief-row, .alloc-section,
+.summary-mini, .modal, .bottom-nav, .qa-fab {
+  box-shadow: none !important;
+}
+
+.section, .summary-mini, .alloc-section, .brief-row {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+}
+
+.summary-hero, .today-hero {
+  box-shadow: 0 8px 24px rgba(91,76,245,0.20) !important;
+}
