@@ -5,12 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Toto — Onboarding Experience Spec</title>
   <style>
+    :root {
+      --bg: #f0f9ff;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --primary: #0891b2;
+      --primary-light: #ecfeff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --radius: 12px;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f8fafc;
-      color: #1e293b;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
       line-height: 1.6;
     }
 
@@ -18,38 +37,51 @@
     nav {
       position: sticky;
       top: 0;
-      background: #fff;
-      border-bottom: 1px solid #e2e8f0;
+      background: #0891b2;
+      border-bottom: none;
       padding: 0 32px;
       display: flex;
       align-items: center;
-      gap: 24px;
-      height: 56px;
+      gap: 6px;
+      height: 52px;
       z-index: 100;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
-    .nav-brand { font-weight: 700; font-size: 16px; color: #0d9488; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-brand {
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      color: #fff;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
     nav a {
-      font-size: 13px;
-      color: #64748b;
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.72);
       text-decoration: none;
-      padding: 4px 0;
-      border-bottom: 2px solid transparent;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.15s;
     }
-    nav a:hover { color: #0d9488; border-bottom-color: #0d9488; }
+    nav a:hover { color: #fff; background: rgba(255,255,255,0.15); }
 
     /* ── Layout ── */
-    .container { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+    .container { max-width: 920px; margin: 0 auto; padding: 40px 24px 80px; }
 
-    h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-    .subtitle { color: #64748b; font-size: 15px; margin-bottom: 48px; }
+    h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--text); }
+    .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 40px; }
 
-    h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
-    h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
 
-    section { margin-bottom: 56px; }
+    section { margin-bottom: 48px; }
 
-    p { color: #475569; font-size: 14px; margin-bottom: 12px; }
+    p { color: #475569; font-size: 13px; margin-bottom: 12px; }
 
     /* ── Naming section ── */
     .name-grid {
@@ -59,28 +91,28 @@
       margin: 20px 0;
     }
     .name-card {
-      background: #fff;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
       padding: 16px;
       transition: all 0.15s;
     }
-    .name-card:hover { border-color: #0d9488; box-shadow: 0 4px 12px rgba(13,148,136,0.1); }
-    .name-card.recommended { border-color: #0d9488; background: #f0fdfa; }
+    .name-card:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(8,145,178,0.12); }
+    .name-card.recommended { border-color: var(--primary); background: var(--primary-light); }
     .name-card .badge {
       display: inline-block;
       font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      background: #0d9488;
+      background: var(--primary);
       color: #fff;
       border-radius: 4px;
       padding: 2px 6px;
       margin-bottom: 6px;
     }
-    .name-card .word { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .name-card .desc { font-size: 12px; color: #64748b; }
+    .name-card .word { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+    .name-card .desc { font-size: 12px; color: var(--text-muted); }
 
     /* ── Flow overview ── */
     .flow-steps {
@@ -89,10 +121,11 @@
       margin: 24px 0;
       overflow-x: auto;
       padding-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
     }
     .flow-step {
       flex: 1;
-      min-width: 130px;
+      min-width: 120px;
       text-align: center;
       position: relative;
     }
@@ -103,7 +136,7 @@
       right: -1px;
       width: 50%;
       height: 2px;
-      background: #cbd5e1;
+      background: var(--border);
     }
     .flow-step::before {
       content: '';
@@ -112,7 +145,7 @@
       left: -1px;
       width: 50%;
       height: 2px;
-      background: #cbd5e1;
+      background: var(--border);
     }
     .flow-step:first-child::before { display: none; }
     .flow-step:last-child::after { display: none; }
@@ -127,13 +160,13 @@
       margin: 0 auto 8px;
       position: relative;
       z-index: 1;
-      border: 2px solid #e2e8f0;
-      background: #fff;
+      border: 2px solid var(--border);
+      background: var(--surface);
     }
-    .flow-step.active .flow-dot { background: #0d9488; border-color: #0d9488; color: #fff; font-size: 14px; font-weight: 700; }
-    .flow-step.new .flow-dot { background: #f0fdfa; border-color: #0d9488; }
-    .flow-step.optional .flow-dot { background: #fefce8; border-color: #eab308; }
-    .flow-label { font-size: 12px; font-weight: 600; color: #374151; }
+    .flow-step.active .flow-dot { background: var(--primary); border-color: var(--primary); color: #fff; font-size: 13px; font-weight: 700; }
+    .flow-step.new .flow-dot { background: var(--primary-light); border-color: var(--primary); }
+    .flow-step.optional .flow-dot { background: var(--warning-light); border-color: var(--warning); }
+    .flow-label { font-size: 12px; font-weight: 600; color: var(--text); }
     .flow-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
     .flow-tag {
       display: inline-block;
@@ -142,44 +175,45 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
       padding: 2px 5px;
-      border-radius: 3px;
+      border-radius: 4px;
       margin-top: 4px;
     }
     .tag-existing { background: #e0f2fe; color: #0369a1; }
-    .tag-new { background: #dcfce7; color: #16a34a; }
-    .tag-optional { background: #fef9c3; color: #854d0e; }
+    .tag-new { background: var(--success-light); color: #166534; }
+    .tag-optional { background: var(--warning-light); color: #92400e; }
 
     /* ── Step cards ── */
     .step-card {
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
     .step-header {
       display: flex;
       align-items: flex-start;
       gap: 16px;
-      padding: 20px 24px;
-      border-bottom: 1px solid #f1f5f9;
-      background: #f8fafc;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
     }
     .step-number {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      background: #0d9488;
+      background: var(--primary);
       color: #fff;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
-    .step-header-text h3 { font-size: 16px; font-weight: 700; }
-    .step-header-text p { color: #64748b; font-size: 13px; margin: 0; }
+    .step-header-text h3 { font-size: 15px; font-weight: 700; color: var(--text); }
+    .step-header-text p { color: var(--text-muted); font-size: 13px; margin: 0; }
     .step-badge {
       margin-left: auto;
       display: flex;
@@ -190,56 +224,56 @@
       font-size: 11px;
       font-weight: 600;
       padding: 3px 10px;
-      border-radius: 20px;
+      border-radius: 99px;
     }
     .pill-existing { background: #e0f2fe; color: #0369a1; }
-    .pill-new { background: #dcfce7; color: #16a34a; }
-    .pill-optional { background: #fef9c3; color: #854d0e; }
-    .pill-required { background: #fee2e2; color: #b91c1c; }
+    .pill-new { background: var(--success-light); color: #166534; }
+    .pill-optional { background: var(--warning-light); color: #92400e; }
+    .pill-required { background: var(--danger-light); color: #b91c1c; }
 
-    .step-body { padding: 20px 24px; }
+    .step-body { padding: 18px 22px; }
 
     /* ── Fields ── */
     .field-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 10px;
       margin: 12px 0;
     }
     @media (max-width: 600px) { .field-grid { grid-template-columns: 1fr; } }
 
     .field {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 12px 14px;
+      padding: 11px 13px;
     }
     .field-label {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
       color: #94a3b8;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .field-value { font-size: 13px; color: #334155; font-weight: 500; }
     .field-note { font-size: 11px; color: #94a3b8; margin-top: 3px; }
 
-    /* ── Improvement callouts ── */
+    /* ── Callouts ── */
     .callout {
       display: flex;
       gap: 12px;
-      padding: 14px 16px;
+      padding: 13px 15px;
       border-radius: 10px;
-      margin: 14px 0;
+      margin: 12px 0;
       font-size: 13px;
     }
     .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
     .callout-body { color: #374151; }
-    .callout-body strong { color: #1e293b; }
-    .callout.idea { background: #f0f9ff; border: 1px solid #bae6fd; }
-    .callout.warn { background: #fffbeb; border: 1px solid #fde68a; }
-    .callout.success { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .callout-body strong { color: var(--text); }
+    .callout.idea { background: var(--primary-light); border: 1px solid #a5f3fc; }
+    .callout.warn { background: var(--warning-light); border: 1px solid #fde68a; }
+    .callout.success { background: var(--success-light); border: 1px solid #bbf7d0; }
 
     /* ── Member row ── */
     .member-row {
@@ -247,7 +281,7 @@
       align-items: center;
       gap: 12px;
       padding: 12px 0;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--border);
     }
     .member-row:last-child { border: none; }
     .member-avatar {
@@ -262,36 +296,36 @@
       flex-shrink: 0;
     }
     .member-info { flex: 1; }
-    .member-name { font-size: 14px; font-weight: 600; }
-    .member-role { font-size: 12px; color: #64748b; }
+    .member-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .member-role { font-size: 12px; color: var(--text-muted); }
     .member-fields { display: flex; gap: 8px; flex-wrap: wrap; }
     .tag {
       font-size: 11px;
       padding: 2px 8px;
-      border-radius: 20px;
-      border: 1px solid #e2e8f0;
+      border-radius: 99px;
+      border: 1px solid var(--border);
       color: #475569;
     }
 
-    /* ── Progress mockup ── */
+    /* ── Progress bar ── */
     .progress-bar {
-      background: #e2e8f0;
+      background: var(--border);
       border-radius: 99px;
       height: 6px;
       margin: 16px 0;
       overflow: hidden;
     }
-    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #0d9488, #06b6d4); }
+    .progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, #0891b2, #22d3ee); }
 
     /* ── Wireframe mockup ── */
     .mockup {
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
-      max-width: 440px;
+      max-width: 420px;
       margin: 20px auto;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.07);
     }
     .mockup-dots {
       display: flex;
@@ -303,22 +337,22 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #e2e8f0;
+      background: var(--border);
     }
-    .mockup-dot.active { background: #0d9488; width: 20px; border-radius: 4px; }
-    .mockup-dot.done { background: #0d9488; }
-    .mockup-heading { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 6px; }
-    .mockup-sub { font-size: 13px; color: #64748b; text-align: center; margin-bottom: 24px; }
-    .mockup-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 8px; }
+    .mockup-dot.active { background: var(--primary); width: 20px; border-radius: 4px; }
+    .mockup-dot.done { background: var(--primary); }
+    .mockup-heading { font-size: 19px; font-weight: 800; text-align: center; margin-bottom: 6px; letter-spacing: -0.01em; color: var(--text); }
+    .mockup-sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 22px; }
+    .mockup-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; margin-bottom: 8px; }
     .mockup-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .mockup-option {
-      padding: 8px 16px;
-      border: 1.5px solid #e2e8f0;
+      padding: 7px 14px;
+      border: 1.5px solid var(--border);
       border-radius: 99px;
       font-size: 13px;
       cursor: pointer;
     }
-    .mockup-option.selected { border-color: #0d9488; background: #f0fdfa; color: #0d9488; font-weight: 600; }
+    .mockup-option.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
     .mockup-input-row {
       display: flex;
       gap: 8px;
@@ -329,7 +363,7 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: #f1f5f9;
+      background: var(--surface2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -339,28 +373,28 @@
     }
     .mockup-field {
       flex: 1;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px 12px;
       font-size: 13px;
       color: #94a3b8;
     }
-    .mockup-footer { display: flex; justify-content: space-between; margin-top: 24px; gap: 12px; }
+    .mockup-footer { display: flex; justify-content: space-between; margin-top: 22px; gap: 12px; }
     .mockup-btn-secondary {
-      padding: 10px 20px;
-      border: 1.5px solid #e2e8f0;
+      padding: 10px 18px;
+      border: 1.5px solid var(--border);
       border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
-      color: #64748b;
-      background: #fff;
+      color: var(--text-muted);
+      background: var(--surface);
       cursor: pointer;
     }
     .mockup-btn-primary {
       flex: 1;
-      padding: 10px 20px;
-      background: #0d9488;
+      padding: 10px 18px;
+      background: var(--primary);
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -370,84 +404,88 @@
     }
 
     /* ── Divider ── */
-    .divider { border: none; border-top: 1px solid #e2e8f0; margin: 40px 0; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
 
     /* ── Collapsible sections ── */
-    .collapsible-section { margin-bottom: 16px; }
+    .collapsible-section { margin-bottom: 12px; }
     .section-toggle {
       display: flex; align-items: center; justify-content: space-between;
       cursor: pointer; user-select: none;
-      padding: 16px 22px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 14px;
       transition: background 0.15s, border-color 0.15s;
       gap: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-    .section-toggle:hover { background: #f0fdfa; border-color: #0d9488; }
+    .section-toggle:hover { background: var(--primary-light); border-color: var(--primary); }
     .collapsible-section.open .section-toggle {
       border-radius: 14px 14px 0 0;
-      border-bottom-color: #f1f5f9;
-      background: #f0fdfa;
-      border-color: #0d9488;
+      border-bottom-color: var(--border);
+      background: var(--primary-light);
+      border-color: var(--primary);
     }
-    .section-toggle-left { display: flex; align-items: center; gap: 14px; }
+    .section-toggle-left { display: flex; align-items: center; gap: 12px; }
     .section-num {
-      width: 30px; height: 30px; border-radius: 50%;
-      background: #0d9488; color: #fff;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: #fff;
       font-size: 12px; font-weight: 700;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .section-toggle-title { font-size: 15px; font-weight: 700; color: #1e293b; }
-    .section-toggle-sub { font-size: 12px; color: #64748b; margin-top: 1px; }
+    .section-toggle-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .section-toggle-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
     .section-chevron {
       font-size: 11px; color: #94a3b8; flex-shrink: 0;
       transition: transform 0.25s ease;
     }
-    .collapsible-section.open .section-chevron { transform: rotate(180deg); color: #0d9488; }
+    .collapsible-section.open .section-chevron { transform: rotate(180deg); color: var(--primary); }
     .section-body {
       display: none;
-      border: 1px solid #0d9488;
+      border: 1px solid var(--primary);
       border-top: none;
       border-radius: 0 0 14px 14px;
-      background: #fff;
-      padding: 24px 24px 28px;
+      background: var(--surface);
+      padding: 22px 22px 26px;
     }
     .section-body.open { display: block; }
 
     /* ── Principles ── */
-    .principles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin: 20px 0; }
+    .principles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin: 20px 0; }
     .principle {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
-    .principle-icon { font-size: 24px; margin-bottom: 8px; }
-    .principle h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-    .principle p { font-size: 12px; color: #64748b; margin: 0; }
+    .principle-icon { font-size: 22px; margin-bottom: 8px; }
+    .principle h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+    .principle p { font-size: 12px; color: var(--text-muted); margin: 0; }
 
     /* ── Data map table ── */
-    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; border-radius: var(--radius); overflow: hidden; }
     th {
       text-align: left;
-      padding: 10px 12px;
-      background: #f1f5f9;
-      font-size: 11px;
+      padding: 10px 14px;
+      background: var(--surface2);
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #64748b;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
     }
-    td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; color: #334155; }
     tr:last-child td { border: none; }
-    td.mono { font-family: monospace; font-size: 12px; color: #7c3aed; }
+    tr:hover td { background: var(--surface2); }
+    td.mono { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12px; color: #7c3aed; }
   </style>
 </head>
 <body>
 
 <nav>
-  <span class="nav-brand">Toto</span>
+  <span class="nav-brand">TOTO</span>
   <a href="#naming">Naming</a>
   <a href="#principles">Principles</a>
   <a href="#flow">Flow</a>
@@ -1170,7 +1208,7 @@
         <div class="mockup-heading" style="font-size:16px">Who's using Toto?</div>
         <div class="mockup-sub" style="font-size:12px">Tap your name to continue</div>
         <div style="display:flex;flex-direction:column;gap:10px;margin:20px 0">
-          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid #0d9488;border-radius:12px;background:#f0fdfa;cursor:pointer">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1.5px solid #0891b2;border-radius:12px;background:#ecfeff;cursor:pointer">
             <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ecfeff,#ccfbf1);display:flex;align-items:center;justify-content:center;font-size:20px">👤</div>
             <div>
               <div style="font-size:14px;font-weight:600">Chris</div>
@@ -1206,15 +1244,15 @@
         <div class="mockup-heading" style="font-size:18px">Hi Mia! 👋</div>
         <div class="mockup-sub" style="font-size:12px">Enter your PIN to continue</div>
         <div style="display:flex;justify-content:center;gap:12px;margin:24px 0">
-          <div style="width:48px;height:56px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0d9488">●</div>
-          <div style="width:48px;height:56px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0d9488">●</div>
+          <div style="width:48px;height:56px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0891b2">●</div>
+          <div style="width:48px;height:56px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0891b2">●</div>
           <div style="width:48px;height:56px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
           <div style="width:48px;height:56px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center"></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:200px;margin:0 auto">
           ${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(n => `<div style="height:44px;border:1.5px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#374151;cursor:pointer;background:#fff">${n}</div>`).join('')}
         </div>
-        <div style="text-align:center;margin-top:16px"><a href="#" style="font-size:12px;color:#0d9488;text-decoration:none">← Switch profile</a></div>
+        <div style="text-align:center;margin-top:16px"><a href="#" style="font-size:12px;color:#0891b2;text-decoration:none">← Switch profile</a></div>
       </div>
 
     </div>
@@ -1251,17 +1289,17 @@
           <div style="position:relative;width:52px;height:52px">
             <svg width="52" height="52" viewBox="0 0 52 52">
               <circle cx="26" cy="26" r="22" fill="none" stroke="#e2e8f0" stroke-width="5"/>
-              <circle cx="26" cy="26" r="22" fill="none" stroke="#0d9488" stroke-width="5"
+              <circle cx="26" cy="26" r="22" fill="none" stroke="#0891b2" stroke-width="5"
                 stroke-dasharray="138.2" stroke-dashoffset="62.2"
                 stroke-linecap="round" transform="rotate(-90 26 26)"/>
             </svg>
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0d9488">56%</div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#0891b2">56%</div>
           </div>
         </div>
 
         <!-- Progress bar -->
         <div style="background:#e2e8f0;border-radius:99px;height:5px;margin-bottom:16px;overflow:hidden">
-          <div style="width:56%;height:100%;border-radius:99px;background:linear-gradient(90deg,#0d9488,#06b6d4)"></div>
+          <div style="width:56%;height:100%;border-radius:99px;background:linear-gradient(90deg,#0891b2,#06b6d4)"></div>
         </div>
 
         <!-- Todo items -->
@@ -1295,10 +1333,10 @@
           </div>
 
           <!-- To do -->
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1.5px solid #0d9488;background:#f0fdfa;cursor:pointer">
-            <div style="width:22px;height:22px;border-radius:50%;border:2px solid #0d9488;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1.5px solid #0891b2;background:#ecfeff;cursor:pointer">
+            <div style="width:22px;height:22px;border-radius:50%;border:2px solid #0891b2;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
             <span style="font-size:13px;color:#1e293b;font-weight:500;flex:1">Set your first savings goal</span>
-            <span style="font-size:11px;color:#0d9488;font-weight:600">Go →</span>
+            <span style="font-size:11px;color:#0891b2;font-weight:600">Go →</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;cursor:pointer">
             <div style="width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;flex-shrink:0"></div>
@@ -1382,12 +1420,12 @@
         <div style="font-size:13px;color:#64748b;margin-bottom:4px">You've got <strong style="color:#16a34a">$2,350 surplus</strong> each month.</div>
         <div style="font-size:13px;color:#64748b;margin-bottom:20px">Put it to work — set a goal and watch your progress.</div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px">
-          <div style="padding:8px 14px;background:#f0fdfa;border:1.5px solid #0d9488;border-radius:99px;font-size:12px;font-weight:600;color:#0d9488;cursor:pointer">🏖️ Holiday fund</div>
-          <div style="padding:8px 14px;background:#f0fdfa;border:1.5px solid #0d9488;border-radius:99px;font-size:12px;font-weight:600;color:#0d9488;cursor:pointer">🏠 Renovation</div>
-          <div style="padding:8px 14px;background:#f0fdfa;border:1.5px solid #0d9488;border-radius:99px;font-size:12px;font-weight:600;color:#0d9488;cursor:pointer">🆘 Emergency fund</div>
+          <div style="padding:8px 14px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:99px;font-size:12px;font-weight:600;color:#0891b2;cursor:pointer">🏖️ Holiday fund</div>
+          <div style="padding:8px 14px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:99px;font-size:12px;font-weight:600;color:#0891b2;cursor:pointer">🏠 Renovation</div>
+          <div style="padding:8px 14px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:99px;font-size:12px;font-weight:600;color:#0891b2;cursor:pointer">🆘 Emergency fund</div>
           <div style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:99px;font-size:12px;color:#64748b;cursor:pointer">+ Custom goal</div>
         </div>
-        <button style="background:#0d9488;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">Add my first goal →</button>
+        <button style="background:#0891b2;color:#fff;border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer">Add my first goal →</button>
       </div>
     </div>
 
@@ -1412,7 +1450,7 @@
             <div style="font-size:12px;color:#374151;line-height:1.8">Mortgage balance<br>Car loans<br>Credit cards<br>Personal loans</div>
           </div>
         </div>
-        <button style="width:100%;background:#0d9488;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Start tracking net worth →</button>
+        <button style="width:100%;background:#0891b2;color:#fff;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Start tracking net worth →</button>
       </div>
     </div>
 
@@ -1551,7 +1589,7 @@
 
           <div style="font-size:12px;color:#94a3b8;text-align:center;margin-bottom:16px">Invite sent to <strong style="color:#475569">sam@email.com</strong> · Expires in 7 days</div>
           <button class="mockup-btn-primary" style="width:100%">Accept invite →</button>
-          <div style="text-align:center;margin-top:10px;font-size:12px;color:#94a3b8">Not you? <a href="#" style="color:#0d9488;text-decoration:none">Ignore this invite</a></div>
+          <div style="text-align:center;margin-top:10px;font-size:12px;color:#94a3b8">Not you? <a href="#" style="color:#0891b2;text-decoration:none">Ignore this invite</a></div>
         </div>
 
         <div class="callout idea">
@@ -1587,7 +1625,7 @@
           </div>
 
           <div class="mockup-label">Password</div>
-          <div style="background:#f8fafc;border:1px solid #0d9488;border-radius:8px;padding:10px 12px;font-size:13px;color:#94a3b8;margin-bottom:6px">••••••••••</div>
+          <div style="background:#f8fafc;border:1px solid #0891b2;border-radius:8px;padding:10px 12px;font-size:13px;color:#94a3b8;margin-bottom:6px">••••••••••</div>
           <div style="font-size:11px;color:#94a3b8;margin-bottom:20px">Minimum 8 characters</div>
 
           <button class="mockup-btn-primary" style="width:100%;margin-bottom:12px">Create account →</button>
@@ -1627,8 +1665,8 @@
           <div class="mockup-heading" style="font-size:18px">You're in, Sam!</div>
           <div class="mockup-sub">Welcome to Chris's Toto household.</div>
 
-          <div style="background:#f0fdfa;border-radius:12px;padding:16px;margin:16px 0;border:1px solid #ccfbf1">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#0d9488;margin-bottom:12px">Your household</div>
+          <div style="background:#ecfeff;border-radius:12px;padding:16px;margin:16px 0;border:1px solid #ccfbf1">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#0891b2;margin-bottom:12px">Your household</div>
             <div class="member-row">
               <div class="member-avatar">👤</div>
               <div class="member-info">
@@ -1665,7 +1703,7 @@
               <div style="font-size:11px;color:#64748b">monthly surplus</div>
             </div>
             <div style="flex:1;background:#f8fafc;border-radius:10px;padding:12px;text-align:center;border:1px solid #e2e8f0">
-              <div style="font-size:18px;font-weight:700;color:#0d9488">5</div>
+              <div style="font-size:18px;font-weight:700;color:#0891b2">5</div>
               <div style="font-size:11px;color:#64748b">goals tracked</div>
             </div>
           </div>
@@ -1695,7 +1733,7 @@
             <div style="font-size:14px;font-weight:700;text-align:center;margin-bottom:6px">The Kitty</div>
             <div style="font-size:12px;color:#64748b;text-align:center;line-height:1.5">Budget, bills, goals &amp; net worth. See where the money goes each month.</div>
             <div style="display:flex;justify-content:center;gap:4px;margin-top:14px">
-              <div style="width:18px;height:4px;border-radius:99px;background:#0d9488"></div>
+              <div style="width:18px;height:4px;border-radius:99px;background:#0891b2"></div>
               <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
               <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
             </div>
@@ -1707,7 +1745,7 @@
             <div style="font-size:12px;color:#64748b;text-align:center;line-height:1.5">Weekly planner, meal plans &amp; the kids' lunchboxes. One place for the week ahead.</div>
             <div style="display:flex;justify-content:center;gap:4px;margin-top:14px">
               <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
-              <div style="width:18px;height:4px;border-radius:99px;background:#0d9488"></div>
+              <div style="width:18px;height:4px;border-radius:99px;background:#0891b2"></div>
               <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
             </div>
           </div>
@@ -1719,7 +1757,7 @@
             <div style="display:flex;justify-content:center;gap:4px;margin-top:14px">
               <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
               <div style="width:6px;height:4px;border-radius:99px;background:#e2e8f0"></div>
-              <div style="width:18px;height:4px;border-radius:99px;background:#0d9488"></div>
+              <div style="width:18px;height:4px;border-radius:99px;background:#0891b2"></div>
             </div>
           </div>
 
@@ -1813,7 +1851,7 @@
           <div style="font-size:12px;color:#94a3b8;text-align:center;margin-bottom:14px">Enter <strong>your</strong> PIN (parent)</div>
 
           <div style="text-align:center">
-            <button style="background:none;border:none;color:#0d9488;font-size:13px;font-weight:600;cursor:pointer">← Switch profile</button>
+            <button style="background:none;border:none;color:#0891b2;font-size:13px;font-weight:600;cursor:pointer">← Switch profile</button>
           </div>
         </div>
 
@@ -1837,7 +1875,7 @@
       <div class="step-body">
         <p>Once the parent approves, the screen transitions to the child's welcome. Big emoji, their name, bright colours. No text-heavy explanation — just excitement and one button to press.</p>
 
-        <div class="mockup" style="background:linear-gradient(160deg,#f0fdfa,#ecfeff);border-color:#ccfbf1">
+        <div class="mockup" style="background:linear-gradient(160deg,#ecfeff,#ecfeff);border-color:#ccfbf1">
           <div style="text-align:center;font-size:64px;margin-bottom:16px;animation:bounce 1s">🦊</div>
           <div style="text-align:center;font-size:24px;font-weight:800;color:#0f172a;margin-bottom:8px">Hi Mia! 👋</div>
           <div style="text-align:center;font-size:14px;color:#475569;margin-bottom:24px">Welcome to your Toto. Let's get you set up!</div>
@@ -1880,8 +1918,8 @@
             <div class="mockup-heading" style="font-size:16px">Choose your secret code</div>
             <div class="mockup-sub" style="font-size:12px">Pick 4 numbers only you know!</div>
             <div style="display:flex;justify-content:center;gap:8px;margin:18px 0">
-              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
-              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0891b2">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0891b2">●</div>
               <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc"></div>
               <div style="width:44px;height:52px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc"></div>
             </div>
@@ -1895,10 +1933,10 @@
             <div class="mockup-heading" style="font-size:16px">Type it again</div>
             <div class="mockup-sub" style="font-size:12px">Just to make sure!</div>
             <div style="display:flex;justify-content:center;gap:8px;margin:18px 0">
-              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
-              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
-              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
-              <div style="width:44px;height:52px;border:2px solid #0d9488;border-radius:10px;background:#f0fdfa;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0d9488">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0891b2">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0891b2">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0891b2">●</div>
+              <div style="width:44px;height:52px;border:2px solid #0891b2;border-radius:10px;background:#ecfeff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#0891b2">●</div>
             </div>
             <div style="text-align:center;margin-top:12px">
               <div style="font-size:22px;margin-bottom:6px">🎉</div>
@@ -1961,7 +1999,7 @@
       <div class="step-body">
         <p>The child's home screen is a simplified, visual-first dashboard. If a parent has already set up chores, the first chore is immediately visible and actionable — instant engagement. If no chores exist yet, a friendly prompt asks the child to ask mum or dad to add some.</p>
 
-        <div class="mockup" style="background:linear-gradient(160deg,#f0fdfa,#ecfeff);max-width:360px">
+        <div class="mockup" style="background:linear-gradient(160deg,#ecfeff,#ecfeff);max-width:360px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
             <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fef9c3,#fde68a);display:flex;align-items:center;justify-content:center;font-size:22px">🦊</div>
             <div>
@@ -1982,7 +2020,7 @@
               <div style="font-size:13px;font-weight:600;color:#1e293b">Make my bed</div>
               <div style="font-size:11px;color:#64748b">+5 ⭐ coins</div>
             </div>
-            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #0d9488;display:flex;align-items:center;justify-content:center;color:#0d9488;font-size:14px;cursor:pointer">✓</div>
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #0891b2;display:flex;align-items:center;justify-content:center;color:#0891b2;font-size:14px;cursor:pointer">✓</div>
           </div>
 
           <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#f0fdf4;border-radius:12px;margin-bottom:16px;border:1.5px solid #86efac">

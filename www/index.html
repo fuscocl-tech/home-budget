@@ -304,7 +304,17 @@
     /* ─── Child + PIN setup overlays ───────────── */
     #child-view-overlay.hidden,
     #pin-setup-overlay.hidden,
+    #adult-pin-modal.hidden,
     #invite-flow-overlay.hidden { display: none !important; }
+
+    #pin-setup-overlay { transition: background .4s ease; }
+
+    @keyframes pso-bounce {
+      0%   { transform: scale(0.6); opacity: 0; }
+      60%  { transform: scale(1.15); }
+      80%  { transform: scale(0.95); }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
     /* ─── Kid mode — restrict to kids tab only ── */
     body.kid-mode .nav-item,
@@ -1420,7 +1430,7 @@
     .nw-empty { text-align: center; padding: 20px; color: #94a3b8; font-size: 13px; }
 
     /* ─── Onboarding ─────────────────────────── */
-    .ob-header { background: linear-gradient(135deg,#0891b2,#0e7490); padding: 32px 32px 24px; color: #fff; }
+    .ob-header { background: linear-gradient(160deg,#1a9bb5 0%,#0e7490 60%,#0c6a84 100%); padding: 36px 32px 28px; color: #fff; }
     .ob-step-dots { display: flex; gap: 6px; margin-bottom: 20px; }
     .ob-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: background 0.2s; }
     .ob-dot.active { background: #fff; width: 24px; border-radius: 4px; }
@@ -1444,11 +1454,12 @@
     .ob-expense-name { font-size: 13px; font-weight: 600; }
     .ob-expense-cat  { font-size: 11px; color: #94a3b8; }
     .ob-add-link { font-size: 13px; color: #0891b2; font-weight: 600; cursor: pointer; background: none; border: none; padding: 0; margin-top: 4px; }
-    .ob-footer { display: flex; align-items: center; justify-content: space-between; padding: 0 32px 28px; }
-    .ob-back { background: none; border: none; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; padding: 0; }
+    .ob-footer { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 28px; gap: 16px; }
+    .ob-back { background: none; border: none; color: #94a3b8; font-size: 14px; font-weight: 600; cursor: pointer; padding: 0; flex-shrink: 0; }
     .ob-back:hover { color: #64748b; }
-    .ob-next { background: #0891b2; color: #fff; border: none; border-radius: 10px; padding: 12px 28px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
-    .ob-next:hover { background: #0e7490; }
+    .ob-next { background: #0e7490; color: #fff; border: none; border-radius: 99px; padding: 14px 32px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.15s; flex: 1; box-shadow: 0 4px 14px rgba(14,116,144,0.35); }
+    .ob-next:hover { background: #155e75; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(14,116,144,0.4); }
+    .ob-next:active { transform: scale(0.97); }
     /* ─── Custom Select ──────────────────────── */
     .cs-wrap { position: relative; }
     .cs-trigger { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 14px; background: #fff; cursor: pointer; user-select: none; color: var(--text); text-align: left; transition: border-color 0.15s; }
@@ -1468,7 +1479,7 @@
     .ob-emoji-picker button:hover { background: #e2e8f0; }
     .ob-skip-toggle { font-size: 11px; color: #94a3b8; cursor: pointer; background: none; border: none; padding: 0; font-weight: 600; margin-top: 4px; display: block; text-align: right; }
     .ob-skip-toggle:hover { color: #64748b; }
-    .ob-welcome-feature { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #374151; }
+    .ob-welcome-feature { display: flex; align-items: center; gap: 14px; padding: 15px 0; border-bottom: 1px solid #f1f5f9; font-size: 15px; font-weight: 500; color: #1e293b; }
     .ob-welcome-feature:last-child { border-bottom: none; }
     .ob-summary-member { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
     .ob-summary-member:last-child { border-bottom: none; }
@@ -2614,22 +2625,23 @@
         <div style="font-size:11px;color:rgba(255,255,255,0.75)">Your dashboard</div>
       </div>
     </div>
-    <button onclick="exitChildView()" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:99px;padding:6px 14px;color:#fff;cursor:pointer">👨‍👩‍👧 Parent</button>
+    <div style="display:flex;gap:8px">
+      <button onclick="exitChildView()" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:99px;padding:6px 14px;color:#fff;cursor:pointer">Sign out</button>
+    </div>
   </div>
   <div id="cv-content" style="flex:1;padding:20px;max-width:520px;margin:0 auto;width:100%"></div>
 </div>
 
-<!-- ─── PIN setup (full-screen, uses same pad as login) ─── -->
-<div id="pin-setup-overlay" class="hidden" style="position:fixed;inset:0;background:#f8fafc;z-index:6100;align-items:center;justify-content:center;flex-direction:column;padding:24px">
-  <div style="width:100%;max-width:320px;text-align:center">
-    <div id="pso-avatar" style="font-size:52px;margin-bottom:12px"></div>
-    <div id="pso-title" style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:6px"></div>
-    <div id="pso-sub" style="font-size:13px;color:#64748b;margin-bottom:28px"></div>
-    <div id="pso-dots" style="display:flex;justify-content:center;gap:10px;margin-bottom:16px"></div>
-    <div id="pso-error" style="font-size:13px;color:#ef4444;min-height:18px;margin-bottom:12px"></div>
-    <div id="pso-pad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto 24px"></div>
-    <button onclick="closePinSetupOverlay()" style="font-size:13px;color:#94a3b8;background:none;border:none;cursor:pointer">Cancel</button>
+<!-- ─── Adult PIN setup modal ─── -->
+<div id="adult-pin-modal" class="hidden" style="position:fixed;inset:0;z-index:6200;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.6);padding:20px">
+  <div style="background:#fff;border-radius:20px;width:100%;max-width:340px;padding:32px 24px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.2)">
+    <div id="adult-pin-modal-body"></div>
   </div>
+</div>
+
+<!-- ─── PIN setup (full-screen, uses same pad as login) ─── -->
+<div id="pin-setup-overlay" class="hidden" style="position:fixed;inset:0;z-index:6100;display:flex;align-items:center;justify-content:center;overflow-y:auto">
+  <div id="pso-screen" style="width:100%;max-width:340px;padding:32px 24px;text-align:center"></div>
 </div>
 
 <!-- Kid mode banner — shown via CSS class on body -->
@@ -3513,13 +3525,14 @@ function showProfileSelector() {
 
   let rows = '';
   adults.forEach((m, i) => {
-    rows += `<div class="profile-card" onclick="_pickAdult()">
-      <div class="profile-avatar">👤</div>
+    const hasPin = !!m.pinHash;
+    rows += `<div class="profile-card" onclick="_pickAdult(${i})">
+      <div class="profile-avatar">🧑</div>
       <div style="flex:1">
         <div style="font-size:15px;font-weight:700;color:#1e293b">${escHtml(m.name)}</div>
-        <div style="font-size:12px;color:#64748b;margin-top:2px">${i===0?'Owner':'Member'} · Adult</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">${i===0?'Owner':'Member'} · ${hasPin ? 'PIN login' : 'Tap to enter'}</div>
       </div>
-      <div style="font-size:12px;color:#0891b2;font-weight:600">Enter →</div>
+      <div style="font-size:12px;color:#0891b2;font-weight:600">${hasPin ? 'PIN →' : 'Enter →'}</div>
     </div>`;
   });
   kids.forEach(kid => {
@@ -3539,7 +3552,18 @@ function showProfileSelector() {
   document.getElementById('profile-overlay').classList.remove('hidden');
 }
 
-function _pickAdult() {
+function _pickAdult(memberIndex) {
+  const members = state.householdProfile?.members || [];
+  const adults  = members.filter(m => m.role === 'adult' && m.name);
+  const m = adults[memberIndex ?? 0];
+  if (m?.pinHash) {
+    _pinTargetId   = 'adult:' + (memberIndex ?? 0);
+    _pinBuffer     = '';
+    _pinAttempts   = 0;
+    _pinLockUntil  = 0;
+    _showPinScreen({ emoji: '🧑', name: m.name, _isAdult: true, _memberIndex: memberIndex ?? 0 });
+    return;
+  }
   _activeProfile = null;
   clearKidSession();
   document.getElementById('profile-overlay').classList.add('hidden');
@@ -3560,10 +3584,10 @@ function _pickKid(kidId) {
   }
 }
 
-function _showPinScreen(kid) {
+function _showPinScreen(profile) {
   document.getElementById('profile-overlay').classList.add('hidden');
-  document.getElementById('pin-avatar').textContent    = kid.emoji || '😊';
-  document.getElementById('pin-greeting').textContent  = `Hi ${kid.name}! 👋`;
+  document.getElementById('pin-avatar').textContent    = profile.emoji || (profile._isAdult ? '🧑' : '😊');
+  document.getElementById('pin-greeting').textContent  = `Hi ${profile.name}! 👋`;
   document.getElementById('pin-sub').textContent       = 'Enter your PIN to continue';
   document.getElementById('pin-error').textContent     = '';
   _renderPinDots();
@@ -3604,30 +3628,6 @@ function _pinKey(k) {
   _pinBuffer += k;
   _renderPinDots();
   if (_pinBuffer.length === 4) _verifyPin();
-}
-
-async function _verifyPin() {
-  const kid = (state.kids?.profiles || []).find(k => k.id === _pinTargetId);
-  if (!kid) return;
-  const hash = await _hashPin(_pinBuffer);
-  if (hash === kid.pinHash) {
-    _pinAttempts = 0;
-    _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
-    setKidSession(kid.id);
-    document.getElementById('pin-overlay').classList.add('hidden');
-    _applyActiveProfile();
-  } else {
-    _pinAttempts++;
-    _pinBuffer = '';
-    _renderPinDots();
-    if (_pinAttempts >= 3) {
-      _pinLockUntil = Date.now() + 30000;
-      _renderPinPad();
-    } else {
-      document.getElementById('pin-error').textContent =
-        `Incorrect PIN (${3 - _pinAttempts} attempt${3 - _pinAttempts !== 1 ? 's' : ''} left)`;
-    }
-  }
 }
 
 function _updateSwitchBtn() {
@@ -3722,6 +3722,88 @@ function clearKidPin(kidId) {
   saveData(state);
 }
 
+// ── Adult PIN ─────────────────────────────────────────
+function setAdultPin(adultIndex) {
+  const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
+  const m = adults[adultIndex];
+  if (!m) return;
+  _adultPinTarget = adultIndex;
+  _adultPinFirst  = '';
+  _adultPinBuf    = '';
+  _adultPinStep   = 'enter';
+  _renderAdultPinModal();
+  document.getElementById('adult-pin-modal').classList.remove('hidden');
+}
+
+function clearAdultPin(adultIndex) {
+  const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
+  if (!adults[adultIndex]) return;
+  delete adults[adultIndex].pinHash;
+  saveData(state);
+  renderSettings();
+}
+
+let _adultPinTarget = 0;
+let _adultPinStep   = 'enter'; // enter | confirm
+let _adultPinFirst  = '';
+let _adultPinBuf    = '';
+
+function _renderAdultPinModal() {
+  const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
+  const m = adults[_adultPinTarget];
+  if (!m) return;
+  const isEnter  = _adultPinStep === 'enter';
+  const title    = isEnter ? (m.pinHash ? 'Change your PIN 🔢' : 'Set your PIN 🔢') : 'Confirm your PIN ✅';
+  const sub      = isEnter ? 'Pick 4 numbers — used on shared devices' : 'Enter it again to confirm';
+  const dotsHtml = [0,1,2,3].map(i => {
+    const filled = i < _adultPinBuf.length;
+    return `<div style="width:52px;height:60px;border:2px solid ${filled?'#0891b2':'#e2e8f0'};border-radius:10px;background:${filled?'#ecfeff':'#f8fafc'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0891b2">${filled?'●':''}</div>`;
+  }).join('');
+  const padHtml = [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k =>
+    k === '' ? `<div></div>`
+             : `<div onclick="_adultPinKey('${k}')" style="height:52px;border:1.5px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#374151;cursor:pointer;background:#fff;-webkit-tap-highlight-color:transparent;user-select:none">${k}</div>`
+  ).join('');
+
+  document.getElementById('adult-pin-modal-body').innerHTML = `
+    <div style="font-size:40px;margin-bottom:12px">${isEnter ? '🔢' : '✅'}</div>
+    <div style="font-size:18px;font-weight:700;color:#1e293b;margin-bottom:6px">${title}</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:20px">${sub}</div>
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px">${dotsHtml}</div>
+    <div id="adult-pin-error" style="font-size:13px;color:#ef4444;min-height:18px;margin-bottom:12px"></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:220px;margin:0 auto 20px">${padHtml}</div>
+    <button onclick="document.getElementById('adult-pin-modal').classList.add('hidden')" style="font-size:13px;color:#94a3b8;background:none;border:none;cursor:pointer">Cancel</button>`;
+}
+
+function _adultPinKey(k) {
+  if (k === '⌫') { _adultPinBuf = _adultPinBuf.slice(0, -1); _renderAdultPinModal(); return; }
+  if (_adultPinBuf.length >= 4) return;
+  _adultPinBuf += k;
+  _renderAdultPinModal();
+  if (_adultPinBuf.length === 4) _adultPinSubmit();
+}
+
+async function _adultPinSubmit() {
+  if (_adultPinStep === 'enter') {
+    _adultPinFirst = _adultPinBuf;
+    _adultPinBuf   = '';
+    _adultPinStep  = 'confirm';
+    _renderAdultPinModal();
+  } else {
+    if (_adultPinBuf !== _adultPinFirst) {
+      _adultPinBuf = ''; _adultPinFirst = ''; _adultPinStep = 'enter';
+      _renderAdultPinModal();
+      const err = document.getElementById('adult-pin-error');
+      if (err) err.textContent = "Those didn't match — try again";
+      return;
+    }
+    const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
+    adults[_adultPinTarget].pinHash = await _hashPin(_adultPinBuf);
+    saveData(state);
+    document.getElementById('adult-pin-modal').classList.add('hidden');
+    renderSettings();
+  }
+}
+
 // ── Child View ────────────────────────────────────────
 function showChildView(kidId) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
@@ -3791,6 +3873,7 @@ function exitChildView() {
   ov.style.display = '';
   _activeProfile = null;
   clearKidSession();
+  switchProfile();
 }
 
 function markChoreChildView(kidId, choreId) {
@@ -4260,64 +4343,182 @@ function _dismissInviteFlow() {
 }
 
 // ── PIN Setup (full-screen pad) ───────────────────────
-let _psoKidId   = null;
-let _psoStep    = 'enter';   // 'enter' | 'confirm'
-let _psoFirst   = '';
-let _psoBuf     = '';
+// ── PIN Setup — C1 gate · C2 hello · enter · confirm · C4 tour ──────────
+const PIN_HARD_LOCK_KEY  = 'toto_pin_hard_';   // + kidId
+const PIN_TOTAL_ATT_KEY  = 'toto_pin_att_';    // + kidId
+
+let _psoKidId    = null;
+let _psoStep     = 'gate';  // gate|hello|enter|confirm|tour
+let _psoFirst    = '';
+let _psoBuf      = '';
+let _psoTourSlide = 0;
+let _psoHoldTimer = null;
 
 function openPinSetup(kidId) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
   if (!kid) return;
-  _psoKidId = kidId;
-  _psoStep  = 'enter';
-  _psoFirst = '';
-  _psoBuf   = '';
-  document.getElementById('pso-avatar').textContent = kid.emoji || '😊';
-  _renderPsoStep(kid);
-  const psov = document.getElementById('pin-setup-overlay');
-  psov.style.display = 'flex';
-  psov.classList.remove('hidden');
+  _psoKidId  = kidId;
+  _psoBuf    = '';
+  _psoFirst  = '';
+  // Skip gate/hello if PIN already exists (parent is changing it)
+  _psoStep   = kid.pinHash ? 'enter' : 'gate';
+  _psoRender();
+  const ov = document.getElementById('pin-setup-overlay');
+  ov.classList.remove('hidden');
 }
 
 function closePinSetupOverlay() {
+  if (_psoHoldTimer) { clearInterval(_psoHoldTimer); _psoHoldTimer = null; }
   const el = document.getElementById('pin-setup-overlay');
   el.classList.add('hidden');
-  el.style.display = '';
   _psoKidId = null;
 }
 
-function _renderPsoStep(kid) {
-  const k = kid || (state.kids?.profiles || []).find(k => k.id === _psoKidId);
-  if (!k) return;
-  document.getElementById('pso-title').textContent = _psoStep === 'enter' ? `Set PIN for ${k.name}` : 'Confirm PIN';
-  document.getElementById('pso-sub').textContent   = _psoStep === 'enter' ? 'Choose a 4-digit PIN' : 'Enter the same PIN again';
-  document.getElementById('pso-error').textContent = '';
-  _renderPsoDots();
-  _renderPsoPad();
+function _psoRender() {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(_psoKidId));
+  if (!kid) return;
+  const scr = document.getElementById('pso-screen');
+  if (!scr) return;
+
+  const emoji = kid.emoji || '🧒';
+  const name  = escHtml(kid.name);
+
+  // Background colour per step
+  const bgs = { gate:'#f8fafc', hello:'linear-gradient(160deg,#f0fdfa,#ecfeff)',
+                enter:'#f8fafc', confirm:'#f8fafc', tour:'#f8fafc' };
+  document.getElementById('pin-setup-overlay').style.background = bgs[_psoStep] || '#f8fafc';
+
+  if (_psoStep === 'gate') {
+    // ── C1: Parent approval gate ──────────────────
+    scr.innerHTML = `
+      <div style="font-size:56px;margin-bottom:16px">${emoji}</div>
+      <div style="font-size:20px;font-weight:800;color:#1e293b;margin-bottom:8px">Setting up ${name}'s account</div>
+      <div style="font-size:14px;color:#64748b;margin-bottom:8px;line-height:1.6">A parent needs to approve this first.</div>
+      <div style="font-size:13px;color:#94a3b8;margin-bottom:28px">Hold the button below to confirm you're a parent.</div>
+
+      <div style="position:relative;margin-bottom:20px">
+        <button id="pso-hold-btn"
+          onmousedown="_psoHoldStart()" ontouchstart="_psoHoldStart()"
+          onmouseup="_psoHoldEnd()"    ontouchend="_psoHoldEnd()"
+          onmouseleave="_psoHoldEnd()"
+          style="width:100%;padding:16px;border:2px solid #0d9488;border-radius:12px;background:#f0fdfa;font-size:15px;font-weight:700;color:#0d9488;cursor:pointer;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
+          <div id="pso-hold-fill" style="position:absolute;inset:0;background:#0d9488;opacity:.12;transform:scaleX(0);transform-origin:left;transition:none;pointer-events:none"></div>
+          <span>Hold to approve as parent</span>
+        </button>
+      </div>
+      <button onclick="closePinSetupOverlay()" style="font-size:13px;color:#94a3b8;background:none;border:none;cursor:pointer">Cancel</button>`;
+
+  } else if (_psoStep === 'hello') {
+    // ── C2: Hello screen ──────────────────────────
+    scr.innerHTML = `
+      <div style="font-size:72px;margin-bottom:16px;animation:pso-bounce .6s ease">${emoji}</div>
+      <div style="font-size:26px;font-weight:800;color:#0f172a;margin-bottom:8px">Hi ${name}! 👋</div>
+      <div style="font-size:15px;color:#64748b;margin-bottom:28px">Welcome to your Toto.<br>Let's get you set up!</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px;text-align:left">
+        <div style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;padding:14px;border:1px solid #e2e8f0">
+          <span style="font-size:22px">📋</span>
+          <span style="font-size:14px;font-weight:600;color:#374151">Your chores &amp; how to earn coins</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;padding:14px;border:1px solid #e2e8f0">
+          <span style="font-size:22px">🏆</span>
+          <span style="font-size:14px;font-weight:600;color:#374151">Prizes you can win</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;background:#fff;border-radius:12px;padding:14px;border:1px solid #e2e8f0">
+          <span style="font-size:22px">🍱</span>
+          <span style="font-size:14px;font-weight:600;color:#374151">Your lunchbox this week</span>
+        </div>
+      </div>
+      <button onclick="_psoStep='enter';_psoRender()"
+        style="width:100%;padding:15px;background:#0d9488;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer">
+        Let's go! →
+      </button>`;
+
+  } else if (_psoStep === 'enter' || _psoStep === 'confirm') {
+    // ── PIN entry / confirm ───────────────────────
+    const isEnter   = _psoStep === 'enter';
+    const title     = isEnter ? (kid.pinHash ? `Change ${name}'s PIN` : 'Choose your secret code 🔢') : 'Type it again ✅';
+    const sub       = isEnter ? 'Pick 4 numbers only you know!' : 'Just to make sure!';
+    const dotsHtml  = [0,1,2,3].map(i => {
+      const filled = i < _psoBuf.length;
+      return `<div style="width:52px;height:60px;border:2px solid ${filled?'#0d9488':'#e2e8f0'};border-radius:10px;background:${filled?'#f0fdfa':'#f8fafc'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#0d9488">${filled?'●':''}</div>`;
+    }).join('');
+    const padHtml   = [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k =>
+      k === '' ? `<div></div>`
+               : `<div onclick="_psoKey('${k}')" style="height:52px;border:1.5px solid #e2e8f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:#374151;cursor:pointer;background:#fff;-webkit-tap-highlight-color:transparent;user-select:none">${k}</div>`
+    ).join('');
+
+    scr.innerHTML = `
+      <div style="font-size:40px;margin-bottom:12px">${isEnter ? '🔢' : '✅'}</div>
+      <div style="font-size:18px;font-weight:700;color:#1e293b;margin-bottom:6px">${title}</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:20px">${sub}</div>
+      <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px">${dotsHtml}</div>
+      <div id="pso-error" style="font-size:13px;color:#ef4444;min-height:18px;margin-bottom:12px"></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:220px;margin:0 auto 20px">${padHtml}</div>
+      <button onclick="closePinSetupOverlay()" style="font-size:13px;color:#94a3b8;background:none;border:none;cursor:pointer">Cancel</button>`;
+
+  } else if (_psoStep === 'tour') {
+    // ── C4: Quick tour ────────────────────────────
+    const slides = [
+      { bg:'linear-gradient(160deg,#fef9c3,#fde68a)', emoji:'⭐', titleCol:'#92400e',
+        title:'Earn coins!', body:'Do your chores to collect coins.<br>Save up for prizes!', bodyCol:'#78350f' },
+      { bg:'linear-gradient(160deg,#ede9fe,#ddd6fe)', emoji:'🏆', titleCol:'#5b21b6',
+        title:'Prize store', body:'See what you can win and how<br>many coins you need.', bodyCol:'#4c1d95' },
+      { bg:'linear-gradient(160deg,#ecfeff,#cffafe)', emoji:'🍱', titleCol:'#0e7490',
+        title:'Lunchbox', body:"See what's in your lunchbox<br>each day this week.", bodyCol:'#155e75' },
+    ];
+    const s = slides[_psoTourSlide];
+    const isLast = _psoTourSlide === slides.length - 1;
+    const dotsHtml = slides.map((_,i) =>
+      `<div style="width:${i===_psoTourSlide?20:8}px;height:8px;border-radius:99px;background:${i===_psoTourSlide?'#0d9488':'#e2e8f0'};transition:all .2s"></div>`
+    ).join('');
+
+    document.getElementById('pin-setup-overlay').style.background = s.bg;
+    scr.innerHTML = `
+      <div style="font-size:72px;margin-bottom:16px">${s.emoji}</div>
+      <div style="font-size:22px;font-weight:800;color:${s.titleCol};margin-bottom:10px">${s.title}</div>
+      <div style="font-size:15px;color:${s.bodyCol};margin-bottom:32px;line-height:1.6">${s.body}</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:28px">${dotsHtml}</div>
+      <button onclick="${isLast ? '_psoTourDone()' : '_psoTourSlide++;_psoRender()'}"
+        style="width:100%;padding:15px;background:#0d9488;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px">
+        ${isLast ? 'Done! →' : 'Next →'}
+      </button>
+      ${!isLast ? `<button onclick="_psoTourDone()" style="font-size:13px;color:#94a3b8;background:none;border:none;cursor:pointer">Skip</button>` : ''}`;
+  }
 }
 
-function _renderPsoDots() {
-  const el = document.getElementById('pso-dots');
-  if (!el) return;
-  el.innerHTML = [0,1,2,3].map(i =>
-    `<div class="pin-dot ${i < _psoBuf.length ? 'filled' : ''}">${i < _psoBuf.length ? '●' : ''}</div>`
-  ).join('');
+// Hold-to-approve for parent gate
+function _psoHoldStart() {
+  if (_psoHoldTimer) return;
+  let progress = 0;
+  const fill = document.getElementById('pso-hold-fill');
+  if (fill) { fill.style.transition = 'none'; fill.style.transform = 'scaleX(0)'; }
+  _psoHoldTimer = setInterval(() => {
+    progress += 50;
+    const pct = Math.min(progress / 2000, 1);
+    if (fill) { fill.style.transition = 'none'; fill.style.transform = `scaleX(${pct})`; }
+    if (progress >= 2000) {
+      clearInterval(_psoHoldTimer);
+      _psoHoldTimer = null;
+      _psoStep = 'hello';
+      _psoRender();
+    }
+  }, 50);
 }
-
-function _renderPsoPad() {
-  const el = document.getElementById('pso-pad');
-  if (!el) return;
-  el.innerHTML = [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k =>
-    k === '' ? `<div class="pin-key empty"></div>`
-             : `<div class="pin-key" onclick="_psoKey('${k}')">${k}</div>`
-  ).join('');
+function _psoHoldEnd() {
+  if (_psoHoldTimer) { clearInterval(_psoHoldTimer); _psoHoldTimer = null; }
+  const fill = document.getElementById('pso-hold-fill');
+  if (fill) { fill.style.transition = 'transform .3s'; fill.style.transform = 'scaleX(0)'; }
 }
 
 function _psoKey(k) {
-  if (k === '⌫') { _psoBuf = _psoBuf.slice(0,-1); _renderPsoDots(); return; }
+  if (k === '⌫') {
+    _psoBuf = _psoBuf.slice(0,-1);
+    _psoRender();
+    return;
+  }
   if (_psoBuf.length >= 4) return;
   _psoBuf += k;
-  _renderPsoDots();
+  _psoRender();
   if (_psoBuf.length === 4) _psoSubmit();
 }
 
@@ -4326,20 +4527,154 @@ async function _psoSubmit() {
     _psoFirst = _psoBuf;
     _psoBuf   = '';
     _psoStep  = 'confirm';
-    _renderPsoStep();
-  } else {
+    _psoRender();
+  } else if (_psoStep === 'confirm') {
     if (_psoBuf !== _psoFirst) {
-      document.getElementById('pso-error').textContent = 'PINs don\'t match — try again';
       _psoBuf = ''; _psoFirst = ''; _psoStep = 'enter';
-      _renderPsoStep();
+      _psoRender();
+      const err = document.getElementById('pso-error');
+      if (err) err.textContent = "Those didn't match — try again 🙈";
       return;
     }
     await setKidPin(_psoKidId, _psoBuf);
-    closePinSetupOverlay();
-    renderKids();
+    const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(_psoKidId));
+    // If this was first-time setup (came through hello), show tour
+    if (kid && !kid._pinWasSet) {
+      _psoTourSlide = 0;
+      _psoStep = 'tour';
+      _psoRender();
+    } else {
+      closePinSetupOverlay();
+      renderKids();
+      renderSettings();
+    }
+    kid._pinWasSet = true;
   }
 }
-// ───────────────────────────────────────────────────
+
+function _psoTourDone() {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(_psoKidId));
+  closePinSetupOverlay();
+  if (kid) showChildView(kid.id);
+}
+
+// ── Improved rate limiting: hard lock at 10 total attempts ──────────────
+function _getPinTotalAttempts(kidId) {
+  return parseInt(localStorage.getItem(PIN_TOTAL_ATT_KEY + kidId) || '0');
+}
+function _incPinTotalAttempts(kidId) {
+  const n = _getPinTotalAttempts(kidId) + 1;
+  localStorage.setItem(PIN_TOTAL_ATT_KEY + kidId, String(n));
+  return n;
+}
+function _resetPinAttempts(kidId) {
+  localStorage.removeItem(PIN_TOTAL_ATT_KEY + kidId);
+  localStorage.removeItem(PIN_HARD_LOCK_KEY  + kidId);
+}
+function _isPinHardLocked(kidId) {
+  return localStorage.getItem(PIN_HARD_LOCK_KEY + kidId) === '1';
+}
+function _setPinHardLock(kidId) {
+  localStorage.setItem(PIN_HARD_LOCK_KEY + kidId, '1');
+}
+
+// Override _verifyPin to use improved rate limiting
+async function _verifyPin() {
+  const hash = await _hashPin(_pinBuffer);
+
+  // Adult PIN
+  if (typeof _pinTargetId === 'string' && _pinTargetId.startsWith('adult:')) {
+    const memberIndex = parseInt(_pinTargetId.split(':')[1]);
+    const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
+    const m = adults[memberIndex];
+    if (!m) return;
+    if (hash === m.pinHash) {
+      _pinAttempts = 0;
+      _activeProfile = null;
+      clearKidSession();
+      document.getElementById('pin-overlay').classList.add('hidden');
+      _applyActiveProfile();
+    } else {
+      _pinAttempts++;
+      _pinBuffer = '';
+      _renderPinDots();
+      if (_pinAttempts >= 3) {
+        _pinLockUntil = Date.now() + 30000;
+        _pinAttempts  = 0;
+        _renderPinPad();
+      } else {
+        document.getElementById('pin-error').textContent =
+          `Wrong PIN — ${3 - _pinAttempts} tr${3 - _pinAttempts !== 1 ? 'ies' : 'y'} left`;
+      }
+    }
+    return;
+  }
+
+  // Child PIN
+  const kid = (state.kids?.profiles || []).find(k => k.id === _pinTargetId);
+  if (!kid) return;
+
+  // Hard lock check
+  if (_isPinHardLocked(kid.id)) {
+    document.getElementById('pin-error').textContent = 'PIN locked — ask mum or dad to reset it 🔒';
+    document.getElementById('pin-pad').innerHTML = '';
+    _showParentLockNotification(kid);
+    return;
+  }
+
+  if (hash === kid.pinHash) {
+    _resetPinAttempts(kid.id);
+    _pinAttempts = 0;
+    _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+    setKidSession(kid.id);
+    document.getElementById('pin-overlay').classList.add('hidden');
+    _applyActiveProfile();
+  } else {
+    _pinBuffer = '';
+    _renderPinDots();
+    _pinAttempts++;
+    const total = _incPinTotalAttempts(kid.id);
+
+    if (total >= 10) {
+      _setPinHardLock(kid.id);
+      _pinLockUntil = 0;
+      document.getElementById('pin-error').textContent = 'PIN locked — ask mum or dad to reset it 🔒';
+      document.getElementById('pin-pad').innerHTML = '';
+      _showParentLockNotification(kid);
+    } else if (_pinAttempts >= 3) {
+      _pinLockUntil = Date.now() + 30000;
+      _pinAttempts  = 0;
+      _renderPinPad();
+    } else {
+      const attLeft = 3 - _pinAttempts;
+      document.getElementById('pin-error').textContent =
+        `Wrong PIN — ${attLeft} try${attLeft !== 1 ? 's' : ''} left`;
+    }
+  }
+}
+
+function _showParentLockNotification(kid) {
+  // Show a persistent banner so a parent knows when they next open the app
+  if (!state.notifications) state.notifications = [];
+  const already = state.notifications.some(n => n.type === 'pin-lock' && n.kidId === kid.id);
+  if (!already) {
+    state.notifications.unshift({
+      id: uid(), type: 'pin-lock', kidId: kid.id,
+      msg: `${kid.name}'s PIN has been locked after too many failed attempts. Reset it in Settings → Household.`,
+      ts: new Date().toISOString(), read: false
+    });
+    saveData(state);
+  }
+}
+
+// Admin: reset hard lock for a kid (called from settings)
+function resetKidPinLock(kidId) {
+  _resetPinAttempts(kidId);
+  _pinAttempts = 0;
+  _pinLockUntil = 0;
+  renderSettings();
+}
+// ── End PIN setup ───────────────────────────────────────────────────────
 
 // ─── Per-month budget helpers ──────────────────────
 function getMonthData(monthStr) {
@@ -9429,6 +9764,18 @@ function renderSettings() {
         // ── Access status for this member ──
         let accessHtml = '';
         if (isAdult) {
+          const adultIndex = _members.slice(0, i).filter(x => x.role === 'adult').length;
+          const hasAdultPin = !!m.pinHash;
+          const adultPinHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;margin-top:8px;background:${hasAdultPin?'#f0fdf4':'var(--surface2)'};border-radius:8px;border:1px solid ${hasAdultPin?'#bbf7d0':'var(--border)'}">
+            <span style="font-size:16px">🔢</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:${hasAdultPin?'#16a34a':'var(--text)'}">Shared device PIN · ${hasAdultPin ? 'Set ✓' : 'Not set'}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${hasAdultPin ? 'Required when signing in on a shared device' : 'Optional — protects your profile on shared devices'}</div>
+            </div>
+            <button onclick="event.stopPropagation();setAdultPin(${adultIndex})" style="padding:6px 10px;border:1px solid ${hasAdultPin?'#bbf7d0':'var(--border)'};border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">${hasAdultPin ? 'Change' : 'Set PIN'}</button>
+            ${hasAdultPin ? `<button onclick="event.stopPropagation();clearAdultPin(${adultIndex})" style="padding:6px 10px;border:1px solid #fecaca;border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:#b91c1c;cursor:pointer">Remove</button>` : ''}
+          </div>`;
+
           if (isOwner) {
             accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0">
               <span style="font-size:16px">✅</span>
@@ -9436,7 +9783,7 @@ function renderSettings() {
                 <div style="font-size:12px;font-weight:600;color:#16a34a">Google login · Owner</div>
                 <div style="font-size:11px;color:#64748b">Full access · Set up this household</div>
               </div>
-            </div>`;
+            </div>` + adultPinHtml;
           } else {
             // Check if this adult has joined via invite
             const joined = _authedUsers.find(u => u.name && m.name && u.name.toLowerCase().includes(m.name.toLowerCase().split(' ')[0]));
@@ -9451,7 +9798,7 @@ function renderSettings() {
                   <div style="font-size:12px;font-weight:600;color:#16a34a">Google login · Member</div>
                   <div style="font-size:11px;color:#64748b">${escHtml((joined||{}).email || 'Joined via invite')}</div>
                 </div>
-              </div>`;
+              </div>` + adultPinHtml;
             } else if (pending) {
               const expiry = new Date(pending.expiresAt).toLocaleDateString();
               accessHtml = `<div style="padding:10px 12px;background:#fef9c3;border-radius:8px;border:1px solid #fde68a">
@@ -9466,7 +9813,7 @@ function renderSettings() {
                   <button onclick="event.stopPropagation();_copyInviteLinkForMember('${pending.id}')" style="flex:1;padding:6px;border:1px solid #fde68a;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#854d0e;cursor:pointer">📋 Copy link</button>
                   <button onclick="event.stopPropagation();revokeInvite('${pending.id}')" style="padding:6px 10px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#ef4444;cursor:pointer">Revoke</button>
                 </div>
-              </div>`;
+              </div>` + adultPinHtml;
             } else {
               accessHtml = `<div style="padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -9477,7 +9824,7 @@ function renderSettings() {
                   </div>
                 </div>
                 <button onclick="event.stopPropagation();inviteMember(${i})" class="btn btn-primary btn-sm" style="width:100%">Invite to join →</button>
-              </div>`;
+              </div>` + adultPinHtml;
             }
           }
         } else {
@@ -9486,7 +9833,20 @@ function renderSettings() {
           const hasPin  = !!(kidProfile?.pinHash);
           const hasName = !!(m.name && m.name.trim());
 
-          if (!hasName) {
+          const isHardLocked = kidProfile && _isPinHardLocked ? _isPinHardLocked(kidProfile.id) : false;
+
+          if (isHardLocked) {
+            accessHtml = `<div style="padding:10px 12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <span style="font-size:16px">🔒</span>
+                <div style="flex:1">
+                  <div style="font-size:12px;font-weight:600;color:#b91c1c">PIN locked</div>
+                  <div style="font-size:11px;color:#64748b">Too many failed attempts</div>
+                </div>
+              </div>
+              <button onclick="event.stopPropagation();resetKidPinLock(${kidProfile.id})" style="width:100%;padding:7px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer">Reset PIN lock</button>
+            </div>`;
+          } else if (!hasName) {
             accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
               <span style="font-size:16px">🔢</span>
               <div style="font-size:12px;color:var(--text-muted)">Enter a name above to enable PIN login</div>
@@ -9697,6 +10057,12 @@ function renderSettings() {
       </div>
     </div>`);
 
+
+  /* ── DEV TOOLS — remove before release ── */
+  html += `<div style="margin-top:24px;padding:16px;border:2px dashed #f59e0b;border-radius:12px;background:#fffbeb">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#92400e;margin-bottom:12px">⚠️ Dev Tools — Remove before release</div>
+    <button onclick="showProfileSelector()" class="btn btn-secondary" style="width:100%">🔄 Open profile switcher (shared device)</button>
+  </div>`;
 
   html += `<div class="settings-save-bar" id="settings-save-bar" style="display:${_settingsDirty ? 'flex' : 'none'}">
     <div class="unsaved-dot"></div>

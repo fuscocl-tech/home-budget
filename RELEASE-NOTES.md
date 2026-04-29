@@ -1,5 +1,34 @@
 # Toto — Release Notes
 
+## 28 April 2026 · Session Build
+
+### Child PIN Setup (C1–C5 flow)
+- Full child onboarding PIN flow (C1 parent approval gate, C2 welcome screen, C3 PIN entry + confirm, C4/C5 mini tour) confirmed working end-to-end
+- Removed trivial PIN rejection (1234, 0000 etc.) — not required
+
+### Child Sign Out
+- Added **Sign out** button to the child view header
+- Signing out returns the user to the profile selection screen
+
+### Shared Device — Profile Switcher
+- Added Dev Tools button in Settings to open the profile switcher for testing (flagged for removal before release)
+- Fixed button — was calling `switchProfile()` which gate-checks device mode; now calls `showProfileSelector()` directly
+
+### Adult PINs on Shared Devices
+- Adults can now set an optional 4-digit PIN from **Settings → Household → [adult member]**
+- PIN is opt-in — adults without one tap straight through on the shared device selector
+- Profile selector shows "PIN →" or "Tap to enter" per adult depending on PIN status
+- Same numpad overlay, SHA-256 hashing, and rate-limiting as kids (3 attempts → 30s lockout)
+- Fixed: duplicate `_verifyPin` function was silently overriding adult PIN logic — merged into single function
+
+### Onboarding Modal Styling
+- "Let's get started" button updated to pill shape with drop shadow, matching app button style
+- Header gradient enriched; feature list rows updated to heavier weight
+
+### Dev Tooling
+- Added `npm run dev` — starts local dev server at port 3000
+- Added `npm run sim` — copies `index.html` to `www/` and syncs to iOS in one command
+
 ## 27 April 2026 · Session Build
 
 ### Onboarding
