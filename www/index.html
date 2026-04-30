@@ -2115,6 +2115,48 @@
     .brief-body .s { font-size: 11px; color: #71717a; margin-top: 2px; line-height: 1.4; }
     .brief-arrow { color: #d4d4d8; flex-shrink: 0; }
 
+    /* ── ROUTINES START ── styles */
+    .routines-today-card { border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8); backdrop-filter: blur(8px); cursor: pointer; transition: box-shadow 0.15s; }
+    .routines-today-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .routines-today-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .routines-today-title { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+    .routines-today-link { font-size: 12px; font-weight: 600; color: var(--section-accent, #0891b2); }
+    .routines-today-rows { display: flex; flex-direction: column; gap: 6px; }
+    .routine-today-row { display: flex; align-items: center; gap: 10px; }
+    .routine-today-emoji { font-size: 16px; width: 28px; text-align: center; flex-shrink: 0; }
+    .routine-today-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+    .routine-today-progress { display: flex; align-items: center; gap: 6px; }
+    .routine-today-bar-wrap { width: 64px; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .routine-today-bar-fill { height: 100%; border-radius: 99px; background: var(--section-accent, #0891b2); transition: width 0.3s; }
+    .routine-today-frac { font-size: 11px; font-weight: 600; color: var(--text-muted); min-width: 28px; text-align: right; }
+    /* Full routines tab */
+    .routine-card { border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8); backdrop-filter: blur(8px); }
+    .routine-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .routine-card-title { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; color: var(--text); }
+    .routine-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+    .routine-card-actions { display: flex; gap: 8px; }
+    .routine-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .routine-progress-bar-wrap { flex: 1; height: 7px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .routine-progress-bar-fill { height: 100%; border-radius: 99px; background: var(--section-accent, #0891b2); transition: width 0.4s; }
+    .routine-progress-label { font-size: 12px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    .routine-steps { display: flex; flex-direction: column; }
+    .routine-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(24,24,27,0.06); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.15s; }
+    .routine-step:last-child { border-bottom: none; }
+    .routine-step:active { opacity: 0.7; }
+    .routine-step-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s; }
+    .routine-step-check.done { background: var(--section-accent, #0891b2); border-color: var(--section-accent, #0891b2); }
+    .routine-step-check.done svg { display: block; }
+    .routine-step-check svg { display: none; width: 12px; height: 12px; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; fill: none; }
+    .routine-step-emoji { font-size: 18px; flex-shrink: 0; }
+    .routine-step-label { flex: 1; font-size: 14px; font-weight: 500; color: var(--text); transition: color 0.18s; }
+    .routine-step-label.done { color: var(--text-muted); text-decoration: line-through; }
+    .routine-step-dur { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+    .routine-streak { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 99px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: var(--text); }
+    .routine-all-done { text-align: center; padding: 10px 0 4px; font-size: 13px; font-weight: 700; color: var(--section-accent, #0891b2); }
+    .routine-add-step-btn { width: 100%; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; margin-top: 8px; transition: border-color 0.15s, color 0.15s; }
+    .routine-add-step-btn:hover { border-color: var(--section-accent, #0891b2); color: var(--section-accent, #0891b2); }
+    /* ── ROUTINES END ── styles */
+
     /* ─── Round 3 — Wallet (scoped to #tab-budget) ─── */
     #tab-budget .summary-hero {
       background: linear-gradient(150deg, #18181b 0%, #14271a 60%, #0d3520 100%) !important;
@@ -2913,6 +2955,12 @@
     <div id="planner-content"></div>
   </div>
 
+  <!-- ── ROUTINES START ── tab panel -->
+  <div class="tab-panel" id="tab-routines">
+    <div id="routines-content"></div>
+  </div>
+  <!-- ── ROUTINES END ── tab panel -->
+
   <!-- SETTINGS -->
   <div class="tab-panel" id="tab-settings">
     <div class="page-header">
@@ -3340,7 +3388,33 @@ const DEFAULT_DATA = {
     { id: 5, name: 'Lifestyle',       icon: '🎮', categories: ['Entertainment', 'Subscriptions', 'Clothing'] },
     { id: 6, name: 'Savings',         icon: '💰', categories: ['Savings / Investment'] },
     { id: 7, name: 'Other',           icon: '📦', categories: ['Other'] }
+  ],
+  // ── ROUTINES START ── default state
+  routines: [
+    {
+      id: 1, name: 'Morning', emoji: '🌅', triggerTime: '07:00',
+      steps: [
+        { id: 1, label: 'Make bed',       emoji: '🛏',  durationMin: 2 },
+        { id: 2, label: 'Shower',         emoji: '🚿',  durationMin: 10 },
+        { id: 3, label: 'Breakfast',      emoji: '🍳',  durationMin: 15 },
+        { id: 4, label: 'Exercise',       emoji: '💪',  durationMin: 20 },
+        { id: 5, label: 'Plan the day',   emoji: '📋',  durationMin: 5 }
+      ],
+      completions: {}
+    },
+    {
+      id: 2, name: 'Evening', emoji: '🌙', triggerTime: '21:00',
+      steps: [
+        { id: 1, label: 'Tidy kitchen',   emoji: '🍽',  durationMin: 10 },
+        { id: 2, label: 'Prep tomorrow',  emoji: '👔',  durationMin: 5 },
+        { id: 3, label: 'Family time',    emoji: '👨‍👩‍👧', durationMin: 30 },
+        { id: 4, label: 'Read',           emoji: '📚',  durationMin: 20 },
+        { id: 5, label: 'Lights out',     emoji: '💤',  durationMin: 0 }
+      ],
+      completions: {}
+    }
   ]
+  // ── ROUTINES END ── default state
 };
 
 function loadData() {
@@ -3423,6 +3497,10 @@ function loadData() {
     if (!d.vehicles) d.vehicles = [];
     if (!d.documents) d.documents = [];
     if (!d.maintenance) d.maintenance = [];
+    // ── ROUTINES START ── migration
+    if (!d.routines) d.routines = JSON.parse(JSON.stringify(DEFAULT_DATA.routines));
+    d.routines.forEach(r => { if (!r.completions) r.completions = {}; });
+    // ── ROUTINES END ── migration
     if (!d.settings) d.settings = { autoFillMonths: false };
     if (!d.settings.notifStyle) d.settings.notifStyle = 'focus-timeline';
     if (d.settings.typeAMode === undefined) d.settings.typeAMode = false;
@@ -5744,7 +5822,10 @@ const SECTIONS = {
     { tab:'forecast', label:'Forecast' },
     { tab:'meals',    label:'Meals' },
     { tab:'lunchbox', label:'Lunchbox' },
-    { tab:'pantry', label:'Pantry' },
+    { tab:'pantry',   label:'Pantry' },
+    // ── ROUTINES START ── section pill
+    { tab:'routines', label:'Routines' },
+    // ── ROUTINES END ── section pill
   ]},
   home: { navTab:'documents', label:'Home', tabs:[
     { tab:'documents',   label:'Documents' },
@@ -7068,6 +7149,8 @@ function renderToday() {
     ${missionHtml}
 
     ${lifeScoreHtml}
+
+    ${_renderRoutinesTodayCard()}
 
     <div class="today-seclabel"><span class="lbl">Today's briefing</span></div>
     <div class="today-brief">${briefHtml}</div>`;
@@ -13791,6 +13874,233 @@ function safeRender(fn) {
   try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
 }
 
+// ═══════════════════════════════════════════════════════════
+// ── ROUTINES START ── all logic contained here
+// To remove this feature: delete this entire block, remove the
+// tab panel, the SECTIONS pill entry, the _TAB_RENDERERS entry,
+// the DEFAULT_DATA.routines key, the loadData() migration line,
+// and the _renderRoutinesTodayCard() call in renderToday().
+// ═══════════════════════════════════════════════════════════
+
+function _routineTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function _routineCompletedToday(routine) {
+  const done = routine.completions[_routineTodayKey()] || [];
+  return done.length;
+}
+
+function _routineStreak(routine) {
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const done = routine.completions[key] || [];
+    if (done.length === routine.steps.length && routine.steps.length > 0) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function _renderRoutinesTodayCard() {
+  const routines = state.routines || [];
+  if (!routines.length) return '';
+  const rows = routines.map(r => {
+    const done = _routineCompletedToday(r);
+    const total = r.steps.length;
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    return `<div class="routine-today-row" onclick="activateTab('routines')">
+      <div class="routine-today-emoji">${r.emoji}</div>
+      <div class="routine-today-name">${escHtml(r.name)}</div>
+      <div class="routine-today-progress">
+        <div class="routine-today-bar-wrap"><div class="routine-today-bar-fill" style="width:${pct}%"></div></div>
+        <span class="routine-today-frac">${done}/${total}</span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="routines-today-card" onclick="activateTab('routines')">
+    <div class="routines-today-header">
+      <span class="routines-today-title">Routines</span>
+      <span class="routines-today-link">View all →</span>
+    </div>
+    <div class="routines-today-rows">${rows}</div>
+  </div>`;
+}
+
+function renderRoutines() {
+  const el = document.getElementById('routines-content');
+  if (!el) return;
+  const routines = state.routines || [];
+  const todayKey = _routineTodayKey();
+
+  let html = `<div class="page-header" style="margin-bottom:20px">
+    <h1>Routines</h1>
+    <p>Build consistent morning and evening habits</p>
+  </div>`;
+
+  routines.forEach(routine => {
+    const done = routine.completions[todayKey] || [];
+    const total = routine.steps.length;
+    const pct = total > 0 ? Math.round(done.length / total * 100) : 0;
+    const allDone = done.length === total && total > 0;
+    const streak = _routineStreak(routine);
+    const totalMins = routine.steps.reduce((s, st) => s + (st.durationMin || 0), 0);
+
+    const stepsHtml = routine.steps.map(step => {
+      const isDone = done.includes(step.id);
+      return `<div class="routine-step" onclick="_routineToggleStep(${routine.id}, ${step.id})">
+        <div class="routine-step-check${isDone ? ' done' : ''}">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="routine-step-emoji">${step.emoji}</span>
+        <span class="routine-step-label${isDone ? ' done' : ''}">${escHtml(step.label)}</span>
+        ${step.durationMin ? `<span class="routine-step-dur">${step.durationMin}m</span>` : ''}
+      </div>`;
+    }).join('');
+
+    html += `<div class="routine-card">
+      <div class="routine-card-header">
+        <div class="routine-card-title">${routine.emoji} ${escHtml(routine.name)}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${streak > 0 ? `<span class="routine-streak">🔥 ${streak} day${streak !== 1 ? 's' : ''}</span>` : ''}
+          <button class="btn btn-sm btn-ghost" onclick="_routineEdit(${routine.id})" title="Edit routine">✏️</button>
+        </div>
+      </div>
+      <div class="routine-card-meta">${totalMins}min total · ${routine.triggerTime}</div>
+      <div class="routine-progress-row">
+        <div class="routine-progress-bar-wrap">
+          <div class="routine-progress-bar-fill" style="width:${pct}%"></div>
+        </div>
+        <span class="routine-progress-label">${done.length}/${total}</span>
+      </div>
+      <div class="routine-steps">${stepsHtml}</div>
+      ${allDone ? `<div class="routine-all-done">✓ Complete — great work!</div>` : ''}
+      <button class="routine-add-step-btn" onclick="_routineAddStep(${routine.id})">+ Add step</button>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function _routineToggleStep(routineId, stepId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const key = _routineTodayKey();
+  if (!routine.completions[key]) routine.completions[key] = [];
+  const idx = routine.completions[key].indexOf(stepId);
+  if (idx === -1) routine.completions[key].push(stepId);
+  else routine.completions[key].splice(idx, 1);
+  saveData(state);
+  renderRoutines();
+}
+
+function _routineAddStep(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const newId = Math.max(0, ...routine.steps.map(s => s.id)) + 1;
+  openModal('Add step', `
+    <div class="form-group">
+      <label class="form-label">Label</label>
+      <input class="form-input" id="rs-label" placeholder="e.g. Meditate" maxlength="40">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji</label>
+      <input class="form-input" id="rs-emoji" placeholder="🧘" maxlength="4" style="width:80px">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Duration (minutes)</label>
+      <input class="form-input" id="rs-dur" type="number" min="0" max="120" placeholder="10" style="width:100px">
+    </div>
+  `, `
+    <button class="btn btn-primary" onclick="_routineAddStepSave(${routineId}, ${newId})">Add</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+  `);
+  setTimeout(() => document.getElementById('rs-label')?.focus(), 100);
+}
+
+function _routineAddStepSave(routineId, newId) {
+  const label = document.getElementById('rs-label')?.value.trim();
+  if (!label) return;
+  const emoji = document.getElementById('rs-emoji')?.value.trim() || '✅';
+  const dur = parseInt(document.getElementById('rs-dur')?.value) || 0;
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  routine.steps.push({ id: newId, label, emoji, durationMin: dur });
+  saveData(state);
+  closeModal();
+  renderRoutines();
+}
+
+function _routineEdit(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const stepsRows = routine.steps.map((s, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:16px">${s.emoji}</span>
+      <span style="flex:1;font-size:13px;font-weight:500">${escHtml(s.label)}</span>
+      <span style="font-size:11px;color:var(--text-muted)">${s.durationMin || 0}m</span>
+      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteStep(${routineId}, ${s.id})">✕</button>
+    </div>`).join('');
+  openModal(`Edit: ${routine.emoji} ${routine.name}`, `
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input class="form-input" id="re-name" value="${escHtml(routine.name)}" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji</label>
+      <input class="form-input" id="re-emoji" value="${routine.emoji}" maxlength="4" style="width:80px">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Time</label>
+      <input class="form-input" id="re-time" type="time" value="${routine.triggerTime}" style="width:120px">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Steps</label>
+      <div id="re-steps">${stepsRows}</div>
+    </div>
+  `, `
+    <button class="btn btn-primary" onclick="_routineEditSave(${routineId})">Save</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+  `);
+}
+
+function _routineEditSave(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const name = document.getElementById('re-name')?.value.trim();
+  const emoji = document.getElementById('re-emoji')?.value.trim();
+  const time = document.getElementById('re-time')?.value;
+  if (name) routine.name = name;
+  if (emoji) routine.emoji = emoji;
+  if (time) routine.triggerTime = time;
+  saveData(state);
+  closeModal();
+  renderRoutines();
+}
+
+function _routineDeleteStep(routineId, stepId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  routine.steps = routine.steps.filter(s => s.id !== stepId);
+  // Remove from any completions
+  Object.keys(routine.completions).forEach(k => {
+    routine.completions[k] = routine.completions[k].filter(id => id !== stepId);
+  });
+  saveData(state);
+  // Re-render the edit modal with updated step list, then reopen
+  closeModal();
+  _routineEdit(routineId);
+}
+
+// ── ROUTINES END ── all logic
+// ═══════════════════════════════════════════════════════════
+
 const _TAB_RENDERERS = {
   today:       [renderToday],
   money:       [renderMoneyDashboard],
@@ -13812,6 +14122,7 @@ const _TAB_RENDERERS = {
   vehicles:    [renderVehicles],
   documents:   [renderDocuments],
   maintenance: [renderMaintenance],
+  routines:    [renderRoutines],    // ── ROUTINES ──
 };
 
 function _activeTab() {
