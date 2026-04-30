@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Toto</title>
   <link rel="manifest" href="/home-budget/manifest.json">
   <meta name="theme-color" content="#ffffff">
@@ -584,6 +584,143 @@
     .cv2-age-tween .cv2-bal-badge { background:#1e293b; border:1px solid #334155; }
     .cv2-age-tween .cv2-card--warm { background:#fafaf8; border-color:#e2e8f0; }
 
+    /* Child overlay — bottom nav */
+    .cv2-bottom-nav {
+      display: flex; background: #fff; border-top: 1px solid #e2e8f0;
+      flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .cv2-bn-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px; padding: 10px 0 11px;
+      border: none; background: none; cursor: pointer;
+      font-size: 10px; font-weight: 600; color: #94a3b8;
+      transition: color .15s; position: relative;
+    }
+    .cv2-bn-item.active { color: #5B4CF5; }
+    .cv2-bn-icon { font-size: 22px; line-height: 1; }
+    .cv2-bn-label { font-size: 10px; font-weight: 600; }
+    .cv2-bn-item.active::after {
+      content: ''; position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%); width: 20px; height: 3px;
+      border-radius: 99px 99px 0 0; background: #5B4CF5;
+    }
+    .cv2-bn-badge {
+      position: absolute; top: 8px; right: calc(50% - 18px);
+      background: #ef4444; color: #fff; font-size: 9px; font-weight: 800;
+      min-width: 16px; height: 16px; border-radius: 99px; padding: 0 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* Tween dark nav */
+    .cv2-age-tween .cv2-bottom-nav { background: #0f172a; border-top-color: #1e293b; }
+    .cv2-age-tween .cv2-bn-item     { color: #475569; }
+    .cv2-age-tween .cv2-bn-item.active { color: #a78bfa; }
+    .cv2-age-tween .cv2-bn-item.active::after { background: #a78bfa; }
+    /* Tiny Tots: no nav at all */
+    .cv2-age-tiny .cv2-bottom-nav { display: none !important; }
+    /* Early Readers: same nav but hide month toggle in calendar */
+    .cv2-age-early .cv-cal-month-toggle { display:none !important; }
+
+    /* Today events section */
+    .cv2-event-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 15px; border-bottom: 1px solid #f8fafc;
+    }
+    .cv2-event-row:last-child { border-bottom: none; }
+    .cv2-event-time { font-size: 11px; font-weight: 700; color: #94a3b8; min-width: 44px; text-align: right; flex-shrink: 0; }
+    .cv2-event-bar  { width: 3px; border-radius: 99px; align-self: stretch; min-height: 18px; flex-shrink: 0; background: #10b981; }
+    .cv2-event-emoji { font-size: 18px; flex-shrink: 0; }
+    .cv2-event-body { flex: 1; min-width: 0; }
+    .cv2-event-title { font-size: 14px; font-weight: 600; color: #1e293b; }
+    .cv2-event-sub   { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+
+    /* Prizes tab */
+    .cv2-prizes-balance {
+      background: linear-gradient(135deg, #5B4CF5, #7C3AED);
+      border-radius: 18px; padding: 20px; margin-bottom: 18px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cv2-prizes-balance-left { color: #fff; }
+    .cv2-prizes-balance-pts  { font-size: 36px; font-weight: 900; line-height: 1; }
+    .cv2-prizes-balance-lbl  { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 2px; }
+    .cv2-prizes-balance-emoji { font-size: 48px; opacity: .85; }
+    .cv2-age-tween .cv2-prizes-balance { background: #1e293b; }
+
+    .cv2-redeem-history-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-bottom: 1px solid #f8fafc;
+    }
+    .cv2-redeem-history-row:last-child { border-bottom: none; }
+
+    /* See my week shortcut */
+    .cv2-week-shortcut {
+      display:block; width:100%; margin-bottom:16px;
+      padding:11px 16px; background:#f5f3ff; border:1.5px solid #ddd6fe;
+      border-radius:12px; color:#5B4CF5; font-size:13px; font-weight:700;
+      cursor:pointer; text-align:left;
+    }
+
+    /* Calendar — month grid */
+    .cv-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin:8px 0 12px; }
+    .cv-cal-day-hdr { text-align:center; font-size:10px; font-weight:700; color:#94a3b8; padding:4px 0; text-transform:uppercase; letter-spacing:.5px; }
+    .cv-cal-cell { border-radius:8px; padding:5px 3px; min-height:46px; background:#fff; border:1px solid #f1f5f9; cursor:pointer; transition:background .1s; }
+    .cv-cal-cell:active { background:#f5f3ff; }
+    .cv-cal-cell.cv-today { border-color:#5B4CF5; background:#f5f3ff; }
+    .cv-cal-cell.cv-other { opacity:.3; pointer-events:none; }
+    .cv-cal-cell--sel { border-color:#5B4CF5 !important; background:#ede9fe !important; }
+    .cv-cal-cell--sel .cv-cal-cell-num { color:#5B4CF5; }
+    .cv-cal-cell-num { font-size:11px; font-weight:700; color:#64748b; margin-bottom:3px; text-align:center; }
+    .cv-cal-cell.cv-today .cv-cal-cell-num { color:#5B4CF5; }
+    .cv-cal-dot { width:6px; height:6px; border-radius:50%; margin:1px auto; }
+
+    /* Calendar — 7-day strip */
+    .cv-week-strip { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin:8px 0 14px; }
+    .cv-week-cell { border-radius:12px; padding:9px 4px; text-align:center; background:#fff; border:1px solid #f1f5f9; cursor:pointer; transition:background .15s; }
+    .cv-week-cell.cv-today { background:#5B4CF5; border-color:#5B4CF5; }
+    .cv-week-dow { font-size:9px; font-weight:700; color:#94a3b8; text-transform:uppercase; }
+    .cv-week-cell.cv-today .cv-week-dow { color:rgba(255,255,255,.7); }
+    .cv-week-date { font-size:15px; font-weight:800; color:#1e293b; margin:3px 0; }
+    .cv-week-cell.cv-today .cv-week-date { color:#fff; }
+
+    /* Day detail panel */
+    .cv-day-detail { padding:0; }
+    .cv-day-detail-hdr { display:flex; align-items:center; gap:12px; padding:14px 0 10px; }
+    .cv-day-detail-back { background:none; border:none; font-size:24px; cursor:pointer; color:#5B4CF5; line-height:1; padding:0; }
+    .cv-day-detail-title { font-size:15px; font-weight:800; color:#1e293b; }
+
+    /* Schedule items */
+    .cv-sched-section-hdr { font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:#94a3b8; margin:14px 0 6px 2px; }
+    .cv-sched-item { background:#fff; border-radius:14px; border:1px solid #e2e8f0; margin-bottom:8px; overflow:hidden; }
+    .cv-sched-row { display:flex; align-items:center; gap:10px; padding:11px 13px; }
+    .cv-sched-time { font-size:11px; font-weight:700; color:#94a3b8; min-width:38px; flex-shrink:0; text-align:right; }
+    .cv-sched-color-bar { width:3px; border-radius:99px; align-self:stretch; flex-shrink:0; min-height:20px; }
+    .cv-sched-emoji { font-size:18px; flex-shrink:0; }
+    .cv-sched-body { flex:1; min-width:0; }
+    .cv-sched-title { font-size:14px; font-weight:600; color:#1e293b; }
+    .cv-sched-sub { font-size:11px; color:#94a3b8; margin-top:1px; }
+    .cv-sched-tag { font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; flex-shrink:0; }
+    .cv-sched-progress { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .cv-sched-prog-bar { width:36px; height:4px; background:#f1f5f9; border-radius:99px; overflow:hidden; }
+    .cv-sched-prog-fill { height:100%; border-radius:99px; background:#5B4CF5; transition:width .3s; }
+    .cv-sched-expand-btn { background:none; border:none; font-size:13px; color:#94a3b8; cursor:pointer; padding:0 4px; flex-shrink:0; line-height:1; }
+
+    /* Routine step rows inside schedule */
+    .cv-sched-steps { border-top:1px solid #f1f5f9; padding:4px 0 6px; }
+    .cv-sched-step { display:flex; align-items:center; gap:10px; padding:9px 13px; border-bottom:1px solid #f8fafc; cursor:pointer; user-select:none; }
+    .cv-sched-step:last-child { border-bottom:none; }
+    .cv-sched-step-check { width:22px; height:22px; border-radius:50%; flex-shrink:0; border:2px solid #cbd5e1; display:flex; align-items:center; justify-content:center; transition:all .18s; }
+    .cv-sched-step-check--done { border-color:#5B4CF5; background:#5B4CF5; }
+    .cv-sched-step-emoji { font-size:16px; flex-shrink:0; }
+    .cv-sched-step-label { flex:1; font-size:13px; font-weight:500; color:#1e293b; }
+    .cv-sched-step-label--done { color:#94a3b8; text-decoration:line-through; }
+    .cv-sched-step-pts { font-size:10px; font-weight:700; background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:99px; flex-shrink:0; }
+
+    /* Month view day panel */
+    .cv-month-day-panel { margin-top:12px; border-top:2px solid #5B4CF5; padding-top:12px; }
+    .cv-month-day-panel-title { font-size:14px; font-weight:800; color:#1e293b; margin-bottom:10px; }
+
+    .cv-event-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .cv-event-tag { font-size:10px; font-weight:700; padding:2px 7px; border-radius:99px; flex-shrink:0; }
+
     /* Adult read-only banner */
     .cv2-readonly-bar {
       background:#1e293b; color:#fff;
@@ -904,7 +1041,8 @@
       align-items: center;
       justify-content: center;
       z-index: 100;
-      padding: 20px;
+      /* Push modal above bottom nav (56px) + safe area on iOS */
+      padding: 20px 20px calc(56px + env(safe-area-inset-bottom, 16px)) 20px;
     }
 
     .modal-overlay.hidden { display: none; }
@@ -948,11 +1086,15 @@
     }
     .modal-close:hover { background: var(--border); }
 
-    .modal-body { padding: 0 24px 8px; overflow-y: auto; flex: 1; min-width: 0; }
-    .modal-body::-webkit-scrollbar { display: none; }
+    .modal-body {
+      padding: 0 24px 12px; overflow-y: auto; flex: 1; min-width: 0;
+    }
+    .modal-body::-webkit-scrollbar { width: 4px; }
+    .modal-body::-webkit-scrollbar-track { background: transparent; }
+    .modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
     .modal-body > div, .modal-body .form-group { min-width: 0; }
     .modal-body [style*="display:grid"] > * { min-width: 0; }
-    .modal-footer { padding: 12px 24px 20px; display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; border-top: 1px solid var(--border); }
+    .modal-footer { padding: 12px 24px 16px; display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; border-top: 1px solid var(--border); }
 
     /* ─── Form fields ─────────────────────────── */
     .form-group { margin-bottom: 16px; }
@@ -971,7 +1113,8 @@
       border: 1.5px solid var(--border);
       border-radius: 10px;
       padding: 11px 14px;
-      font-size: 14px;
+      /* 16px prevents iOS auto-zoom on focus */
+      font-size: 16px;
       color: var(--text);
       background: var(--surface);
       transition: border-color 0.15s, box-shadow 0.15s;
@@ -979,7 +1122,7 @@
       font-family: inherit;
       box-sizing: border-box;
     }
-    input[type="time"].form-input { padding: 11px 6px; font-size: 12px; min-width: 0 !important; max-width: 100% !important; width: 100% !important; display: block; box-sizing: border-box; -webkit-appearance: none; appearance: none; overflow: hidden; }
+    input[type="time"].form-input { padding: 11px 6px; font-size: 16px; min-width: 0 !important; max-width: 100% !important; width: 100% !important; display: block; box-sizing: border-box; -webkit-appearance: none; appearance: none; overflow: hidden; }
     .form-input:focus, .form-select:focus {
       border-color: #0891b2;
       box-shadow: 0 0 0 3px rgba(8,145,178,0.12);
@@ -3137,6 +3280,22 @@
     <div id="cv-nudge" class="cv2-nudge" style="display:none"></div>
   </div>
   <div id="cv-content" class="cv2-body"></div>
+  <!-- Bottom nav — hidden for Tiny Tots -->
+  <div id="cv-nav" class="cv2-bottom-nav" style="display:none">
+    <button class="cv2-bn-item active" id="cv-nav-today" onclick="_cvSwitchTab('today',null)">
+      <span class="cv2-bn-icon">☀️</span>
+      <span class="cv2-bn-label">Today</span>
+    </button>
+    <button class="cv2-bn-item" id="cv-nav-calendar" onclick="_cvSwitchTab('calendar',null)">
+      <span class="cv2-bn-icon">📅</span>
+      <span class="cv2-bn-label">Calendar</span>
+    </button>
+    <button class="cv2-bn-item" id="cv-nav-prizes" onclick="_cvSwitchTab('prizes',null)">
+      <span class="cv2-bn-icon">🏆</span>
+      <span class="cv2-bn-label">Prizes</span>
+      <span class="cv2-bn-badge" id="cv-prizes-badge" style="display:none"></span>
+    </button>
+  </div>
 </div>
 
 <!-- ─── Adult PIN setup modal ─── -->
@@ -3755,8 +3914,9 @@ const DEFAULT_DATA = {
   ],
   // ── ROUTINES START ── default state
   routines: [],
-  routineAssignments: []
+  routineAssignments: [],
   // ── ROUTINES END ── default state
+  childEvents: []
 };
 
 function loadData() {
@@ -3776,7 +3936,15 @@ function loadData() {
     if (!d.subscriptions) d.subscriptions = [];
     if (d.onboarded === undefined) d.onboarded = true; // existing users skip onboarding
     if (!d.planner) d.planner = { events: [] };
-    if (d.planner?.events) d.planner.events.forEach(e => { if (!e.recurring) e.recurring = 'none'; });
+    if (d.planner?.events) d.planner.events.forEach(e => {
+      if (!e.recurring) e.recurring = 'none';
+      // Migrate legacy recurring string → rich recurrence object
+      if (!e.recurrence && e.recurring && e.recurring !== 'none') {
+        const legacyMap = { weekly:{type:'interval',intervalDays:7}, fortnightly:{type:'interval',intervalDays:14}, monthly:{type:'interval',intervalDays:30}, quarterly:{type:'interval',intervalDays:91}, yearly:{type:'interval',intervalDays:365} };
+        const mapped = legacyMap[e.recurring];
+        if (mapped) e.recurrence = { ...mapped, startDate: e.date || new Date().toISOString().slice(0,10) };
+      }
+    });
     if (!d.kids) d.kids = { profiles: [], chores: [], prizes: [], completions: [], redemptions: [] };
     if (!d.kids.profiles)    d.kids.profiles    = [];
     if (!d.kids.chores)      d.kids.chores      = [];
@@ -3851,6 +4019,9 @@ function loadData() {
       if (!r.linkedType)        r.linkedType        = null;
       if (r.pointsPerCompletion === undefined) r.pointsPerCompletion = 0;
       (r.steps || []).forEach(s => { if (s.points === undefined) s.points = 0; });
+      if (!r.skippedDates)  r.skippedDates  = [];
+      if (!r.pausePeriods)  r.pausePeriods  = [];
+      if (!r.recurrence)    r.recurrence    = { type: 'daily', startDate: (r.lastEditedAt || new Date().toISOString()).slice(0,10) };
       // Scope repair: derive ownerType from routineAssignments rather than defaulting
       // everything to 'adult'. A routine that appears in routineAssignments is household-scoped.
       if (!r.ownerType || !r.ownerId) {
@@ -3893,6 +4064,12 @@ function loadData() {
     // After backfilling, clear completions from household routines — they now live on assignments
     d.routines.forEach(r => {
       if (r.ownerType === 'household') r.completions = {};
+    });
+    if (!d.childEvents) d.childEvents = [];
+    d.childEvents.forEach(ev => {
+      if (!ev.recurrence)                 ev.recurrence      = null;
+      if (!ev.assignedTo)                 ev.assignedTo      = [];
+      if (ev.isHouseholdWide === undefined) ev.isHouseholdWide = false;
     });
     // ── ROUTINES END ── migration
     if (!d.settings) d.settings = { autoFillMonths: false };
@@ -4450,6 +4627,8 @@ function showChildView(kidId) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
   if (!kid) return;
 
+  _cvActiveKidId = kidId;
+  _cvActiveTab   = 'today';
   const k       = state.kids;
   const bal     = kidBalance(k, kid.id);
   const bracket = _cvAgeBracket(kid);
@@ -4486,8 +4665,22 @@ function showChildView(kidId) {
   if (isTiny)  ov.classList.add('cv2-age-tiny');
   if (isTween) ov.classList.add('cv2-age-tween');
 
+  // Show/hide nav bar; reset to Today tab
+  const navEl = document.getElementById('cv-nav');
+  if (navEl) navEl.style.display = isTiny ? 'none' : '';
+  document.getElementById('cv-nav-today')?.classList.add('active');
+  document.getElementById('cv-nav-calendar')?.classList.remove('active');
+  document.getElementById('cv-nav-prizes')?.classList.remove('active');
+  // Update prizes badge
+  _cvUpdatePrizesBadge(kid);
+
   // ── ROUTINES START ── child view section
-  const myAssignments = (state.routineAssignments || []).filter(a => a.childId === kid.id);
+  const todayStr      = new Date().toISOString().slice(0, 10);
+  const myAssignments = (state.routineAssignments || []).filter(a => {
+    if (a.childId !== kid.id) return false;
+    const r = (state.routines || []).find(r => r.id === a.routineId);
+    return r && _routineMatchesDate(r, todayStr);
+  });
   const todayKey      = _routineTodayKey();
   let routinesHtml    = '';
   let totalTasksDone  = 0;
@@ -4617,39 +4810,56 @@ function showChildView(kidId) {
     </div>`;
   }
 
-  // Prize store (always visible)
-  const prizes = k.prizes || [];
-  // Tiny Tots: show star strip instead of numeric balance
-  const balDisplay = isTiny
-    ? `<span class="cv2-bal-badge">${'⭐'.repeat(Math.min(bal, 10))}${bal > 10 ? '+' : ''}</span>`
-    : `<span class="cv2-bal-badge">⭐ ${bal} pts</span>`;
-
-  let prizeStoreHtml = `<div class="cv2-group">
-    <div class="cv2-group-heading">🏆 Prize Store</div>
-    <div class="cv2-card cv2-card--warm">
-      <div class="cv2-prize-header">
-        <span class="cv2-prize-header-title">${isTiny ? '🎁 Prizes' : 'Prizes'}</span>
-        ${balDisplay}
-      </div>`;
-  if (!prizes.length) {
-    prizeStoreHtml += `<div style="padding:12px 16px 16px;font-size:13px;color:#94a3b8;text-align:center">No prizes set up yet</div>`;
-  } else {
-    prizes.forEach(pr => {
-      const canAfford = bal >= pr.pointCost;
-      prizeStoreHtml += `<div class="cv2-prize">
-        <span class="cv2-prize-emoji">${pr.emoji || '🎁'}</span>
-        <div class="cv2-prize-info">
-          <div class="cv2-prize-name">${escHtml(pr.name)}</div>
-          ${!isTiny ? `<div class="cv2-prize-cost">⭐ ${pr.pointCost} points</div>` : ''}
+  // Today's events (child events + everyone planner events, sorted by time, hidden if none)
+  const { events: todayEvents } = _cvEventsForDate(kid, todayStr);
+  const sortedEvents = [...todayEvents].sort((a,b) => (a.time||'99:99').localeCompare(b.time||'99:99'));
+  let eventsHtml = '';
+  if (sortedEvents.length && !isTiny) {
+    let rows = sortedEvents.map(ev => `
+      <div class="cv2-event-row">
+        <span class="cv2-event-time">${ev.time ? _cvFmt12h(ev.time) : ''}</span>
+        <div class="cv2-event-bar"></div>
+        <span class="cv2-event-emoji">${ev.emoji}</span>
+        <div class="cv2-event-body">
+          <div class="cv2-event-title">${escHtml(ev.label)}</div>
+          ${ev.notes ? `<div class="cv2-event-sub">${escHtml(ev.notes)}</div>` : ''}
         </div>
-        <button class="cv2-prize-btn ${canAfford ? 'cv2-prize-btn--can' : 'cv2-prize-btn--cant'}"
-          ${canAfford && !ro ? `onclick="_cvShowPrizeConfirm('${kid.id}','${pr.id}')"` : 'disabled'}>
-          ${canAfford ? (isTiny ? '🎁' : 'Redeem') : (isTiny ? '🔒' : `⭐ ${pr.pointCost}`)}
-        </button>
-      </div>`;
-    });
+      </div>`).join('');
+    eventsHtml = `<div class="cv2-group">
+      <div class="cv2-group-heading">📅 Today's Events</div>
+      <div class="cv2-card">${rows}</div>
+    </div>`;
   }
-  prizeStoreHtml += `</div></div>`;
+
+  // Prizes teaser — tap to go to Prizes tab (shown for non-tiny, non-read-only)
+  const prizes = k.prizes || [];
+  const affordable = prizes.filter(pr => bal >= pr.pointCost);
+  let prizeStoreHtml = '';
+  if (!isTiny) {
+    const teaserContent = affordable.length
+      ? `<div style="display:flex;align-items:center;gap:10px;padding:14px 15px">
+          <span style="font-size:28px">${affordable[0].emoji || '🎁'}</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#1e293b">You can afford ${affordable.length} prize${affordable.length>1?'s':''}!</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:1px">⭐ ${bal} pts · Tap to visit the Prize Store</div>
+          </div>
+          <span style="font-size:18px;color:#94a3b8">›</span>
+        </div>`
+      : `<div style="display:flex;align-items:center;gap:10px;padding:14px 15px">
+          <span style="font-size:28px">🏆</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#1e293b">Prize Store</div>
+            <div style="font-size:11px;color:#94a3b8;margin-top:1px">⭐ ${bal} pts · Keep earning!</div>
+          </div>
+          <span style="font-size:18px;color:#94a3b8">›</span>
+        </div>`;
+    prizeStoreHtml = `<div class="cv2-group">
+      <div class="cv2-group-heading">🏆 Prizes</div>
+      <div class="cv2-card cv2-card--warm" style="cursor:pointer" onclick="_cvSwitchTab('prizes','${kid.id}')">
+        ${teaserContent}
+      </div>
+    </div>`;
+  }
 
   // Prize / chore approval notifications (unread for this kid)
   const notifs = (k.notifications || []).filter(n => n.kidId === kid.id && !n.read);
@@ -4678,9 +4888,12 @@ function showChildView(kidId) {
       <div class="cv2-celeb-title">${isTiny ? '🎉 Yay!' : `Amazing work, ${escHtml(kid.name)}!`}</div>
       <div class="cv2-celeb-sub">${isTiny ? 'All done! You\'re a star!' : 'You\'ve finished everything for today. You\'re a superstar! ⭐'}</div>
     </div>
-    ${prizeStoreHtml}`;
+    ${eventsHtml}${lbHtml}${prizeStoreHtml}`;
   } else {
     mainHtml = notifHtml;
+    if (bracket !== 'tiny-tots' && !ro) {
+      mainHtml += `<button class="cv2-week-shortcut" onclick="_cvSwitchTab('calendar','${kid.id}')">📅 See my week →</button>`;
+    }
     if (myAssignments.length) {
       mainHtml += `<div class="cv2-group">
         <div class="cv2-group-heading">📋 My Routines</div>
@@ -4693,6 +4906,7 @@ function showChildView(kidId) {
         <div class="cv2-card">${choresHtml}</div>
       </div>`;
     }
+    mainHtml += eventsHtml;
     mainHtml += lbHtml;
     mainHtml += prizeStoreHtml;
   }
@@ -4704,6 +4918,471 @@ function showChildView(kidId) {
 
   if (allDoneToday && !ro) _cvConfetti();
 }
+
+// ── Prizes tab ──────────────────────────────────────────────────
+
+function _cvUpdatePrizesBadge(kid) {
+  const badgeEl = document.getElementById('cv-prizes-badge');
+  if (!badgeEl) return;
+  const k = state.kids;
+  const bal = kidBalance(k, kid.id);
+  const unreadNotifs = (k.notifications || []).filter(n => n.kidId === kid.id && !n.read).length;
+  const newlyAffordable = (k.prizes || []).filter(p => bal >= p.pointCost).length;
+  const count = unreadNotifs + (newlyAffordable > 0 && unreadNotifs === 0 ? newlyAffordable : 0);
+  if (count > 0) {
+    badgeEl.textContent = count > 9 ? '9+' : String(count);
+    badgeEl.style.display = '';
+  } else {
+    badgeEl.style.display = 'none';
+  }
+}
+
+function _cvRenderPrizesTab(kid) {
+  const k   = state.kids;
+  const bal = kidBalance(k, kid.id);
+  const bracket = _cvAgeBracket(kid);
+  const isTiny  = bracket === 'tiny-tots';
+  const ro      = _cvReadOnly;
+  const prizes  = k.prizes || [];
+
+  // Mark notifications as read when the user visits Prizes tab
+  let notifsDirty = false;
+  (k.notifications || []).filter(n => n.kidId === kid.id && !n.read).forEach(n => {
+    n.read = true; notifsDirty = true;
+  });
+  if (notifsDirty) saveData(state);
+  _cvUpdatePrizesBadge(kid);
+
+  const balDisplay = isTiny
+    ? `${'⭐'.repeat(Math.min(bal, 10))}${bal > 10 ? '+' : ''}`
+    : `${bal}`;
+
+  // Balance hero
+  let html = `<div class="cv2-prizes-balance">
+    <div class="cv2-prizes-balance-left">
+      <div class="cv2-prizes-balance-pts">${isTiny ? balDisplay : `⭐ ${balDisplay}`}</div>
+      <div class="cv2-prizes-balance-lbl">${isTiny ? 'stars earned' : 'points to spend'}</div>
+    </div>
+    <span class="cv2-prizes-balance-emoji">🏆</span>
+  </div>`;
+
+  // Prize list
+  html += `<div class="cv2-group-heading" style="margin-bottom:8px">Prizes</div>`;
+  if (!prizes.length) {
+    html += `<div style="text-align:center;padding:24px 0;color:#94a3b8;font-size:13px">No prizes set up yet</div>`;
+  } else {
+    html += `<div class="cv2-card cv2-card--warm" style="margin-bottom:18px">`;
+    prizes.forEach(pr => {
+      const canAfford = bal >= pr.pointCost;
+      html += `<div class="cv2-prize">
+        <span class="cv2-prize-emoji">${pr.emoji || '🎁'}</span>
+        <div class="cv2-prize-info">
+          <div class="cv2-prize-name">${escHtml(pr.name)}</div>
+          ${!isTiny ? `<div class="cv2-prize-cost">⭐ ${pr.pointCost} points</div>` : ''}
+        </div>
+        <button class="cv2-prize-btn ${canAfford ? 'cv2-prize-btn--can' : 'cv2-prize-btn--cant'}"
+          ${canAfford && !ro ? `onclick="_cvShowPrizeConfirm('${kid.id}','${pr.id}')"` : 'disabled'}>
+          ${canAfford ? (isTiny ? '🎁' : 'Redeem') : (isTiny ? '🔒' : `⭐ ${pr.pointCost}`)}
+        </button>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Redemption history
+  const history = (k.redemptions || [])
+    .filter(r => r.kidId === kid.id)
+    .sort((a,b) => (b.ts||b.requestedAt||0) > (a.ts||a.requestedAt||0) ? 1 : -1)
+    .slice(0, 8);
+  if (history.length) {
+    html += `<div class="cv2-group-heading" style="margin-bottom:8px">Recent</div>`;
+    html += `<div class="cv2-card">`;
+    history.forEach(r => {
+      const pr = prizes.find(p => p.id === r.prizeId);
+      if (!pr) return;
+      const statusMap = {
+        approved: { label:'✓ Approved', bg:'#f0fdf4', color:'#15803d' },
+        rejected: { label:'Declined',   bg:'#fef2f2', color:'#b91c1c' },
+        pending:  { label:'⏳ Waiting', bg:'#fffbeb', color:'#854d0e' },
+      };
+      const s = statusMap[r.status] || statusMap.pending;
+      const when = r.approvedAt || r.ts || r.requestedAt;
+      const whenLabel = when ? new Date(when).toLocaleDateString('en-AU', { day:'numeric', month:'short' }) : '';
+      html += `<div class="cv2-redeem-history-row">
+        <span style="font-size:20px">${pr.emoji || '🎁'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:#1e293b">${escHtml(pr.name)}</div>
+          ${whenLabel ? `<div style="font-size:11px;color:#94a3b8">${whenLabel}</div>` : ''}
+        </div>
+        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;background:${s.bg};color:${s.color}">${s.label}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  const contentEl = document.getElementById('cv-content');
+  if (contentEl) contentEl.innerHTML = html;
+}
+
+// ── CHILD CALENDAR START ────────────────────────────────────────
+let _cvActiveKidId   = null;
+let _cvActiveTab     = 'today';
+let _cvCalView       = '7day';   // '7day' | 'month'
+let _cvSelectedDate  = null;     // tapped day in month view
+let _cvExpandedRoutines = new Set(); // routineIds expanded in day schedule
+
+function _cvSwitchTab(tab, kidId) {
+  if (kidId) _cvActiveKidId = kidId;
+  _cvActiveTab = tab;
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(_cvActiveKidId));
+  if (!kid) return;
+  const bracket = _cvAgeBracket(kid);
+  const navEl   = document.getElementById('cv-nav');
+  if (navEl) navEl.style.display = bracket === 'tiny-tots' ? 'none' : '';
+  document.getElementById('cv-nav-today')?.classList.toggle('active', tab === 'today');
+  document.getElementById('cv-nav-calendar')?.classList.toggle('active', tab === 'calendar');
+  document.getElementById('cv-nav-prizes')?.classList.toggle('active', tab === 'prizes');
+  if (tab === 'today') {
+    showChildView(_cvActiveKidId);
+  } else if (tab === 'prizes') {
+    _cvRenderPrizesTab(kid);
+  } else {
+    _cvSelectedDate = null;
+    _cvRenderCalendar(kid);
+  }
+}
+
+// Returns rich event objects for a given date, keeping full refs for schedule rendering.
+function _cvEventsForDate(kid, dateStr) {
+  // Routines — include routine+assignment ref for step rendering
+  const routines = (state.routineAssignments || [])
+    .filter(a => a.childId === kid.id)
+    .map(a => {
+      const r = (state.routines || []).find(r => r.id === a.routineId);
+      return r && _routineMatchesDate(r, dateStr) ? { type:'routine', routine:r, assignment:a, label:r.name, emoji:r.emoji, color:'#7C3AED', tag:'Routine', time:r.triggerTime||null } : null;
+    }).filter(Boolean);
+
+  // Child events (assigned specifically to this kid, all kids, or household-wide)
+  const childEvs = (state.childEvents || []).filter(ev => {
+    const ids = Array.isArray(ev.assignedTo) ? ev.assignedTo : [ev.assignedTo];
+    const assigned = ids.includes(kid.id) || ids.includes('all') || ev.isHouseholdWide;
+    if (!assigned) return false;
+    return ev.recurrence ? _recurrenceMatchesDate(ev.recurrence, dateStr) : ev.date === dateStr;
+  }).map(ev => ({ type:'event', label:ev.title, emoji:ev.emoji||'📅', color:'#10b981', tag:'Event', notes:ev.notes, time:ev.time||null }));
+
+  // Planner events assigned to 'everyone' — these belong on every family member's calendar
+  const plannerEvs = (state.planner?.events || []).filter(ev => {
+    const ids = _plannerEvMemberIds(ev);
+    if (!ids.includes('everyone')) return false;
+    if (ev.recurrence && ev.recurrence.type !== 'one_time') return _recurrenceMatchesDate(ev.recurrence, dateStr);
+    if (ev.endDate && ev.endDate > ev.date) return dateStr >= ev.date && dateStr <= ev.endDate;
+    return ev.date === dateStr;
+  }).map(ev => ({ type:'event', label:ev.title, emoji: (PLANNER_CATS[ev.category]?.emoji || '📅'), color:'#10b981', tag:'Event', notes:ev.notes||'', time:ev.time||null }));
+
+  const events = [...childEvs, ...plannerEvs];
+
+  // Chores — no time, shown at bottom
+  const chores = (state.kids?.chores || [])
+    .filter(c => (c.assignedTo === kid.id || c.assignedTo === 'all') && !c._isRoutine)
+    .map(c => ({ type:'chore', label:c.name, emoji:c.emoji||'📋', color:'#ec4899', tag:'Chore', time:null }));
+
+  return { routines, events, chores };
+}
+
+// Formats HH:MM → 9:30 am
+function _cvFmt12h(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'pm' : 'am'}`;
+}
+
+// Toggle a routine expanded/collapsed in the day schedule
+function _cvToggleRoutineExpand(routineId) {
+  if (_cvExpandedRoutines.has(routineId)) _cvExpandedRoutines.delete(routineId);
+  else _cvExpandedRoutines.add(routineId);
+  // Re-render just the schedule panel without losing scroll position
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(_cvActiveKidId));
+  if (!kid) return;
+  if (_cvCalView === '7day' || _cvAgeBracket(kid) === 'early-reader') {
+    const todayStr = new Date().toISOString().slice(0,10);
+    _cvRefreshSchedulePanel(kid, todayStr);
+  } else {
+    _cvRefreshSchedulePanel(kid, _cvSelectedDate);
+  }
+}
+
+// Tick a routine step from the calendar (writes to completionState for that date)
+function _cvToggleStepFromCal(routineId, stepId, dateStr) {
+  if (_cvReadOnly) return;
+  const assignment = _routineGetAssignment(routineId, _cvActiveKidId);
+  if (!assignment) return;
+  if (!assignment.completionState) assignment.completionState = {};
+  const key = dateStr; // use the calendar date, not necessarily today
+  if (!assignment.completionState[key]) assignment.completionState[key] = [];
+  const idx = assignment.completionState[key].indexOf(stepId);
+  const ticking = idx === -1;
+  if (ticking) assignment.completionState[key].push(stepId);
+  else assignment.completionState[key].splice(idx, 1);
+
+  // Award points only when ticking on today
+  const todayStr = new Date().toISOString().slice(0,10);
+  if (ticking && dateStr === todayStr) {
+    const routine = (state.routines || []).find(r => r.id === routineId);
+    if (routine) {
+      const step = routine.steps.find(s => s.id === stepId);
+      if ((step?.points || 0) > 0) _routineAwardStepPoints(routine, step, _cvActiveKidId);
+      const total = routine.steps.length;
+      const done  = assignment.completionState[key].length;
+      if (done === total && total > 0 && (routine.pointsPerCompletion || 0) > 0)
+        _routineAwardPoints(routine, _cvActiveKidId);
+    }
+  }
+
+  saveData(state);
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(_cvActiveKidId));
+  if (kid) _cvRefreshSchedulePanel(kid, dateStr);
+}
+
+// Re-renders only the schedule panel (below the strip/grid) without touching the calendar chrome
+function _cvRefreshSchedulePanel(kid, dateStr) {
+  const panelId = _cvCalView === 'month' ? 'cv-day-panel' : 'cv-schedule-panel';
+  const el = document.getElementById(panelId);
+  if (!el) return;
+  el.innerHTML = _cvScheduleHtml(kid, dateStr);
+}
+
+// Builds the full day schedule HTML for a given kid + date
+function _cvScheduleHtml(kid, dateStr) {
+  if (!dateStr) return '';
+  const { routines, events, chores } = _cvEventsForDate(kid, dateStr);
+  const dateKey = dateStr; // completionState key
+
+  if (!routines.length && !events.length && !chores.length) {
+    return `<div style="text-align:center;padding:28px 0;color:#94a3b8;font-size:13px">Nothing scheduled</div>`;
+  }
+
+  // Merge routines + events, sort by time
+  const timed = [
+    ...routines.map(r => ({ ...r, sortKey: r.time || '23:59' })),
+    ...events.map(e => ({ ...e, sortKey: e.time || '23:59' }))
+  ].sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+  let html = '';
+
+  if (timed.length) {
+    html += `<div class="cv-sched-section-hdr">Schedule</div>`;
+    timed.forEach(item => {
+      if (item.type === 'routine') {
+        html += _cvRoutineSchedCard(item.routine, item.assignment, dateKey);
+      } else {
+        html += `<div class="cv-sched-item">
+          <div class="cv-sched-row">
+            <span class="cv-sched-time">${item.time ? _cvFmt12h(item.time) : ''}</span>
+            <div class="cv-sched-color-bar" style="background:${item.color}"></div>
+            <span class="cv-sched-emoji">${item.emoji}</span>
+            <div class="cv-sched-body">
+              <div class="cv-sched-title">${escHtml(item.label)}</div>
+              ${item.notes ? `<div class="cv-sched-sub">${escHtml(item.notes)}</div>` : ''}
+            </div>
+            <span class="cv-sched-tag" style="background:${item.color}20;color:${item.color}">${item.tag}</span>
+          </div>
+        </div>`;
+      }
+    });
+  }
+
+  if (chores.length) {
+    html += `<div class="cv-sched-section-hdr">Chores</div>`;
+    chores.forEach(c => {
+      const pending = (state.kids?.completions || []).some(x => x.kidId === kid.id && x.choreId === (state.kids?.chores||[]).find(ch=>ch.name===c.label)?.id && x.status === 'pending');
+      html += `<div class="cv-sched-item">
+        <div class="cv-sched-row">
+          <span class="cv-sched-time"></span>
+          <div class="cv-sched-color-bar" style="background:${c.color}"></div>
+          <span class="cv-sched-emoji">${c.emoji}</span>
+          <div class="cv-sched-body">
+            <div class="cv-sched-title">${escHtml(c.label)}</div>
+          </div>
+          ${pending ? `<span class="cv-sched-tag" style="background:#fef9c320;color:#854d0e">Waiting ✓</span>` : `<span class="cv-sched-tag" style="background:${c.color}20;color:${c.color}">Chore</span>`}
+        </div>
+      </div>`;
+    });
+  }
+
+  return html;
+}
+
+// Builds a single expandable routine card for the schedule
+function _cvRoutineSchedCard(routine, assignment, dateKey) {
+  const done     = assignment.completionState?.[dateKey] || [];
+  const total    = routine.steps.length;
+  const pct      = total > 0 ? Math.round(done.length / total * 100) : 0;
+  const allDone  = done.length === total && total > 0;
+  const expanded = _cvExpandedRoutines.has(routine.id);
+
+  const progressHtml = total > 0 ? `
+    <div class="cv-sched-progress">
+      <div class="cv-sched-prog-bar"><div class="cv-sched-prog-fill" style="width:${pct}%"></div></div>
+      <span style="font-size:11px;color:#94a3b8;font-weight:600">${done.length}/${total}</span>
+    </div>` : '';
+
+  let stepsHtml = '';
+  if (expanded && total > 0) {
+    stepsHtml = `<div class="cv-sched-steps">`;
+    routine.steps.forEach(step => {
+      const isDone   = done.includes(step.id);
+      const canTick  = !_cvReadOnly;
+      const check    = isDone ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>` : '';
+      stepsHtml += `<div class="cv-sched-step" ${canTick ? `onclick="_cvToggleStepFromCal(${JSON.stringify(routine.id)},${JSON.stringify(step.id)},'${dateKey}')"` : 'style="cursor:default"'}>
+        <div class="cv-sched-step-check${isDone ? ' cv-sched-step-check--done' : ''}">${check}</div>
+        <span class="cv-sched-step-emoji">${step.emoji}</span>
+        <span class="cv-sched-step-label${isDone ? ' cv-sched-step-label--done' : ''}">${escHtml(step.label)}</span>
+        ${step.points > 0 ? `<span class="cv-sched-step-pts">⭐ ${step.points}</span>` : ''}
+      </div>`;
+    });
+    stepsHtml += `</div>`;
+    if (allDone) {
+      stepsHtml += `<div style="text-align:center;padding:8px;font-size:12px;font-weight:700;color:#5B4CF5;background:#f5f3ff">✓ All done! 🎉</div>`;
+    }
+  }
+
+  return `<div class="cv-sched-item">
+    <div class="cv-sched-row" style="cursor:pointer" onclick="_cvToggleRoutineExpand(${JSON.stringify(routine.id)})">
+      <span class="cv-sched-time">${routine.triggerTime ? _cvFmt12h(routine.triggerTime) : ''}</span>
+      <div class="cv-sched-color-bar" style="background:#7C3AED"></div>
+      <span class="cv-sched-emoji">${routine.emoji}</span>
+      <div class="cv-sched-body">
+        <div class="cv-sched-title">${escHtml(routine.name)}</div>
+        ${allDone ? `<div class="cv-sched-sub" style="color:#5B4CF5;font-weight:700">✓ Complete</div>` : routine.triggerTime ? `<div class="cv-sched-sub">${_cvFmt12h(routine.triggerTime)}</div>` : ''}
+      </div>
+      ${progressHtml}
+      <button class="cv-sched-expand-btn">${expanded ? '▲' : '▼'}</button>
+    </div>
+    ${stepsHtml}
+  </div>`;
+}
+
+function _cvRenderCalendar(kid) {
+  if (!kid) return;
+  const bracket   = _cvAgeBracket(kid);
+  const isEarly   = bracket === 'early-reader';
+  const view      = isEarly ? '7day' : _cvCalView;
+  const todayStr  = new Date().toISOString().slice(0, 10);
+  const contentEl = document.getElementById('cv-content');
+  if (!contentEl) return;
+
+  let html = '';
+  if (!isEarly) {
+    html += `<div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="cv2-nav-tab cv-cal-month-toggle" style="border-radius:99px;padding:6px 16px;flex:none;${view==='7day'?'color:#5B4CF5;border-bottom-color:#5B4CF5':''}"
+        onclick="_cvCalViewToggle('7day','${kid.id}')">Week</button>
+      <button class="cv2-nav-tab cv-cal-month-toggle" style="border-radius:99px;padding:6px 16px;flex:none;${view==='month'?'color:#5B4CF5;border-bottom-color:#5B4CF5':''}"
+        onclick="_cvCalViewToggle('month','${kid.id}')">Month</button>
+    </div>`;
+  }
+  html += view === '7day' ? _cvRender7Day(kid, todayStr) : _cvRenderMonth(kid, todayStr);
+  contentEl.innerHTML = html;
+}
+
+function _cvCalViewToggle(view, kidId) {
+  _cvCalView = view;
+  _cvSelectedDate = null;
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (kid) _cvRenderCalendar(kid);
+}
+
+function _cvRender7Day(kid, todayStr) {
+  const DOW = ['S','M','T','W','T','F','S'];
+  const anchor = new Date(todayStr + 'T12:00:00');
+  let html = `<div class="cv-week-strip">`;
+  for (let i = 0; i < 7; i++) {
+    const d  = new Date(anchor); d.setDate(anchor.getDate() + i);
+    const ds = d.toISOString().slice(0, 10);
+    const isT = ds === todayStr;
+    const { routines, events, chores } = _cvEventsForDate(kid, ds);
+    const allItems = [...routines, ...events, ...chores];
+    const dots = allItems.slice(0,3).map(e=>`<div class="cv-cal-dot" style="background:${e.color}"></div>`).join('');
+    html += `<div class="cv-week-cell ${isT?'cv-today':''}" onclick="_cvWeekDayTap('${ds}','${kid.id}')">
+      <div class="cv-week-dow">${DOW[d.getDay()]}</div>
+      <div class="cv-week-date">${d.getDate()}</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:3px">${dots}</div>
+    </div>`;
+  }
+  html += `</div>`;
+  // Today's schedule below the strip
+  const dateLabel = new Date(todayStr + 'T12:00:00').toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long' });
+  html += `<div style="font-size:13px;font-weight:700;color:#1e293b;margin:10px 0 2px">${escHtml(dateLabel)}</div>`;
+  html += `<div id="cv-schedule-panel">${_cvScheduleHtml(kid, todayStr)}</div>`;
+  return html;
+}
+
+// Tapping a day in 7-day view updates the schedule panel below
+function _cvWeekDayTap(dateStr, kidId) {
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (!kid) return;
+  _cvExpandedRoutines.clear();
+  // Update selected day highlighting
+  document.querySelectorAll('.cv-week-cell').forEach(el => {
+    el.classList.toggle('cv-today', el.getAttribute('onclick')?.includes(`'${dateStr}'`));
+  });
+  const dateLabel = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long' });
+  const panelEl = document.getElementById('cv-schedule-panel');
+  if (panelEl) {
+    panelEl.previousElementSibling.textContent = dateLabel;
+    panelEl.innerHTML = _cvScheduleHtml(kid, dateStr);
+  }
+}
+
+function _cvRenderMonth(kid, todayStr) {
+  const now   = new Date(todayStr + 'T12:00:00');
+  const year  = now.getFullYear(), month = now.getMonth();
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DOW_H  = ['S','M','T','W','T','F','S'];
+  const firstDow    = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const selDate     = _cvSelectedDate || todayStr;
+
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <span style="font-size:14px;font-weight:800;color:#1e293b">${MONTHS[month]} ${year}</span>
+  </div>`;
+  html += `<div class="cv-cal-grid">`;
+  DOW_H.forEach(d => { html += `<div class="cv-cal-day-hdr">${d}</div>`; });
+  for (let i = 0; i < firstDow; i++) html += `<div class="cv-cal-cell cv-other"></div>`;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const ds  = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const isT = ds === todayStr;
+    const isSel = ds === selDate;
+    const { routines, events, chores } = _cvEventsForDate(kid, ds);
+    const allItems = [...routines, ...events, ...chores];
+    const dots = allItems.slice(0,3).map(e=>`<div class="cv-cal-dot" style="background:${e.color}"></div>`).join('');
+    html += `<div class="cv-cal-cell ${isT?'cv-today':''} ${isSel&&!isT?'cv-cal-cell--sel':''}" onclick="_cvMonthDayTap('${ds}','${kid.id}')">
+      <div class="cv-cal-cell-num">${day}</div>
+      <div style="display:flex;flex-direction:column;align-items:center">${dots}</div>
+    </div>`;
+  }
+  html += `</div>`;
+
+  // Day detail panel below grid
+  const panelLabel = new Date(selDate + 'T12:00:00').toLocaleDateString('en-AU', { weekday:'long', day:'numeric', month:'long' });
+  html += `<div class="cv-month-day-panel">
+    <div class="cv-month-day-panel-title">${escHtml(panelLabel)}</div>
+    <div id="cv-day-panel">${_cvScheduleHtml(kid, selDate)}</div>
+  </div>`;
+  return html;
+}
+
+function _cvMonthDayTap(dateStr, kidId) {
+  _cvSelectedDate = dateStr;
+  _cvExpandedRoutines.clear();
+  const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
+  if (kid) _cvRenderCalendar(kid);
+}
+
+function _cvShowDayDetail(dateStr, kidId) {
+  // Legacy — redirects to the new inline panel system
+  _cvMonthDayTap(dateStr, kidId);
+}
+// ── CHILD CALENDAR END ──────────────────────────────────────────
 
 function _cvDismissNotif(notifId, kidId) {
   const n = (state.kids?.notifications || []).find(x => x.id === notifId);
@@ -4722,7 +5401,7 @@ function _cvShowPrizeConfirm(kidId, prizeId) {
     <button class="cv2-confirm-send" onclick="redeemPrizeChildView('${kidId}','${prizeId}')">
       Send request ✉️
     </button>
-    <button class="cv2-confirm-cancel" onclick="showChildView('${kidId}')">Cancel</button>
+    <button class="cv2-confirm-cancel" onclick="_cvSwitchTab('prizes','${kidId}')">Cancel</button>
   </div>`;
   document.getElementById('cv-content').innerHTML = html;
 }
@@ -4738,7 +5417,7 @@ function markChoreChildView(kidId, choreId) {
 function redeemPrizeChildView(kidId, prizeId) {
   state.kids.redemptions.push({ id: uid(), kidId, prizeId, status: 'pending', ts: new Date().toISOString() });
   saveData(state);
-  showChildView(kidId);
+  _cvSwitchTab('prizes', kidId);
 }
 
 function switchToKidMode(kidId) {
@@ -12112,43 +12791,6 @@ function deleteExpense(id) {
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
 
-// ─────────────────────────────────────────────────
-// EXPORT / IMPORT
-// ─────────────────────────────────────────────────
-
-function exportData() {
-  const json = JSON.stringify(state, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const date = new Date().toISOString().slice(0,10);
-  a.href = url;
-  a.download = `home-finance-backup-${date}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (!imported.buildContract || !imported.budget) throw new Error('Invalid file');
-      if (!confirm('This will replace all current data. Continue?')) return;
-      state = imported;
-      logActivity('Imported backup data', file.name);
-      saveData(state);
-      renderAll();
-      alert('Data imported successfully.');
-    } catch(err) {
-      alert('Import failed: invalid file format.');
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
 
 // ─────────────────────────────────────────────────
 // RENDER ALL
@@ -14622,12 +15264,21 @@ let _cvReadOnly = false;
 
 function viewChildToday(kidId) {
   _cvReadOnly = true;
-  // Show readonly bar, hide sign-out button
   const bar = document.getElementById('cv-readonly-bar');
   const btn = document.getElementById('cv-signout-btn');
   if (bar) bar.style.display = '';
   if (btn) btn.style.display = 'none';
   showChildView(kidId);
+}
+
+function _cvViewCalendar(kidId) {
+  _cvReadOnly = true;
+  const bar = document.getElementById('cv-readonly-bar');
+  const btn = document.getElementById('cv-signout-btn');
+  if (bar) bar.style.display = '';
+  if (btn) btn.style.display = 'none';
+  showChildView(kidId);
+  setTimeout(() => { _cvSwitchTab('calendar', kidId); }, 50);
 }
 
 function exitChildView() {
@@ -14647,6 +15298,31 @@ function exitChildView() {
   }
 }
 
+// ── Shared recurrence engine (used by routines + child calendar) ──
+// Pure function — reads no state, has no side effects.
+function _recurrenceMatchesDate(recurrence, dateStr) {
+  if (!recurrence) return true;
+  const { type, days, intervalDays, startDate, endDate } = recurrence;
+  if (startDate && dateStr < startDate) return false;
+  if (endDate   && dateStr > endDate)   return false;
+  const d = new Date(dateStr + 'T12:00:00');
+  const dow = d.getDay(); // 0=Sun..6=Sat
+  switch (type) {
+    case 'daily':         return true;
+    case 'weekdays':      return dow >= 1 && dow <= 5;
+    case 'weekends':      return dow === 0 || dow === 6;
+    case 'specific_days': return Array.isArray(days) && days.includes(String(dow));
+    case 'interval': {
+      if (!startDate || !intervalDays) return false;
+      const start = new Date(startDate + 'T12:00:00');
+      const diff  = Math.round((d - start) / 86400000);
+      return diff >= 0 && diff % intervalDays === 0;
+    }
+    case 'one_time': return dateStr === startDate;
+    default:         return true;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════
 // ── ROUTINES START ── all logic contained here (v3)
 // To remove: delete this block + CSS block + tab panel HTML +
@@ -14654,6 +15330,14 @@ function exitChildView() {
 // DEFAULT_DATA.routines/routineAssignments + loadData() migration +
 // _renderRoutinesTodayCard() call in renderToday().
 // ═══════════════════════════════════════════════════════════
+
+// Returns true if a routine should be shown/active on the given date.
+function _routineMatchesDate(routine, dateStr) {
+  if (!routine) return false;
+  if ((routine.pausePeriods || []).some(p => dateStr >= p.from && (!p.to || dateStr <= p.to))) return false;
+  if ((routine.skippedDates || []).includes(dateStr)) return false;
+  return _recurrenceMatchesDate(routine.recurrence || null, dateStr);
+}
 
 // ── Suggestion library (not stored in state) ─────────────────
 const ROUTINE_SUGGESTIONS = {
@@ -14849,7 +15533,8 @@ function _routineIntelNudge() {
 // ── Today card ────────────────────────────────────────────────
 
 function _renderRoutinesTodayCard() {
-  const myRoutines = _routinesForCurrentUser();
+  const todayStr   = new Date().toISOString().slice(0, 10);
+  const myRoutines = _routinesForCurrentUser().filter(r => _routineMatchesDate(r, todayStr));
   if (!myRoutines.length) return '';
   const now = new Date();
   const hour = now.getHours();
@@ -14930,7 +15615,8 @@ function _renderAdultRoutines() {
   });
   if (claimed) _routineSaveValidated('lazy-uid-claim');
 
-  const myRoutines = _routinesForCurrentUser();
+  const todayStr   = new Date().toISOString().slice(0, 10);
+  const myRoutines = _routinesForCurrentUser().filter(r => _routineMatchesDate(r, todayStr));
   const todayKey   = _routineTodayKey();
   let html = '';
 
@@ -14979,12 +15665,19 @@ function _renderAdultRoutines() {
       </div>`;
     }).join('');
 
+    // Icon buttons for the card header — always visible actions
+    const skippedToday = (routine.skippedDates || []).includes(new Date().toISOString().slice(0,10));
+    const headerIcons = canEdit ? `
+      <button class="btn btn-sm btn-ghost" onclick="_routineSkipDay(${routine.id})" title="${skippedToday ? 'Un-skip today' : 'Skip today'}" style="${skippedToday ? 'color:#d97706' : ''}">${skippedToday ? '⏭' : '⏭'}</button>
+      <button class="btn btn-sm btn-ghost" onclick="_routinePauseMenu(${routine.id})" title="Pause">⏸</button>
+      <button class="btn btn-sm btn-ghost" onclick="_routineEdit(${routine.id})" title="Edit">✏️</button>
+      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDelete(${routine.id})" title="Delete">🗑</button>` : '';
+
+    // Bottom row: secondary actions only
     let btns = `<button class="btn btn-sm btn-secondary" onclick="_routineResetToday(${routine.id})">↺ Reset today</button>
       <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory(${routine.id},null)">📅 History</button>`;
     if (canEdit) {
-      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineEdit(${routine.id})">✏️ Edit</button>
-        <button class="btn btn-sm btn-secondary" onclick="_routineShareMenu(${routine.id})">👥 Share</button>
-        <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto" onclick="_routineDelete(${routine.id})">Delete</button>`;
+      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineShareMenu(${routine.id})">👥 Share</button>`;
     } else if (isJoined) {
       btns += `<button class="btn btn-sm btn-secondary" onclick="_routineDuplicateFromJoined(${routine.id})">📋 Duplicate to mine</button>
         <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto" onclick="_routineLeave(${routine.id})">Leave</button>`;
@@ -14996,12 +15689,13 @@ function _renderAdultRoutines() {
     html += `<div class="routine-card">
       <div class="routine-card-header">
         <div class="routine-card-title">${routine.emoji} ${escHtml(routine.name)}</div>
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          ${streak > 0 ? `<span class="routine-streak">🔥 ${streak}d</span>` : ''}
-          ${ownerBadge}
+        <div style="display:flex;align-items:center;gap:2px;flex-wrap:wrap">
+          ${streak > 0 ? `<span class="routine-streak" style="margin-right:4px">🔥 ${streak}d</span>` : ''}
+          ${ownerBadge ? `<span style="margin-right:4px">${ownerBadge}</span>` : ''}
+          ${headerIcons}
         </div>
       </div>
-      <div class="routine-card-meta">${totalMins ? `${totalMins}min · ` : ''}${routine.triggerTime}</div>
+      <div class="routine-card-meta">${totalMins ? `${totalMins}min · ` : ''}${routine.triggerTime}${skippedToday ? ' · <span style="color:#d97706;font-weight:700">Skipped today</span>' : ''}</div>
       <div class="routine-progress-row">
         <div class="routine-progress-bar-wrap"><div class="routine-progress-bar-fill" style="width:${pct}%"></div></div>
         <span class="routine-progress-label">${done.length}/${total}</span>
@@ -15193,15 +15887,19 @@ function _renderChildRoutines(kids) {
         </div>
       </div>`).join('');
 
+    const childSkippedToday = (routine.skippedDates || []).includes(new Date().toISOString().slice(0,10));
     html += `<div class="routine-card">
       <div class="routine-card-header">
         <div class="routine-card-title">${routine.emoji} ${escHtml(routine.name)}</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:11px;color:var(--text-muted)">${routine.triggerTime}</span>
+        <div style="display:flex;align-items:center;gap:2px">
+          <span style="font-size:11px;color:var(--text-muted);margin-right:4px">${routine.triggerTime}</span>
+          <button class="btn btn-sm btn-ghost" onclick="_routineSkipDay(${routine.id})" title="${childSkippedToday ? 'Un-skip today' : 'Skip today'}" style="${childSkippedToday ? 'color:#d97706' : ''}">⏭</button>
+          <button class="btn btn-sm btn-ghost" onclick="_routinePauseMenu(${routine.id})" title="Pause">⏸</button>
           <button class="btn btn-sm btn-ghost" onclick="_routineEdit(${routine.id})" title="Edit">✏️</button>
           <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteChild(${routine.id})" title="Delete">🗑</button>
         </div>
       </div>
+      ${childSkippedToday ? `<div style="font-size:11px;color:#d97706;font-weight:700;margin-bottom:8px">⏭ Skipped today</div>` : ''}
 
       <!-- Assigned children -->
       <div style="margin-bottom:12px">
@@ -15220,6 +15918,7 @@ function _renderChildRoutines(kids) {
 
       <!-- Actions -->
       <div class="routine-card-btns" style="margin-top:12px">
+        <button class="btn btn-sm btn-secondary" onclick="_routineResetTodayAllKids(${routine.id})">↺ Reset today</button>
         <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory(${routine.id},null)">📅 History</button>
         ${routine.pointsPerCompletion > 0 ? `<span style="font-size:12px;color:var(--text-muted);align-self:center">⭐ ${routine.pointsPerCompletion} pts</span>` : ''}
       </div>
@@ -15354,10 +16053,72 @@ function _routineResetToday(routineId) {
   saveData(state); renderRoutines();
 }
 
+function _routineSkipDay(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const today = new Date().toISOString().slice(0, 10);
+  if (!routine.skippedDates) routine.skippedDates = [];
+  if (routine.skippedDates.includes(today)) {
+    routine.skippedDates = routine.skippedDates.filter(d => d !== today);
+  } else {
+    routine.skippedDates.push(today);
+  }
+  saveData(state); renderRoutines();
+}
+
+function _routinePauseMenu(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  if (!routine.pausePeriods) routine.pausePeriods = [];
+  const today = new Date().toISOString().slice(0, 10);
+  const activePauses = routine.pausePeriods.filter(p => !p.to || p.to >= today);
+  const pauseListHtml = activePauses.length
+    ? `<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Active pauses</div>${
+        activePauses.map((p,i) => `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border)">
+          <span style="flex:1">${p.from}${p.to ? ' → '+p.to : ' (indefinite)'}${p.reason ? ' · '+escHtml(p.reason) : ''}</span>
+          <button class="btn btn-ghost btn-sm" style="color:#ef4444;padding:2px 6px" onclick="_routineRemovePause(${routineId},${routine.pausePeriods.indexOf(p)})">Remove</button>
+        </div>`).join('')
+      }</div>` : '';
+  openModal('Pause routine', `
+    ${pauseListHtml}
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">Add pause period</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div><label class="form-label">From</label>
+        <input class="form-input" id="rp-from" type="date" value="${today}" style="width:150px"></div>
+      <div><label class="form-label">Until <span style="font-size:11px;color:var(--text-muted)">(optional)</span></label>
+        <input class="form-input" id="rp-to" type="date" style="width:150px"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Reason (optional)</label>
+      <input class="form-input" id="rp-reason" placeholder="e.g. School holidays" maxlength="60"></div>
+  `, () => {
+    const from   = document.getElementById('rp-from')?.value;
+    if (!from) return;
+    const to     = document.getElementById('rp-to')?.value   || undefined;
+    const reason = document.getElementById('rp-reason')?.value.trim() || undefined;
+    routine.pausePeriods.push({ from, to, reason });
+    saveData(state); closeModal(); renderRoutines();
+  });
+}
+
+function _routineRemovePause(routineId, pauseIdx) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine || !routine.pausePeriods) return;
+  routine.pausePeriods.splice(pauseIdx, 1);
+  saveData(state); closeModal(); renderRoutines();
+}
+
 function _routineResetTodayKid(routineId, childId) {
   const assignment = _routineGetAssignment(routineId, childId);
   if (!assignment) return;
   if (assignment.completionState) delete assignment.completionState[_routineTodayKey()];
+  saveData(state); renderRoutines();
+}
+
+function _routineResetTodayAllKids(routineId) {
+  const key = _routineTodayKey();
+  (state.routineAssignments || []).filter(a => a.routineId === routineId).forEach(a => {
+    if (a.completionState) delete a.completionState[key];
+  });
   saveData(state); renderRoutines();
 }
 
@@ -15471,6 +16232,7 @@ function _routineEdit(routineId) {
       <input class="form-input" id="re-time" type="time" value="${routine.triggerTime}" style="width:130px">
     </div>
     ${pointsField}
+    ${_routineRecurrenceFormHtml(routine.recurrence)}
     <div class="form-group"><label class="form-label">Steps</label><div>${stepsRows}</div></div>
   `, () => {
     const name  = document.getElementById('re-name')?.value.trim();
@@ -15483,10 +16245,12 @@ function _routineEdit(routineId) {
       const pts = parseInt(document.getElementById('re-pts')?.value);
       if (!isNaN(pts)) routine.pointsPerCompletion = pts;
     }
+    routine.recurrence   = _routineRecurrenceCollect();
     routine.lastEditedBy = _routineCurrentUserId();
     routine.lastEditedAt = new Date().toISOString();
     saveData(state); closeModal(); renderRoutines();
   });
+  setTimeout(() => { _routineRecurrenceSummaryUpdate(); }, 100);
 }
 
 // fromEditModal: true = re-open the Edit routine modal after deletion
@@ -15593,6 +16357,83 @@ function _routineToggleAssignment(routineId, childId) {
 // Simplified: just type (Adult/Child), name, emoji, time.
 // Assignment happens after creation on the card itself.
 
+// ── Recurrence form helpers ───────────────────────────────────
+
+function _routineRecurrenceFormHtml(rec) {
+  const t   = rec?.type         || 'daily';
+  const sD  = rec?.startDate    || new Date().toISOString().slice(0, 10);
+  const eD  = rec?.endDate      || '';
+  const iDy = rec?.intervalDays || 2;
+  const sel = rec?.days         || [];
+  const DOW = [['1','Mon'],['2','Tue'],['3','Wed'],['4','Thu'],['5','Fri'],['6','Sat'],['0','Sun']];
+  return `
+    <div class="form-group">
+      <label class="form-label">Repeat</label>
+      <select class="form-input" id="rn-rec-type" onchange="_routineRecurrenceTypeChange()" style="width:100%;max-width:240px">
+        <option value="daily"         ${t==='daily'         ?'selected':''}>Every day</option>
+        <option value="weekdays"      ${t==='weekdays'      ?'selected':''}>Weekdays only (Mon–Fri)</option>
+        <option value="weekends"      ${t==='weekends'      ?'selected':''}>Weekends only</option>
+        <option value="specific_days" ${t==='specific_days' ?'selected':''}>Specific days…</option>
+        <option value="interval"      ${t==='interval'      ?'selected':''}>Every N days…</option>
+        <option value="one_time"      ${t==='one_time'      ?'selected':''}>One time only</option>
+      </select>
+    </div>
+    <div id="rn-rec-days" style="display:${t==='specific_days'?'flex':'none'};gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      ${DOW.map(([v,l])=>`<label style="display:flex;align-items:center;cursor:pointer;padding:5px 10px;border-radius:99px;border:1.5px solid ${sel.includes(v)?'var(--primary)':'var(--border)'};background:${sel.includes(v)?'var(--primary-light)':'transparent'};font-size:12px;font-weight:600">
+        <input type="checkbox" value="${v}" name="rn-rec-dow" ${sel.includes(v)?'checked':''} style="display:none" onchange="_routineRecurrenceSummaryUpdate()"> ${l}
+      </label>`).join('')}
+    </div>
+    <div id="rn-rec-interval" style="display:${t==='interval'?'flex':'none'};align-items:center;gap:8px;margin-bottom:12px">
+      <label class="form-label" style="margin:0;white-space:nowrap">Every</label>
+      <input class="form-input" id="rn-rec-interval-days" type="number" min="2" max="365" value="${iDy}" style="width:70px" oninput="_routineRecurrenceSummaryUpdate()">
+      <span style="font-size:13px;color:var(--text-muted)">days</span>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+      <div><label class="form-label">Start date</label>
+        <input class="form-input" id="rn-rec-start" type="date" value="${sD}" style="width:150px"></div>
+      <div><label class="form-label">End date <span style="font-size:11px;color:var(--text-muted)">(optional)</span></label>
+        <input class="form-input" id="rn-rec-end" type="date" value="${eD}" style="width:150px"></div>
+    </div>
+    <div id="rn-rec-summary" style="font-size:12px;color:var(--primary);font-weight:600;padding:8px 12px;background:var(--primary-light);border-radius:8px;margin-bottom:4px"></div>`;
+}
+
+function _routineRecurrenceTypeChange() {
+  const t = document.getElementById('rn-rec-type')?.value;
+  if (!t) return;
+  document.getElementById('rn-rec-days').style.display     = t === 'specific_days' ? 'flex' : 'none';
+  document.getElementById('rn-rec-interval').style.display = t === 'interval'      ? 'flex' : 'none';
+  _routineRecurrenceSummaryUpdate();
+}
+
+function _routineRecurrenceSummaryUpdate() {
+  const el = document.getElementById('rn-rec-summary');
+  if (!el) return;
+  const t = document.getElementById('rn-rec-type')?.value;
+  const MAP = { daily:'Every day', weekdays:'Mon – Fri', weekends:'Sat & Sun', one_time:'Once only' };
+  if (MAP[t]) { el.textContent = MAP[t]; return; }
+  if (t === 'specific_days') {
+    const names = [...document.querySelectorAll('input[name="rn-rec-dow"]:checked')]
+      .map(c => (['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][c.value]));
+    el.textContent = names.length ? names.join(', ') : 'No days selected';
+  } else if (t === 'interval') {
+    const n = document.getElementById('rn-rec-interval-days')?.value || 2;
+    el.textContent = `Every ${n} days`;
+  }
+}
+
+function _routineRecurrenceCollect() {
+  const t = document.getElementById('rn-rec-type')?.value || 'daily';
+  const startDate = document.getElementById('rn-rec-start')?.value || new Date().toISOString().slice(0, 10);
+  const endDate   = document.getElementById('rn-rec-end')?.value || undefined;
+  const rec = { type: t, startDate };
+  if (endDate) rec.endDate = endDate;
+  if (t === 'specific_days')
+    rec.days = [...document.querySelectorAll('input[name="rn-rec-dow"]:checked')].map(c => c.value);
+  if (t === 'interval')
+    rec.intervalDays = parseInt(document.getElementById('rn-rec-interval-days')?.value) || 2;
+  return rec;
+}
+
 function _routineCreate(preselectType) {
   // preselectType: undefined = default to 'adult', 'child' = child tab context
   const defaultIsChild = preselectType === 'child';
@@ -15627,6 +16468,7 @@ function _routineCreate(preselectType) {
       <input class="form-input" id="rn-pts" type="number" min="0" max="999" placeholder="0" style="width:90px">
       <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Awarded when the child completes all steps</div>
     </div>
+    ${_routineRecurrenceFormHtml(null)}
   `, () => {
     const name = document.getElementById('rn-name')?.value.trim();
     if (!name) return;
@@ -15636,12 +16478,14 @@ function _routineCreate(preselectType) {
     const pts        = parseInt(document.getElementById('rn-pts')?.value) || 0;
     const currentUid = _routineCurrentUserId();
     const routineId  = _routineNextId();
+    const recurrence = _routineRecurrenceCollect();
 
     if (type === 'adult') {
       const r = { id: routineId, name, emoji, triggerTime: time,
         steps: [], completions: {}, assignedTo: [],
         ownerType: 'adult', ownerId: currentUid,
-        sharedWith: [], linkedFrom: null, linkedType: null, pointsPerCompletion: 0 };
+        sharedWith: [], linkedFrom: null, linkedType: null, pointsPerCompletion: 0,
+        recurrence, skippedDates: [], pausePeriods: [] };
       _routineAssertScope(r);
       state.routines.push(r);
       _routineSaveValidated('create:adult');
@@ -15652,7 +16496,8 @@ function _routineCreate(preselectType) {
         steps: [], completions: {}, assignedTo: [],
         ownerType: 'household', ownerId: 'household',
         sharedWith: [], linkedFrom: null, linkedType: null, pointsPerCompletion: pts,
-        createdBy: currentUid, lastEditedBy: currentUid, lastEditedAt: new Date().toISOString() };
+        createdBy: currentUid, lastEditedBy: currentUid, lastEditedAt: new Date().toISOString(),
+        recurrence, skippedDates: [], pausePeriods: [] };
       _routineAssertScope(r);
       state.routines.push(r);
       _routineSaveValidated('create:child');
@@ -15661,7 +16506,7 @@ function _routineCreate(preselectType) {
     }
     renderRoutines();
   });
-  setTimeout(() => document.getElementById('rn-name')?.focus(), 100);
+  setTimeout(() => { document.getElementById('rn-name')?.focus(); _routineRecurrenceSummaryUpdate(); }, 100);
 }
 
 function _routineTypeSelect(type) {
@@ -15898,6 +16743,7 @@ function renderKidsParent(el, k, pendingCount) {
     { id: 'chores',   label: 'Chores' },
     { id: 'prizes',   label: 'Prize Shelf' },
     { id: 'approvals',label: `Approvals${pendingCount ? ` <span style="background:#ef4444;color:#fff;border-radius:99px;padding:1px 7px;font-size:11px;vertical-align:middle;margin-left:4px">${pendingCount}</span>` : ''}` },
+    { id: 'events',   label: '📅 Events' },
   ];
 
   let html = `
@@ -15913,6 +16759,7 @@ function renderKidsParent(el, k, pendingCount) {
   else if (kidsParentTab === 'chores')  html += renderChoreMgmt(k);
   else if (kidsParentTab === 'prizes')  html += renderPrizeMgmt(k);
   else if (kidsParentTab === 'approvals') html += renderApprovals(k);
+  else if (kidsParentTab === 'events')    html += _renderChildEventsMgmt();
   el.innerHTML = html;
 }
 
@@ -15949,6 +16796,9 @@ function renderKidsOverview(k) {
         </button>
         <button onclick="viewChildToday('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;font-size:12px;color:#5B4CF5;font-weight:600;cursor:pointer">
           👁 View ${escHtml(kid.name)}'s Today
+        </button>
+        <button onclick="_cvViewCalendar('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:12px;color:#15803d;font-weight:600;cursor:pointer">
+          📅 View ${escHtml(kid.name)}'s Calendar
         </button>
         <button onclick="openPinSetup('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:${kid.pinHash?'#f0fdf4':'#fffbeb'};border:1px solid ${kid.pinHash?'#bbf7d0':'#fde68a'};border-radius:8px;font-size:12px;color:${kid.pinHash?'#15803d':'#854d0e'};font-weight:600;cursor:pointer">
           ${kid.pinHash ? '🔒 PIN set — change' : '🔓 Set PIN for login'}
@@ -16129,6 +16979,99 @@ function renderKidView(el, k, kid) {
   el.innerHTML = html;
 }
 
+// ── Child Events management ─────────────────────────
+function _renderChildEventsMgmt() {
+  const events = state.childEvents || [];
+  const kids   = state.kids?.profiles || [];
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <span style="font-size:15px;font-weight:600">Child Events</span>
+    <button class="btn btn-primary btn-sm" onclick="_openChildEventModal()">+ Add Event</button>
+  </div>`;
+  if (!events.length) {
+    return html + `<div style="text-align:center;padding:40px 20px;color:#64748b">
+      <div style="font-size:36px;margin-bottom:10px">📅</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">No events yet</div>
+      <div style="font-size:13px">Add activities, appointments and school days for your kids</div>
+    </div>`;
+  }
+  const sorted = [...events].sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  sorted.forEach(ev => {
+    const ids = Array.isArray(ev.assignedTo) ? ev.assignedTo : [ev.assignedTo];
+    const who = ev.isHouseholdWide || ids.includes('all')
+      ? 'All kids'
+      : ids.map(id => kids.find(k=>k.id===id)?.name || '?').join(', ');
+    const recLabel = ev.recurrence ? ` · 🔁 ${({daily:'Daily',weekdays:'Weekdays',weekends:'Weekends',specific_days:'Selected days',interval:`Every ${ev.recurrence.intervalDays}d`,one_time:'Once'})[ev.recurrence.type]||''}` : '';
+    html += `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px">
+      <span style="font-size:22px">${ev.emoji||'📅'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:#1e293b">${escHtml(ev.title)}</div>
+        <div style="font-size:11px;color:#64748b">${ev.date||''}${ev.time?' · '+ev.time:''}${recLabel} · ${who}</div>
+      </div>
+      <button onclick="_openChildEventModal('${ev.id}')" class="btn btn-ghost btn-sm">✏️</button>
+      <button onclick="_deleteChildEvent('${ev.id}')" class="btn btn-ghost btn-sm" style="color:#ef4444">🗑</button>
+    </div>`;
+  });
+  return html;
+}
+
+const CHILD_EVENT_EMOJIS = ['📅','⚽','🏊','🎓','🎂','🎨','🏃','🎭','🚌','🎡','🏖','🎪'];
+
+function _openChildEventModal(id) {
+  const ev   = id ? (state.childEvents||[]).find(e=>e.id===id) : null;
+  const kids = state.kids?.profiles || [];
+  openModal(ev ? 'Edit Event' : 'Add Event', `
+    ${id ? `<input type="hidden" id="ce-id" value="${id}">` : ''}
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Title</label>
+        <input class="form-input" id="ce-title" value="${escAttr(ev?.title||'')}" placeholder="e.g. Swimming lesson" autofocus maxlength="50"></div>
+      <div><label class="form-label">Emoji</label>
+        <input class="form-input" id="ce-emoji" value="${ev?.emoji||'📅'}" maxlength="4" style="width:64px"></div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div class="form-group"><label class="form-label">Date</label>
+        <input class="form-input" id="ce-date" type="date" value="${ev?.date||new Date().toISOString().slice(0,10)}" style="width:150px"></div>
+      <div class="form-group"><label class="form-label">Time (optional)</label>
+        <input class="form-input" id="ce-time" type="time" value="${ev?.time||''}" style="width:130px"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Assign to</label>
+      <select class="form-input" id="ce-who" style="max-width:240px">
+        <option value="all" ${(!ev||(ev.isHouseholdWide||ev.assignedTo==='all'||ev.assignedTo?.includes?.('all')))?'selected':''}>All kids</option>
+        ${kids.map(k=>`<option value="${k.id}" ${(Array.isArray(ev?.assignedTo)&&ev.assignedTo.includes(k.id))?'selected':''}>${k.emoji||''} ${escHtml(k.name)}</option>`).join('')}
+      </select>
+    </div>
+    ${_routineRecurrenceFormHtml(ev?.recurrence||null)}
+    <div class="form-group"><label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="ce-notes" value="${escAttr(ev?.notes||'')}" placeholder="e.g. Bring water bottle" maxlength="200"></div>
+  `, () => {
+    const title = document.getElementById('ce-title')?.value.trim();
+    if (!title) return;
+    const emoji = document.getElementById('ce-emoji')?.value.trim() || '📅';
+    const date  = document.getElementById('ce-date')?.value;
+    const time  = document.getElementById('ce-time')?.value || undefined;
+    const who   = document.getElementById('ce-who')?.value;
+    const notes = document.getElementById('ce-notes')?.value.trim() || '';
+    const recurrence = _routineRecurrenceCollect();
+    const existingId = document.getElementById('ce-id')?.value;
+    if (!state.childEvents) state.childEvents = [];
+    if (existingId) {
+      const existing = state.childEvents.find(e=>e.id===existingId);
+      if (existing) Object.assign(existing, { title, emoji, date, time, notes, recurrence, isHouseholdWide: who==='all', assignedTo: who==='all'?'all':[who] });
+    } else {
+      state.childEvents.push({ id:uid(), title, emoji, date, time, notes, recurrence,
+        assignedTo: who==='all'?'all':[who], isHouseholdWide: who==='all',
+        createdBy: _routineCurrentUserId() });
+    }
+    saveData(state); closeModal(); renderKids();
+  });
+  setTimeout(() => { _routineRecurrenceSummaryUpdate(); }, 100);
+}
+
+function _deleteChildEvent(id) {
+  if (!confirm('Delete this event?')) return;
+  state.childEvents = (state.childEvents||[]).filter(e=>e.id!==id);
+  saveData(state); renderKids();
+}
+
 // ── Actions ────────────────────────────────────────
 function markChoreDone(choreId, kidId) {
   state.kids.completions.push({ id: uid(), choreId, kidId, completedAt: Date.now(), status: 'pending' });
@@ -16240,6 +17183,16 @@ function deleteKid(id) {
   state.kids.redemptions  = state.kids.redemptions.filter(r => r.kidId !== id);
   if (state.meals?.lunchbox?.profiles) {
     state.meals.lunchbox.profiles = state.meals.lunchbox.profiles.filter(p => p.id !== id);
+  }
+  if (state.childEvents) {
+    state.childEvents = state.childEvents.filter(ev => {
+      if (ev.isHouseholdWide) return true;
+      const ids = Array.isArray(ev.assignedTo) ? ev.assignedTo : [ev.assignedTo];
+      const remaining = ids.filter(x => x !== id);
+      if (!remaining.length) return false;
+      ev.assignedTo = remaining;
+      return true;
+    });
   }
   // If this device was assigned to the deleted kid, reset to adult
   if (getDeviceProfile() === id) { setDeviceProfile('adult'); }
@@ -18148,6 +19101,24 @@ function _plannerEvWhoLabel(ev) {
   return ids.map(id => _plannerMemberById(id).name).join(', ');
 }
 
+// Returns a human-readable recurrence label for an event, or '' if one-time.
+function _plannerRecurrenceLabel(ev) {
+  // New rich recurrence
+  if (ev.recurrence && ev.recurrence.type && ev.recurrence.type !== 'one_time') {
+    const MAP = { daily:'Every day', weekdays:'Mon–Fri', weekends:'Sat & Sun' };
+    if (MAP[ev.recurrence.type]) return MAP[ev.recurrence.type];
+    if (ev.recurrence.type === 'specific_days') {
+      const names = (ev.recurrence.days||[]).map(d => ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]).join(', ');
+      return names || 'Specific days';
+    }
+    if (ev.recurrence.type === 'interval') return `Every ${ev.recurrence.intervalDays} days`;
+  }
+  // Legacy recurring string
+  const LEG = { weekly:'Every week', fortnightly:'Every 2 weeks', monthly:'Every month', quarterly:'Every 3 months', yearly:'Annually' };
+  if (ev.recurring && ev.recurring !== 'none') return LEG[ev.recurring] || ev.recurring;
+  return '';
+}
+
 function _plannerVisibleEvents() {
   const all = state.planner?.events || [];
   if (_plannerFilterMembers.size === 0) return all;
@@ -18155,6 +19126,23 @@ function _plannerVisibleEvents() {
     const ids = _plannerEvMemberIds(e);
     if (ids.includes('everyone')) return true;
     return [..._plannerFilterMembers].some(id => ids.includes(id));
+  });
+}
+
+// Returns visible events that match a given date — respects recurrence.
+function _plannerEventsForDate(dateStr) {
+  return _plannerVisibleEvents().filter(e => {
+    // Legacy auto-generated copies match by exact date
+    if (e._recurringSourceId) return e.date === dateStr;
+    // New recurrence engine
+    if (e.recurrence && e.recurrence.type !== 'one_time') {
+      return _recurrenceMatchesDate(e.recurrence, dateStr);
+    }
+    // One-time or no recurrence — exact date match (or within endDate range)
+    if (e.endDate && e.endDate > e.date) {
+      return dateStr >= e.date && dateStr <= e.endDate;
+    }
+    return e.date === dateStr;
   });
 }
 
@@ -18628,7 +19616,7 @@ function _renderPlannerMonthGrid() {
   const grid = cells.map(cell => {
     const isToday    = cell.dateStr === today;
     const isSelected = cell.dateStr === _plannerSelectedDay;
-    const dayEvs     = _plannerVisibleEvents().filter(e => e.date === cell.dateStr);
+    const dayEvs     = cell.dateStr ? _plannerEventsForDate(cell.dateStr) : [];
     const memberDots = [...new Set(dayEvs.flatMap(e => _plannerEvMemberIds(e)))].filter(id => id !== 'everyone').slice(0,3);
     const dots = memberDots.map(mid => {
       const mb = _plannerMemberById(mid);
@@ -18658,7 +19646,7 @@ function _renderPlannerWeekStrip() {
   return `<div class="pl-week-strip">${days.map(({date, dateStr}) => {
     const isToday    = dateStr === today;
     const isSelected = dateStr === _plannerSelectedDay;
-    const dayEvs     = _plannerVisibleEvents().filter(e => e.date === dateStr);
+    const dayEvs     = _plannerEventsForDate(dateStr);
     const memberDots = [...new Set(dayEvs.flatMap(e => _plannerEvMemberIds(e)))].filter(id => id !== 'everyone').slice(0,3);
     const dots = memberDots.map(mid => {
       const mb = _plannerMemberById(mid);
@@ -18686,7 +19674,8 @@ function _renderPlannerEventRow(ev) {
       ? `<span style="font-size:12px;color:var(--text-muted)">$${acceptedTotal.toLocaleString('en-AU')}</span>`
       : '';
   const _recurringLabels = { weekly:'Weekly', fortnightly:'Fortnightly', monthly:'Monthly', quarterly:'Quarterly', yearly:'Annually' };
-  if (ev.recurring && ev.recurring !== 'none') sideBadge = `<span class="recurring-badge">🔄 ${_recurringLabels[ev.recurring]||ev.recurring}</span> ` + sideBadge;
+  const _recLabel = _plannerRecurrenceLabel(ev);
+  if (_recLabel) sideBadge = `<span class="recurring-badge">🔄 ${_recLabel}</span> ` + sideBadge;
 
   let body = '';
   if (isOpen) {
@@ -18805,8 +19794,7 @@ function _plannerOpenDaySheet(dateStr) {
   el.classList.add('open');
 }
 function _plannerRenderDaySheetList(dateStr) {
-  const dayEvs = _plannerVisibleEvents()
-    .filter(e => e.date === dateStr)
+  const dayEvs = _plannerEventsForDate(dateStr)
     .sort((a,b) => (a.time||'99:99').localeCompare(b.time||'99:99'));
   const list = document.getElementById('pl-sheet-list');
   if (!list) return;
@@ -18913,7 +19901,7 @@ function _plannerOpenDetail(evId) {
     timeStr ? { icon:'🕐', label:'Time', value: timeStr } : null,
     { icon:'👥', label:'Who', value: `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${whoChips}</div>` },
     { icon: cat.emoji, label:'Category', value: cat.label },
-    ev.recurring && ev.recurring !== 'none' ? { icon:'🔄', label:'Repeats', value: ({weekly:'Every week',fortnightly:'Every 2 weeks',monthly:'Every month',yearly:'Every year'})[ev.recurring]||ev.recurring } : null,
+    _plannerRecurrenceLabel(ev) ? { icon:'🔄', label:'Repeats', value: _plannerRecurrenceLabel(ev) } : null,
     total > 0 ? { icon:'💰', label:'Est. cost', value: `$${total.toLocaleString('en-AU')}` } : null,
     ev.notes ? { icon:'📝', label:'Notes', value: escHtml(ev.notes) } : null,
   ].filter(Boolean);
@@ -19273,26 +20261,15 @@ function openPlannerModal(id, presetDate) {
         <input class="form-input" id="pe-end-time" type="time" value="${ev?.endTime||''}" style="width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:11px 6px;font-size:13px;-webkit-appearance:none;appearance:none">
       </div>
     </div>
-    <!-- Category + Repeats -->
-    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px" class="form-group">
-      <div>
-        <label class="form-label">Category</label>
-        <select class="form-input" id="pe-cat" onchange="_pmHandleCatChange()">
-          ${Object.entries(PLANNER_CATS).map(([k,v])=>`<option value="${k}" ${(ev?.category||'other')===k?'selected':''}>${v.emoji} ${v.label}</option>`).join('')}
-        </select>
-      </div>
-      <div>
-        <label class="form-label">Repeats</label>
-        <select class="form-input" id="pe-recurring">
-          <option value="none"        ${(ev?.recurring||'none')==='none'?'selected':''}>Does not repeat</option>
-          <option value="weekly"      ${ev?.recurring==='weekly'?'selected':''}>Weekly</option>
-          <option value="fortnightly" ${ev?.recurring==='fortnightly'?'selected':''}>Fortnightly</option>
-          <option value="monthly"     ${ev?.recurring==='monthly'?'selected':''}>Monthly</option>
-          <option value="quarterly"   ${ev?.recurring==='quarterly'?'selected':''}>Quarterly</option>
-          <option value="yearly"      ${ev?.recurring==='yearly'?'selected':''}>Annually</option>
-        </select>
-      </div>
+    <!-- Category -->
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-input" id="pe-cat" style="max-width:240px">
+        ${Object.entries(PLANNER_CATS).map(([k,v])=>`<option value="${k}" ${(ev?.category||'other')===k?'selected':''}>${v.emoji} ${v.label}</option>`).join('')}
+      </select>
     </div>
+    <!-- Recurrence (shared engine) -->
+    ${_routineRecurrenceFormHtml(ev?.recurrence || { type: 'one_time', startDate: (ev?.date || defaultDate) })}
     <!-- Notes -->
     <div class="form-group">
       <label class="form-label">Notes <span style="font-weight:400;color:var(--text-muted)">(helps AI estimate costs)</span></label>
@@ -19311,6 +20288,7 @@ function openPlannerModal(id, presetDate) {
   _pmRenderMemberPicker();
   _pmToggleAllDay();
   _pmHandleCatChange();
+  setTimeout(() => { _routineRecurrenceSummaryUpdate(); }, 100);
 }
 
 function _pmFmtDate(d) {
@@ -19358,12 +20336,7 @@ function _pmToggleAllDay() {
 }
 
 function _pmHandleCatChange() {
-  const cat = document.getElementById('pe-cat')?.value;
-  const isYearly = PLANNER_CATS[cat]?.yearlyAuto || (cat === 'birthday' || cat === 'anniversary');
-  const rec = document.getElementById('pe-recurring');
-  if (!rec) return;
-  if (isYearly) { rec.value = 'yearly'; rec.disabled = true; rec.style.opacity = '.5'; }
-  else          { rec.disabled = false; rec.style.opacity = ''; }
+  // No-op — recurrence is now handled by the shared recurrence form
 }
 
 // Date picker for planner modal (portal approach)
@@ -19479,17 +20452,19 @@ function savePlannerEvent(id) {
   const allDay    = document.getElementById('pe-allday')?.checked || false;
   const time      = allDay ? '' : (document.getElementById('pe-time')?.value || '');
   const endTime   = allDay ? '' : (document.getElementById('pe-end-time')?.value || '');
-  const notes     = document.getElementById('pe-notes').value.trim();
-  const recurring = document.getElementById('pe-recurring').value;
-  const memberIds = _pmSelectedMembers.size > 0 ? [..._pmSelectedMembers] : ['everyone'];
+  const notes      = document.getElementById('pe-notes').value.trim();
+  const recurrence = _routineRecurrenceCollect();
+  // Keep legacy recurring field so _autoCreateRecurringEvents still works for old copies
+  const recurringLegacy = recurrence.type === 'one_time' ? 'none' : 'none';
+  const memberIds  = _pmSelectedMembers.size > 0 ? [..._pmSelectedMembers] : ['everyone'];
   if (!title || !date) { alert('Title and date are required.'); return; }
   if (!state.planner) state.planner = { events: [] };
   if (id) {
     const ev = state.planner.events.find(e => e.id === id);
-    if (ev) { ev.title=title; ev.category=cat; ev.date=date; ev.endDate=endDate||date; ev.allDay=allDay; ev.time=time; ev.endTime=endTime; ev.notes=notes; ev.recurring=recurring; ev.memberIds=memberIds; }
+    if (ev) { ev.title=title; ev.category=cat; ev.date=date; ev.endDate=endDate||date; ev.allDay=allDay; ev.time=time; ev.endTime=endTime; ev.notes=notes; ev.recurrence=recurrence; ev.recurring=recurringLegacy; ev.memberIds=memberIds; }
   } else {
     const newId = 'ev-' + Date.now();
-    state.planner.events.push({ id:newId, title, category:cat, date, endDate:endDate||date, allDay, time, endTime, notes, recurring, memberIds, estimates:[], pushed:false });
+    state.planner.events.push({ id:newId, title, category:cat, date, endDate:endDate||date, allDay, time, endTime, notes, recurrence, recurring:recurringLegacy, memberIds, estimates:[], pushed:false });
     _plannerExpanded.add(newId);
     _plannerSelectedDay = date;
     _plannerMonth = date.slice(0,7);
