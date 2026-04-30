@@ -316,6 +316,230 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
+    /* ══════════════════════════════════════════════════
+       ─── Children's Today Screen — Section 7 ─────────
+       ══════════════════════════════════════════════════ */
+
+    /* Header */
+    .cv2-header {
+      background: linear-gradient(135deg, #5B4CF5 0%, #7C3AED 100%);
+      padding: 52px 20px 22px;
+      flex-shrink: 0;
+    }
+    .cv2-header-row { display:flex; align-items:center; justify-content:space-between; }
+    .cv2-avatar-wrap { display:flex; align-items:center; gap:12px; }
+    .cv2-avatar { font-size:38px; line-height:1; }
+    .cv2-name { font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.3px; }
+    .cv2-greeting { font-size:13px; color:rgba(255,255,255,0.75); margin-top:1px; }
+    .cv2-signout {
+      font-size:12px; font-weight:700;
+      background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35);
+      border-radius:99px; padding:7px 14px; color:#fff; cursor:pointer;
+    }
+    .cv2-nudge {
+      margin-top:14px; background:rgba(255,255,255,0.18); border-radius:12px;
+      padding:9px 14px; font-size:13px; font-weight:600; color:#fff;
+    }
+
+    /* Scroll body */
+    .cv2-body {
+      flex:1; overflow-y:auto; padding:20px 16px 80px;
+      max-width:520px; margin:0 auto; width:100%;
+    }
+
+    /* Section group */
+    .cv2-group { margin-bottom:22px; }
+    .cv2-group-heading {
+      font-size:11px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
+      color:#94a3b8; margin-bottom:10px; padding-left:2px;
+    }
+    .cv2-card {
+      background:#fff; border-radius:18px;
+      border:1px solid #e2e8f0; overflow:hidden;
+    }
+
+    /* Warm variant for lunchbox / prize store */
+    .cv2-card--warm { background:#fffbf5; border-color:#fde68a; }
+
+    /* Routine header */
+    .cv2-routine-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px 10px; cursor:pointer; user-select:none;
+    }
+    .cv2-routine-title { display:flex; align-items:center; gap:9px; }
+    .cv2-routine-name { font-size:15px; font-weight:700; color:#1e293b; }
+    .cv2-routine-frac { font-size:12px; color:#94a3b8; font-weight:600; }
+    .cv2-routine-lock {
+      font-size:11px; font-weight:700; color:#94a3b8;
+      background:#f1f5f9; border-radius:99px; padding:4px 10px;
+      display:flex; align-items:center; gap:4px;
+    }
+    .cv2-progress {
+      height:5px; background:#f1f5f9; margin:0 16px 2px;
+    }
+    .cv2-progress-fill {
+      height:100%; border-radius:99px;
+      background:linear-gradient(90deg,#5B4CF5,#7C3AED);
+      transition:width .3s ease;
+    }
+    .cv2-steps { padding:4px 0 8px; }
+    .cv2-step {
+      display:flex; align-items:center; gap:12px;
+      padding:11px 16px; border-bottom:1px solid #f8fafc;
+      cursor:pointer; user-select:none; transition:background .1s;
+    }
+    .cv2-step:active { background:#f8fafc; }
+    .cv2-step:last-child { border-bottom:none; }
+    .cv2-step-check {
+      width:26px; height:26px; border-radius:50%; flex-shrink:0;
+      border:2px solid #cbd5e1; background:transparent;
+      display:flex; align-items:center; justify-content:center;
+      transition:all .18s;
+    }
+    .cv2-step-check--done {
+      border-color:#5B4CF5; background:#5B4CF5;
+    }
+    .cv2-step-emoji { font-size:20px; flex-shrink:0; }
+    .cv2-step-label {
+      flex:1; font-size:14px; font-weight:500; color:#1e293b;
+    }
+    .cv2-step-label--done { color:#94a3b8; text-decoration:line-through; }
+    .cv2-step-pts {
+      background:#fef9c3; color:#854d0e; font-size:11px;
+      font-weight:700; padding:3px 8px; border-radius:99px; flex-shrink:0;
+    }
+
+    /* Locked routine state */
+    .cv2-card--locked { opacity:.55; }
+    .cv2-card--locked .cv2-step { pointer-events:none; cursor:default; }
+
+    /* Routine completion banner */
+    .cv2-routine-done {
+      text-align:center; padding:12px 16px;
+      font-size:13px; font-weight:700; color:#5B4CF5;
+      background:#f5f3ff; border-top:1px solid #ede9fe;
+    }
+
+    /* Chores */
+    .cv2-chore {
+      display:flex; align-items:center; gap:12px;
+      padding:12px 16px; border-bottom:1px solid #f8fafc;
+    }
+    .cv2-chore:last-child { border-bottom:none; }
+    .cv2-chore-emoji { font-size:22px; flex-shrink:0; }
+    .cv2-chore-info { flex:1; }
+    .cv2-chore-name { font-size:14px; font-weight:600; color:#1e293b; }
+    .cv2-chore-pts { font-size:12px; color:#64748b; margin-top:2px; }
+    .cv2-chore-done-badge {
+      background:#fef9c3; color:#854d0e; font-size:11px;
+      font-weight:700; padding:5px 12px; border-radius:99px;
+    }
+    .cv2-chore-btn {
+      background:#5B4CF5; color:#fff; border:none; border-radius:10px;
+      padding:9px 16px; font-size:12px; font-weight:700; cursor:pointer;
+    }
+
+    /* Lunchbox */
+    .cv2-lb-chips { display:flex; flex-wrap:wrap; gap:8px; padding:12px 16px 14px; }
+    .cv2-lb-chip {
+      display:flex; align-items:center; gap:6px;
+      background:#fff; border:1px solid #fde68a;
+      border-radius:99px; padding:6px 12px;
+      font-size:13px; font-weight:600; color:#1e293b;
+    }
+    .cv2-lb-empty {
+      padding:14px 16px; font-size:13px; color:#94a3b8; text-align:center;
+    }
+
+    /* Prize store */
+    .cv2-prize-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px 12px;
+    }
+    .cv2-prize-header-title { font-size:15px; font-weight:700; color:#1e293b; }
+    .cv2-bal-badge {
+      background:linear-gradient(135deg,#5B4CF5,#7C3AED);
+      color:#fff; font-size:13px; font-weight:800;
+      padding:5px 14px; border-radius:99px;
+    }
+    .cv2-prize {
+      display:flex; align-items:center; gap:12px;
+      padding:11px 16px; border-top:1px solid #f8fafc;
+    }
+    .cv2-prize-emoji { font-size:26px; flex-shrink:0; }
+    .cv2-prize-info { flex:1; }
+    .cv2-prize-name { font-size:14px; font-weight:600; color:#1e293b; }
+    .cv2-prize-cost { font-size:12px; color:#64748b; margin-top:2px; }
+    .cv2-prize-btn {
+      border:none; border-radius:10px; padding:9px 16px;
+      font-size:12px; font-weight:700; cursor:pointer;
+    }
+    .cv2-prize-btn--can { background:#5B4CF5; color:#fff; }
+    .cv2-prize-btn--cant { background:#f1f5f9; color:#94a3b8; cursor:default; }
+
+    /* Prize confirmation screen */
+    .cv2-confirm {
+      flex:1; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:40px 24px; text-align:center;
+    }
+    .cv2-confirm-emoji { font-size:64px; margin-bottom:16px; }
+    .cv2-confirm-title { font-size:22px; font-weight:800; color:#1e293b; margin-bottom:6px; }
+    .cv2-confirm-cost { font-size:14px; color:#64748b; margin-bottom:32px; }
+    .cv2-confirm-send {
+      background:linear-gradient(135deg,#5B4CF5,#7C3AED); color:#fff;
+      border:none; border-radius:14px; padding:16px 40px;
+      font-size:16px; font-weight:800; cursor:pointer; width:100%;
+      max-width:300px; margin-bottom:12px;
+    }
+    .cv2-confirm-cancel {
+      background:none; border:none; color:#94a3b8;
+      font-size:14px; font-weight:600; cursor:pointer; padding:8px;
+    }
+
+    /* Celebration / all-done state */
+    .cv2-celebration {
+      flex:1; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:40px 24px; text-align:center;
+    }
+    .cv2-celeb-emoji { font-size:72px; margin-bottom:16px;
+      animation: cv2-bounce .6s ease; }
+    .cv2-celeb-title { font-size:26px; font-weight:900; color:#1e293b;
+      letter-spacing:-0.5px; margin-bottom:8px; }
+    .cv2-celeb-sub { font-size:15px; color:#64748b; max-width:260px; line-height:1.5; }
+    @keyframes cv2-bounce {
+      0%   { transform:scale(0.5); opacity:0; }
+      60%  { transform:scale(1.2); }
+      80%  { transform:scale(0.92); }
+      100% { transform:scale(1); opacity:1; }
+    }
+
+    /* Confetti particles */
+    .cv2-confetti-wrap {
+      position:absolute; inset:0; pointer-events:none; overflow:hidden;
+    }
+    .cv2-confetti-particle {
+      position:absolute; top:-12px; width:10px; height:10px;
+      border-radius:2px; opacity:.9;
+      animation: cv2-fall linear forwards;
+    }
+    @keyframes cv2-fall {
+      0%   { transform:translateY(0) rotate(0deg); opacity:1; }
+      100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+    }
+
+    /* Age bracket overrides ─ Early Readers (5-8) */
+    .cv2-age-early .cv2-name  { font-size:22px; }
+    .cv2-age-early .cv2-step  { padding:13px 16px; }
+    .cv2-age-early .cv2-step-check { width:30px; height:30px; }
+    .cv2-age-early .cv2-step-emoji { font-size:24px; }
+    .cv2-age-early .cv2-step-label { font-size:15px; }
+
+    /* Age bracket overrides ─ Independents (8-12) — uses base styles */
+
+    /* ══ end Children's Today Screen ══════════════════ */
+
     /* ─── Kid mode — restrict to kids tab only ── */
     body.kid-mode .nav-item,
     body.kid-mode .nav-text-item,
@@ -2116,6 +2340,7 @@
     .brief-arrow { color: #d4d4d8; flex-shrink: 0; }
 
     /* ── ROUTINES START ── styles */
+    /* Today card */
     .routines-today-card { border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8); backdrop-filter: blur(8px); cursor: pointer; transition: box-shadow 0.15s; }
     .routines-today-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
     .routines-today-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -2125,25 +2350,26 @@
     .routine-today-row { display: flex; align-items: center; gap: 10px; }
     .routine-today-emoji { font-size: 16px; width: 28px; text-align: center; flex-shrink: 0; }
     .routine-today-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+    .routine-today-nudge { font-size: 10px; font-weight: 600; color: #d97706; background: #fffbeb; border-radius: 6px; padding: 2px 6px; flex-shrink: 0; }
     .routine-today-progress { display: flex; align-items: center; gap: 6px; }
     .routine-today-bar-wrap { width: 64px; height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
     .routine-today-bar-fill { height: 100%; border-radius: 99px; background: var(--section-accent, #0891b2); transition: width 0.3s; }
     .routine-today-frac { font-size: 11px; font-weight: 600; color: var(--text-muted); min-width: 28px; text-align: right; }
-    /* Full routines tab */
+    /* Routine card */
     .routine-card { border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; background: rgba(255,255,255,0.55); border: 1.5px solid rgba(255,255,255,0.8); backdrop-filter: blur(8px); }
     .routine-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
     .routine-card-title { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; color: var(--text); }
     .routine-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
-    .routine-card-actions { display: flex; gap: 8px; }
     .routine-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
     .routine-progress-bar-wrap { flex: 1; height: 7px; background: var(--border); border-radius: 99px; overflow: hidden; }
     .routine-progress-bar-fill { height: 100%; border-radius: 99px; background: var(--section-accent, #0891b2); transition: width 0.4s; }
     .routine-progress-label { font-size: 12px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+    /* Steps */
     .routine-steps { display: flex; flex-direction: column; }
-    .routine-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(24,24,27,0.06); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.15s; }
+    .routine-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(24,24,27,0.06); -webkit-tap-highlight-color: transparent; }
     .routine-step:last-child { border-bottom: none; }
-    .routine-step:active { opacity: 0.7; }
-    .routine-step-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.18s; }
+    .routine-step-grab { cursor: grab; color: var(--text-muted); font-size: 14px; flex-shrink: 0; padding: 0 2px; touch-action: none; }
+    .routine-step-check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: all 0.18s; }
     .routine-step-check.done { background: var(--section-accent, #0891b2); border-color: var(--section-accent, #0891b2); }
     .routine-step-check.done svg { display: block; }
     .routine-step-check svg { display: none; width: 12px; height: 12px; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; fill: none; }
@@ -2151,10 +2377,71 @@
     .routine-step-label { flex: 1; font-size: 14px; font-weight: 500; color: var(--text); transition: color 0.18s; }
     .routine-step-label.done { color: var(--text-muted); text-decoration: line-through; }
     .routine-step-dur { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+    .routine-step.dragging { opacity: 0.4; }
+    .routine-step.drag-over { border-top: 2px solid var(--section-accent, #0891b2); }
+    /* Badges */
     .routine-streak { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.7); border: 1.5px solid rgba(255,255,255,0.9); border-radius: 99px; padding: 4px 10px; font-size: 12px; font-weight: 700; color: var(--text); }
     .routine-all-done { text-align: center; padding: 10px 0 4px; font-size: 13px; font-weight: 700; color: var(--section-accent, #0891b2); }
     .routine-add-step-btn { width: 100%; padding: 10px; border: 1.5px dashed var(--border); border-radius: 10px; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; margin-top: 8px; transition: border-color 0.15s, color 0.15s; }
     .routine-add-step-btn:hover { border-color: var(--section-accent, #0891b2); color: var(--section-accent, #0891b2); }
+    /* Card actions row */
+    .routine-card-btns { display: flex; gap: 8px; margin-top: 4px; }
+    /* History */
+    .routine-history-grid { display: flex; gap: 4px; flex-wrap: wrap; margin: 10px 0 4px; }
+    .routine-history-dot { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; cursor: default; }
+    .routine-history-dot.full { background: var(--section-accent, #0891b2); color: #fff; }
+    .routine-history-dot.partial { background: var(--primary-light, #eff6ff); color: var(--section-accent, #0891b2); border: 1.5px solid var(--section-accent, #0891b2); }
+    .routine-history-dot.empty { background: var(--surface2); color: var(--text-muted); }
+    .routine-history-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+    /* New routine card */
+    .routine-new-card { border-radius: 16px; padding: 18px 20px; margin-bottom: 14px; background: transparent; border: 1.5px dashed var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .routine-new-card:hover { border-color: var(--section-accent, #0891b2); background: rgba(255,255,255,0.3); }
+    .routine-new-card-label { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+    /* Intelligence nudge on Today */
+    .routine-intel-nudge { border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; background: #18181b; color: #fafafa; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .routine-intel-icon { width: 36px; height: 36px; background: #2a2a36; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; }
+    .routine-intel-body { flex: 1; font-size: 13px; font-weight: 500; line-height: 1.4; }
+    .routine-intel-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #52525b; margin-bottom: 3px; }
+    /* Member assignment chips */
+    .routine-member-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .routine-member-chip { padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .routine-member-chip.active { background: var(--section-accent, #0891b2); border-color: var(--section-accent, #0891b2); color: #fff; }
+    /* Suggestions */
+    .routine-suggestions { margin-top: 12px; border-top: 1px solid rgba(24,24,27,0.06); padding-top: 10px; }
+    .routine-suggestions-toggle { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; font-size: 12px; font-weight: 700; color: var(--text-muted); -webkit-tap-highlight-color: transparent; }
+    .routine-suggestions-toggle .chevron { transition: transform 0.2s; font-size: 10px; }
+    .routine-suggestions-toggle.open .chevron { transform: rotate(180deg); }
+    .routine-suggestions-list { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+    .routine-suggestion-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--surface2); cursor: pointer; transition: background 0.15s; }
+    .routine-suggestion-row:hover { background: var(--primary-light, #eff6ff); }
+    .routine-suggestion-row.added { opacity: 0.4; pointer-events: none; }
+    .routine-suggestion-emoji { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .routine-suggestion-label { flex: 1; font-size: 13px; font-weight: 500; color: var(--text); }
+    .routine-suggestion-dur { font-size: 11px; color: var(--text-muted); }
+    .routine-suggestion-add { font-size: 18px; color: var(--section-accent, #0891b2); font-weight: 700; flex-shrink: 0; }
+    /* Ownership / sharing badge */
+    .routine-owner-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--surface2); border-radius: 8px; padding: 3px 8px; }
+    .routine-shared-badge { background: #eff6ff; color: #2563eb; }
+    .routine-joined-badge { background: #f0fdf4; color: #16a34a; }
+    /* Tabs (adult / children) */
+    .routine-tab-bar { display: flex; gap: 6px; margin-bottom: 16px; }
+    .routine-tab { padding: 7px 18px; border-radius: 99px; font-size: 13px; font-weight: 600; border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .routine-tab.active { background: var(--section-accent, #0891b2); border-color: var(--section-accent, #0891b2); color: #fff; }
+    /* Child routine assignment row */
+    .routine-child-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(24,24,27,0.06); }
+    .routine-child-row:last-child { border-bottom: none; }
+    .routine-child-avatar { font-size: 24px; width: 36px; text-align: center; }
+    .routine-child-name { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+    .routine-child-status { font-size: 11px; font-weight: 600; }
+    .routine-child-status.assigned { color: #16a34a; }
+    .routine-child-status.unassigned { color: var(--text-muted); }
+    /* "Who is this for?" picklist */
+    .routine-for-picklist { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .routine-for-option { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 14px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--surface2); cursor: pointer; transition: all 0.15s; min-width: 64px; }
+    .routine-for-option.selected { border-color: var(--section-accent, #0891b2); background: var(--primary-light, #eff6ff); }
+    .routine-for-avatar { font-size: 22px; line-height: 1; }
+    .routine-for-name { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; }
+    .routine-for-option.selected .routine-for-name { color: var(--section-accent, #0891b2); }
     /* ── ROUTINES END ── styles */
 
     /* ─── Round 3 — Wallet (scoped to #tab-budget) ─── */
@@ -2759,20 +3046,21 @@
 </div>
 
 <!-- ─── Child view (full-screen, sits on top of adult app) ── -->
-<div id="child-view-overlay" class="hidden" style="position:fixed;inset:0;background:#f0f9ff;z-index:6000;overflow-y:auto;flex-direction:column">
-  <div style="background:#0891b2;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-    <div style="display:flex;align-items:center;gap:10px">
-      <span id="cv-avatar" style="font-size:28px"></span>
-      <div>
-        <div id="cv-name" style="font-size:16px;font-weight:700;color:#fff"></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.75)">Your dashboard</div>
+<div id="child-view-overlay" class="hidden" style="position:fixed;inset:0;background:#f5f3ff;z-index:6000;display:flex;flex-direction:column">
+  <div id="cv-header-wrap" class="cv2-header">
+    <div class="cv2-header-row">
+      <div class="cv2-avatar-wrap">
+        <span id="cv-avatar" class="cv2-avatar"></span>
+        <div>
+          <div id="cv-name" class="cv2-name"></div>
+          <div id="cv-greeting" class="cv2-greeting">Good morning!</div>
+        </div>
       </div>
+      <button onclick="exitChildView()" class="cv2-signout">Sign out</button>
     </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="exitChildView()" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);border-radius:99px;padding:6px 14px;color:#fff;cursor:pointer">Sign out</button>
-    </div>
+    <div id="cv-nudge" class="cv2-nudge" style="display:none"></div>
   </div>
-  <div id="cv-content" style="flex:1;padding:20px;max-width:520px;margin:0 auto;width:100%"></div>
+  <div id="cv-content" class="cv2-body"></div>
 </div>
 
 <!-- ─── Adult PIN setup modal ─── -->
@@ -3390,30 +3678,8 @@ const DEFAULT_DATA = {
     { id: 7, name: 'Other',           icon: '📦', categories: ['Other'] }
   ],
   // ── ROUTINES START ── default state
-  routines: [
-    {
-      id: 1, name: 'Morning', emoji: '🌅', triggerTime: '07:00',
-      steps: [
-        { id: 1, label: 'Make bed',       emoji: '🛏',  durationMin: 2 },
-        { id: 2, label: 'Shower',         emoji: '🚿',  durationMin: 10 },
-        { id: 3, label: 'Breakfast',      emoji: '🍳',  durationMin: 15 },
-        { id: 4, label: 'Exercise',       emoji: '💪',  durationMin: 20 },
-        { id: 5, label: 'Plan the day',   emoji: '📋',  durationMin: 5 }
-      ],
-      completions: {}
-    },
-    {
-      id: 2, name: 'Evening', emoji: '🌙', triggerTime: '21:00',
-      steps: [
-        { id: 1, label: 'Tidy kitchen',   emoji: '🍽',  durationMin: 10 },
-        { id: 2, label: 'Prep tomorrow',  emoji: '👔',  durationMin: 5 },
-        { id: 3, label: 'Family time',    emoji: '👨‍👩‍👧', durationMin: 30 },
-        { id: 4, label: 'Read',           emoji: '📚',  durationMin: 20 },
-        { id: 5, label: 'Lights out',     emoji: '💤',  durationMin: 0 }
-      ],
-      completions: {}
-    }
-  ]
+  routines: [],
+  routineAssignments: []
   // ── ROUTINES END ── default state
 };
 
@@ -3498,8 +3764,60 @@ function loadData() {
     if (!d.documents) d.documents = [];
     if (!d.maintenance) d.maintenance = [];
     // ── ROUTINES START ── migration
-    if (!d.routines) d.routines = JSON.parse(JSON.stringify(DEFAULT_DATA.routines));
-    d.routines.forEach(r => { if (!r.completions) r.completions = {}; });
+    if (!d.routines) d.routines = [];
+    if (!d.routineAssignments) d.routineAssignments = [];
+    const _assignedRoutineIds = new Set((d.routineAssignments || []).map(a => a.routineId));
+    d.routines.forEach(r => {
+      if (!r.completions)       r.completions       = {};
+      if (!r.sharedWith)        r.sharedWith        = [];
+      if (!r.assignedTo)        r.assignedTo        = [];
+      if (!r.linkedFrom)        r.linkedFrom        = null;
+      if (!r.linkedType)        r.linkedType        = null;
+      if (r.pointsPerCompletion === undefined) r.pointsPerCompletion = 0;
+      (r.steps || []).forEach(s => { if (s.points === undefined) s.points = 0; });
+      // Scope repair: derive ownerType from routineAssignments rather than defaulting
+      // everything to 'adult'. A routine that appears in routineAssignments is household-scoped.
+      if (!r.ownerType || !r.ownerId) {
+        if (_assignedRoutineIds.has(r.id)) {
+          r.ownerType = 'household';
+          r.ownerId   = 'household';
+        } else {
+          r.ownerType = 'adult';
+          r.ownerId   = 'guest';
+        }
+      }
+      // Integrity: a routine in routineAssignments MUST be household-scoped.
+      if (_assignedRoutineIds.has(r.id) && r.ownerType !== 'household') {
+        r.ownerType = 'household';
+        r.ownerId   = 'household';
+      }
+      // Strip pre-populated steps from old default adult routines
+      if (r.ownerType === 'adult' && r.ownerId === 'guest' && r.steps?.length > 0) {
+        const defaultLabels = new Set(['Make bed','Shower','Breakfast','Exercise','Plan the day',
+                               'Tidy kitchen','Prep tomorrow','Family time','Read','Lights out']);
+        if (r.steps.every(s => defaultLabels.has(s.label))) r.steps = [];
+      }
+    });
+    // Migrate assignments: ensure completionState exists; backfill from routine.completions
+    // if it was previously stored there (pre-spec behaviour).
+    d.routineAssignments.forEach(a => {
+      if (!a.completionState) {
+        const r = d.routines.find(r => r.id === a.routineId);
+        // Backfill: move any existing routine.completions into the assignment
+        a.completionState = (r && Object.keys(r.completions || {}).length)
+          ? JSON.parse(JSON.stringify(r.completions))
+          : {};
+      }
+      if (!a.archivedCompletionState) a.archivedCompletionState = null;
+      if (!a.childIds) {
+        // Old single-child assignments: promote childId to childIds array
+        a.childIds = a.childId ? [a.childId] : [];
+      }
+    });
+    // After backfilling, clear completions from household routines — they now live on assignments
+    d.routines.forEach(r => {
+      if (r.ownerType === 'household') r.completions = {};
+    });
     // ── ROUTINES END ── migration
     if (!d.settings) d.settings = { autoFillMonths: false };
     if (!d.settings.notifStyle) d.settings.notifStyle = 'focus-timeline';
@@ -3823,6 +4141,7 @@ function _applyActiveProfile() {
   if (_activeProfile?.role === 'child') {
     window.kidsView = _activeProfile.id;
     activateTab('kids');
+    showChildView(_activeProfile.id);
   } else {
     // Restore all nav items when switching back to adult
     document.querySelectorAll('.nav-item, .nav-text-item').forEach(el => el.style.display = '');
@@ -3983,67 +4302,294 @@ async function _adultPinSubmit() {
   }
 }
 
-// ── Child View ────────────────────────────────────────
+// ── Child View — Section 7 ────────────────────────────
+// All functions here apply to child profiles only.
+
+function _cvAgeBracket(kid) {
+  const age = Number(kid.age || 0);
+  if (age < 5)  return 'tiny-tots';
+  if (age < 8)  return 'early-reader';
+  if (age < 12) return 'independent';
+  return 'tween';
+}
+
+function _cvTimeGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+// Returns true if routine's time window is currently active.
+// Active = current hour >= triggerTime hour AND < triggerTime hour + 6.
+// If no triggerTime, treat as always active.
+function _cvRoutineIsActive(routine) {
+  if (!routine.triggerTime) return true;
+  const [trigH, trigM] = routine.triggerTime.split(':').map(Number);
+  const now = new Date();
+  const nowMins = now.getHours() * 60 + now.getMinutes();
+  const startMins = trigH * 60 + (trigM || 0);
+  const endMins   = startMins + 360; // 6-hour window
+  return nowMins >= startMins && nowMins < endMins;
+}
+
+function _cvRoutineAvailLabel(routine) {
+  if (!routine.triggerTime) return '';
+  const [trigH] = routine.triggerTime.split(':').map(Number);
+  if (trigH < 12) return 'Available this morning';
+  if (trigH < 17) return 'Available this afternoon';
+  return 'Available tonight';
+}
+
+// Fires confetti burst inside the overlay
+function _cvConfetti() {
+  const ov = document.getElementById('child-view-overlay');
+  if (!ov) return;
+  let wrap = document.getElementById('cv-confetti-wrap');
+  if (wrap) wrap.remove();
+  wrap = document.createElement('div');
+  wrap.id = 'cv-confetti-wrap';
+  wrap.className = 'cv2-confetti-wrap';
+  ov.appendChild(wrap);
+  const colors = ['#5B4CF5','#7C3AED','#F59E0B','#10B981','#F43F5E','#FBBF24'];
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('div');
+    p.className = 'cv2-confetti-particle';
+    p.style.cssText = `
+      left:${Math.random()*100}%;
+      background:${colors[i % colors.length]};
+      width:${6 + Math.random()*8}px;
+      height:${6 + Math.random()*8}px;
+      animation-duration:${1.4 + Math.random()*1.4}s;
+      animation-delay:${Math.random()*0.6}s;
+    `;
+    wrap.appendChild(p);
+  }
+  setTimeout(() => { if (wrap.parentNode) wrap.remove(); }, 3500);
+}
+
 function showChildView(kidId) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
   if (!kid) return;
-  const k = state.kids;
-  const bal = kidBalance(k, kid.id);
-  const myChores = k.chores.filter(c => c.assignedTo === kid.id || c.assignedTo === 'all');
-  const pending  = k.completions.filter(c => c.kidId === kid.id && c.status === 'pending');
-  const prizes   = k.prizes;
 
-  document.getElementById('cv-avatar').textContent = kid.emoji || '😊';
-  document.getElementById('cv-name').textContent   = kid.name;
+  const k       = state.kids;
+  const bal     = kidBalance(k, kid.id);
+  const bracket = _cvAgeBracket(kid);
 
-  let html = '';
+  // Header
+  const ov = document.getElementById('child-view-overlay');
+  document.getElementById('cv-avatar').textContent   = kid.emoji || '😊';
+  document.getElementById('cv-name').textContent     = kid.name;
+  document.getElementById('cv-greeting').textContent = _cvTimeGreeting() + '!';
 
-  // Points balance
-  html += `<div style="background:#fff;border-radius:16px;padding:20px;text-align:center;margin-bottom:16px;border:2px solid #e0f2fe">
-    <div style="font-size:44px;font-weight:800;color:#0891b2">${bal}</div>
-    <div style="font-size:14px;color:#64748b;font-weight:600">⭐ points</div>
-  </div>`;
-
-  // Chores
-  html += `<div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #e2e8f0">
-    <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:14px">📋 My Chores</div>`;
-  if (!myChores.length) {
-    html += `<div style="text-align:center;padding:16px;color:#94a3b8;font-size:13px">No chores yet!</div>`;
+  // Points nudge
+  const earnedToday = (k.completions || []).filter(c =>
+    c.kidId === kid.id && c.status === 'approved' &&
+    new Date(c.completedAt || c.ts).toDateString() === new Date().toDateString()
+  ).reduce((sum, c) => {
+    const chore = (k.chores || []).find(ch => ch.id === c.choreId);
+    return sum + (chore?.points || 0);
+  }, 0);
+  const nudgeEl = document.getElementById('cv-nudge');
+  if (earnedToday > 0) {
+    nudgeEl.textContent = `You've earned ⭐ ${earnedToday} points today — keep going!`;
+    nudgeEl.style.display = '';
   } else {
+    nudgeEl.style.display = 'none';
+  }
+
+  // Age bracket class on overlay
+  ov.className = ov.className.replace(/cv2-age-\S+/g, '').trim();
+  if (bracket === 'early-reader') ov.classList.add('cv2-age-early');
+
+  // ── ROUTINES START ── child view section
+  const myAssignments = (state.routineAssignments || []).filter(a => a.childId === kid.id);
+  const todayKey      = _routineTodayKey();
+  let routinesHtml    = '';
+  let totalTasksDone  = 0;
+  let totalTasks      = 0;
+
+  if (myAssignments.length) {
+    myAssignments.forEach(assignment => {
+      const routine = (state.routines || []).find(r => r.id === assignment.routineId);
+      if (!routine) return;
+      const done    = assignment.completionState?.[todayKey] || [];
+      const total   = routine.steps.length;
+      const pct     = total > 0 ? Math.round(done.length / total * 100) : 0;
+      const allDone = done.length === total && total > 0;
+      const active  = _cvRoutineIsActive(routine);
+      totalTasks    += total;
+      totalTasksDone += done.length;
+
+      const lockLabel = active ? '' : _cvRoutineAvailLabel(routine);
+      routinesHtml += `<div class="cv2-card${active ? '' : ' cv2-card--locked'}" style="margin-bottom:10px">
+        <div class="cv2-routine-header">
+          <div class="cv2-routine-title">
+            <span>${routine.emoji}</span>
+            <span class="cv2-routine-name">${escHtml(routine.name)}</span>
+          </div>
+          ${active
+            ? `<span class="cv2-routine-frac">${done.length}/${total}${routine.pointsPerCompletion > 0 ? ` · ⭐${routine.pointsPerCompletion}` : ''}</span>`
+            : `<span class="cv2-routine-lock">🔒 ${escHtml(lockLabel)}</span>`
+          }
+        </div>
+        <div class="cv2-progress"><div class="cv2-progress-fill" style="width:${pct}%"></div></div>
+        <div class="cv2-steps">`;
+
+      if (!total) {
+        routinesHtml += `<div style="padding:12px 16px;font-size:13px;color:#94a3b8;text-align:center">No steps added yet</div>`;
+      } else {
+        routine.steps.forEach(step => {
+          const isDone = done.includes(step.id);
+          const check  = isDone
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`
+            : '';
+          routinesHtml += `<div class="cv2-step" onclick="${active ? `_routineToggleStepKid(${JSON.stringify(routine.id)},${JSON.stringify(step.id)},'${kid.id}')` : ''}">
+            <div class="cv2-step-check${isDone ? ' cv2-step-check--done' : ''}">${check}</div>
+            <span class="cv2-step-emoji">${step.emoji}</span>
+            <span class="cv2-step-label${isDone ? ' cv2-step-label--done' : ''}">${escHtml(step.label)}</span>
+            ${step.points > 0 ? `<span class="cv2-step-pts">⭐ ${step.points}</span>` : ''}
+          </div>`;
+        });
+      }
+
+      routinesHtml += `</div>`;
+      if (allDone) {
+        routinesHtml += `<div class="cv2-routine-done">✓ All done! Great work${routine.pointsPerCompletion > 0 ? ` · ⭐ ${routine.pointsPerCompletion} bonus pts` : ''}! 🎉</div>`;
+      }
+      routinesHtml += `</div>`;
+    });
+  }
+  // ── ROUTINES END ── child view section
+
+  // Chores (hidden if none)
+  const myChores = (k.chores || []).filter(c =>
+    (c.assignedTo === kid.id || c.assignedTo === 'all') && !c._isRoutine
+  );
+  const pending = (k.completions || []).filter(c => c.kidId === kid.id && c.status === 'pending');
+  totalTasks    += myChores.length;
+  totalTasksDone += myChores.filter(ch => pending.some(p => p.choreId === ch.id)).length;
+
+  let choresHtml = '';
+  if (myChores.length) {
     myChores.forEach(ch => {
-      const done = pending.some(p => p.choreId === ch.id);
-      html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
-        <span style="font-size:22px">${ch.emoji || '📋'}</span>
-        <div style="flex:1"><div style="font-size:14px;font-weight:600">${escHtml(ch.name)}</div><div style="font-size:12px;color:#64748b">⭐ ${ch.points} · ${ch.frequency}</div></div>
-        ${done ? `<span style="background:#fef9c3;color:#854d0e;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px">Waiting</span>`
-                : `<button onclick="markChoreChildView('${kid.id}','${ch.id}')" style="background:#0891b2;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">Done ✓</button>`}
+      const isDone = pending.some(p => p.choreId === ch.id);
+      choresHtml += `<div class="cv2-chore">
+        <span class="cv2-chore-emoji">${ch.emoji || '📋'}</span>
+        <div class="cv2-chore-info">
+          <div class="cv2-chore-name">${escHtml(ch.name)}</div>
+          <div class="cv2-chore-pts">⭐ ${ch.points} · ${ch.frequency}</div>
+        </div>
+        ${isDone
+          ? `<span class="cv2-chore-done-badge">Waiting ✓</span>`
+          : `<button class="cv2-chore-btn" onclick="markChoreChildView('${kid.id}','${ch.id}')">Done ✓</button>`
+        }
       </div>`;
     });
   }
-  html += `</div>`;
 
-  // Prize store
-  if (prizes.length) {
-    html += `<div style="background:#fff;border-radius:16px;padding:20px;border:1px solid #e2e8f0">
-      <div style="font-size:15px;font-weight:700;color:#1e293b;margin-bottom:14px">🎁 Prize Store</div>`;
+  // Lunchbox (hidden if nothing entered today)
+  const weekKey  = _mealWeekKey(0);
+  const dow      = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const dayPlan  = (state.meals?.lunchbox?.plans?.[weekKey]?.[kid.id]?.[dow]) || {};
+  const lbSlots  = ['main','snack','fruit','drink'];
+  const lbItems  = lbSlots.map(s => dayPlan[s]).filter(Boolean);
+  const slotEmojis = { main:'🥪', snack:'🍪', fruit:'🍎', drink:'🥤' };
+  let lbHtml = '';
+  if (lbItems.length) {
+    let chips = '';
+    lbSlots.forEach(s => {
+      if (!dayPlan[s]) return;
+      chips += `<div class="cv2-lb-chip">${slotEmojis[s]} ${escHtml(dayPlan[s])}</div>`;
+    });
+    lbHtml = `<div class="cv2-group">
+      <div class="cv2-group-heading">🥪 Lunchbox</div>
+      <div class="cv2-card cv2-card--warm">
+        <div class="cv2-lb-chips">${chips}</div>
+      </div>
+    </div>`;
+  }
+
+  // Prize store (always visible)
+  const prizes = k.prizes || [];
+  let prizeStoreHtml = `<div class="cv2-group">
+    <div class="cv2-group-heading">🏆 Prize Store</div>
+    <div class="cv2-card cv2-card--warm">
+      <div class="cv2-prize-header">
+        <span class="cv2-prize-header-title">Prizes</span>
+        <span class="cv2-bal-badge">⭐ ${bal} pts</span>
+      </div>`;
+  if (!prizes.length) {
+    prizeStoreHtml += `<div style="padding:12px 16px 16px;font-size:13px;color:#94a3b8;text-align:center">No prizes set up yet</div>`;
+  } else {
     prizes.forEach(pr => {
       const canAfford = bal >= pr.pointCost;
-      html += `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9">
-        <span style="font-size:24px">${pr.emoji || '🎁'}</span>
-        <div style="flex:1"><div style="font-size:14px;font-weight:600">${escHtml(pr.name)}</div><div style="font-size:12px;color:#64748b">⭐ ${pr.pointCost} points</div></div>
-        <button ${canAfford ? `onclick="redeemPrizeChildView('${kid.id}','${pr.id}')"` : 'disabled'} style="background:${canAfford?'#eab308':'#e2e8f0'};color:${canAfford?'#fff':'#94a3b8'};border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:${canAfford?'pointer':'default'}">
-          ${canAfford ? 'Redeem' : 'Not enough'}
+      prizeStoreHtml += `<div class="cv2-prize">
+        <span class="cv2-prize-emoji">${pr.emoji || '🎁'}</span>
+        <div class="cv2-prize-info">
+          <div class="cv2-prize-name">${escHtml(pr.name)}</div>
+          <div class="cv2-prize-cost">⭐ ${pr.pointCost} points</div>
+        </div>
+        <button class="cv2-prize-btn ${canAfford ? 'cv2-prize-btn--can' : 'cv2-prize-btn--cant'}"
+          ${canAfford ? `onclick="_cvShowPrizeConfirm('${kid.id}','${pr.id}')"` : 'disabled'}>
+          ${canAfford ? 'Redeem' : `⭐ ${pr.pointCost}`}
         </button>
       </div>`;
     });
-    html += `</div>`;
+  }
+  prizeStoreHtml += `</div></div>`;
+
+  // Check full-day celebration (all routines + chores done)
+  const allDoneToday = totalTasks > 0 && totalTasksDone === totalTasks;
+
+  let mainHtml;
+  if (allDoneToday) {
+    mainHtml = `<div class="cv2-celebration">
+      <div class="cv2-celeb-emoji">🏆</div>
+      <div class="cv2-celeb-title">Amazing work, ${escHtml(kid.name)}!</div>
+      <div class="cv2-celeb-sub">You've finished everything for today. You're a superstar! ⭐</div>
+    </div>
+    ${prizeStoreHtml}`;
+  } else {
+    mainHtml = '';
+    if (myAssignments.length) {
+      mainHtml += `<div class="cv2-group">
+        <div class="cv2-group-heading">📋 My Routines</div>
+        ${routinesHtml}
+      </div>`;
+    }
+    if (myChores.length) {
+      mainHtml += `<div class="cv2-group">
+        <div class="cv2-group-heading">🧹 Chores</div>
+        <div class="cv2-card">${choresHtml}</div>
+      </div>`;
+    }
+    mainHtml += lbHtml;
+    mainHtml += prizeStoreHtml;
   }
 
-  document.getElementById('cv-content').innerHTML = html;
+  document.getElementById('cv-content').innerHTML = mainHtml;
 
-  const ov = document.getElementById('child-view-overlay');
-  ov.style.display = 'flex';
   ov.classList.remove('hidden');
+  ov.style.display = 'flex';
+
+  // Fire confetti if everything just got done
+  if (allDoneToday) _cvConfetti();
+}
+
+function _cvShowPrizeConfirm(kidId, prizeId) {
+  const prize = (state.kids?.prizes || []).find(p => String(p.id) === String(prizeId));
+  if (!prize) return;
+  const html = `<div class="cv2-confirm">
+    <div class="cv2-confirm-emoji">${prize.emoji || '🎁'}</div>
+    <div class="cv2-confirm-title">${escHtml(prize.name)}</div>
+    <div class="cv2-confirm-cost">⭐ ${prize.pointCost} points</div>
+    <button class="cv2-confirm-send" onclick="redeemPrizeChildView('${kidId}','${prizeId}')">
+      Send request ✉️
+    </button>
+    <button class="cv2-confirm-cancel" onclick="showChildView('${kidId}')">Cancel</button>
+  </div>`;
+  document.getElementById('cv-content').innerHTML = html;
 }
 
 function exitChildView() {
@@ -13875,56 +14421,233 @@ function safeRender(fn) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// ── ROUTINES START ── all logic contained here
-// To remove this feature: delete this entire block, remove the
-// tab panel, the SECTIONS pill entry, the _TAB_RENDERERS entry,
-// the DEFAULT_DATA.routines key, the loadData() migration line,
-// and the _renderRoutinesTodayCard() call in renderToday().
+// ── ROUTINES START ── all logic contained here (v3)
+// To remove: delete this block + CSS block + tab panel HTML +
+// SECTIONS pill entry + _TAB_RENDERERS entry +
+// DEFAULT_DATA.routines/routineAssignments + loadData() migration +
+// _renderRoutinesTodayCard() call in renderToday().
 // ═══════════════════════════════════════════════════════════
 
-function _routineTodayKey() {
-  const d = new Date();
+// ── Suggestion library (not stored in state) ─────────────────
+const ROUTINE_SUGGESTIONS = {
+  morning: [
+    { label: 'Make bed',      emoji: '🛏',  durationMin: 2  },
+    { label: 'Shower',        emoji: '🚿',  durationMin: 10 },
+    { label: 'Breakfast',     emoji: '🍳',  durationMin: 15 },
+    { label: 'Exercise',      emoji: '💪',  durationMin: 20 },
+    { label: 'Meditate',      emoji: '🧘',  durationMin: 10 },
+    { label: 'Plan the day',  emoji: '📋',  durationMin: 5  },
+    { label: 'Read',          emoji: '📚',  durationMin: 15 },
+    { label: 'Vitamins',      emoji: '💊',  durationMin: 1  },
+    { label: 'Walk',          emoji: '🚶',  durationMin: 20 },
+    { label: 'Journaling',    emoji: '✍️',  durationMin: 10 }
+  ],
+  evening: [
+    { label: 'Tidy kitchen',   emoji: '🍽',  durationMin: 10 },
+    { label: 'Prep tomorrow',  emoji: '👔',  durationMin: 5  },
+    { label: 'Family time',    emoji: '👨‍👩‍👧', durationMin: 30 },
+    { label: 'Read',           emoji: '📚',  durationMin: 20 },
+    { label: 'Lights out',     emoji: '💤',  durationMin: 0  },
+    { label: 'Stretch',        emoji: '🤸',  durationMin: 10 },
+    { label: 'Review the day', emoji: '🪞',  durationMin: 5  },
+    { label: 'Skincare',       emoji: '🧴',  durationMin: 5  },
+    { label: 'No screens',     emoji: '📵',  durationMin: 0  },
+    { label: 'Brush teeth',    emoji: '🦷',  durationMin: 3  }
+  ],
+  general: [
+    { label: 'Drink water',    emoji: '💧',  durationMin: 1  },
+    { label: 'Check messages', emoji: '📱',  durationMin: 5  },
+    { label: 'Quick tidy',     emoji: '🧹',  durationMin: 5  },
+    { label: 'Gratitude',      emoji: '🙏',  durationMin: 3  }
+  ]
+};
+
+// ── Helpers ──────────────────────────────────────────────────
+
+function _routineDateKey(date) {
+  const d = date || new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
+function _routineTodayKey() { return _routineDateKey(new Date()); }
+function _routineCurrentUserId() { return _currentUser?.uid || 'guest'; }
+
+// Adult-scoped only — never returns household/child routines
+function _routinesForCurrentUser() {
+  const uid = _routineCurrentUserId();
+  return (state.routines || []).filter(r =>
+    r.ownerType === 'adult' &&
+    (r.ownerId === uid || (r.sharedWith || []).includes(uid))
+  );
+}
+
+// Household/child-scoped only
+function _routinesForHousehold() {
+  return (state.routines || []).filter(r => r.ownerType === 'household');
+}
+
+function _routineIsOwner(r) { return r.ownerId === _routineCurrentUserId(); }
+function _routineKids()     { return state.kids?.profiles || []; }
+function _routineNextId()   { return Math.max(0, ...(state.routines || []).map(r => r.id)) + 1; }
+
+function _routineOtherAdults() {
+  const uid = _routineCurrentUserId();
+  return (state.householdProfile?.authorizedUsers || []).filter(u => u.uid !== uid);
+}
+
+// ── Per-child assignment accessors ───────────────────────────
+// All child completion state lives on the assignment, not on the routine.
+
+function _routineGetAssignment(routineId, childId) {
+  return (state.routineAssignments || []).find(
+    a => a.routineId === routineId && a.childId === childId
+  );
+}
+
+function _assignmentCompletedToday(assignment) {
+  return (assignment?.completionState?.[_routineTodayKey()] || []).length;
+}
+
+function _assignmentStreak(assignment, totalSteps) {
+  if (!assignment) return 0;
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const done = (assignment.completionState?.[_routineDateKey(d)] || []).length;
+    if (done === totalSteps && totalSteps > 0) { streak++; d.setDate(d.getDate() - 1); }
+    else break;
+  }
+  return streak;
+}
+
+function _assignmentHistory(assignment, totalSteps, days) {
+  const result = [];
+  const d = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(d);
+    date.setDate(d.getDate() - i);
+    const key = _routineDateKey(date);
+    const done = (assignment?.completionState?.[key] || []).length;
+    result.push({ key, label: date.getDate(), done, total: totalSteps });
+  }
+  return result;
+}
+
+// ── Adult completion state (still on routine.completions) ─────
 
 function _routineCompletedToday(routine) {
-  const done = routine.completions[_routineTodayKey()] || [];
-  return done.length;
+  return (routine.completions?.[_routineTodayKey()] || []).length;
 }
 
 function _routineStreak(routine) {
   let streak = 0;
   const d = new Date();
   while (true) {
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const done = routine.completions[key] || [];
+    const done = routine.completions?.[_routineDateKey(d)] || [];
     if (done.length === routine.steps.length && routine.steps.length > 0) {
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else {
-      break;
-    }
+      streak++; d.setDate(d.getDate() - 1);
+    } else break;
   }
   return streak;
 }
 
-function _renderRoutinesTodayCard() {
-  const routines = state.routines || [];
-  if (!routines.length) return '';
-  const rows = routines.map(r => {
-    const done = _routineCompletedToday(r);
+function _routineHistory(routine, days) {
+  const result = [];
+  const d = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(d);
+    date.setDate(d.getDate() - i);
+    const key = _routineDateKey(date);
+    const done = (routine.completions?.[key] || []).length;
+    result.push({ key, label: date.getDate(), done, total: routine.steps.length });
+  }
+  return result;
+}
+
+// ── Suggestions helpers ───────────────────────────────────────
+
+function _routineAvailableSuggestions(routine) {
+  const existingLabels = new Set(routine.steps.map(s => s.label.toLowerCase()));
+  const nameL = routine.name.toLowerCase();
+  let pool;
+  if (nameL.includes('morning'))
+    pool = [...ROUTINE_SUGGESTIONS.morning, ...ROUTINE_SUGGESTIONS.general];
+  else if (nameL.includes('evening') || nameL.includes('night') || nameL.includes('bed'))
+    pool = [...ROUTINE_SUGGESTIONS.evening, ...ROUTINE_SUGGESTIONS.general];
+  else
+    pool = [...ROUTINE_SUGGESTIONS.morning, ...ROUTINE_SUGGESTIONS.evening, ...ROUTINE_SUGGESTIONS.general];
+  return pool.filter(s => !existingLabels.has(s.label.toLowerCase()));
+}
+
+// ── Write-time scope validation ───────────────────────────────
+
+function _routineAssertScope(routine) {
+  if (routine.ownerType === 'household') {
+    if (routine.ownerId !== 'household')
+      throw new Error(`Scope violation: household routine has ownerId="${routine.ownerId}"`);
+  } else if (routine.ownerType === 'adult') {
+    if (!routine.ownerId || routine.ownerId === 'household')
+      throw new Error(`Scope violation: adult routine has ownerId="${routine.ownerId}"`);
+  } else {
+    throw new Error(`Scope violation: unknown ownerType="${routine.ownerType}"`);
+  }
+}
+
+function _routineSaveValidated(label) {
+  (state.routines || []).forEach(r => {
+    try { _routineAssertScope(r); }
+    catch(e) { console.error(`[Routines] ${label}:`, e.message, r); }
+  });
+  saveData(state);
+}
+
+// ── Intelligence nudge (adult only) ──────────────────────────
+
+function _routineIntelNudge() {
+  const routines = _routinesForCurrentUser();
+  const now = new Date();
+  const hour = now.getHours();
+  for (const r of routines) {
+    const done  = _routineCompletedToday(r);
     const total = r.steps.length;
-    const pct = total > 0 ? Math.round(done / total * 100) : 0;
-    return `<div class="routine-today-row" onclick="activateTab('routines')">
+    if (!total) continue;
+    const [trigH] = (r.triggerTime || '00:00').split(':').map(Number);
+    const streak   = _routineStreak(r);
+    if (hour >= trigH + 1 && done === 0) return { icon: r.emoji, text: `Your ${r.name} routine hasn't been started yet.` };
+    if (streak > 0 && streak % 7 === 0) return { icon: '🔥', text: `${streak}-day streak on your ${r.name} routine — keep it up!` };
+    if (done > 0 && done === total - 1) return { icon: r.emoji, text: `One step left in your ${r.name} routine!` };
+  }
+  return null;
+}
+
+// ── Today card ────────────────────────────────────────────────
+
+function _renderRoutinesTodayCard() {
+  const myRoutines = _routinesForCurrentUser();
+  if (!myRoutines.length) return '';
+  const now = new Date();
+  const hour = now.getHours();
+  const rows = myRoutines.map(r => {
+    const done  = _routineCompletedToday(r);
+    const total = r.steps.length;
+    const pct   = total > 0 ? Math.round(done / total * 100) : 0;
+    const [trigH] = (r.triggerTime || '00:00').split(':').map(Number);
+    const isOverdue = hour >= trigH + 1 && done === 0 && total > 0;
+    return `<div class="routine-today-row">
       <div class="routine-today-emoji">${r.emoji}</div>
       <div class="routine-today-name">${escHtml(r.name)}</div>
+      ${isOverdue ? `<span class="routine-today-nudge">Not started</span>` : ''}
       <div class="routine-today-progress">
         <div class="routine-today-bar-wrap"><div class="routine-today-bar-fill" style="width:${pct}%"></div></div>
         <span class="routine-today-frac">${done}/${total}</span>
       </div>
     </div>`;
   }).join('');
-  return `<div class="routines-today-card" onclick="activateTab('routines')">
+  const nudge = _routineIntelNudge();
+  const nudgeHtml = nudge ? `<div class="routine-intel-nudge" onclick="activateTab('routines')" style="margin-bottom:8px">
+    <div class="routine-intel-icon">${nudge.icon}</div>
+    <div class="routine-intel-body"><div class="routine-intel-label">Routines</div>${escHtml(nudge.text)}</div>
+  </div>` : '';
+  return `${nudgeHtml}<div class="routines-today-card" onclick="activateTab('routines')">
     <div class="routines-today-header">
       <span class="routines-today-title">Routines</span>
       <span class="routines-today-link">View all →</span>
@@ -13933,65 +14656,375 @@ function _renderRoutinesTodayCard() {
   </div>`;
 }
 
+// ── Tab state ─────────────────────────────────────────────────
+
+let _routineActiveTab = 'mine';
+
+// ── Main render ───────────────────────────────────────────────
+
 function renderRoutines() {
   const el = document.getElementById('routines-content');
   if (!el) return;
-  const routines = state.routines || [];
-  const todayKey = _routineTodayKey();
+  const kids = _routineKids();
+  const showKidsTab = kids.length > 0;
 
-  let html = `<div class="page-header" style="margin-bottom:20px">
+  let html = `<div class="page-header" style="margin-bottom:4px">
     <h1>Routines</h1>
-    <p>Build consistent morning and evening habits</p>
+    <p>Build consistent daily habits</p>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+    <button class="btn btn-primary btn-sm" onclick="_routineCreate()">＋ New routine</button>
   </div>`;
 
-  routines.forEach(routine => {
-    const done = routine.completions[todayKey] || [];
-    const total = routine.steps.length;
-    const pct = total > 0 ? Math.round(done.length / total * 100) : 0;
-    const allDone = done.length === total && total > 0;
-    const streak = _routineStreak(routine);
-    const totalMins = routine.steps.reduce((s, st) => s + (st.durationMin || 0), 0);
+  if (showKidsTab) {
+    html += `<div class="routine-tab-bar">
+      <button class="routine-tab${_routineActiveTab === 'mine' ? ' active' : ''}" onclick="_routineSetTab('mine')">My Routines</button>
+      <button class="routine-tab${_routineActiveTab === 'children' ? ' active' : ''}" onclick="_routineSetTab('children')">Children's Routines</button>
+    </div>`;
+  }
 
-    const stepsHtml = routine.steps.map(step => {
+  html += _routineActiveTab === 'children' && showKidsTab
+    ? _renderChildRoutines(kids)
+    : _renderAdultRoutines();
+
+  el.innerHTML = html;
+}
+
+function _routineSetTab(tab) { _routineActiveTab = tab; renderRoutines(); }
+
+// ── Adult routines view ───────────────────────────────────────
+
+function _renderAdultRoutines() {
+  // Lazy uid claim: adult routines saved as 'guest' before sign-in
+  const uid = _routineCurrentUserId();
+  let claimed = false;
+  (state.routines || []).forEach(r => {
+    if (r.ownerType === 'adult' && r.ownerId === 'guest') { r.ownerId = uid; claimed = true; }
+  });
+  if (claimed) _routineSaveValidated('lazy-uid-claim');
+
+  const myRoutines = _routinesForCurrentUser();
+  const todayKey   = _routineTodayKey();
+  let html = '';
+
+  if (!myRoutines.length) {
+    return `<div style="text-align:center;padding:32px 20px;color:var(--text-muted)">
+      <div style="font-size:40px;margin-bottom:12px">📋</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No routines yet</div>
+      <div style="font-size:13px">Tap ＋ New routine to get started.</div>
+    </div>
+    <div class="routine-new-card" onclick="_routineCreate()">
+      <span style="font-size:22px">＋</span>
+      <span class="routine-new-card-label">Create new routine</span>
+    </div>`;
+  }
+
+  myRoutines.forEach(routine => {
+    const isOwner      = _routineIsOwner(routine);
+    const isJoined     = routine.linkedType === 'join';
+    const isSharedToMe = !isOwner && (routine.sharedWith || []).includes(uid);
+    const done         = routine.completions?.[todayKey] || [];
+    const total        = routine.steps.length;
+    const pct          = total > 0 ? Math.round(done.length / total * 100) : 0;
+    const allDone      = done.length === total && total > 0;
+    const streak       = _routineStreak(routine);
+    const totalMins    = routine.steps.reduce((s, st) => s + (st.durationMin || 0), 0);
+    const canEdit      = isOwner && !isJoined;
+
+    let ownerBadge = '';
+    if (isJoined)     ownerBadge = `<span class="routine-owner-badge routine-joined-badge">🔗 Joined</span>`;
+    else if (routine.linkedType === 'duplicate') ownerBadge = `<span class="routine-owner-badge">📋 Duplicated</span>`;
+    else if (isSharedToMe) ownerBadge = `<span class="routine-owner-badge routine-shared-badge">👥 Shared with you</span>`;
+
+    const stepsHtml = routine.steps.map((step, idx) => {
       const isDone = done.includes(step.id);
-      return `<div class="routine-step" onclick="_routineToggleStep(${routine.id}, ${step.id})">
-        <div class="routine-step-check${isDone ? ' done' : ''}">
+      return `<div class="routine-step"${canEdit ? ` draggable="true" data-routine="${routine.id}" data-step="${step.id}" data-idx="${idx}"
+          ondragstart="_routineDragStart(event)" ondragover="_routineDragOver(event)"
+          ondrop="_routineDrop(event,${routine.id})" ondragend="_routineDragEnd(event)"` : ''}>
+        ${canEdit ? `<span class="routine-step-grab" title="Drag to reorder">⠿</span>` : '<span style="width:18px;flex-shrink:0"></span>'}
+        <div class="routine-step-check${isDone ? ' done' : ''}" onclick="_routineToggleStep(${routine.id},${step.id})">
           <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <span class="routine-step-emoji">${step.emoji}</span>
         <span class="routine-step-label${isDone ? ' done' : ''}">${escHtml(step.label)}</span>
         ${step.durationMin ? `<span class="routine-step-dur">${step.durationMin}m</span>` : ''}
+        ${step.notes ? `<span class="routine-step-dur" style="font-style:italic">${escHtml(step.notes)}</span>` : ''}
       </div>`;
     }).join('');
+
+    let btns = `<button class="btn btn-sm btn-secondary" onclick="_routineResetToday(${routine.id})">↺ Reset today</button>
+      <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory(${routine.id},null)">📅 History</button>`;
+    if (canEdit) {
+      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineEdit(${routine.id})">✏️ Edit</button>
+        <button class="btn btn-sm btn-secondary" onclick="_routineShareMenu(${routine.id})">👥 Share</button>
+        <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto" onclick="_routineDelete(${routine.id})">Delete</button>`;
+    } else if (isJoined) {
+      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineDuplicateFromJoined(${routine.id})">📋 Duplicate to mine</button>
+        <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto" onclick="_routineLeave(${routine.id})">Leave</button>`;
+    } else if (isSharedToMe) {
+      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineDuplicateTo(${routine.id})">📋 Duplicate to mine</button>
+        <button class="btn btn-sm btn-secondary" onclick="_routineJoin(${routine.id})">🔗 Join (stay in sync)</button>`;
+    }
 
     html += `<div class="routine-card">
       <div class="routine-card-header">
         <div class="routine-card-title">${routine.emoji} ${escHtml(routine.name)}</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          ${streak > 0 ? `<span class="routine-streak">🔥 ${streak} day${streak !== 1 ? 's' : ''}</span>` : ''}
-          <button class="btn btn-sm btn-ghost" onclick="_routineEdit(${routine.id})" title="Edit routine">✏️</button>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${streak > 0 ? `<span class="routine-streak">🔥 ${streak}d</span>` : ''}
+          ${ownerBadge}
         </div>
       </div>
-      <div class="routine-card-meta">${totalMins}min total · ${routine.triggerTime}</div>
+      <div class="routine-card-meta">${totalMins ? `${totalMins}min · ` : ''}${routine.triggerTime}</div>
       <div class="routine-progress-row">
-        <div class="routine-progress-bar-wrap">
-          <div class="routine-progress-bar-fill" style="width:${pct}%"></div>
-        </div>
+        <div class="routine-progress-bar-wrap"><div class="routine-progress-bar-fill" style="width:${pct}%"></div></div>
         <span class="routine-progress-label">${done.length}/${total}</span>
       </div>
       <div class="routine-steps">${stepsHtml}</div>
       ${allDone ? `<div class="routine-all-done">✓ Complete — great work!</div>` : ''}
-      <button class="routine-add-step-btn" onclick="_routineAddStep(${routine.id})">+ Add step</button>
+      ${canEdit ? `<button class="routine-add-step-btn" onclick="_routineAddStep(${routine.id})">+ Add step</button>` : ''}
+      ${canEdit ? _renderSuggestionsSection(routine) : ''}
+      <div class="routine-card-btns" style="margin-top:12px">${btns}</div>
     </div>`;
   });
 
-  el.innerHTML = html;
+  html += `<div class="routine-new-card" onclick="_routineCreate()">
+    <span style="font-size:22px">＋</span>
+    <span class="routine-new-card-label">Create new routine</span>
+  </div>`;
+
+  return html;
 }
 
-function _routineToggleStep(routineId, stepId) {
+// ── Suggestions ───────────────────────────────────────────────
+
+const _routineSuggCollapsed = {};
+const _routineSuggExpanded  = {};
+const SUGG_PREVIEW = 3;
+
+function _routineToggleSugg(routineId) { _routineSuggCollapsed[routineId] = !_routineSuggCollapsed[routineId]; renderRoutines(); }
+function _routineExpandSugg(routineId) { _routineSuggExpanded[routineId]  = true; renderRoutines(); }
+
+function _renderSuggestionsSection(routine) {
+  const suggestions  = _routineAvailableSuggestions(routine);
+  if (!suggestions.length) return '';
+  const isOpen       = !_routineSuggCollapsed[routine.id];
+  const showAll      = !!_routineSuggExpanded[routine.id];
+  const visible      = showAll ? suggestions : suggestions.slice(0, SUGG_PREVIEW);
+  const hiddenCount  = suggestions.length - SUGG_PREVIEW;
+  const isChild = routine.ownerType === 'household';
+  const rowsHtml = visible.map(s => `
+    <div class="routine-suggestion-row">
+      <span class="routine-suggestion-emoji">${s.emoji}</span>
+      <span class="routine-suggestion-label">${escHtml(s.label)}</span>
+      ${s.durationMin ? `<span class="routine-suggestion-dur">${s.durationMin}m</span>` : ''}
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto">
+        ${isChild ? `<button class="btn btn-sm btn-ghost" style="padding:2px 7px;font-size:12px"
+          onclick="event.stopPropagation();_routineEditSuggestion(${routine.id},'${escHtml(s.label).replace(/'/g,"\\'")}','${s.emoji}',${s.durationMin})"
+          title="Add with points">✏️</button>` : ''}
+        <span class="routine-suggestion-add"
+          onclick="_routineAddSuggestion(${routine.id},'${escHtml(s.label).replace(/'/g,"\\'")}','${s.emoji}',${s.durationMin})">+</span>
+      </div>
+    </div>`).join('');
+  const moreBtn = !showAll && hiddenCount > 0
+    ? `<button class="btn btn-sm btn-ghost" style="margin-top:4px;width:100%;font-size:12px" onclick="_routineExpandSugg(${routine.id})">Show ${hiddenCount} more ▼</button>`
+    : '';
+  return `<div class="routine-suggestions">
+    <div class="routine-suggestions-toggle${isOpen ? ' open' : ''}" onclick="_routineToggleSugg(${routine.id})">
+      <span>Suggested steps (${suggestions.length})</span><span class="chevron">▼</span>
+    </div>
+    <div class="routine-suggestions-list" style="display:${isOpen ? 'flex' : 'none'};flex-direction:column">
+      ${rowsHtml}${moreBtn}
+    </div>
+  </div>`;
+}
+
+function _routineEditSuggestion(routineId, label, emoji, durationMin) {
+  openModal('Add step', `
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Label</label>
+        <input class="form-input" id="rse-label" value="${escHtml(label)}" maxlength="40"></div>
+      <div><label class="form-label">Emoji</label>
+        <input class="form-input" id="rse-emoji" value="${emoji}" maxlength="4" style="width:64px"></div>
+    </div>
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Duration (min)</label>
+        <input class="form-input" id="rse-dur" type="number" min="0" max="120" value="${durationMin || 0}"></div>
+      <div style="flex:1"><label class="form-label">Points</label>
+        <input class="form-input" id="rse-pts" type="number" min="0" max="999" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="rse-notes" placeholder="e.g. 20 min walk or gym" maxlength="80">
+    </div>
+  `, () => {
+    const finalLabel = document.getElementById('rse-label')?.value.trim() || label;
+    _routineAddSuggestion(routineId, finalLabel,
+      document.getElementById('rse-emoji')?.value.trim() || emoji,
+      parseInt(document.getElementById('rse-dur')?.value) || 0,
+      parseInt(document.getElementById('rse-pts')?.value) || 0,
+      document.getElementById('rse-notes')?.value.trim() || ''
+    );
+  });
+}
+
+function _routineAddSuggestion(routineId, label, emoji, durationMin, points, notes) {
   const routine = (state.routines || []).find(r => r.id === routineId);
   if (!routine) return;
+  const allUsed = new Set([
+    ...routine.steps.map(s => s.id),
+    ...Object.values(routine.completions || {}).flat(),
+    ...(state.routineAssignments || [])
+      .filter(a => a.routineId === routineId)
+      .flatMap(a => Object.values(a.completionState || {}).flat())
+  ]);
+  let newId = Math.max(0, ...allUsed) + 1;
+  while (allUsed.has(newId)) newId++;
+  routine.steps.push({ id: newId, label, emoji, durationMin: durationMin || 0, points: points || 0, notes: notes || '' });
+  _routinePropagateStepAdd(routine.id, routine.steps[routine.steps.length - 1]);
+  saveData(state);
+  renderRoutines();
+}
+
+// ── Children's routines view ──────────────────────────────────
+// Organised by routine (not by child). Each routine card shows:
+//   - Step builder (add/suggest/drag)
+//   - Inline child assignment chips
+//   - Per-child progress (if assigned to >1 child, show each child's bar)
+
+function _renderChildRoutines(kids) {
+  const assignments       = state.routineAssignments || [];
+  const householdRoutines = _routinesForHousehold();
+  const todayKey          = _routineTodayKey();
+
+  if (!householdRoutines.length) {
+    return `<div style="text-align:center;padding:32px 20px;color:var(--text-muted)">
+      <div style="font-size:40px;margin-bottom:12px">👧</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">No children's routines yet</div>
+      <div style="font-size:13px">Tap ＋ New routine to create one, then assign it to your children.</div>
+    </div>
+    <div class="routine-new-card" onclick="_routineCreate('child')">
+      <span style="font-size:22px">＋</span>
+      <span class="routine-new-card-label">Create children's routine</span>
+    </div>`;
+  }
+
+  let html = '';
+
+  householdRoutines.forEach(routine => {
+    const routineAssignments = assignments.filter(a => a.routineId === routine.id);
+    const assignedKids = routineAssignments
+      .map(a => ({ kid: kids.find(k => k.id === a.childId), assignment: a }))
+      .filter(x => x.kid);
+    const totalSteps = routine.steps.length;
+
+    // ── Inline child assignment chips ─────────────────────────
+    const childChipsHtml = kids.map(kid => {
+      const isAssigned = routineAssignments.some(a => a.childId === kid.id);
+      return `<span class="routine-member-chip${isAssigned ? ' active' : ''}"
+        onclick="_routineToggleAssignment(${routine.id},'${kid.id}')"
+        title="${isAssigned ? 'Remove' : 'Assign'} ${escHtml(kid.name)}">
+        ${kid.emoji || '👤'} ${escHtml(kid.name)}
+      </span>`;
+    }).join('');
+
+    // ── Per-child progress rows ────────────────────────────────
+    const progressRowsHtml = assignedKids.length
+      ? assignedKids.map(({ kid, assignment }) => {
+          const done    = assignment.completionState?.[todayKey] || [];
+          const pct     = totalSteps > 0 ? Math.round(done.length / totalSteps * 100) : 0;
+          const streak  = _assignmentStreak(assignment, totalSteps);
+          const allDone = done.length === totalSteps && totalSteps > 0;
+          return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+            <span style="font-size:14px;width:22px;text-align:center;flex-shrink:0">${kid.emoji || '👤'}</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text);flex-shrink:0;min-width:52px">${escHtml(kid.name)}</span>
+            <div class="routine-progress-bar-wrap" style="flex:1">
+              <div class="routine-progress-bar-fill" style="width:${pct}%"></div>
+            </div>
+            <span class="routine-progress-label">${done.length}/${totalSteps}</span>
+            ${streak > 0 ? `<span class="routine-streak" style="font-size:11px;padding:2px 7px">🔥${streak}</span>` : ''}
+            ${allDone ? `<span style="font-size:12px;color:var(--section-accent,#0891b2);font-weight:700">✓</span>` : ''}
+          </div>`;
+        }).join('')
+      : `<div style="font-size:12px;color:var(--text-muted);padding:4px 0">No children assigned yet — tap a name above to assign.</div>`;
+
+    // ── Step list (adult editable) ─────────────────────────────
+    const stepsHtml = routine.steps.map((step, idx) => `
+      <div class="routine-step" draggable="true"
+          data-routine="${routine.id}" data-step="${step.id}" data-idx="${idx}"
+          ondragstart="_routineDragStart(event)" ondragover="_routineDragOver(event)"
+          ondrop="_routineDrop(event,${routine.id})" ondragend="_routineDragEnd(event)">
+        <span class="routine-step-grab">⠿</span>
+        <span class="routine-step-emoji">${step.emoji}</span>
+        <span class="routine-step-label">${escHtml(step.label)}</span>
+        ${step.durationMin ? `<span class="routine-step-dur">${step.durationMin}m</span>` : ''}
+        ${step.notes ? `<span class="routine-step-dur" style="font-style:italic">${escHtml(step.notes)}</span>` : ''}
+        <div style="display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0">
+          ${step.points > 0 ? `<span style="font-size:10px;font-weight:700;background:#fef9c3;color:#854d0e;padding:2px 6px;border-radius:99px">⭐${step.points}</span>` : ''}
+          <button onclick="event.stopPropagation();_routineEditStep(${routine.id},${step.id})"
+            style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px;padding:0 3px;line-height:1" title="Edit step">✏️</button>
+          <button onclick="event.stopPropagation();_routineDeleteStep(${routine.id},${step.id},false)"
+            style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:14px;padding:0 3px;line-height:1" title="Remove step">✕</button>
+        </div>
+      </div>`).join('');
+
+    html += `<div class="routine-card">
+      <div class="routine-card-header">
+        <div class="routine-card-title">${routine.emoji} ${escHtml(routine.name)}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;color:var(--text-muted)">${routine.triggerTime}</span>
+          <button class="btn btn-sm btn-ghost" onclick="_routineEdit(${routine.id})" title="Edit">✏️</button>
+          <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteChild(${routine.id})" title="Delete">🗑</button>
+        </div>
+      </div>
+
+      <!-- Assigned children -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Assigned to</div>
+        <div class="routine-member-chips">${childChipsHtml}</div>
+      </div>
+
+      <!-- Per-child progress (only if assigned) -->
+      ${assignedKids.length ? `<div style="margin-bottom:12px">${progressRowsHtml}</div>` : `<div style="margin-bottom:8px">${progressRowsHtml}</div>`}
+
+      <!-- Steps -->
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Steps</div>
+      <div class="routine-steps">${stepsHtml || `<div style="font-size:13px;color:var(--text-muted);padding:8px 0">No steps yet — add from suggestions or create your own.</div>`}</div>
+      <button class="routine-add-step-btn" onclick="_routineAddStep(${routine.id})">+ Add step</button>
+      ${_renderSuggestionsSection(routine)}
+
+      <!-- Actions -->
+      <div class="routine-card-btns" style="margin-top:12px">
+        <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory(${routine.id},null)">📅 History</button>
+        ${routine.pointsPerCompletion > 0 ? `<span style="font-size:12px;color:var(--text-muted);align-self:center">⭐ ${routine.pointsPerCompletion} pts</span>` : ''}
+      </div>
+    </div>`;
+  });
+
+  html += `<div class="routine-new-card" onclick="_routineCreate('child')">
+    <span style="font-size:22px">＋</span>
+    <span class="routine-new-card-label">Create children's routine</span>
+  </div>`;
+
+  return html;
+}
+
+// Delete a child (household) routine and all its assignments
+function _routineDeleteChild(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  if (!confirm(`Delete "${routine.name}"? All assignments and history will be removed.`)) return;
+  state.routines = state.routines.filter(r => r.id !== routineId);
+  state.routineAssignments = (state.routineAssignments || []).filter(a => a.routineId !== routineId);
+  saveData(state); renderRoutines();
+}
+
+// ── Step toggles ──────────────────────────────────────────────
+
+// Adult toggle — completions live on routine
+function _routineToggleStep(routineId, stepId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine || routine.ownerType !== 'adult') return;
   const key = _routineTodayKey();
+  if (!routine.completions) routine.completions = {};
   if (!routine.completions[key]) routine.completions[key] = [];
   const idx = routine.completions[key].indexOf(stepId);
   if (idx === -1) routine.completions[key].push(stepId);
@@ -14000,102 +15033,565 @@ function _routineToggleStep(routineId, stepId) {
   renderRoutines();
 }
 
+// Child toggle — completions live on the assignment record
+function _routineToggleStepKid(routineId, stepId, childId) {
+  const assignment = _routineGetAssignment(routineId, childId);
+  if (!assignment) return;
+  if (!assignment.completionState) assignment.completionState = {};
+  const key = _routineTodayKey();
+  if (!assignment.completionState[key]) assignment.completionState[key] = [];
+  const idx = assignment.completionState[key].indexOf(stepId);
+  const ticking = idx === -1; // true = marking done, false = unmarking
+  if (ticking) assignment.completionState[key].push(stepId);
+  else assignment.completionState[key].splice(idx, 1);
+
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (routine && ticking) {
+    const step = routine.steps.find(s => s.id === stepId);
+    // Award per-step points immediately when ticked
+    if ((step?.points || 0) > 0) {
+      _routineAwardStepPoints(routine, step, childId);
+    }
+    // Award completion bonus when all steps done
+    const total = routine.steps.length;
+    const done  = assignment.completionState[key].length;
+    if (done === total && total > 0 && (routine.pointsPerCompletion || 0) > 0) {
+      _routineAwardPoints(routine, childId);
+    }
+  }
+
+  saveData(state);
+  // Refresh child view if we're in it, otherwise refresh routines tab
+  if (_activeProfile?.role === 'child') showChildView(childId);
+  else renderRoutines();
+}
+
+function _routineAwardStepPoints(routine, step, childId) {
+  if (!state.kids) return;
+  if (!state.kids.completions) state.kids.completions = [];
+  if (!state.kids.chores) state.kids.chores = [];
+  const syntheticId = `routine-${routine.id}-step-${step.id}`;
+  // Ensure a matching synthetic chore exists
+  const existing = state.kids.chores.find(c => c.id === syntheticId);
+  if (!existing) {
+    state.kids.chores.push({ id: syntheticId, name: `${routine.name}: ${step.label}`,
+      emoji: step.emoji, points: step.points, frequency: 'daily',
+      assignedTo: childId, _isRoutine: true, _isStep: true });
+  } else {
+    existing.points = step.points;
+  }
+  // Only award once per day per step
+  const todayStr = new Date().toDateString();
+  const already = state.kids.completions.some(c =>
+    c.choreId === syntheticId && c.kidId === childId &&
+    new Date(c.completedAt).toDateString() === todayStr && c.status === 'approved'
+  );
+  if (!already) {
+    state.kids.completions.push({ id: uid(), choreId: syntheticId, kidId: childId,
+      completedAt: Date.now(), status: 'approved', _fromRoutine: true });
+  }
+}
+
+function _routineAwardPoints(routine, childId) {
+  if (!state.kids) return;
+  if (!state.kids.completions) state.kids.completions = [];
+  // Create a synthetic chore completion for the points system
+  const syntheticChoreId = `routine-${routine.id}`;
+  // Ensure a matching "chore" entry exists so kidBalance can read the points
+  if (!state.kids.chores) state.kids.chores = [];
+  const existing = state.kids.chores.find(c => c.id === syntheticChoreId);
+  if (!existing) {
+    state.kids.chores.push({ id: syntheticChoreId, name: routine.name, emoji: routine.emoji,
+      points: routine.pointsPerCompletion, frequency: 'daily', assignedTo: childId, _isRoutine: true });
+  } else {
+    existing.points = routine.pointsPerCompletion;
+  }
+  // Only award once per day
+  const todayStr = new Date().toDateString();
+  const alreadyAwarded = state.kids.completions.some(c =>
+    c.choreId === syntheticChoreId && c.kidId === childId &&
+    new Date(c.completedAt).toDateString() === todayStr && c.status === 'approved'
+  );
+  if (!alreadyAwarded) {
+    state.kids.completions.push({ id: uid(), choreId: syntheticChoreId, kidId: childId,
+      completedAt: Date.now(), status: 'approved', _fromRoutine: true });
+  }
+}
+
+// ── Reset ─────────────────────────────────────────────────────
+
+function _routineResetToday(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  delete routine.completions[_routineTodayKey()];
+  saveData(state); renderRoutines();
+}
+
+function _routineResetTodayKid(routineId, childId) {
+  const assignment = _routineGetAssignment(routineId, childId);
+  if (!assignment) return;
+  if (assignment.completionState) delete assignment.completionState[_routineTodayKey()];
+  saveData(state); renderRoutines();
+}
+
+// ── Drag-to-reorder ───────────────────────────────────────────
+
+let _routineDragIdx = null;
+function _routineDragStart(e) { _routineDragIdx = parseInt(e.currentTarget.dataset.idx); e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+function _routineDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; document.querySelectorAll('.routine-step.drag-over').forEach(el => el.classList.remove('drag-over')); e.currentTarget.classList.add('drag-over'); }
+function _routineDrop(e, routineId) {
+  e.preventDefault();
+  const toIdx = parseInt(e.currentTarget.dataset.idx);
+  if (_routineDragIdx === null || _routineDragIdx === toIdx) return;
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const moved = routine.steps.splice(_routineDragIdx, 1)[0];
+  routine.steps.splice(toIdx, 0, moved);
+  _routineDragIdx = null;
+  saveData(state); renderRoutines();
+}
+function _routineDragEnd(e) { e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.routine-step.drag-over').forEach(el => el.classList.remove('drag-over')); _routineDragIdx = null; }
+
+// ── Add step ──────────────────────────────────────────────────
+
 function _routineAddStep(routineId) {
   const routine = (state.routines || []).find(r => r.id === routineId);
   if (!routine) return;
-  const newId = Math.max(0, ...routine.steps.map(s => s.id)) + 1;
+  const isChildRoutine = routine.ownerType === 'household';
   openModal('Add step', `
-    <div class="form-group">
-      <label class="form-label">Label</label>
+    <div class="form-group"><label class="form-label">Label</label>
       <input class="form-input" id="rs-label" placeholder="e.g. Meditate" maxlength="40">
     </div>
-    <div class="form-group">
-      <label class="form-label">Emoji</label>
-      <input class="form-input" id="rs-emoji" placeholder="🧘" maxlength="4" style="width:80px">
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Emoji</label>
+        <input class="form-input" id="rs-emoji" placeholder="🧘" maxlength="4"></div>
+      <div style="flex:1"><label class="form-label">Duration (min)</label>
+        <input class="form-input" id="rs-dur" type="number" min="0" max="120" placeholder="10"></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Duration (minutes)</label>
-      <input class="form-input" id="rs-dur" type="number" min="0" max="120" placeholder="10" style="width:100px">
-    </div>
-  `, `
-    <button class="btn btn-primary" onclick="_routineAddStepSave(${routineId}, ${newId})">Add</button>
-    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-  `);
+    ${isChildRoutine ? `<div class="form-group"><label class="form-label">Points for this step <span style="font-size:11px;color:var(--text-muted)">(optional)</span></label>
+      <input class="form-input" id="rs-pts" type="number" min="0" max="999" placeholder="0" style="width:90px"></div>` : ''}
+    <div class="form-group"><label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="rs-notes" placeholder="e.g. 20 min walk or gym" maxlength="80">
+    </div>`, () => {
+    const label = document.getElementById('rs-label')?.value.trim();
+    if (!label) return;
+    const allUsed = new Set([
+      ...routine.steps.map(s => s.id),
+      ...Object.values(routine.completions || {}).flat(),
+      ...(state.routineAssignments || []).filter(a => a.routineId === routineId)
+        .flatMap(a => Object.values(a.completionState || {}).flat())
+    ]);
+    let newId = Math.max(0, ...allUsed) + 1;
+    while (allUsed.has(newId)) newId++;
+    const step = { id: newId, label,
+      emoji: document.getElementById('rs-emoji')?.value.trim() || '✅',
+      durationMin: parseInt(document.getElementById('rs-dur')?.value) || 0,
+      points: isChildRoutine ? (parseInt(document.getElementById('rs-pts')?.value) || 0) : 0,
+      notes: document.getElementById('rs-notes')?.value.trim() || '' };
+    routine.steps.push(step);
+    _routinePropagateStepAdd(routine.id, step);
+    saveData(state); closeModal(); renderRoutines();
+  });
   setTimeout(() => document.getElementById('rs-label')?.focus(), 100);
 }
 
-function _routineAddStepSave(routineId, newId) {
-  const label = document.getElementById('rs-label')?.value.trim();
-  if (!label) return;
-  const emoji = document.getElementById('rs-emoji')?.value.trim() || '✅';
-  const dur = parseInt(document.getElementById('rs-dur')?.value) || 0;
-  const routine = (state.routines || []).find(r => r.id === routineId);
-  if (!routine) return;
-  routine.steps.push({ id: newId, label, emoji, durationMin: dur });
-  saveData(state);
-  closeModal();
-  renderRoutines();
+function _routinePropagateStepAdd(sourceId, newStep) {
+  (state.routines || []).forEach(r => {
+    if (r.linkedType === 'join' && r.linkedFrom === sourceId && !r.steps.some(s => s.label === newStep.label)) {
+      const newId = Math.max(0, ...r.steps.map(s => s.id), 0) + 1;
+      r.steps.push({ ...newStep, id: newId });
+    }
+  });
 }
+
+function _routinePropagateStepDelete(sourceId, deletedLabel) {
+  (state.routines || []).forEach(r => {
+    if (r.linkedType === 'join' && r.linkedFrom === sourceId)
+      r.steps = r.steps.filter(s => s.label !== deletedLabel);
+  });
+}
+
+// ── Edit routine ──────────────────────────────────────────────
 
 function _routineEdit(routineId) {
   const routine = (state.routines || []).find(r => r.id === routineId);
   if (!routine) return;
-  const stepsRows = routine.steps.map((s, i) => `
+  const isChildRoutine = routine.ownerType === 'household';
+  const stepsRows = routine.steps.map(s => `
     <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
       <span style="font-size:16px">${s.emoji}</span>
       <span style="flex:1;font-size:13px;font-weight:500">${escHtml(s.label)}</span>
       <span style="font-size:11px;color:var(--text-muted)">${s.durationMin || 0}m</span>
-      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteStep(${routineId}, ${s.id})">✕</button>
+      ${isChildRoutine ? `<span style="font-size:11px;color:var(--text-muted)">⭐${s.points || 0}</span>` : ''}
+      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteStep(${routineId},${s.id},true)">✕</button>
     </div>`).join('');
+
+  // Points field only for child (household) routines
+  const pointsField = routine.ownerType === 'household' ? `
+    <div class="form-group"><label class="form-label">Points on completion</label>
+      <input class="form-input" id="re-pts" type="number" min="0" max="999" value="${routine.pointsPerCompletion || 0}" style="width:90px">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Awarded to the child when all steps are done</div>
+    </div>` : '';
+
   openModal(`Edit: ${routine.emoji} ${routine.name}`, `
-    <div class="form-group">
-      <label class="form-label">Name</label>
-      <input class="form-input" id="re-name" value="${escHtml(routine.name)}" maxlength="30">
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Name</label>
+        <input class="form-input" id="re-name" value="${escHtml(routine.name)}" maxlength="30"></div>
+      <div><label class="form-label">Emoji</label>
+        <input class="form-input" id="re-emoji" value="${routine.emoji}" maxlength="4" style="width:64px"></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Emoji</label>
-      <input class="form-input" id="re-emoji" value="${routine.emoji}" maxlength="4" style="width:80px">
+    <div class="form-group"><label class="form-label">Trigger time</label>
+      <input class="form-input" id="re-time" type="time" value="${routine.triggerTime}" style="width:130px">
     </div>
-    <div class="form-group">
-      <label class="form-label">Time</label>
-      <input class="form-input" id="re-time" type="time" value="${routine.triggerTime}" style="width:120px">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Steps</label>
-      <div id="re-steps">${stepsRows}</div>
-    </div>
-  `, `
-    <button class="btn btn-primary" onclick="_routineEditSave(${routineId})">Save</button>
-    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-  `);
+    ${pointsField}
+    <div class="form-group"><label class="form-label">Steps</label><div>${stepsRows}</div></div>
+  `, () => {
+    const name  = document.getElementById('re-name')?.value.trim();
+    const emoji = document.getElementById('re-emoji')?.value.trim();
+    const time  = document.getElementById('re-time')?.value;
+    if (name)  routine.name  = name;
+    if (emoji) routine.emoji = emoji;
+    if (time)  routine.triggerTime = time;
+    if (routine.ownerType === 'household') {
+      const pts = parseInt(document.getElementById('re-pts')?.value);
+      if (!isNaN(pts)) routine.pointsPerCompletion = pts;
+    }
+    routine.lastEditedBy = _routineCurrentUserId();
+    routine.lastEditedAt = new Date().toISOString();
+    saveData(state); closeModal(); renderRoutines();
+  });
 }
 
-function _routineEditSave(routineId) {
+// fromEditModal: true = re-open the Edit routine modal after deletion
+//                false/undefined = just close and re-render the card
+function _routineDeleteStep(routineId, stepId, fromEditModal) {
   const routine = (state.routines || []).find(r => r.id === routineId);
   if (!routine) return;
-  const name = document.getElementById('re-name')?.value.trim();
-  const emoji = document.getElementById('re-emoji')?.value.trim();
-  const time = document.getElementById('re-time')?.value;
-  if (name) routine.name = name;
-  if (emoji) routine.emoji = emoji;
-  if (time) routine.triggerTime = time;
-  saveData(state);
-  closeModal();
-  renderRoutines();
-}
-
-function _routineDeleteStep(routineId, stepId) {
-  const routine = (state.routines || []).find(r => r.id === routineId);
-  if (!routine) return;
+  const deleted = routine.steps.find(s => s.id === stepId);
   routine.steps = routine.steps.filter(s => s.id !== stepId);
-  // Remove from any completions
-  Object.keys(routine.completions).forEach(k => {
+  Object.keys(routine.completions || {}).forEach(k => {
     routine.completions[k] = routine.completions[k].filter(id => id !== stepId);
   });
+  (state.routineAssignments || []).filter(a => a.routineId === routineId).forEach(a => {
+    Object.keys(a.completionState || {}).forEach(k => {
+      a.completionState[k] = a.completionState[k].filter(id => id !== stepId);
+    });
+  });
+  if (deleted) _routinePropagateStepDelete(routine.id, deleted.label);
   saveData(state);
-  // Re-render the edit modal with updated step list, then reopen
-  closeModal();
-  _routineEdit(routineId);
+  if (fromEditModal) { closeModal(); _routineEdit(routineId); }
+  else { closeModal(); renderRoutines(); }
+}
+
+function _routineEditStep(routineId, stepId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const step = routine.steps.find(s => s.id === stepId);
+  if (!step) return;
+  const isChild = routine.ownerType === 'household';
+  openModal('Edit step', `
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Label</label>
+        <input class="form-input" id="rst-label" value="${escHtml(step.label)}" maxlength="40"></div>
+      <div><label class="form-label">Emoji</label>
+        <input class="form-input" id="rst-emoji" value="${step.emoji}" maxlength="4" style="width:64px"></div>
+    </div>
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Duration (min)</label>
+        <input class="form-input" id="rst-dur" type="number" min="0" max="120" value="${step.durationMin || 0}"></div>
+      ${isChild ? `<div style="flex:1"><label class="form-label">Points</label>
+        <input class="form-input" id="rst-pts" type="number" min="0" max="999" value="${step.points || 0}"></div>` : ''}
+    </div>
+    <div class="form-group"><label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="rst-notes" value="${escHtml(step.notes || '')}" maxlength="80">
+    </div>
+  `, () => {
+    const label = document.getElementById('rst-label')?.value.trim();
+    if (!label) return;
+    step.label = label;
+    step.emoji = document.getElementById('rst-emoji')?.value.trim() || step.emoji;
+    step.durationMin = parseInt(document.getElementById('rst-dur')?.value) || 0;
+    step.notes = document.getElementById('rst-notes')?.value.trim() || '';
+    if (isChild) step.points = parseInt(document.getElementById('rst-pts')?.value) || 0;
+    saveData(state);
+    closeModal();
+    renderRoutines();
+  });
+}
+
+// ── Manage assignments (multi-child) ──────────────────────────
+
+function _routineManageAssignments(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const kids = _routineKids();
+  if (!kids.length) { openModal('Assign', `<p style="color:var(--text-muted);font-size:13px">No children in this household yet.</p>`, () => closeModal()); return; }
+  const assignments = state.routineAssignments || [];
+  const rows = kids.map(kid => {
+    const isAssigned = assignments.some(a => a.routineId === routineId && a.childId === kid.id);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <span style="font-size:22px">${kid.emoji || '👤'}</span>
+      <span style="flex:1;font-size:14px;font-weight:600">${escHtml(kid.name)}</span>
+      <button class="btn btn-sm ${isAssigned ? 'btn-danger-ghost' : 'btn-primary'}"
+        onclick="_routineToggleAssignment(${routineId},'${kid.id}')">
+        ${isAssigned ? 'Remove' : 'Assign'}
+      </button>
+    </div>`;
+  }).join('');
+  openModal(`${routine.emoji} ${routine.name} — Assigned to`, `
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Each child tracks their own progress independently.</p>
+    ${rows}
+  `, () => closeModal());
+}
+
+function _routineToggleAssignment(routineId, childId) {
+  if (!state.routineAssignments) state.routineAssignments = [];
+  const existing = _routineGetAssignment(routineId, childId);
+  if (existing) {
+    // Unassign: archive completion state silently (chip tap is reversible)
+    existing.archivedCompletionState = JSON.parse(JSON.stringify(existing.completionState || {}));
+    existing.archivedAt = new Date().toISOString();
+    state.routineAssignments = state.routineAssignments.filter(a => !(a.routineId === routineId && a.childId === childId));
+  } else {
+    state.routineAssignments.push({
+      id: uid(), routineId, childId,
+      assignedBy: _routineCurrentUserId(), assignedAt: new Date().toISOString(),
+      completionState: {}, archivedCompletionState: null, childIds: [childId]
+    });
+  }
+  saveData(state); renderRoutines();
+}
+
+// ── Create routine ────────────────────────────────────────────
+// Simplified: just type (Adult/Child), name, emoji, time.
+// Assignment happens after creation on the card itself.
+
+function _routineCreate(preselectType) {
+  // preselectType: undefined = default to 'adult', 'child' = child tab context
+  const defaultIsChild = preselectType === 'child';
+
+  openModal('New routine', `
+    <div class="form-group">
+      <label class="form-label">Routine type</label>
+      <div class="routine-for-picklist">
+        <label class="routine-for-option${!defaultIsChild ? ' selected' : ''}" id="rn-type-adult" onclick="_routineTypeSelect('adult')">
+          <input type="radio" name="rn-type" value="adult" ${!defaultIsChild ? 'checked' : ''} style="display:none">
+          <span class="routine-for-avatar">🧑</span>
+          <span class="routine-for-name">Adult</span>
+        </label>
+        <label class="routine-for-option${defaultIsChild ? ' selected' : ''}" id="rn-type-child" onclick="_routineTypeSelect('child')">
+          <input type="radio" name="rn-type" value="child" ${defaultIsChild ? 'checked' : ''} style="display:none">
+          <span class="routine-for-avatar">👧</span>
+          <span class="routine-for-name">Child</span>
+        </label>
+      </div>
+    </div>
+    <div class="form-group" style="display:flex;gap:12px">
+      <div style="flex:1"><label class="form-label">Name</label>
+        <input class="form-input" id="rn-name" placeholder="e.g. Morning, Bedtime" maxlength="30"></div>
+      <div><label class="form-label">Emoji</label>
+        <input class="form-input" id="rn-emoji" placeholder="📋" maxlength="4" style="width:64px"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Trigger time</label>
+      <input class="form-input" id="rn-time" type="time" value="${defaultIsChild ? '19:30' : '08:00'}" style="width:130px">
+    </div>
+    <div class="form-group" id="rn-pts-group" style="display:${defaultIsChild ? 'block' : 'none'}">
+      <label class="form-label">Points on completion <span style="font-size:11px;color:var(--text-muted)">(optional)</span></label>
+      <input class="form-input" id="rn-pts" type="number" min="0" max="999" placeholder="0" style="width:90px">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Awarded when the child completes all steps</div>
+    </div>
+  `, () => {
+    const name = document.getElementById('rn-name')?.value.trim();
+    if (!name) return;
+    const type       = document.querySelector('input[name="rn-type"]:checked')?.value || 'adult';
+    const emoji      = document.getElementById('rn-emoji')?.value.trim() || '📋';
+    const time       = document.getElementById('rn-time')?.value || (type === 'child' ? '19:30' : '08:00');
+    const pts        = parseInt(document.getElementById('rn-pts')?.value) || 0;
+    const currentUid = _routineCurrentUserId();
+    const routineId  = _routineNextId();
+
+    if (type === 'adult') {
+      const r = { id: routineId, name, emoji, triggerTime: time,
+        steps: [], completions: {}, assignedTo: [],
+        ownerType: 'adult', ownerId: currentUid,
+        sharedWith: [], linkedFrom: null, linkedType: null, pointsPerCompletion: 0 };
+      _routineAssertScope(r);
+      state.routines.push(r);
+      _routineSaveValidated('create:adult');
+      closeModal();
+      _routineActiveTab = 'mine';
+    } else {
+      const r = { id: routineId, name, emoji, triggerTime: time,
+        steps: [], completions: {}, assignedTo: [],
+        ownerType: 'household', ownerId: 'household',
+        sharedWith: [], linkedFrom: null, linkedType: null, pointsPerCompletion: pts,
+        createdBy: currentUid, lastEditedBy: currentUid, lastEditedAt: new Date().toISOString() };
+      _routineAssertScope(r);
+      state.routines.push(r);
+      _routineSaveValidated('create:child');
+      closeModal();
+      _routineActiveTab = 'children';
+    }
+    renderRoutines();
+  });
+  setTimeout(() => document.getElementById('rn-name')?.focus(), 100);
+}
+
+function _routineTypeSelect(type) {
+  document.querySelectorAll('input[name="rn-type"]').forEach(r => r.checked = r.value === type);
+  document.getElementById('rn-type-adult')?.classList.toggle('selected', type === 'adult');
+  document.getElementById('rn-type-child')?.classList.toggle('selected', type === 'child');
+  const timeInput = document.getElementById('rn-time');
+  if (timeInput) timeInput.value = type === 'child' ? '19:30' : '08:00';
+  const ptsGroup = document.getElementById('rn-pts-group');
+  if (ptsGroup) ptsGroup.style.display = type === 'child' ? 'block' : 'none';
+}
+
+// ── Delete / leave / unassign ─────────────────────────────────
+
+function _routineDelete(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  if (!confirm(`Delete "${routine.name}"? This cannot be undone.`)) return;
+  state.routines = state.routines.filter(r => r.id !== routineId);
+  state.routineAssignments = (state.routineAssignments || []).filter(a => a.routineId !== routineId);
+  saveData(state); renderRoutines();
+}
+
+function _routineLeave(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  if (!confirm(`Leave "${routine.name}"? Your completion history will be removed.`)) return;
+  state.routines = state.routines.filter(r => r.id !== routineId);
+  saveData(state); renderRoutines();
+}
+
+function _routineUnassign(routineId, kidId) {
+  if (!confirm('Unassign this child? Their completion history will be archived.')) return;
+  const assignment = _routineGetAssignment(routineId, kidId);
+  if (assignment) {
+    assignment.archivedCompletionState = JSON.parse(JSON.stringify(assignment.completionState || {}));
+    assignment.archivedAt = new Date().toISOString();
+  }
+  state.routineAssignments = (state.routineAssignments || []).filter(
+    a => !(a.routineId === routineId && a.childId === kidId)
+  );
+  // Delete routine only if no remaining assignments
+  if (!(state.routineAssignments || []).some(a => a.routineId === routineId))
+    state.routines = state.routines.filter(r => r.id !== routineId);
+  saveData(state); renderRoutines();
+}
+
+// ── Sharing (adult routines) ──────────────────────────────────
+
+function _routineShareMenu(routineId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const others = _routineOtherAdults();
+  if (!others.length) {
+    openModal('Share routine', `<p style="color:var(--text-muted);font-size:13px">No other adults have joined yet. Invite them via Settings → Household first.</p>`, () => closeModal());
+    return;
+  }
+  const alreadyShared = routine.sharedWith || [];
+  const rows = others.map(u => {
+    const isShared = alreadyShared.includes(u.uid);
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <span style="flex:1;font-size:14px;font-weight:500">${escHtml(u.name || u.email || u.uid)}</span>
+      <button class="btn btn-sm ${isShared ? 'btn-danger-ghost' : 'btn-primary'}"
+        onclick="_routineToggleShare(${routineId},'${u.uid}')">
+        ${isShared ? 'Remove' : 'Share'}
+      </button>
+    </div>`;
+  }).join('');
+  openModal(`Share: ${routine.emoji} ${routine.name}`, `
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Shared routines are view-only. The recipient can duplicate or join.</p>
+    ${rows}
+  `, () => closeModal());
+}
+
+function _routineToggleShare(routineId, targetUid) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  if (!routine.sharedWith) routine.sharedWith = [];
+  const idx = routine.sharedWith.indexOf(targetUid);
+  if (idx === -1) routine.sharedWith.push(targetUid);
+  else routine.sharedWith.splice(idx, 1);
+  saveData(state); closeModal(); _routineShareMenu(routineId);
+}
+
+// ── Duplicate / Join ──────────────────────────────────────────
+
+function _routineDuplicateTo(sourceId) {
+  const source = (state.routines || []).find(r => r.id === sourceId);
+  if (!source) return;
+  const uid = _routineCurrentUserId();
+  const r = { ...JSON.parse(JSON.stringify(source)), id: _routineNextId(),
+    ownerId: uid, ownerType: 'adult', sharedWith: [], completions: {},
+    linkedFrom: sourceId, linkedType: 'duplicate' };
+  state.routines.push(r); saveData(state); closeModal(); renderRoutines();
+}
+
+function _routineJoin(sourceId) {
+  const source = (state.routines || []).find(r => r.id === sourceId);
+  if (!source) return;
+  const uid = _routineCurrentUserId();
+  if ((state.routines || []).some(r => r.linkedFrom === sourceId && r.linkedType === 'join' && r.ownerId === uid)) {
+    alert('You have already joined this routine.'); return;
+  }
+  const r = { ...JSON.parse(JSON.stringify(source)), id: _routineNextId(),
+    ownerId: uid, ownerType: 'adult', sharedWith: [], completions: {},
+    linkedFrom: sourceId, linkedType: 'join' };
+  state.routines.push(r); saveData(state); closeModal(); renderRoutines();
+}
+
+function _routineDuplicateFromJoined(joinedId) {
+  const joined = (state.routines || []).find(r => r.id === joinedId);
+  if (joined?.linkedFrom) _routineDuplicateTo(joined.linkedFrom);
+}
+
+// ── History modal ─────────────────────────────────────────────
+// childId: null for adult routine, kid.id for child assignment
+
+function _routineShowHistory(routineId, childId) {
+  const routine = (state.routines || []).find(r => r.id === routineId);
+  if (!routine) return;
+  const total = routine.steps.length;
+
+  let history, streak, title;
+  if (childId) {
+    const assignment = _routineGetAssignment(routineId, childId);
+    const kid = _routineKids().find(k => k.id === childId);
+    history = _assignmentHistory(assignment, total, 90);
+    streak  = _assignmentStreak(assignment, total);
+    title   = `${routine.emoji} ${routine.name} — ${kid?.name || 'Child'}`;
+  } else {
+    history = _routineHistory(routine, 90);
+    streak  = _routineStreak(routine);
+    title   = `${routine.emoji} ${routine.name} — History`;
+  }
+
+  const completeDays = history.filter(h => h.done === h.total && h.total > 0).length;
+  const partialDays  = history.filter(h => h.done > 0 && h.done < h.total).length;
+  const dotsHtml = history.map(h => {
+    const cls    = h.done === h.total && h.total > 0 ? 'full' : h.done > 0 ? 'partial' : 'empty';
+    const symbol = h.done === h.total && h.total > 0 ? '✓' : h.done > 0 ? `${h.done}` : '';
+    return `<div class="routine-history-dot ${cls}" title="${h.key}: ${h.done}/${h.total}">${symbol}</div>`;
+  }).join('');
+
+  openModal(title, `
+    <div style="display:flex;gap:20px;margin-bottom:16px">
+      <div style="text-align:center"><div style="font-size:28px;font-weight:900">🔥 ${streak}</div><div style="font-size:11px;color:var(--text-muted);font-weight:600">Current streak</div></div>
+      <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#10b981">${completeDays}</div><div style="font-size:11px;color:var(--text-muted);font-weight:600">Full days (90d)</div></div>
+      <div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#f59e0b">${partialDays}</div><div style="font-size:11px;color:var(--text-muted);font-weight:600">Partial days</div></div>
+    </div>
+    <div class="routine-history-label">Last 90 days</div>
+    <div class="routine-history-grid">${dotsHtml}</div>
+    <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:var(--text-muted)">
+      <span><span style="display:inline-block;width:12px;height:12px;background:var(--section-accent,#0891b2);border-radius:3px;margin-right:4px;vertical-align:middle"></span>Complete</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:var(--primary-light,#eff6ff);border:1.5px solid var(--section-accent,#0891b2);border-radius:3px;margin-right:4px;vertical-align:middle"></span>Partial</span>
+      <span><span style="display:inline-block;width:12px;height:12px;background:var(--surface2);border-radius:3px;margin-right:4px;vertical-align:middle"></span>Missed</span>
+    </div>
+  `, () => closeModal());
 }
 
 // ── ROUTINES END ── all logic
