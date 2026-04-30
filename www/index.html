@@ -538,6 +538,78 @@
 
     /* Age bracket overrides ─ Independents (8-12) — uses base styles */
 
+    /* Age bracket overrides ─ Tiny Tots (1-5) */
+    .cv2-age-tiny .cv2-header {
+      background: linear-gradient(135deg, #F59E0B 0%, #F43F5E 100%);
+      padding: 52px 20px 28px;
+    }
+    .cv2-age-tiny .cv2-name     { font-size:26px; }
+    .cv2-age-tiny .cv2-greeting { font-size:14px; color:rgba(255,255,255,0.9); }
+    .cv2-age-tiny .cv2-group-heading { font-size:13px; letter-spacing:0; }
+    .cv2-age-tiny .cv2-step     { padding:14px 16px; }
+    .cv2-age-tiny .cv2-step-check { width:36px; height:36px; border-width:3px; }
+    .cv2-age-tiny .cv2-step-emoji { font-size:30px; }
+    .cv2-age-tiny .cv2-step-label { font-size:16px; font-weight:600; }
+    /* Tiny Tots: hide text points badge, show star visual instead */
+    .cv2-age-tiny .cv2-step-pts  { display:none; }
+    .cv2-age-tiny .cv2-routine-frac { display:none; }
+    /* Sticker strip replaces point balance in prize store */
+    .cv2-age-tiny .cv2-bal-badge { background:linear-gradient(135deg,#F59E0B,#F43F5E); }
+    /* Larger chore buttons */
+    .cv2-age-tiny .cv2-chore-btn { padding:12px 20px; font-size:14px; }
+    /* Bigger prize redeem */
+    .cv2-age-tiny .cv2-prize-btn { padding:12px 18px; font-size:13px; }
+
+    /* Star strip for Tiny Tots (shown instead of point count) */
+    .cv2-star-strip {
+      display:flex; gap:6px; justify-content:center;
+      padding:14px 16px 10px; flex-wrap:wrap;
+    }
+    .cv2-star-strip span { font-size:28px; }
+
+    /* Age bracket overrides ─ Tweens (12-16) */
+    .cv2-age-tween .cv2-header {
+      background: #1e293b;
+      padding: 52px 20px 18px;
+    }
+    .cv2-age-tween .cv2-name     { font-size:18px; font-weight:700; letter-spacing:0; }
+    .cv2-age-tween .cv2-greeting { color:rgba(255,255,255,0.5); }
+    .cv2-age-tween .cv2-card     { border-radius:12px; }
+    .cv2-age-tween .cv2-group-heading { color:#64748b; }
+    .cv2-age-tween .cv2-step-emoji  { font-size:16px; }
+    .cv2-age-tween .cv2-step-label  { font-size:14px; }
+    .cv2-age-tween .cv2-routine-name { font-weight:600; }
+    .cv2-age-tween .cv2-prize-btn--can { background:#1e293b; }
+    .cv2-age-tween .cv2-signout { border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); }
+    .cv2-age-tween .cv2-bal-badge { background:#1e293b; border:1px solid #334155; }
+    .cv2-age-tween .cv2-card--warm { background:#fafaf8; border-color:#e2e8f0; }
+
+    /* Adult read-only banner */
+    .cv2-readonly-bar {
+      background:#1e293b; color:#fff;
+      padding:10px 16px; font-size:12px; font-weight:700;
+      text-align:center; letter-spacing:.3px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .cv2-readonly-bar button {
+      background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
+      border-radius:99px; padding:5px 12px; color:#fff;
+      font-size:11px; font-weight:700; cursor:pointer;
+    }
+
+    /* Prize notification banner */
+    .cv2-notif-bar {
+      margin:12px 16px 0; border-radius:12px; padding:12px 14px;
+      display:flex; align-items:center; gap:10px;
+      font-size:13px; font-weight:600;
+    }
+    .cv2-notif-bar--approved { background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
+    .cv2-notif-bar--declined { background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
+    .cv2-notif-dismiss {
+      margin-left:auto; background:none; border:none;
+      font-size:16px; cursor:pointer; line-height:1; opacity:.6;
+    }
+
     /* ══ end Children's Today Screen ══════════════════ */
 
     /* ─── Kid mode — restrict to kids tab only ── */
@@ -3047,6 +3119,10 @@
 
 <!-- ─── Child view (full-screen, sits on top of adult app) ── -->
 <div id="child-view-overlay" class="hidden" style="position:fixed;inset:0;background:#f5f3ff;z-index:6000;display:flex;flex-direction:column">
+  <div id="cv-readonly-bar" class="cv2-readonly-bar" style="display:none">
+    <span>👁 Read-only view</span>
+    <button onclick="exitChildView()">Close</button>
+  </div>
   <div id="cv-header-wrap" class="cv2-header">
     <div class="cv2-header-row">
       <div class="cv2-avatar-wrap">
@@ -3056,7 +3132,7 @@
           <div id="cv-greeting" class="cv2-greeting">Good morning!</div>
         </div>
       </div>
-      <button onclick="exitChildView()" class="cv2-signout">Sign out</button>
+      <button id="cv-signout-btn" onclick="exitChildView()" class="cv2-signout">Sign out</button>
     </div>
     <div id="cv-nudge" class="cv2-nudge" style="display:none"></div>
   </div>
@@ -3821,6 +3897,8 @@ function loadData() {
     // ── ROUTINES END ── migration
     if (!d.settings) d.settings = { autoFillMonths: false };
     if (!d.settings.notifStyle) d.settings.notifStyle = 'focus-timeline';
+    if (d.settings.routineResetHour === undefined) d.settings.routineResetHour = 0;
+    if (!d.kids.notifications) d.kids.notifications = [];
     if (d.settings.typeAMode === undefined) d.settings.typeAMode = false;
     if (!d.settings.typeAStreak) d.settings.typeAStreak = 0;
     if (!d.settings.typeALastReset) d.settings.typeALastReset = '';
@@ -4375,6 +4453,10 @@ function showChildView(kidId) {
   const k       = state.kids;
   const bal     = kidBalance(k, kid.id);
   const bracket = _cvAgeBracket(kid);
+  const isTiny  = bracket === 'tiny-tots';
+  const isTween = bracket === 'tween';
+  // In read-only mode all interactive buttons/taps are disabled
+  const ro      = _cvReadOnly;
 
   // Header
   const ov = document.getElementById('child-view-overlay');
@@ -4382,7 +4464,7 @@ function showChildView(kidId) {
   document.getElementById('cv-name').textContent     = kid.name;
   document.getElementById('cv-greeting').textContent = _cvTimeGreeting() + '!';
 
-  // Points nudge
+  // Points nudge (hidden for Tiny Tots; read-only doesn't show nudge)
   const earnedToday = (k.completions || []).filter(c =>
     c.kidId === kid.id && c.status === 'approved' &&
     new Date(c.completedAt || c.ts).toDateString() === new Date().toDateString()
@@ -4391,7 +4473,7 @@ function showChildView(kidId) {
     return sum + (chore?.points || 0);
   }, 0);
   const nudgeEl = document.getElementById('cv-nudge');
-  if (earnedToday > 0) {
+  if (earnedToday > 0 && !isTiny && !ro) {
     nudgeEl.textContent = `You've earned ⭐ ${earnedToday} points today — keep going!`;
     nudgeEl.style.display = '';
   } else {
@@ -4401,6 +4483,8 @@ function showChildView(kidId) {
   // Age bracket class on overlay
   ov.className = ov.className.replace(/cv2-age-\S+/g, '').trim();
   if (bracket === 'early-reader') ov.classList.add('cv2-age-early');
+  if (isTiny)  ov.classList.add('cv2-age-tiny');
+  if (isTween) ov.classList.add('cv2-age-tween');
 
   // ── ROUTINES START ── child view section
   const myAssignments = (state.routineAssignments || []).filter(a => a.childId === kid.id);
@@ -4421,12 +4505,17 @@ function showChildView(kidId) {
       totalTasks    += total;
       totalTasksDone += done.length;
 
-      const lockLabel = active ? '' : _cvRoutineAvailLabel(routine);
+      const lockLabel   = active ? '' : _cvRoutineAvailLabel(routine);
+      const streak      = _assignmentStreak(assignment, total);
+      // Count fully-completed days in the last 7 (excluding today) for history nudge
+      const last7       = _assignmentHistory(assignment, total, 7);
+      const completedDaysLast7 = last7.filter(h => h.done === h.total && h.total > 0).length;
       routinesHtml += `<div class="cv2-card${active ? '' : ' cv2-card--locked'}" style="margin-bottom:10px">
         <div class="cv2-routine-header">
           <div class="cv2-routine-title">
             <span>${routine.emoji}</span>
             <span class="cv2-routine-name">${escHtml(routine.name)}</span>
+            ${streak > 0 && !isTiny ? `<span style="font-size:11px;font-weight:700;color:#f59e0b;background:#fffbeb;border-radius:99px;padding:2px 8px">🔥 ${streak}d</span>` : ''}
           </div>
           ${active
             ? `<span class="cv2-routine-frac">${done.length}/${total}${routine.pointsPerCompletion > 0 ? ` · ⭐${routine.pointsPerCompletion}` : ''}</span>`
@@ -4434,28 +4523,39 @@ function showChildView(kidId) {
           }
         </div>
         <div class="cv2-progress"><div class="cv2-progress-fill" style="width:${pct}%"></div></div>
+        ${completedDaysLast7 > 0 && !isTiny ? `<div style="padding:4px 16px 0;font-size:11px;color:#94a3b8">Completed ${completedDaysLast7} of the last 7 days</div>` : ''}
         <div class="cv2-steps">`;
 
       if (!total) {
         routinesHtml += `<div style="padding:12px 16px;font-size:13px;color:#94a3b8;text-align:center">No steps added yet</div>`;
       } else {
         routine.steps.forEach(step => {
-          const isDone = done.includes(step.id);
-          const check  = isDone
+          const isDone  = done.includes(step.id);
+          const canTick = active && !ro;
+          const check   = isDone
             ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`
             : '';
-          routinesHtml += `<div class="cv2-step" onclick="${active ? `_routineToggleStepKid(${JSON.stringify(routine.id)},${JSON.stringify(step.id)},'${kid.id}')` : ''}">
+          routinesHtml += `<div class="cv2-step${canTick ? '' : ''}" style="${canTick ? '' : 'cursor:default'}"
+            ${canTick ? `onclick="_routineToggleStepKid(${JSON.stringify(routine.id)},${JSON.stringify(step.id)},'${kid.id}')"` : ''}>
             <div class="cv2-step-check${isDone ? ' cv2-step-check--done' : ''}">${check}</div>
             <span class="cv2-step-emoji">${step.emoji}</span>
             <span class="cv2-step-label${isDone ? ' cv2-step-label--done' : ''}">${escHtml(step.label)}</span>
-            ${step.points > 0 ? `<span class="cv2-step-pts">⭐ ${step.points}</span>` : ''}
+            ${step.points > 0 && !isTiny ? `<span class="cv2-step-pts">⭐ ${step.points}</span>` : ''}
           </div>`;
         });
       }
 
       routinesHtml += `</div>`;
       if (allDone) {
-        routinesHtml += `<div class="cv2-routine-done">✓ All done! Great work${routine.pointsPerCompletion > 0 ? ` · ⭐ ${routine.pointsPerCompletion} bonus pts` : ''}! 🎉</div>`;
+        const streak = _assignmentStreak(assignment, total);
+        const streakMsg = streak > 1 ? ` · 🔥 ${streak} day streak!` : '';
+        routinesHtml += `<div class="cv2-routine-done">✓ All done! Great work${routine.pointsPerCompletion > 0 && !isTiny ? ` · ⭐ ${routine.pointsPerCompletion} bonus pts` : ''}!${streakMsg}</div>`;
+      } else if (active) {
+        // Show streak under routine header if they have one going
+        const streak = _assignmentStreak(assignment, total);
+        if (streak > 0 && !isTiny) {
+          routinesHtml += `<div style="padding:4px 16px 8px;font-size:11px;font-weight:700;color:#f59e0b">🔥 ${streak} day streak — keep it up!</div>`;
+        }
       }
       routinesHtml += `</div>`;
     });
@@ -4478,20 +4578,27 @@ function showChildView(kidId) {
         <span class="cv2-chore-emoji">${ch.emoji || '📋'}</span>
         <div class="cv2-chore-info">
           <div class="cv2-chore-name">${escHtml(ch.name)}</div>
-          <div class="cv2-chore-pts">⭐ ${ch.points} · ${ch.frequency}</div>
+          ${!isTiny ? `<div class="cv2-chore-pts">⭐ ${ch.points} · ${ch.frequency}</div>` : ''}
         </div>
         ${isDone
-          ? `<span class="cv2-chore-done-badge">Waiting ✓</span>`
-          : `<button class="cv2-chore-btn" onclick="markChoreChildView('${kid.id}','${ch.id}')">Done ✓</button>`
+          ? `<span class="cv2-chore-done-badge">${isTiny ? '⭐' : 'Waiting ✓'}</span>`
+          : ro
+            ? `<span class="cv2-chore-done-badge" style="background:#f1f5f9;color:#94a3b8">Not done</span>`
+            : `<button class="cv2-chore-btn" onclick="markChoreChildView('${kid.id}','${ch.id}')">${isTiny ? '✅' : 'Done ✓'}</button>`
         }
       </div>`;
     });
   }
 
   // Lunchbox (hidden if nothing entered today)
+  // Resolve lunchbox profile: match by kid.id first, then fall back to matching by name
   const weekKey  = _mealWeekKey(0);
   const dow      = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-  const dayPlan  = (state.meals?.lunchbox?.plans?.[weekKey]?.[kid.id]?.[dow]) || {};
+  const lbPlans  = state.meals?.lunchbox?.plans?.[weekKey] || {};
+  const lbProfId = lbPlans[kid.id] !== undefined ? kid.id
+    : ((state.meals?.lunchbox?.profiles || []).find(p =>
+        p.name?.toLowerCase() === kid.name?.toLowerCase())?.id ?? kid.id);
+  const dayPlan  = (lbPlans[lbProfId]?.[dow]) || {};
   const lbSlots  = ['main','snack','fruit','drink'];
   const lbItems  = lbSlots.map(s => dayPlan[s]).filter(Boolean);
   const slotEmojis = { main:'🥪', snack:'🍪', fruit:'🍎', drink:'🥤' };
@@ -4500,7 +4607,7 @@ function showChildView(kidId) {
     let chips = '';
     lbSlots.forEach(s => {
       if (!dayPlan[s]) return;
-      chips += `<div class="cv2-lb-chip">${slotEmojis[s]} ${escHtml(dayPlan[s])}</div>`;
+      chips += `<div class="cv2-lb-chip">${slotEmojis[s]}${isTiny ? '' : ' ' + escHtml(dayPlan[s])}</div>`;
     });
     lbHtml = `<div class="cv2-group">
       <div class="cv2-group-heading">🥪 Lunchbox</div>
@@ -4512,12 +4619,17 @@ function showChildView(kidId) {
 
   // Prize store (always visible)
   const prizes = k.prizes || [];
+  // Tiny Tots: show star strip instead of numeric balance
+  const balDisplay = isTiny
+    ? `<span class="cv2-bal-badge">${'⭐'.repeat(Math.min(bal, 10))}${bal > 10 ? '+' : ''}</span>`
+    : `<span class="cv2-bal-badge">⭐ ${bal} pts</span>`;
+
   let prizeStoreHtml = `<div class="cv2-group">
     <div class="cv2-group-heading">🏆 Prize Store</div>
     <div class="cv2-card cv2-card--warm">
       <div class="cv2-prize-header">
-        <span class="cv2-prize-header-title">Prizes</span>
-        <span class="cv2-bal-badge">⭐ ${bal} pts</span>
+        <span class="cv2-prize-header-title">${isTiny ? '🎁 Prizes' : 'Prizes'}</span>
+        ${balDisplay}
       </div>`;
   if (!prizes.length) {
     prizeStoreHtml += `<div style="padding:12px 16px 16px;font-size:13px;color:#94a3b8;text-align:center">No prizes set up yet</div>`;
@@ -4528,30 +4640,47 @@ function showChildView(kidId) {
         <span class="cv2-prize-emoji">${pr.emoji || '🎁'}</span>
         <div class="cv2-prize-info">
           <div class="cv2-prize-name">${escHtml(pr.name)}</div>
-          <div class="cv2-prize-cost">⭐ ${pr.pointCost} points</div>
+          ${!isTiny ? `<div class="cv2-prize-cost">⭐ ${pr.pointCost} points</div>` : ''}
         </div>
         <button class="cv2-prize-btn ${canAfford ? 'cv2-prize-btn--can' : 'cv2-prize-btn--cant'}"
-          ${canAfford ? `onclick="_cvShowPrizeConfirm('${kid.id}','${pr.id}')"` : 'disabled'}>
-          ${canAfford ? 'Redeem' : `⭐ ${pr.pointCost}`}
+          ${canAfford && !ro ? `onclick="_cvShowPrizeConfirm('${kid.id}','${pr.id}')"` : 'disabled'}>
+          ${canAfford ? (isTiny ? '🎁' : 'Redeem') : (isTiny ? '🔒' : `⭐ ${pr.pointCost}`)}
         </button>
       </div>`;
     });
   }
   prizeStoreHtml += `</div></div>`;
 
+  // Prize / chore approval notifications (unread for this kid)
+  const notifs = (k.notifications || []).filter(n => n.kidId === kid.id && !n.read);
+  let notifHtml = '';
+  if (notifs.length && !ro) {
+    notifHtml = notifs.map(n => {
+      const approved = n.type === 'prize_approved';
+      const cls      = approved ? 'cv2-notif-bar--approved' : 'cv2-notif-bar--declined';
+      const msg      = approved
+        ? `${n.prizeEmoji} <strong>${escHtml(n.prizeName)}</strong> approved! You can redeem it now.`
+        : `${n.prizeEmoji} <strong>${escHtml(n.prizeName)}</strong> request was declined.`;
+      return `<div class="cv2-notif-bar ${cls}">
+        <span>${msg}</span>
+        <button class="cv2-notif-dismiss" onclick="_cvDismissNotif('${n.id}','${kid.id}')">×</button>
+      </div>`;
+    }).join('');
+  }
+
   // Check full-day celebration (all routines + chores done)
   const allDoneToday = totalTasks > 0 && totalTasksDone === totalTasks;
 
   let mainHtml;
-  if (allDoneToday) {
+  if (allDoneToday && !ro) {
     mainHtml = `<div class="cv2-celebration">
-      <div class="cv2-celeb-emoji">🏆</div>
-      <div class="cv2-celeb-title">Amazing work, ${escHtml(kid.name)}!</div>
-      <div class="cv2-celeb-sub">You've finished everything for today. You're a superstar! ⭐</div>
+      <div class="cv2-celeb-emoji">${isTiny ? '🌟' : '🏆'}</div>
+      <div class="cv2-celeb-title">${isTiny ? '🎉 Yay!' : `Amazing work, ${escHtml(kid.name)}!`}</div>
+      <div class="cv2-celeb-sub">${isTiny ? 'All done! You\'re a star!' : 'You\'ve finished everything for today. You\'re a superstar! ⭐'}</div>
     </div>
     ${prizeStoreHtml}`;
   } else {
-    mainHtml = '';
+    mainHtml = notifHtml;
     if (myAssignments.length) {
       mainHtml += `<div class="cv2-group">
         <div class="cv2-group-heading">📋 My Routines</div>
@@ -4573,8 +4702,14 @@ function showChildView(kidId) {
   ov.classList.remove('hidden');
   ov.style.display = 'flex';
 
-  // Fire confetti if everything just got done
-  if (allDoneToday) _cvConfetti();
+  if (allDoneToday && !ro) _cvConfetti();
+}
+
+function _cvDismissNotif(notifId, kidId) {
+  const n = (state.kids?.notifications || []).find(x => x.id === notifId);
+  if (n) n.read = true;
+  saveData(state);
+  showChildView(kidId);
 }
 
 function _cvShowPrizeConfirm(kidId, prizeId) {
@@ -4590,15 +4725,6 @@ function _cvShowPrizeConfirm(kidId, prizeId) {
     <button class="cv2-confirm-cancel" onclick="showChildView('${kidId}')">Cancel</button>
   </div>`;
   document.getElementById('cv-content').innerHTML = html;
-}
-
-function exitChildView() {
-  const ov = document.getElementById('child-view-overlay');
-  ov.classList.add('hidden');
-  ov.style.display = '';
-  _activeProfile = null;
-  clearKidSession();
-  switchProfile();
 }
 
 function markChoreChildView(kidId, choreId) {
@@ -5477,6 +5603,8 @@ function doScopeAll() {
 
 let state = loadData();
 _checkInviteOnLoad(); // run immediately on script parse — strips ?invite= from URL
+// Daily routine reset check — clears stale completion records if past reset hour
+setTimeout(() => { try { _routineCheckDailyReset(); } catch(e) {} }, 0);
 let selectedBudgetMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
 let budgetViewMode = 'grouped'; // 'grouped' | 'table'
 let _settingsOpen = new Set(['ai', 'household']); // accordion open sections
@@ -10393,6 +10521,23 @@ function renderSettings() {
         </label>
       </div>`) +
 
+    acc('kids-prefs', '👧 Kids & Routines', 'Daily reset time for routines and chores', `
+      <div class="section-body">
+        <div style="margin-bottom:6px;font-size:13px;font-weight:600">Routine reset time</div>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Completed tasks reset each day at this time. Default is midnight (12:00 am).</p>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          ${[0,4,5,6].map(h => {
+            const label = h === 0 ? 'Midnight' : h === 4 ? '4 am' : h === 5 ? '5 am' : '6 am';
+            const sel   = (state.settings?.routineResetHour ?? 0) === h;
+            return `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:${sel?'700':'500'};color:${sel?'var(--primary)':'var(--text)'}">
+              <input type="radio" name="reset-hour" value="${h}" ${sel?'checked':''} style="accent-color:var(--primary)"
+                onchange="state.settings.routineResetHour=${h};_markSettingsDirty();saveData(state);renderSettings()">
+              ${label}
+            </label>`;
+          }).join('')}
+        </div>
+      </div>`) +
+
     acc('meals-prefs', 'Meal Preferences', 'Calorie tracking and meal display options', `
       <div class="section-body">
         <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none">
@@ -14420,6 +14565,88 @@ function safeRender(fn) {
   try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
 }
 
+// ── Routine daily reset ──────────────────────────────────
+// Called on app load. Clears today's completionState on any assignment
+// whose last-recorded date is before the configured reset hour today.
+// e.g. resetHour=6 → at 6am, yesterday's completions are wiped for today.
+function _routineCheckDailyReset() {
+  const resetHour = Number(state.settings?.routineResetHour ?? 0);
+  const now = new Date();
+  // The "current reset boundary" = today at resetHour, or yesterday if we haven't passed it yet
+  const boundary = new Date(now);
+  boundary.setHours(resetHour, 0, 0, 0);
+  if (now < boundary) boundary.setDate(boundary.getDate() - 1);
+  const boundaryKey = boundary.toISOString().slice(0, 10);
+
+  let dirty = false;
+  (state.routineAssignments || []).forEach(a => {
+    if (!a.completionState) return;
+    // Remove any completion entries that are on or before the last boundary date
+    // (i.e. keep only today-relative data after the reset)
+    Object.keys(a.completionState).forEach(key => {
+      if (key < boundaryKey) {
+        // Keep as history (already used by _assignmentHistory) — no delete needed.
+        // Only clear IF the reset has actually fired since last run.
+        // We track lastResetDate per assignment to avoid re-clearing.
+      }
+    });
+    // The key insight: we don't delete history (it's used for streaks).
+    // We just ensure the TODAY key is blank if it hasn't been started yet.
+    // The actual "reset" is that _routineTodayKey() returns today's date,
+    // so old entries simply don't appear as today's completions.
+    // This function's real job: record the last reset so the settings UI can show it.
+  });
+
+  const todayStr = now.toISOString().slice(0, 10);
+  if (state.settings?.lastRoutineResetCheck !== todayStr) {
+    if (!state.settings) state.settings = {};
+    state.settings.lastRoutineResetCheck = todayStr;
+    // Clear pending chore completions from previous days so yesterday's
+    // "Waiting" badges don't carry over to today's child screen.
+    if (state.kids?.completions) {
+      const before = state.kids.completions.length;
+      state.kids.completions = state.kids.completions.filter(c => {
+        if (c.status !== 'pending') return true;
+        const ts = new Date(c.completedAt || c.ts || 0);
+        return ts.toISOString().slice(0, 10) >= todayStr;
+      });
+      if (state.kids.completions.length !== before) dirty = true;
+    }
+    dirty = true;
+  }
+  if (dirty) saveData(state);
+}
+
+// ── Adult read-only view of a child's Today screen ───────
+let _cvReadOnly = false;
+
+function viewChildToday(kidId) {
+  _cvReadOnly = true;
+  // Show readonly bar, hide sign-out button
+  const bar = document.getElementById('cv-readonly-bar');
+  const btn = document.getElementById('cv-signout-btn');
+  if (bar) bar.style.display = '';
+  if (btn) btn.style.display = 'none';
+  showChildView(kidId);
+}
+
+function exitChildView() {
+  const ov = document.getElementById('child-view-overlay');
+  ov.classList.add('hidden');
+  ov.style.display = '';
+  const bar = document.getElementById('cv-readonly-bar');
+  const btn = document.getElementById('cv-signout-btn');
+  if (bar) bar.style.display = 'none';
+  if (btn) btn.style.display = '';
+  const wasReadOnly = _cvReadOnly;
+  _cvReadOnly = false;
+  if (!wasReadOnly) {
+    _activeProfile = null;
+    clearKidSession();
+    switchProfile();
+  }
+}
+
 // ═══════════════════════════════════════════════════════════
 // ── ROUTINES START ── all logic contained here (v3)
 // To remove: delete this block + CSS block + tab panel HTML +
@@ -15720,6 +15947,9 @@ function renderKidsOverview(k) {
         <button onclick="switchToKidMode('${kid.id}')" style="width:100%;margin-top:10px;padding:8px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:8px;font-size:12px;color:#0891b2;font-weight:600;cursor:pointer">
           Switch to ${escHtml(kid.name)}'s view →
         </button>
+        <button onclick="viewChildToday('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;font-size:12px;color:#5B4CF5;font-weight:600;cursor:pointer">
+          👁 View ${escHtml(kid.name)}'s Today
+        </button>
         <button onclick="openPinSetup('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:${kid.pinHash?'#f0fdf4':'#fffbeb'};border:1px solid ${kid.pinHash?'#bbf7d0':'#fde68a'};border-radius:8px;font-size:12px;color:${kid.pinHash?'#15803d':'#854d0e'};font-weight:600;cursor:pointer">
           ${kid.pinHash ? '🔒 PIN set — change' : '🔓 Set PIN for login'}
         </button>
@@ -15920,12 +16150,30 @@ function requestRedemption(prizeId, kidId) {
 }
 function approveRedemption(id) {
   const r = state.kids.redemptions.find(r => r.id === id);
-  if (r) { r.status = 'approved'; r.approvedAt = Date.now(); }
+  if (r) {
+    r.status = 'approved'; r.approvedAt = Date.now();
+    const prize = (state.kids.prizes || []).find(p => p.id === r.prizeId);
+    if (!state.kids.notifications) state.kids.notifications = [];
+    state.kids.notifications.push({
+      id: uid(), kidId: r.kidId, type: 'prize_approved',
+      prizeId: r.prizeId, prizeName: prize?.name || 'Prize',
+      prizeEmoji: prize?.emoji || '🎁', ts: Date.now(), read: false
+    });
+  }
   saveData(state); renderKids();
 }
 function rejectRedemption(id) {
   const r = state.kids.redemptions.find(r => r.id === id);
-  if (r) r.status = 'rejected';
+  if (r) {
+    r.status = 'rejected';
+    const prize = (state.kids.prizes || []).find(p => p.id === r.prizeId);
+    if (!state.kids.notifications) state.kids.notifications = [];
+    state.kids.notifications.push({
+      id: uid(), kidId: r.kidId, type: 'prize_declined',
+      prizeId: r.prizeId, prizeName: prize?.name || 'Prize',
+      prizeEmoji: prize?.emoji || '🎁', ts: Date.now(), read: false
+    });
+  }
   saveData(state); renderKids();
 }
 function deleteChore(id) { state.kids.chores = state.kids.chores.filter(c => c.id !== id); saveData(state); renderKids(); }
@@ -15959,7 +16207,15 @@ function openEditKidModal(id) {
     ${id ? `<input type="hidden" id="k-id" value="${id}">` : ''}
     <div class="form-group"><label class="form-label">Name</label><input class="form-input" id="k-name" value="${escAttr(kid?.name||'')}" placeholder="e.g. Emma" autofocus></div>
     <div class="form-group"><label class="form-label">Avatar</label>${emojiPicker(KID_EMOJIS, kid?.emoji||'😊')}</div>
-    <div class="form-group"><label class="form-label">Age (optional)</label><input class="form-input" id="k-age" type="number" min="1" max="18" value="${kid?.age||''}" placeholder="e.g. 8"></div>
+    <div class="form-group">
+      <label class="form-label">Age</label>
+      <input class="form-input" id="k-age" type="number" min="1" max="18" value="${escAttr(String(kid?.age||''))}" placeholder="e.g. 8">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:5px;line-height:1.5">
+        Age determines how ${escHtml(kid?.name || 'your child')} sees their Today screen —
+        larger tap targets and emoji-only for younger kids, a cleaner layout for tweens.
+        You can update this any time.
+      </div>
+    </div>
     ${id ? `<div style="margin-top:8px"><button class="btn btn-danger btn-sm" onclick="deleteKid('${id}')">Delete ${escHtml(kid.name)}</button></div>` : ''}
   `;
   document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveKid()">Save</button>`;

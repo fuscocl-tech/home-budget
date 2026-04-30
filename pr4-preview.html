@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PR #4 — Routines + Children's Today Screen</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  background: #ECEAF5;
+  min-height: 100vh;
+  padding: 48px 20px 80px;
+}
+
+/* ── Page headings ── */
+.page-title {
+  text-align: center; font-size: 26px; font-weight: 800;
+  color: #18181B; letter-spacing: -0.5px; margin-bottom: 4px;
+}
+.page-sub { text-align: center; font-size: 13px; color: #A1A1AA; margin-bottom: 10px; }
+
+.section-heading {
+  text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: #A1A1AA; margin: 48px 0 20px;
+}
+.section-heading span {
+  display: inline-block; background: #ECEAF5; padding: 0 16px; position: relative;
+}
+.section-heading::before {
+  content: ''; display: block; height: 1px; background: #D4D0E8;
+  position: absolute; left: 0; right: 0; top: 50%;
+}
+
+/* ── Layout ── */
+.screens {
+  display: flex; gap: 28px; justify-content: center;
+  flex-wrap: wrap; max-width: 1700px; margin: 0 auto;
+}
+.screen-col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.screen-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: #A1A1AA;
+}
+
+/* ── Phone shell ── */
+.phone {
+  width: 320px; height: 672px; border-radius: 44px;
+  border: 1.5px solid #D4D0E8; overflow: hidden; position: relative;
+  display: flex; flex-direction: column;
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.6), 0 24px 64px rgba(91,76,245,0.15), 0 4px 16px rgba(0,0,0,0.08);
+}
+.phone.bg-white { background: #fafaf8; }
+.phone.bg-purple { background: #f5f3ff; }
+.phone.bg-slate  { background: #f8fafc; }
+
+/* ── Status bar ── */
+.status-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 44px;
+  padding: 12px 24px 0; display: flex; align-items: center;
+  justify-content: space-between; z-index: 10; pointer-events: none;
+}
+.status-bar.dark .status-time { color: #18181B; }
+.status-time { font-size: 13px; font-weight: 600; color: #fff; font-family: ui-monospace, monospace; }
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* ════════════════════════════════════════
+   DESIGN TOKENS (mimicking app's CSS vars)
+   ════════════════════════════════════════ */
+:root {
+  --text:        #18181B;
+  --text-muted:  #71717A;
+  --border:      #E4E4E7;
+  --surface:     #FAFAFA;
+  --surface2:    #F4F4F5;
+  --bg:          #F9FAFB;
+  --primary:     #5B4CF5;
+  --primary-light: #EEF2FF;
+  --section-accent: #0891b2;
+  --success:     #10B981;
+  --danger:      #EF4444;
+}
+
+/* ════════════════════════════════════════
+   ADULT ROUTINES — app styles
+   ════════════════════════════════════════ */
+
+.app-shell {
+  display: flex; flex-direction: column; height: 100%;
+  padding-top: 44px; overflow: hidden;
+}
+.app-body {
+  flex: 1; overflow-y: auto; padding: 16px 16px 60px;
+}
+
+.page-header { margin-bottom: 4px; }
+.page-header h1 { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+.page-header p  { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+.btn { border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+.btn-primary { background: var(--section-accent); color: #fff; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost { background: transparent; color: var(--text-muted); padding: 6px 8px; }
+.btn-sm { padding: 6px 11px; font-size: 12px; border-radius: 8px; }
+.btn-danger { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; }
+
+/* Tab bar */
+.routine-tab-bar { display: flex; gap: 6px; margin-bottom: 14px; }
+.routine-tab {
+  padding: 7px 16px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--text-muted); cursor: pointer;
+}
+.routine-tab.active { background: var(--section-accent); border-color: var(--section-accent); color: #fff; }
+
+/* Routine card */
+.routine-card {
+  border-radius: 16px; padding: 16px 18px; margin-bottom: 12px;
+  background: rgba(255,255,255,0.6); border: 1.5px solid rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+}
+.routine-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+.routine-card-title { font-size: 16px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 7px; }
+.routine-card-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+
+/* Progress */
+.routine-progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.routine-progress-bar-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.routine-progress-bar-fill { height: 100%; border-radius: 99px; background: var(--section-accent); transition: width .4s; }
+.routine-progress-label { font-size: 12px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+
+/* Steps */
+.routine-steps { margin-bottom: 4px; }
+.routine-step {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0; border-bottom: 1px solid rgba(24,24,27,.06);
+}
+.routine-step:last-child { border-bottom: none; }
+.routine-step-grab { color: var(--text-muted); font-size: 13px; flex-shrink: 0; cursor: grab; }
+.routine-step-check {
+  width: 23px; height: 23px; border-radius: 50%; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.routine-step-check.done { background: var(--section-accent); border-color: var(--section-accent); }
+.routine-step-check.done svg { display: block; }
+.routine-step-check svg { display: none; width: 11px; height: 11px; stroke: #fff; stroke-width: 2.5; stroke-linecap: round; fill: none; }
+.routine-step-emoji { font-size: 17px; flex-shrink: 0; }
+.routine-step-label { flex: 1; font-size: 13px; font-weight: 500; color: var(--text); }
+.routine-step-label.done { color: var(--text-muted); text-decoration: line-through; }
+.routine-step-dur { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+.routine-step-pts { font-size: 10px; font-weight: 700; background: #fef9c3; color: #854d0e; padding: 2px 6px; border-radius: 99px; flex-shrink: 0; }
+
+.routine-all-done { text-align: center; padding: 8px 0 2px; font-size: 12px; font-weight: 700; color: var(--section-accent); }
+.routine-streak {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,0.75); border: 1.5px solid rgba(255,255,255,0.9);
+  border-radius: 99px; padding: 3px 9px; font-size: 11px; font-weight: 700; color: var(--text);
+}
+.routine-owner-badge {
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  background: var(--surface2); border-radius: 8px; padding: 3px 8px;
+}
+.routine-joined-badge  { background: #eff6ff; color: #1d4ed8; }
+.routine-shared-badge  { background: #f0fdf4; color: #15803d; }
+
+.routine-add-step-btn {
+  width: 100%; padding: 9px; border: 1.5px dashed var(--border); border-radius: 10px;
+  background: transparent; font-size: 12px; font-weight: 600; color: var(--text-muted);
+  cursor: pointer; margin-top: 6px;
+}
+
+.routine-card-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+
+/* Suggestions */
+.routine-suggestions { margin-top: 10px; border-top: 1px solid rgba(24,24,27,.06); padding-top: 8px; }
+.routine-suggestions-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; padding: 3px 0;
+}
+.routine-suggestions-toggle .chevron { font-size: 10px; transition: transform .2s; }
+.routine-suggestions-toggle.open .chevron { transform: rotate(180deg); }
+.routine-suggestion-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 9px; border-radius: 10px; background: var(--surface2); margin-top: 4px;
+}
+.routine-suggestion-emoji { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
+.routine-suggestion-label { flex: 1; font-size: 12px; font-weight: 500; color: var(--text); }
+.routine-suggestion-dur { font-size: 11px; color: var(--text-muted); }
+.routine-suggestion-add { font-size: 17px; color: var(--section-accent); font-weight: 700; flex-shrink: 0; }
+
+/* New card */
+.routine-new-card {
+  border-radius: 14px; padding: 16px 18px; margin-bottom: 12px;
+  background: transparent; border: 1.5px dashed var(--border);
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+.routine-new-card-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+/* Member chips */
+.routine-member-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.routine-member-chip {
+  padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600;
+  border: 1.5px solid var(--border); background: var(--surface2); color: var(--text-muted);
+}
+.routine-member-chip.active { background: var(--section-accent); border-color: var(--section-accent); color: #fff; }
+
+/* History dots */
+.routine-history-grid { display: flex; gap: 3px; flex-wrap: wrap; margin: 8px 0 4px; }
+.routine-history-dot {
+  width: 20px; height: 20px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700;
+}
+.routine-history-dot.full    { background: var(--section-accent); color: #fff; }
+.routine-history-dot.partial { background: #eff6ff; color: var(--section-accent); border: 1.5px solid var(--section-accent); }
+.routine-history-dot.empty   { background: var(--surface2); color: var(--text-muted); }
+.routine-history-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+
+/* Today card */
+.routines-today-card {
+  border-radius: 14px; padding: 13px 14px; margin-bottom: 8px;
+  background: rgba(255,255,255,0.6); border: 1.5px solid rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px); cursor: pointer;
+}
+.routines-today-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.routines-today-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.routines-today-link  { font-size: 11px; font-weight: 600; color: var(--section-accent); }
+.routine-today-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.routine-today-emoji { font-size: 15px; width: 24px; text-align: center; flex-shrink: 0; }
+.routine-today-name  { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
+.routine-today-nudge { font-size: 10px; font-weight: 600; color: #d97706; background: #fffbeb; border-radius: 6px; padding: 2px 5px; flex-shrink: 0; }
+.routine-today-progress { display: flex; align-items: center; gap: 5px; }
+.routine-today-bar-wrap { width: 56px; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.routine-today-bar-fill { height: 100%; border-radius: 99px; background: var(--section-accent); }
+.routine-today-frac { font-size: 11px; font-weight: 600; color: var(--text-muted); min-width: 24px; text-align: right; }
+
+/* Intel nudge */
+.routine-intel-nudge {
+  border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
+  background: #18181b; color: #fafafa;
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+.routine-intel-icon {
+  width: 34px; height: 34px; background: #2a2a36; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px;
+}
+.routine-intel-body { flex: 1; font-size: 12px; font-weight: 500; line-height: 1.4; }
+.routine-intel-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #52525b; margin-bottom: 2px; }
+
+/* Tabs (bottom nav mock) */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 58px;
+  background: rgba(255,255,255,0.92); border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-around;
+  backdrop-filter: blur(10px); z-index: 20;
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; font-weight: 600; color: var(--text-muted); }
+.nav-item.active { color: var(--section-accent); }
+.nav-icon { font-size: 18px; }
+
+/* ════════════════════════════════════════
+   CHILDREN'S TODAY SCREEN — cv2-* styles
+   ════════════════════════════════════════ */
+
+.cv-shell { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+/* Read-only bar */
+.cv2-readonly-bar {
+  background: #1e293b; color: #fff; padding: 10px 16px;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.cv2-readonly-bar button {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 99px; padding: 4px 11px; color: #fff; font-size: 11px; font-weight: 700; cursor: pointer;
+}
+
+/* Header */
+.cv2-header { background: linear-gradient(135deg,#5B4CF5 0%,#7C3AED 100%); padding: 48px 20px 20px; flex-shrink: 0; }
+.cv2-header-row { display: flex; align-items: center; justify-content: space-between; }
+.cv2-avatar-wrap { display: flex; align-items: center; gap: 12px; }
+.cv2-avatar   { font-size: 36px; line-height: 1; }
+.cv2-name     { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.cv2-greeting { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 1px; }
+.cv2-signout  { font-size: 12px; font-weight: 700; background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.35); border-radius: 99px; padding: 7px 14px; color: #fff; cursor: pointer; }
+.cv2-nudge    { margin-top: 12px; background: rgba(255,255,255,.18); border-radius: 12px; padding: 9px 14px; font-size: 13px; font-weight: 600; color: #fff; }
+
+/* Body */
+.cv2-body { flex: 1; overflow-y: auto; padding: 14px 13px 56px; }
+
+/* Groups */
+.cv2-group { margin-bottom: 18px; }
+.cv2-group-heading { font-size: 10px; font-weight: 700; letter-spacing: .9px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; padding-left: 2px; }
+
+/* Cards */
+.cv2-card      { background: #fff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden; }
+.cv2-card--warm { background: #fffbf5; border-color: #fde68a; }
+.cv2-card--locked { opacity: .55; pointer-events: none; }
+
+/* Routine header */
+.cv2-routine-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 15px 8px; }
+.cv2-routine-title  { display: flex; align-items: center; gap: 7px; }
+.cv2-routine-name   { font-size: 14px; font-weight: 700; color: #1e293b; }
+.cv2-routine-frac   { font-size: 12px; color: #94a3b8; font-weight: 600; }
+.cv2-routine-lock   { font-size: 11px; font-weight: 700; color: #94a3b8; background: #f1f5f9; border-radius: 99px; padding: 4px 10px; }
+.cv2-progress       { height: 4px; background: #f1f5f9; margin: 0 15px 2px; }
+.cv2-progress-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#5B4CF5,#7C3AED); transition: width .3s; }
+
+/* Steps */
+.cv2-steps { padding: 2px 0 6px; }
+.cv2-step { display: flex; align-items: center; gap: 11px; padding: 10px 15px; border-bottom: 1px solid #f8fafc; }
+.cv2-step:last-child { border-bottom: none; }
+.cv2-step-check { width: 25px; height: 25px; border-radius: 50%; flex-shrink: 0; border: 2px solid #cbd5e1; background: transparent; display: flex; align-items: center; justify-content: center; }
+.cv2-step-check--done { border-color: #5B4CF5; background: #5B4CF5; }
+.cv2-step-emoji { font-size: 18px; flex-shrink: 0; }
+.cv2-step-label { flex: 1; font-size: 14px; font-weight: 500; color: #1e293b; }
+.cv2-step-label--done { color: #94a3b8; text-decoration: line-through; }
+.cv2-step-pts { background: #fef9c3; color: #854d0e; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 99px; flex-shrink: 0; }
+.cv2-routine-done { text-align: center; padding: 10px 15px; font-size: 12px; font-weight: 700; color: #5B4CF5; background: #f5f3ff; border-top: 1px solid #ede9fe; }
+
+/* Chores */
+.cv2-chore { display: flex; align-items: center; gap: 11px; padding: 11px 15px; border-bottom: 1px solid #f8fafc; }
+.cv2-chore:last-child { border-bottom: none; }
+.cv2-chore-emoji { font-size: 21px; flex-shrink: 0; }
+.cv2-chore-info  { flex: 1; }
+.cv2-chore-name  { font-size: 14px; font-weight: 600; color: #1e293b; }
+.cv2-chore-pts   { font-size: 12px; color: #64748b; margin-top: 2px; }
+.cv2-chore-done-badge { background: #fef9c3; color: #854d0e; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 99px; }
+.cv2-chore-btn { background: #5B4CF5; color: #fff; border: none; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+/* Lunchbox */
+.cv2-lb-chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 11px 13px 13px; }
+.cv2-lb-chip { display: flex; align-items: center; gap: 5px; background: #fff; border: 1px solid #fde68a; border-radius: 99px; padding: 6px 11px; font-size: 13px; font-weight: 600; color: #1e293b; }
+
+/* Prize store */
+.cv2-prize-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 15px 11px; }
+.cv2-prize-header-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+.cv2-bal-badge { background: linear-gradient(135deg,#5B4CF5,#7C3AED); color: #fff; font-size: 13px; font-weight: 800; padding: 5px 13px; border-radius: 99px; }
+.cv2-prize { display: flex; align-items: center; gap: 11px; padding: 10px 15px; border-top: 1px solid #f8fafc; }
+.cv2-prize-emoji { font-size: 25px; flex-shrink: 0; }
+.cv2-prize-info  { flex: 1; }
+.cv2-prize-name  { font-size: 14px; font-weight: 600; color: #1e293b; }
+.cv2-prize-cost  { font-size: 12px; color: #64748b; margin-top: 2px; }
+.cv2-prize-btn   { border: none; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.cv2-prize-btn--can  { background: #5B4CF5; color: #fff; }
+.cv2-prize-btn--cant { background: #f1f5f9; color: #94a3b8; cursor: default; }
+
+/* Notification bars */
+.cv2-notif-bar { margin: 10px 13px 0; border-radius: 12px; padding: 10px 13px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+.cv2-notif-bar--approved { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.cv2-notif-bar--declined { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.cv2-notif-dismiss { margin-left: auto; background: none; border: none; font-size: 15px; cursor: pointer; opacity: .5; }
+
+/* Prize confirmation */
+.cv2-confirm { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 20px; text-align: center; flex: 1; }
+.cv2-confirm-emoji { font-size: 58px; margin-bottom: 13px; }
+.cv2-confirm-title { font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+.cv2-confirm-cost  { font-size: 14px; color: #64748b; margin-bottom: 26px; }
+.cv2-confirm-send  { background: linear-gradient(135deg,#5B4CF5,#7C3AED); color: #fff; border: none; border-radius: 14px; padding: 14px 32px; font-size: 15px; font-weight: 800; cursor: pointer; width: 100%; margin-bottom: 10px; }
+.cv2-confirm-cancel { background: none; border: none; color: #94a3b8; font-size: 13px; font-weight: 600; cursor: pointer; padding: 6px; }
+
+/* Celebration */
+.cv2-celebration { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 20px; text-align: center; }
+.cv2-celeb-emoji { font-size: 62px; margin-bottom: 13px; animation: cv2-bounce .6s ease; }
+.cv2-celeb-title { font-size: 20px; font-weight: 900; color: #1e293b; letter-spacing: -.3px; margin-bottom: 7px; }
+.cv2-celeb-sub   { font-size: 13px; color: #64748b; max-width: 230px; line-height: 1.5; }
+@keyframes cv2-bounce { 0%{transform:scale(.5);opacity:0} 60%{transform:scale(1.2)} 80%{transform:scale(.93)} 100%{transform:scale(1);opacity:1} }
+
+/* Age brackets */
+.age-early .cv2-name  { font-size: 22px; }
+.age-early .cv2-step  { padding: 12px 15px; }
+.age-early .cv2-step-check { width: 29px; height: 29px; }
+.age-early .cv2-step-emoji { font-size: 23px; }
+.age-early .cv2-step-label { font-size: 15px; }
+
+.age-tiny .cv2-header { background: linear-gradient(135deg,#F59E0B 0%,#F43F5E 100%); }
+.age-tiny .cv2-name   { font-size: 25px; }
+.age-tiny .cv2-step   { padding: 13px 15px; }
+.age-tiny .cv2-step-check { width: 35px; height: 35px; border-width: 3px; }
+.age-tiny .cv2-step-emoji { font-size: 29px; }
+.age-tiny .cv2-step-label { font-size: 16px; font-weight: 600; }
+.age-tiny .cv2-step-pts   { display: none; }
+.age-tiny .cv2-routine-frac { display: none; }
+.age-tiny .cv2-bal-badge { background: linear-gradient(135deg,#F59E0B,#F43F5E); }
+.age-tiny .cv2-chore-btn  { padding: 11px 16px; font-size: 14px; }
+.age-tiny .cv2-chore-pts  { display: none; }
+
+.age-tween .cv2-header { background: #1e293b; }
+.age-tween .cv2-name   { font-size: 18px; font-weight: 700; }
+.age-tween .cv2-greeting { color: rgba(255,255,255,.5); }
+.age-tween .cv2-card   { border-radius: 12px; }
+.age-tween .cv2-group-heading { color: #64748b; }
+.age-tween .cv2-step-emoji { font-size: 16px; }
+.age-tween .cv2-prize-btn--can { background: #1e293b; }
+.age-tween .cv2-signout { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.08); }
+.age-tween .cv2-bal-badge { background: #1e293b; border: 1px solid #334155; }
+.age-tween .cv2-card--warm { background: #fafaf8; border-color: #e2e8f0; }
+
+/* Settings panel */
+.settings-panel { background: #fff; border-radius: 18px; border: 1px solid #e2e8f0; padding: 18px; width: 320px; }
+.settings-panel h3 { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.settings-panel p  { font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.5; }
+.reset-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.reset-opt { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: #1e293b; background: #f5f3ff; border: 2px solid #5B4CF5; border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.reset-opt.inactive { background: #fafaf8; border-color: #e2e8f0; color: #64748b; }
+
+/* Callouts */
+.callouts-section { max-width: 1100px; margin: 48px auto 0; display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
+.callout { background: #fff; border-radius: 16px; border: 1px solid #E8E6F0; padding: 16px 18px; }
+.callout-icon  { font-size: 20px; margin-bottom: 7px; }
+.callout-title { font-size: 13px; font-weight: 700; color: #18181B; margin-bottom: 4px; }
+.callout-body  { font-size: 12px; color: #A1A1AA; line-height: 1.55; }
+
+/* Section divider */
+.section-divider { text-align: center; margin: 52px 0 32px; }
+.section-divider-line { height: 1px; background: #D4D0E8; margin-bottom: -10px; }
+.section-divider-label {
+  display: inline-block; position: relative; background: #ECEAF5;
+  padding: 0 16px; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: #A1A1AA;
+}
+</style>
+</head>
+<body>
+
+<div class="page-title">PR #4 — Routines &amp; Children's Today Screen</div>
+<div class="page-sub">Adult routines · Children's routines management · All 4 child age brackets · Read-only view · Prize notifications · Daily reset</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1 — ADULT ROUTINES
+     ══════════════════════════════════════════════ -->
+<div class="section-divider">
+  <div class="section-divider-line"></div>
+  <span class="section-divider-label">Adult Routines</span>
+</div>
+
+<div class="screens">
+
+  <!-- Adult: My Routines tab — in progress -->
+  <div class="screen-col">
+    <div class="screen-label">My Routines — In Progress</div>
+    <div class="phone bg-slate">
+      <div class="status-bar dark">
+        <span class="status-time" style="color:#18181B">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#18181B" opacity=".35"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#18181B" opacity=".55"/><rect x="9" y=".5" width="3" height="11.5" rx="1" fill="#18181B" opacity=".75"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#18181B"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#18181B" stroke-opacity=".35"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#18181B"/></svg>
+        </div>
+      </div>
+      <div class="app-shell">
+        <div class="app-body">
+          <div class="page-header" style="margin-bottom:12px">
+            <h1>Routines</h1>
+            <p>Build consistent daily habits</p>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div class="routine-tab-bar" style="margin-bottom:0">
+              <button class="routine-tab active">My Routines</button>
+              <button class="routine-tab">Children's</button>
+            </div>
+            <button class="btn btn-primary btn-sm">＋ New</button>
+          </div>
+
+          <!-- Intel nudge -->
+          <div class="routine-intel-nudge">
+            <div class="routine-intel-icon">🌅</div>
+            <div class="routine-intel-body">
+              <div class="routine-intel-label">Routines</div>
+              One step left in your Morning Routine!
+            </div>
+          </div>
+
+          <!-- Morning routine card -->
+          <div class="routine-card">
+            <div class="routine-card-header">
+              <div class="routine-card-title">🌅 Morning</div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span class="routine-streak">🔥 7d</span>
+              </div>
+            </div>
+            <div class="routine-card-meta">25min · 06:30</div>
+            <div class="routine-progress-row">
+              <div class="routine-progress-bar-wrap"><div class="routine-progress-bar-fill" style="width:80%"></div></div>
+              <span class="routine-progress-label">4/5</span>
+            </div>
+            <div class="routine-steps">
+              <div class="routine-step">
+                <span class="routine-step-grab">⠿</span>
+                <div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="routine-step-emoji">🏃</span>
+                <span class="routine-step-label done">Morning run</span>
+                <span class="routine-step-dur">20m</span>
+              </div>
+              <div class="routine-step">
+                <span class="routine-step-grab">⠿</span>
+                <div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="routine-step-emoji">🚿</span>
+                <span class="routine-step-label done">Shower</span>
+              </div>
+              <div class="routine-step">
+                <span class="routine-step-grab">⠿</span>
+                <div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="routine-step-emoji">☕</span>
+                <span class="routine-step-label done">Coffee + breakfast</span>
+                <span class="routine-step-dur">5m</span>
+              </div>
+              <div class="routine-step">
+                <span class="routine-step-grab">⠿</span>
+                <div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="routine-step-emoji">📋</span>
+                <span class="routine-step-label done">Plan the day</span>
+              </div>
+              <div class="routine-step">
+                <span class="routine-step-grab">⠿</span>
+                <div class="routine-step-check"></div>
+                <span class="routine-step-emoji">🧘</span>
+                <span class="routine-step-label">Meditation</span>
+                <span class="routine-step-dur">5m</span>
+              </div>
+            </div>
+            <div class="routine-card-btns">
+              <button class="btn btn-sm btn-secondary">↺ Reset today</button>
+              <button class="btn btn-sm btn-secondary">📅 History</button>
+              <button class="btn btn-sm btn-secondary">✏️ Edit</button>
+              <button class="btn btn-sm btn-secondary">👥 Share</button>
+            </div>
+          </div>
+
+          <!-- Evening routine card (all done) -->
+          <div class="routine-card">
+            <div class="routine-card-header">
+              <div class="routine-card-title">🌙 Evening</div>
+              <span class="routine-streak">🔥 3d</span>
+            </div>
+            <div class="routine-card-meta">20min · 21:00</div>
+            <div class="routine-progress-row">
+              <div class="routine-progress-bar-wrap"><div class="routine-progress-bar-fill" style="width:100%"></div></div>
+              <span class="routine-progress-label">3/3</span>
+            </div>
+            <div class="routine-steps">
+              <div class="routine-step"><span class="routine-step-grab">⠿</span><div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span class="routine-step-emoji">📚</span><span class="routine-step-label done">Read</span><span class="routine-step-dur">20m</span></div>
+              <div class="routine-step"><span class="routine-step-grab">⠿</span><div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span class="routine-step-emoji">🪥</span><span class="routine-step-label done">Teeth</span></div>
+              <div class="routine-step"><span class="routine-step-grab">⠿</span><div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span class="routine-step-emoji">😴</span><span class="routine-step-label done">Lights out</span></div>
+            </div>
+            <div class="routine-all-done">✓ Complete — great work!</div>
+            <div class="routine-card-btns">
+              <button class="btn btn-sm btn-secondary">↺ Reset today</button>
+              <button class="btn btn-sm btn-secondary">📅 History</button>
+              <button class="btn btn-sm btn-secondary">✏️ Edit</button>
+            </div>
+          </div>
+
+          <div class="routine-new-card">
+            <span style="font-size:20px">＋</span>
+            <span class="routine-new-card-label">Create new routine</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">🏠</span>Today</div>
+        <div class="nav-item"><span class="nav-icon">💰</span>Money</div>
+        <div class="nav-item active"><span class="nav-icon">📋</span>Routines</div>
+        <div class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Kids</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>More</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adult: Suggestions + shared -->
+  <div class="screen-col">
+    <div class="screen-label">Suggestions &amp; Sharing</div>
+    <div class="phone bg-slate">
+      <div class="status-bar dark">
+        <span class="status-time" style="color:#18181B">9:41</span>
+      </div>
+      <div class="app-shell">
+        <div class="app-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div class="routine-tab-bar" style="margin-bottom:0">
+              <button class="routine-tab active">My Routines</button>
+              <button class="routine-tab">Children's</button>
+            </div>
+            <button class="btn btn-primary btn-sm">＋ New</button>
+          </div>
+
+          <!-- Joined routine (shared badge) -->
+          <div class="routine-card">
+            <div class="routine-card-header">
+              <div class="routine-card-title">💪 Workout</div>
+              <span class="routine-owner-badge routine-joined-badge">🔗 Joined</span>
+            </div>
+            <div class="routine-card-meta">45min · 07:00</div>
+            <div class="routine-progress-row">
+              <div class="routine-progress-bar-wrap"><div class="routine-progress-bar-fill" style="width:33%"></div></div>
+              <span class="routine-progress-label">1/3</span>
+            </div>
+            <div class="routine-steps">
+              <div class="routine-step"><span style="width:18px;flex-shrink:0"></span><div class="routine-step-check done"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><span class="routine-step-emoji">🏋️</span><span class="routine-step-label done">Warm up</span><span class="routine-step-dur">10m</span></div>
+              <div class="routine-step"><span style="width:18px;flex-shrink:0"></span><div class="routine-step-check"></div><span class="routine-step-emoji">🔥</span><span class="routine-step-label">Main workout</span><span class="routine-step-dur">30m</span></div>
+              <div class="routine-step"><span style="width:18px;flex-shrink:0"></span><div class="routine-step-check"></div><span class="routine-step-emoji">🧊</span><span class="routine-step-label">Cool down</span><span class="routine-step-dur">5m</span></div>
+            </div>
+            <div class="routine-card-btns">
+              <button class="btn btn-sm btn-secondary">↺ Reset</button>
+              <button class="btn btn-sm btn-secondary">📅 History</button>
+              <button class="btn btn-sm btn-secondary">📋 Duplicate to mine</button>
+              <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto">Leave</button>
+            </div>
+          </div>
+
+          <!-- Routine with suggestions open -->
+          <div class="routine-card">
+            <div class="routine-card-header">
+              <div class="routine-card-title">🌅 Morning</div>
+            </div>
+            <div class="routine-card-meta">5min · 06:30</div>
+            <div class="routine-progress-row">
+              <div class="routine-progress-bar-wrap"><div class="routine-progress-bar-fill" style="width:0%"></div></div>
+              <span class="routine-progress-label">0/1</span>
+            </div>
+            <div class="routine-steps">
+              <div class="routine-step"><span class="routine-step-grab">⠿</span><div class="routine-step-check"></div><span class="routine-step-emoji">☕</span><span class="routine-step-label">Coffee</span></div>
+            </div>
+            <button class="routine-add-step-btn">+ Add step</button>
+            <div class="routine-suggestions">
+              <div class="routine-suggestions-toggle open">
+                <span>Suggested steps (4)</span><span class="chevron">▼</span>
+              </div>
+              <div class="routine-suggestion-row">
+                <span class="routine-suggestion-emoji">🏃</span>
+                <span class="routine-suggestion-label">Morning run</span>
+                <span class="routine-suggestion-dur">20m</span>
+                <span class="routine-suggestion-add">+</span>
+              </div>
+              <div class="routine-suggestion-row">
+                <span class="routine-suggestion-emoji">🚿</span>
+                <span class="routine-suggestion-label">Shower</span>
+                <span class="routine-suggestion-dur">10m</span>
+                <span class="routine-suggestion-add">+</span>
+              </div>
+              <div class="routine-suggestion-row">
+                <span class="routine-suggestion-emoji">📋</span>
+                <span class="routine-suggestion-label">Plan the day</span>
+                <span class="routine-suggestion-dur">5m</span>
+                <span class="routine-suggestion-add">+</span>
+              </div>
+              <button class="btn btn-sm btn-ghost" style="margin-top:4px;width:100%;font-size:12px">Show 1 more ▼</button>
+            </div>
+            <div class="routine-card-btns">
+              <button class="btn btn-sm btn-secondary">↺ Reset today</button>
+              <button class="btn btn-sm btn-secondary">📅 History</button>
+              <button class="btn btn-sm btn-secondary">✏️ Edit</button>
+              <button class="btn btn-sm btn-secondary">👥 Share</button>
+              <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">🏠</span>Today</div>
+        <div class="nav-item"><span class="nav-icon">💰</span>Money</div>
+        <div class="nav-item active"><span class="nav-icon">📋</span>Routines</div>
+        <div class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Kids</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>More</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adult: 90-day history modal -->
+  <div class="screen-col">
+    <div class="screen-label">History Modal</div>
+    <div class="phone bg-slate">
+      <div class="status-bar dark"><span class="status-time" style="color:#18181B">9:41</span></div>
+      <div class="app-shell">
+        <div class="app-body" style="position:relative">
+          <!-- Background card (blurred) -->
+          <div style="opacity:.3;pointer-events:none">
+            <div class="routine-card" style="margin-top:4px">
+              <div class="routine-card-title">🌅 Morning</div>
+            </div>
+          </div>
+          <!-- Modal overlay -->
+          <div style="position:absolute;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:flex-end;padding:0">
+            <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;padding:22px 20px 32px">
+              <div style="font-size:16px;font-weight:800;color:#18181B;margin-bottom:16px">🌅 Morning — History</div>
+              <div style="display:flex;gap:16px;margin-bottom:16px">
+                <div style="text-align:center"><div style="font-size:24px;font-weight:900">🔥 7</div><div style="font-size:11px;color:#71717A;font-weight:600">Streak</div></div>
+                <div style="text-align:center"><div style="font-size:24px;font-weight:900;color:#10B981">62</div><div style="font-size:11px;color:#71717A;font-weight:600">Full days (90d)</div></div>
+                <div style="text-align:center"><div style="font-size:24px;font-weight:900;color:#F59E0B">8</div><div style="font-size:11px;color:#71717A;font-weight:600">Partial</div></div>
+              </div>
+              <div class="routine-history-label">Last 90 days</div>
+              <div class="routine-history-grid">
+                <!-- Generate a pattern of dots -->
+                <div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot partial">3</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div>
+                <div class="routine-history-dot full">✓</div><div class="routine-history-dot empty"></div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot partial">2</div><div class="routine-history-dot full">✓</div>
+                <div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot empty"></div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div>
+                <div class="routine-history-dot partial">1</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot full">✓</div><div class="routine-history-dot empty"></div><div class="routine-history-dot full">✓</div>
+              </div>
+              <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:#71717A">
+                <span><span style="display:inline-block;width:12px;height:12px;background:var(--section-accent);border-radius:3px;margin-right:4px;vertical-align:middle"></span>Complete</span>
+                <span><span style="display:inline-block;width:12px;height:12px;background:#eff6ff;border:1.5px solid var(--section-accent);border-radius:3px;margin-right:4px;vertical-align:middle"></span>Partial</span>
+                <span><span style="display:inline-block;width:12px;height:12px;background:#F4F4F5;border-radius:3px;margin-right:4px;vertical-align:middle"></span>Missed</span>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px">
+                <button class="btn btn-primary btn-sm">Done</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Children's routines management -->
+  <div class="screen-col">
+    <div class="screen-label">Children's Routines (Adult)</div>
+    <div class="phone bg-slate">
+      <div class="status-bar dark"><span class="status-time" style="color:#18181B">9:41</span></div>
+      <div class="app-shell">
+        <div class="app-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div class="routine-tab-bar" style="margin-bottom:0">
+              <button class="routine-tab">My Routines</button>
+              <button class="routine-tab active">Children's</button>
+            </div>
+            <button class="btn btn-primary btn-sm">＋ New</button>
+          </div>
+
+          <div class="routine-card">
+            <div class="routine-card-header">
+              <div class="routine-card-title">🌅 Morning Routine</div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:11px;color:var(--text-muted)">07:00</span>
+                <button class="btn btn-sm btn-ghost">✏️</button>
+                <button class="btn btn-sm btn-ghost" style="color:#ef4444">🗑</button>
+              </div>
+            </div>
+
+            <div style="margin-bottom:10px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px">Assigned to</div>
+              <div class="routine-member-chips">
+                <span class="routine-member-chip active">😊 Amy</span>
+                <span class="routine-member-chip active">🦁 Jack</span>
+                <span class="routine-member-chip">🐸 Lily</span>
+              </div>
+            </div>
+
+            <!-- Per-child progress -->
+            <div style="margin-bottom:10px">
+              <div style="display:flex;align-items:center;gap:8px;padding:3px 0">
+                <span style="font-size:13px;width:20px;text-align:center;flex-shrink:0">😊</span>
+                <span style="font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;min-width:40px">Amy</span>
+                <div class="routine-progress-bar-wrap" style="flex:1"><div class="routine-progress-bar-fill" style="width:60%"></div></div>
+                <span class="routine-progress-label">3/5</span>
+                <span class="routine-streak" style="font-size:10px;padding:2px 7px">🔥5</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:3px 0">
+                <span style="font-size:13px;width:20px;text-align:center;flex-shrink:0">🦁</span>
+                <span style="font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;min-width:40px">Jack</span>
+                <div class="routine-progress-bar-wrap" style="flex:1"><div class="routine-progress-bar-fill" style="width:100%"></div></div>
+                <span class="routine-progress-label">5/5</span>
+                <span style="font-size:11px;color:var(--section-accent);font-weight:700">✓</span>
+              </div>
+            </div>
+
+            <div style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px">Steps</div>
+            <div class="routine-steps">
+              <div class="routine-step"><span class="routine-step-grab">⠿</span><span class="routine-step-emoji">🛏️</span><span class="routine-step-label">Make bed</span><span class="routine-step-pts">⭐5</span><button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px">✏️</button><button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px">✕</button></div>
+              <div class="routine-step"><span class="routine-step-grab">⠿</span><span class="routine-step-emoji">🚿</span><span class="routine-step-label">Shower</span><span class="routine-step-pts">⭐5</span><button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px">✏️</button><button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px">✕</button></div>
+              <div class="routine-step"><span class="routine-step-grab">⠿</span><span class="routine-step-emoji">🥣</span><span class="routine-step-label">Breakfast</span><button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px">✏️</button><button style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px">✕</button></div>
+            </div>
+            <button class="routine-add-step-btn">+ Add step</button>
+            <div class="routine-suggestions">
+              <div class="routine-suggestions-toggle">
+                <span>Suggested steps (3)</span><span class="chevron">▼</span>
+              </div>
+            </div>
+            <div class="routine-card-btns">
+              <button class="btn btn-sm btn-secondary">📅 History</button>
+              <span style="font-size:12px;color:var(--text-muted);align-self:center">⭐ 20 pts on completion</span>
+            </div>
+          </div>
+
+          <div class="routine-new-card">
+            <span style="font-size:20px">＋</span>
+            <span class="routine-new-card-label">Create children's routine</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item"><span class="nav-icon">🏠</span>Today</div>
+        <div class="nav-item"><span class="nav-icon">💰</span>Money</div>
+        <div class="nav-item active"><span class="nav-icon">📋</span>Routines</div>
+        <div class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Kids</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>More</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today screen — routine summary card -->
+  <div class="screen-col">
+    <div class="screen-label">Today Screen — Routine Card</div>
+    <div class="phone bg-slate">
+      <div class="status-bar dark"><span class="status-time" style="color:#18181B">9:41</span></div>
+      <div class="app-shell">
+        <div class="app-body">
+          <div style="font-size:22px;font-weight:800;color:#18181B;margin-bottom:2px">Good morning, Rob 👋</div>
+          <div style="font-size:13px;color:#71717A;margin-bottom:16px">Wednesday, 30 April</div>
+
+          <!-- Intel nudge -->
+          <div class="routine-intel-nudge">
+            <div class="routine-intel-icon">🌅</div>
+            <div class="routine-intel-body">
+              <div class="routine-intel-label">Routines</div>
+              Your Morning routine hasn't been started yet.
+            </div>
+          </div>
+
+          <!-- Today card -->
+          <div class="routines-today-card">
+            <div class="routines-today-header">
+              <span class="routines-today-title">Routines</span>
+              <span class="routines-today-link">View all →</span>
+            </div>
+            <div class="routine-today-row">
+              <div class="routine-today-emoji">🌅</div>
+              <div class="routine-today-name">Morning</div>
+              <span class="routine-today-nudge">Not started</span>
+              <div class="routine-today-progress">
+                <div class="routine-today-bar-wrap"><div class="routine-today-bar-fill" style="width:0%"></div></div>
+                <span class="routine-today-frac">0/5</span>
+              </div>
+            </div>
+            <div class="routine-today-row" style="margin-top:4px">
+              <div class="routine-today-emoji">🌙</div>
+              <div class="routine-today-name">Evening</div>
+              <div class="routine-today-progress">
+                <div class="routine-today-bar-wrap"><div class="routine-today-bar-fill" style="width:100%"></div></div>
+                <span class="routine-today-frac">3/3</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Other today cards (placeholder) -->
+          <div style="background:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.85);border-radius:14px;padding:13px 14px;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:700;color:#18181B;margin-bottom:6px">Upcoming bills</div>
+            <div style="font-size:12px;color:#71717A">Nothing due this week</div>
+          </div>
+          <div style="background:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.85);border-radius:14px;padding:13px 14px">
+            <div style="font-size:13px;font-weight:700;color:#18181B;margin-bottom:6px">Kids approvals</div>
+            <div style="font-size:12px;color:#71717A">1 pending — Amy: Ice Cream</div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-nav">
+        <div class="nav-item active"><span class="nav-icon">🏠</span>Today</div>
+        <div class="nav-item"><span class="nav-icon">💰</span>Money</div>
+        <div class="nav-item"><span class="nav-icon">📋</span>Routines</div>
+        <div class="nav-item"><span class="nav-icon">👨‍👩‍👧</span>Kids</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>More</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /adult routines screens -->
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 — CHILDREN'S TODAY SCREEN
+     ══════════════════════════════════════════════ -->
+<div class="section-divider" style="margin-top:60px">
+  <div class="section-divider-line"></div>
+  <span class="section-divider-label">Children's Today Screen — All Age Brackets</span>
+</div>
+
+<div class="screens">
+
+  <!-- Independents (8-12) – standard -->
+  <div class="screen-col">
+    <div class="screen-label">Independents (8–12)</div>
+    <div class="phone bg-purple age-independent">
+      <div class="status-bar"><span class="status-time">9:41</span></div>
+      <div class="cv-shell">
+        <div class="cv2-header">
+          <div class="cv2-header-row">
+            <div class="cv2-avatar-wrap"><span class="cv2-avatar">😊</span><div><div class="cv2-name">Amy</div><div class="cv2-greeting">Good morning!</div></div></div>
+            <button class="cv2-signout">Sign out</button>
+          </div>
+          <div class="cv2-nudge">You've earned ⭐ 15 points today — keep going!</div>
+        </div>
+        <div class="cv2-body">
+          <div class="cv2-notif-bar cv2-notif-bar--approved">🎁 <span><strong>Ice Cream</strong> approved! You can redeem it now.</span><button class="cv2-notif-dismiss">×</button></div>
+          <div class="cv2-group" style="margin-top:12px">
+            <div class="cv2-group-heading">📋 My Routines</div>
+            <div class="cv2-card" style="margin-bottom:10px">
+              <div class="cv2-routine-header"><div class="cv2-routine-title"><span>🌅</span><span class="cv2-routine-name">Morning Routine</span></div><span class="cv2-routine-frac">3/5 · ⭐20</span></div>
+              <div class="cv2-progress"><div class="cv2-progress-fill" style="width:60%"></div></div>
+              <div class="cv2-steps">
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🛏️</span><span class="cv2-step-label cv2-step-label--done">Make bed</span><span class="cv2-step-pts">⭐ 5</span></div>
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🚿</span><span class="cv2-step-label cv2-step-label--done">Shower</span><span class="cv2-step-pts">⭐ 5</span></div>
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🥣</span><span class="cv2-step-label cv2-step-label--done">Breakfast</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🎒</span><span class="cv2-step-label">Pack school bag</span><span class="cv2-step-pts">⭐ 5</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🦷</span><span class="cv2-step-label">Brush teeth</span><span class="cv2-step-pts">⭐ 5</span></div>
+              </div>
+            </div>
+            <div class="cv2-card cv2-card--locked">
+              <div class="cv2-routine-header"><div class="cv2-routine-title"><span>🌙</span><span class="cv2-routine-name">Evening Routine</span></div><span class="cv2-routine-lock">🔒 Available tonight</span></div>
+              <div class="cv2-progress"><div class="cv2-progress-fill" style="width:0%"></div></div>
+              <div class="cv2-steps">
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">📚</span><span class="cv2-step-label">Reading</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🛁</span><span class="cv2-step-label">Bath time</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🧹 Chores</div>
+            <div class="cv2-card">
+              <div class="cv2-chore"><span class="cv2-chore-emoji">🧹</span><div class="cv2-chore-info"><div class="cv2-chore-name">Sweep kitchen</div><div class="cv2-chore-pts">⭐ 10 · daily</div></div><span class="cv2-chore-done-badge">Waiting ✓</span></div>
+              <div class="cv2-chore"><span class="cv2-chore-emoji">🐕</span><div class="cv2-chore-info"><div class="cv2-chore-name">Feed the dog</div><div class="cv2-chore-pts">⭐ 5 · daily</div></div><button class="cv2-chore-btn">Done ✓</button></div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🥪 Lunchbox</div>
+            <div class="cv2-card cv2-card--warm">
+              <div class="cv2-lb-chips"><div class="cv2-lb-chip">🥪 Sandwich</div><div class="cv2-lb-chip">🍎 Apple</div><div class="cv2-lb-chip">🍪 Muesli bar</div><div class="cv2-lb-chip">🥤 Water</div></div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🏆 Prize Store</div>
+            <div class="cv2-card cv2-card--warm">
+              <div class="cv2-prize-header"><span class="cv2-prize-header-title">Prizes</span><span class="cv2-bal-badge">⭐ 45 pts</span></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">🍦</span><div class="cv2-prize-info"><div class="cv2-prize-name">Ice Cream</div><div class="cv2-prize-cost">⭐ 30 points</div></div><button class="cv2-prize-btn cv2-prize-btn--can">Redeem</button></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">🎮</span><div class="cv2-prize-info"><div class="cv2-prize-name">Extra screen time</div><div class="cv2-prize-cost">⭐ 80 points</div></div><button class="cv2-prize-btn cv2-prize-btn--cant" disabled>⭐ 80</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prize confirmation -->
+  <div class="screen-col">
+    <div class="screen-label">Prize Confirmation</div>
+    <div class="phone bg-purple">
+      <div class="status-bar"><span class="status-time">9:41</span></div>
+      <div class="cv-shell">
+        <div class="cv2-header"><div class="cv2-header-row"><div class="cv2-avatar-wrap"><span class="cv2-avatar">😊</span><div><div class="cv2-name">Amy</div><div class="cv2-greeting">Good morning!</div></div></div><button class="cv2-signout">Sign out</button></div></div>
+        <div class="cv2-body" style="display:flex;flex-direction:column">
+          <div class="cv2-confirm">
+            <div class="cv2-confirm-emoji">🍦</div>
+            <div class="cv2-confirm-title">Ice Cream</div>
+            <div class="cv2-confirm-cost">⭐ 30 points</div>
+            <button class="cv2-confirm-send">Send request ✉️</button>
+            <button class="cv2-confirm-cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All done celebration -->
+  <div class="screen-col">
+    <div class="screen-label">All Done! 🎉</div>
+    <div class="phone bg-purple">
+      <div class="status-bar"><span class="status-time">9:41</span></div>
+      <div class="cv-shell">
+        <div class="cv2-header"><div class="cv2-header-row"><div class="cv2-avatar-wrap"><span class="cv2-avatar">😊</span><div><div class="cv2-name">Amy</div><div class="cv2-greeting">Good morning!</div></div></div><button class="cv2-signout">Sign out</button></div></div>
+        <div class="cv2-body" style="position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;pointer-events:none">
+            <div style="position:absolute;top:4%;left:12%;width:10px;height:10px;background:#5B4CF5;border-radius:2px;transform:rotate(20deg)"></div>
+            <div style="position:absolute;top:7%;left:52%;width:8px;height:8px;background:#F59E0B;border-radius:2px;transform:rotate(-30deg)"></div>
+            <div style="position:absolute;top:2%;left:78%;width:9px;height:9px;background:#F43F5E;border-radius:2px;transform:rotate(45deg)"></div>
+            <div style="position:absolute;top:14%;left:32%;width:7px;height:7px;background:#10B981;border-radius:2px;transform:rotate(10deg)"></div>
+            <div style="position:absolute;top:22%;left:88%;width:10px;height:10px;background:#FBBF24;border-radius:2px;transform:rotate(-15deg)"></div>
+          </div>
+          <div class="cv2-celebration">
+            <div class="cv2-celeb-emoji">🏆</div>
+            <div class="cv2-celeb-title">Amazing work, Amy!</div>
+            <div class="cv2-celeb-sub">You've finished everything for today. You're a superstar! ⭐</div>
+          </div>
+          <div class="cv2-group" style="padding:0 2px">
+            <div class="cv2-group-heading">🏆 Prize Store</div>
+            <div class="cv2-card cv2-card--warm">
+              <div class="cv2-prize-header"><span class="cv2-prize-header-title">Prizes</span><span class="cv2-bal-badge">⭐ 65 pts</span></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">🍦</span><div class="cv2-prize-info"><div class="cv2-prize-name">Ice Cream</div><div class="cv2-prize-cost">⭐ 30 points</div></div><button class="cv2-prize-btn cv2-prize-btn--can">Redeem</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adult read-only -->
+  <div class="screen-col">
+    <div class="screen-label">Adult Read-Only View</div>
+    <div class="phone bg-purple">
+      <div class="cv-shell">
+        <div class="cv2-readonly-bar"><span>👁 Read-only view — Amy</span><button>Close</button></div>
+        <div class="cv2-header"><div class="cv2-header-row"><div class="cv2-avatar-wrap"><span class="cv2-avatar">😊</span><div><div class="cv2-name">Amy</div><div class="cv2-greeting">Good morning!</div></div></div></div></div>
+        <div class="cv2-body">
+          <div class="cv2-group">
+            <div class="cv2-group-heading">📋 My Routines</div>
+            <div class="cv2-card" style="margin-bottom:10px">
+              <div class="cv2-routine-header"><div class="cv2-routine-title"><span>🌅</span><span class="cv2-routine-name">Morning Routine</span></div><span class="cv2-routine-frac">3/5</span></div>
+              <div class="cv2-progress"><div class="cv2-progress-fill" style="width:60%"></div></div>
+              <div class="cv2-steps">
+                <div class="cv2-step" style="cursor:default"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🛏️</span><span class="cv2-step-label cv2-step-label--done">Make bed</span></div>
+                <div class="cv2-step" style="cursor:default"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🚿</span><span class="cv2-step-label cv2-step-label--done">Shower</span></div>
+                <div class="cv2-step" style="cursor:default"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🎒</span><span class="cv2-step-label">Pack bag</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🧹 Chores</div>
+            <div class="cv2-card">
+              <div class="cv2-chore"><span class="cv2-chore-emoji">🧹</span><div class="cv2-chore-info"><div class="cv2-chore-name">Sweep kitchen</div><div class="cv2-chore-pts">⭐ 10</div></div><span class="cv2-chore-done-badge">Waiting ✓</span></div>
+              <div class="cv2-chore"><span class="cv2-chore-emoji">🐕</span><div class="cv2-chore-info"><div class="cv2-chore-name">Feed the dog</div><div class="cv2-chore-pts">⭐ 5</div></div><span class="cv2-chore-done-badge" style="background:#f1f5f9;color:#94a3b8">Not done</span></div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🏆 Prize Store</div>
+            <div class="cv2-card cv2-card--warm">
+              <div class="cv2-prize-header"><span class="cv2-prize-header-title">Prizes</span><span class="cv2-bal-badge">⭐ 45 pts</span></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">🍦</span><div class="cv2-prize-info"><div class="cv2-prize-name">Ice Cream</div><div class="cv2-prize-cost">⭐ 30 points</div></div><button class="cv2-prize-btn cv2-prize-btn--cant" disabled>Redeem</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Early Readers (5-8) -->
+  <div class="screen-col">
+    <div class="screen-label">Early Readers (5–8)</div>
+    <div class="phone bg-purple age-early">
+      <div class="status-bar"><span class="status-time">9:41</span></div>
+      <div class="cv-shell">
+        <div class="cv2-header"><div class="cv2-header-row"><div class="cv2-avatar-wrap"><span class="cv2-avatar">🦁</span><div><div class="cv2-name">Jack</div><div class="cv2-greeting">Good morning!</div></div></div><button class="cv2-signout">Sign out</button></div></div>
+        <div class="cv2-body">
+          <div class="cv2-group">
+            <div class="cv2-group-heading">📋 My Routines</div>
+            <div class="cv2-card">
+              <div class="cv2-routine-header"><div class="cv2-routine-title"><span>🌅</span><span class="cv2-routine-name">Morning</span></div><span class="cv2-routine-frac">1/3</span></div>
+              <div class="cv2-progress"><div class="cv2-progress-fill" style="width:33%"></div></div>
+              <div class="cv2-steps">
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🛏️</span><span class="cv2-step-label cv2-step-label--done">Make bed</span><span class="cv2-step-pts">⭐ 5</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🚿</span><span class="cv2-step-label">Have a shower</span><span class="cv2-step-pts">⭐ 5</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🥣</span><span class="cv2-step-label">Eat breakfast</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🏆 Prize Store</div>
+            <div class="cv2-card cv2-card--warm">
+              <div class="cv2-prize-header"><span class="cv2-prize-header-title">Prizes</span><span class="cv2-bal-badge">⭐ 20 pts</span></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">🍦</span><div class="cv2-prize-info"><div class="cv2-prize-name">Ice Cream</div><div class="cv2-prize-cost">⭐ 30 points</div></div><button class="cv2-prize-btn cv2-prize-btn--cant" disabled>⭐ 30</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tiny Tots (1-5) -->
+  <div class="screen-col">
+    <div class="screen-label">Tiny Tots (1–5)</div>
+    <div class="phone age-tiny" style="background:#fff9f5">
+      <div class="status-bar"><span class="status-time">9:41</span></div>
+      <div class="cv-shell">
+        <div class="cv2-header"><div class="cv2-header-row"><div class="cv2-avatar-wrap"><span class="cv2-avatar">🐸</span><div><div class="cv2-name">Lily</div><div class="cv2-greeting">Good morning!</div></div></div><button class="cv2-signout">Sign out</button></div></div>
+        <div class="cv2-body">
+          <div class="cv2-group">
+            <div class="cv2-group-heading">📋 My Routines</div>
+            <div class="cv2-card">
+              <div class="cv2-routine-header"><div class="cv2-routine-title"><span>🌅</span><span class="cv2-routine-name">Morning</span></div></div>
+              <div class="cv2-progress"><div class="cv2-progress-fill" style="width:50%"></div></div>
+              <div class="cv2-steps">
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🛏️</span><span class="cv2-step-label cv2-step-label--done">Make bed</span></div>
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">👗</span><span class="cv2-step-label cv2-step-label--done">Get dressed</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🥣</span><span class="cv2-step-label">Eat breakfast</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🦷</span><span class="cv2-step-label">Brush teeth</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🏆 Prize Store</div>
+            <div class="cv2-card cv2-card--warm">
+              <div class="cv2-prize-header"><span class="cv2-prize-header-title">🎁 Prizes</span><span class="cv2-bal-badge">⭐⭐⭐⭐</span></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">🍦</span><div class="cv2-prize-info"><div class="cv2-prize-name">Ice Cream</div></div><button class="cv2-prize-btn cv2-prize-btn--can">🎁</button></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">🎡</span><div class="cv2-prize-info"><div class="cv2-prize-name">Park trip</div></div><button class="cv2-prize-btn cv2-prize-btn--cant" disabled>🔒</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tweens (12-16) -->
+  <div class="screen-col">
+    <div class="screen-label">Tweens (12–16)</div>
+    <div class="phone age-tween" style="background:#f8fafc">
+      <div class="status-bar"><span class="status-time">9:41</span></div>
+      <div class="cv-shell">
+        <div class="cv2-header"><div class="cv2-header-row"><div class="cv2-avatar-wrap"><span class="cv2-avatar">🧑</span><div><div class="cv2-name">Jordan</div><div class="cv2-greeting">Good morning</div></div></div><button class="cv2-signout">Sign out</button></div></div>
+        <div class="cv2-body">
+          <div class="cv2-group">
+            <div class="cv2-group-heading">📋 My Routines</div>
+            <div class="cv2-card" style="margin-bottom:10px">
+              <div class="cv2-routine-header"><div class="cv2-routine-title"><span>🌅</span><span class="cv2-routine-name">Morning</span></div><span class="cv2-routine-frac">2/4 · ⭐25</span></div>
+              <div class="cv2-progress"><div class="cv2-progress-fill" style="width:50%"></div></div>
+              <div class="cv2-steps">
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🏃</span><span class="cv2-step-label cv2-step-label--done">Morning run</span><span class="cv2-step-pts">⭐ 10</span></div>
+                <div class="cv2-step"><div class="cv2-step-check cv2-step-check--done"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🚿</span><span class="cv2-step-label cv2-step-label--done">Shower</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">📚</span><span class="cv2-step-label">Review timetable</span></div>
+                <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🎒</span><span class="cv2-step-label">Pack bag</span><span class="cv2-step-pts">⭐ 5</span></div>
+              </div>
+            </div>
+            <div class="cv2-card cv2-card--locked">
+              <div class="cv2-routine-header"><div class="cv2-routine-title"><span>🌙</span><span class="cv2-routine-name">Evening</span></div><span class="cv2-routine-lock">🔒 Available tonight</span></div>
+              <div class="cv2-progress"><div class="cv2-progress-fill" style="width:0%"></div></div>
+              <div class="cv2-steps"><div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">📖</span><span class="cv2-step-label">Study</span></div><div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">😴</span><span class="cv2-step-label">Lights out by 10pm</span></div></div>
+            </div>
+          </div>
+          <div class="cv2-group">
+            <div class="cv2-group-heading">🏆 Prize Store</div>
+            <div class="cv2-card cv2-card--warm">
+              <div class="cv2-prize-header"><span class="cv2-prize-header-title">Prizes</span><span class="cv2-bal-badge">⭐ 120 pts</span></div>
+              <div class="cv2-prize"><span class="cv2-prize-emoji">📱</span><div class="cv2-prize-info"><div class="cv2-prize-name">Extra phone time</div><div class="cv2-prize-cost">⭐ 100 points</div></div><button class="cv2-prize-btn cv2-prize-btn--can">Redeem</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /children screens -->
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 — SETTINGS + FEATURE CALLOUTS
+     ══════════════════════════════════════════════ -->
+<div class="section-divider" style="margin-top:60px">
+  <div class="section-divider-line"></div>
+  <span class="section-divider-label">Settings &amp; Feature Summary</span>
+</div>
+
+<div style="max-width:1100px;margin:32px auto 0;display:flex;gap:20px;flex-wrap:wrap;justify-content:center;align-items:flex-start">
+  <div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#A1A1AA;margin-bottom:12px;text-align:center">Settings — Kids &amp; Routines</div>
+    <div class="settings-panel">
+      <h3>👧 Kids &amp; Routines</h3>
+      <p>Completion reset time for routines and chores</p>
+      <div style="font-size:13px;font-weight:600;color:#1e293b;margin-bottom:4px">Routine reset time</div>
+      <p>Completed tasks reset each day at this time. Default is midnight.</p>
+      <div class="reset-options">
+        <label class="reset-opt"><input type="radio" name="rh" checked style="accent-color:#5B4CF5"> Midnight</label>
+        <label class="reset-opt inactive"><input type="radio" name="rh" style="accent-color:#5B4CF5"> 4 am</label>
+        <label class="reset-opt inactive"><input type="radio" name="rh" style="accent-color:#5B4CF5"> 5 am</label>
+        <label class="reset-opt inactive"><input type="radio" name="rh" style="accent-color:#5B4CF5"> 6 am</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callouts-section">
+  <div class="callout"><div class="callout-icon">📋</div><div class="callout-title">Adult routines</div><div class="callout-body">Step-by-step daily routines with progress bars, streaks, drag-to-reorder, and 90-day history. My Routines tab is private; completions live on the routine record.</div></div>
+  <div class="callout"><div class="callout-icon">💡</div><div class="callout-title">Suggested steps</div><div class="callout-body">3 contextual suggestions shown per routine (expand for more). One tap adds the step. For child routines an edit button lets the adult set points before adding.</div></div>
+  <div class="callout"><div class="callout-icon">👥</div><div class="callout-title">Share &amp; join</div><div class="callout-body">Routines can be shared with household members. Recipients can duplicate to their own list or join to stay in sync. Joined routines show a 🔗 badge and can't be edited.</div></div>
+  <div class="callout"><div class="callout-icon">👧</div><div class="callout-title">Children's routines</div><div class="callout-body">Managed from the Children's tab. Assign to one or multiple kids with inline chips. Per-child progress bars and streaks visible at a glance. Points per step + bonus on completion.</div></div>
+  <div class="callout"><div class="callout-icon">⏰</div><div class="callout-title">Time-aware (children)</div><div class="callout-body">Active routines are fully interactive. Non-active ones show 🔒 lock badge and disable all taps until the time window opens (triggerTime + 6 hrs).</div></div>
+  <div class="callout"><div class="callout-icon">👁</div><div class="callout-title">Adult read-only view</div><div class="callout-body">Parents can peek at any child's Today screen from Kids Zone. Dark "Read-only" bar at top, no sign-out button, all interactive buttons disabled.</div></div>
+  <div class="callout"><div class="callout-icon">🔔</div><div class="callout-title">Prize notifications</div><div class="callout-body">When a parent approves or declines a prize request, the child sees a green or red notification banner next login. One tap dismisses it.</div></div>
+  <div class="callout"><div class="callout-icon">🕛</div><div class="callout-title">Configurable reset</div><div class="callout-body">Choose when tasks reset — midnight, 4am, 5am, or 6am — in Settings → Kids &amp; Routines. History preserved for streaks.</div></div>
+</div>
+
+</body>
+</html>
