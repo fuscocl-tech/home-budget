@@ -11,6 +11,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Toto">
   <link rel="apple-touch-icon" href="/home-budget/icons/icon.svg">
+  <link rel="stylesheet" href="reskin.css" id="reskin-css">
+  <script>
+    if (new URLSearchParams(location.search).get('reskin') === '0') {
+      document.getElementById('reskin-css')?.remove();
+    }
+  </script>
   <style>
     :root {
       --bg: #f0f9ff;
@@ -769,11 +775,183 @@
     .bn-item.active .bn-ico { stroke-width: 2; }
     .bn-item:active { transform: scale(0.94); }
 
-    /* ─── Per-section animated gradient backgrounds ── */
+    /* ═══════════════════════════════════════════════════════════
+       TOTO 2028 design tokens — supersedes the per-section gradient
+       /accent system from earlier rounds. Single purple primary,
+       warm cream surface, semantic life-area colours.
+       ═════════════════════════════════════════════════════════── */
     body {
-      transition: background 0.6s ease;
+      background: #FAFAF8 !important;
       isolation: isolate;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
     }
+    /* Disable the previous animated gradient blobs */
+    body::before, body::after, #ambient-blob { display: none !important; }
+    /* Lock primary to purple everywhere — overrides per-section accent */
+    body, body[data-section] {
+      --primary: #5B4CF5;
+      --primary-light: #F0EEFF;
+      --section-accent: #5B4CF5;
+      --section-accent-2: #7C3AED;
+      --section-accent-soft: #F0EEFF;
+    }
+
+    /* AI badge */
+    .ai-badge { display:inline-flex; align-items:center; gap:5px; background:#F0EEFF; border:0.5px solid #D4CFFE; border-radius:20px; padding:5px 11px; margin-top:10px; }
+    .ai-badge-text { font-size:11px; font-weight:500; color:#5B4CF5; letter-spacing:0.3px; }
+
+    /* New header layout (replaces existing .app-header content) */
+    .toto-header { padding: 14px 24px 0; }
+    .toto-header-date { font-size:13px; font-weight:500; letter-spacing:0.2px; color:#A1A1AA; margin-bottom:4px; font-family:'SF Mono', ui-monospace, monospace; }
+    .toto-header-row { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+    .toto-header-greeting { font-size:34px; font-weight:700; color:#18181B; letter-spacing:-1px; line-height:1.08; }
+    .toto-avatar { width:46px; height:46px; background:#5B4CF5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
+    .toto-avatar svg { stroke:#fff; }
+
+    /* Week strip */
+    .week-strip { margin: 18px 20px 0; background:#F2F1F8; border-radius:26px; padding:10px 6px; display:flex; gap:0; }
+    .ws-day { flex:1; text-align:center; padding:7px 3px; border-radius:16px; cursor:pointer; }
+    .ws-day.today { background:#5B4CF5; }
+    .ws-init { font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:#A8A6C0; font-family:'SF Mono', ui-monospace, monospace; }
+    .ws-day.today .ws-init { color:#A89DF7; }
+    .ws-num { font-size:18px; font-weight:500; color:#C4C2D4; line-height:1.2; margin-top:2px; }
+    .ws-day.today .ws-num { font-weight:700; color:#fff; }
+    .ws-day.past .ws-num { color:#A8A6C0; }
+    .ws-dot { width:4px; height:4px; border-radius:50%; margin:4px auto 0; background:#E8E6F5; }
+    .ws-day.today .ws-dot { background: rgba(255,255,255,0.5); }
+    .ws-day.has .ws-dot { background:#C4C2D4; }
+
+    /* Stats row */
+    .toto-stats-row { margin:12px 20px 0; display:flex; gap:10px; }
+    .toto-stat-card { flex:1; border-radius:22px; padding:16px; cursor:pointer; }
+    .toto-stat-card.upcoming { background:#EEEAFF; }
+    .toto-stat-card.completed { background:#ECFDF5; }
+    .toto-stat-label { font-size:10px; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; font-family:'SF Mono', ui-monospace, monospace; }
+    .toto-stat-card.upcoming .toto-stat-label { color:#7B6FD4; }
+    .toto-stat-card.completed .toto-stat-label { color:#10B981; }
+    .toto-stat-num-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+    .toto-stat-num { font-size:32px; font-weight:700; letter-spacing:-1px; line-height:1; }
+    .toto-stat-card.upcoming .toto-stat-num { color:#3730A3; }
+    .toto-stat-card.completed .toto-stat-num { color:#065F46; }
+    .toto-stat-sub { font-size:12px; }
+    .toto-stat-card.upcoming .toto-stat-sub { color:#8B80D4; }
+    .toto-stat-card.completed .toto-stat-sub { color:#34D399; }
+
+    /* Section header (in-screen) */
+    .toto-sec-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px 0; }
+    .toto-sec-title { font-size:16px; font-weight:600; color:#18181B; letter-spacing:-0.2px; }
+    .toto-sec-link { font-size:13px; font-weight:500; color:#5B4CF5; cursor:pointer; }
+
+    /* Life areas grid */
+    .life-grid { padding:10px 20px 0; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .life-card { border-radius:24px; padding:16px; display:flex; flex-direction:column; gap:10px; cursor:pointer; transition:transform 0.12s; }
+    .life-card:active { transform:scale(0.98); }
+    .life-card.work    { background:#FFF8EC; border:1px solid #FDE9B0; }
+    .life-card.study   { background:#F5F0FF; border:1px solid #DDD6FE; }
+    .life-card.social  { background:#FFF1F3; border:1px solid #FECDD3; }
+    .life-card.family  { background:#EDFFF6; border:1px solid #A7F3D0; }
+    .life-card.money   { background:#F5F0FF; border:1px solid #DDD6FE; }
+    .life-card-top { display:flex; align-items:center; justify-content:space-between; }
+    .life-icon-box { width:34px; height:34px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#fff; }
+    .life-card.work   .life-icon-box { background:#F59E0B; }
+    .life-card.study  .life-icon-box { background:#7C3AED; }
+    .life-card.social .life-icon-box { background:#F43F5E; }
+    .life-card.family .life-icon-box { background:#10B981; }
+    .life-card.money  .life-icon-box { background:#5B4CF5; }
+    .life-icon-box svg { width:16px; height:16px; stroke:#fff; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+    .arc-ring { transform: rotate(-90deg); }
+    .arc-track { fill:none; stroke-width:4; stroke-linecap:round; }
+    .arc-progress { fill:none; stroke-width:4; stroke-linecap:round; stroke-dasharray:82; }
+    .life-label { font-size:10px; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; font-family:'SF Mono', ui-monospace, monospace; }
+    .life-card.work   .life-label, .life-card.work   .life-count { color:#78350F; }
+    .life-card.study  .life-label, .life-card.study  .life-count { color:#4C1D95; }
+    .life-card.social .life-label, .life-card.social .life-count { color:#881337; }
+    .life-card.family .life-label, .life-card.family .life-count { color:#064E3B; }
+    .life-card.money  .life-label, .life-card.money  .life-count { color:#3730A3; }
+    .life-count { font-size:26px; font-weight:700; letter-spacing:-0.8px; line-height:1; }
+    .life-sub { font-size:11px; }
+    .life-card.work   .life-sub { color:#B45309; }
+    .life-card.study  .life-sub { color:#5B21B6; }
+    .life-card.social .life-sub { color:#BE123C; }
+    .life-card.family .life-sub { color:#065F46; }
+    .life-card.money  .life-sub { color:#5B21B6; }
+
+    /* Tasks list */
+    .toto-tasks { padding:8px 24px 0; }
+    .toto-tasks-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:2px; }
+    .toto-add-btn { width:28px; height:28px; border-radius:50%; background:#5B4CF5; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(91,76,245,0.35); border:none; }
+    .toto-add-btn svg { stroke:#fff; }
+    .task-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:0.5px solid #F0EFF8; cursor:pointer; }
+    .task-row:last-child { border-bottom:none; }
+    .task-check { width:22px; height:22px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .task-check.done { background:#5B4CF5; color:#fff; }
+    .task-check.done svg { stroke:#fff; }
+    .task-check.pending-work   { border:2px solid #FDE9B0; }
+    .task-check.pending-study  { border:2px solid #DDD6FE; }
+    .task-check.pending-social { border:2px solid #FECDD3; }
+    .task-check.pending-family { border:2px solid #A7F3D0; }
+    .task-check.pending-money  { border:2px solid #DDD6FE; }
+    .task-text { flex:1; min-width:0; }
+    .task-title { font-size:14px; font-weight:500; color:#18181B; line-height:1.3; }
+    .task-title.done { color:#A1A1AA; text-decoration:line-through; }
+    .task-sub { font-size:11px; color:#A1A1AA; margin-top:2px; font-family:'SF Mono', ui-monospace, monospace; }
+    .task-sub.done { color:#D4D4D8; }
+    .task-chip { font-size:10px; font-weight:600; letter-spacing:0.8px; border-radius:8px; padding:3px 8px; text-transform:uppercase; font-family:'SF Mono', ui-monospace, monospace; flex-shrink:0; }
+    .task-chip.work   { background:#FEF3C7; color:#92400E; }
+    .task-chip.study  { background:#F5F0FF; color:#4C1D95; }
+    .task-chip.social { background:#FFF1F3; color:#BE123C; }
+    .task-chip.family { background:#EDFFF6; color:#065F46; }
+    .task-chip.money  { background:#F0EEFF; color:#3730A3; }
+
+    /* Intelligence card */
+    .intel-card { margin:14px 20px 24px; background:#18181B; border-radius:26px; padding:18px; display:flex; gap:14px; align-items:center; cursor:pointer; }
+    .intel-icon { width:46px; height:46px; background:#2A2A36; border-radius:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .intel-icon svg { width:22px; height:22px; stroke:#A89DF7; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; fill:none; }
+    .intel-content { flex:1; min-width:0; }
+    .intel-badge { display:flex; align-items:center; gap:5px; margin-bottom:5px; }
+    .intel-dot { width:5px; height:5px; border-radius:50%; background:#7C3AED; }
+    .intel-badge-label { font-size:10px; font-weight:600; color:#A8A6C0; letter-spacing:0.8px; text-transform:uppercase; font-family:'SF Mono', ui-monospace, monospace; }
+    .intel-body { font-size:14px; font-weight:500; color:#FAFAFA; line-height:1.4; }
+    .intel-chevron { flex-shrink:0; color:#52525B; }
+
+    /* ─── Floating nav pill (replaces glass nav) ─── */
+    .bottom-nav {
+      background: #FFFFFF !important;
+      border: 0.5px solid #E8E6F0 !important;
+      border-radius: 32px !important;
+      padding: 10px 14px !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      gap: 6px;
+      width: fit-content !important;
+      left: 50% !important; right: auto !important;
+      transform: translateX(-50%);
+      bottom: max(18px, env(safe-area-inset-bottom)) !important;
+      height: auto !important;
+    }
+    .bn-item { padding: 0 10px !important; flex: 0 0 auto !important; gap: 3px !important; min-width: 56px; }
+    .bn-item .bn-ico { stroke: #C4C2D4 !important; }
+    .bn-item span { color: #C4C2D4 !important; font-weight: 500 !important; font-size: 10px !important; }
+    .bn-item.active .bn-ico { stroke: #5B4CF5 !important; stroke-width: 2 !important; }
+    .bn-item.active span { color: #5B4CF5 !important; font-weight: 600 !important; }
+    .bn-fab { width:44px; height:44px; border-radius:50%; background:#5B4CF5; display:flex; align-items:center; justify-content:center; margin:0 2px; cursor:pointer; box-shadow:0 4px 12px rgba(91,76,245,0.35); border:none; flex-shrink:0; }
+    .bn-fab svg { stroke:#fff; stroke-width:2.5; }
+
+    /* Header — legacy app-header (TOTO bar) hidden on mobile;
+       the in-screen toto-header replaces it. Sidebar still shows on desktop. */
+    .app-header {
+      background: transparent !important;
+      border: none !important;
+    }
+    @media (max-width: 720px) { .app-header { display: none !important; } }
+    /* Pad the top of mobile content for the iOS notch since the header is gone */
+    @media (max-width: 720px) {
+      .main { padding-top: max(20px, env(safe-area-inset-top)) !important; }
+    }
+
+    /* (legacy block below; blobs + section gradients are killed by overrides above) */
+
     /* Soft drifting blobs sit behind everything — fixed pseudo + a 3rd via #ambient-blob */
     body::before,
     body::after {
@@ -6793,6 +6971,75 @@ function _briefIcon(card) {
   return 'i-clipboard-check';
 }
 
+// Map a card's section/title to a 2028 chip class
+function _chipClassFor(card) {
+  const s = card.section;
+  if (s === 'Wallet') return 'money';
+  if (s === 'Plan')   return 'social';
+  if (s === 'Home')   return 'work';
+  if (s === 'Family') return 'family';
+  return 'study';
+}
+function _chipLabelFor(card) {
+  const s = card.section;
+  return (s || 'Task').toLowerCase();
+}
+
+// Week strip — 7 days centred on today (-3..+3)
+function _renderWeekStrip() {
+  const initials = ['S','M','T','W','T','F','S'];
+  const today = new Date();
+  // Mon-anchored week: index Monday as day 0
+  const dow = today.getDay() === 0 ? 6 : today.getDay() - 1;
+  const monday = new Date(today); monday.setDate(today.getDate() - dow);
+  // Collect activity dates from bills + planner + maintenance
+  const activity = new Set();
+  (state.bills || []).forEach(b => { const d = b.dueDate || b.nextDue; if (d) activity.add(d.slice(0,10)); });
+  (state.planner?.events || []).forEach(e => { if (e.date) activity.add(e.date.slice(0,10)); });
+  (state.maintenance || []).forEach(m => { if (m.nextDue) activity.add(m.nextDue.slice(0,10)); });
+  const cells = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
+    const iso = d.toISOString().slice(0,10);
+    const isToday = d.toDateString() === today.toDateString();
+    const isPast  = d < today && !isToday;
+    const initIdx = d.getDay();
+    const cls = isToday ? 'ws-day today' : (isPast ? 'ws-day past' : 'ws-day');
+    const hasCls = activity.has(iso) ? ' has' : '';
+    cells.push(`<div class="${cls}${hasCls}"><div class="ws-init">${initials[initIdx]}</div><div class="ws-num">${d.getDate()}</div><div class="ws-dot"></div></div>`);
+  }
+  return `<div class="week-strip">${cells.join('')}</div>`;
+}
+
+// Life areas — 4 cards. Counts derive from existing cards array passed in.
+function _renderLifeAreas(cards) {
+  const sections = [
+    { cls:'money',  label:'Money',  match: c => c.section === 'Wallet', icon:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>', track:'#DDD6FE', stroke:'#5B4CF5' },
+    { cls:'family', label:'Family', match: c => /kid|chore|family|riley|mia|child/i.test(c.title || ''), icon:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>', track:'#A7F3D0', stroke:'#10B981' },
+    { cls:'work',   label:'Home',   match: c => c.section === 'Home', icon:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>', track:'#FDE9B0', stroke:'#F59E0B' },
+    { cls:'social', label:'Plan',   match: c => c.section === 'Plan', icon:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>', track:'#FECDD3', stroke:'#F43F5E' },
+  ];
+  return `<div class="life-grid">` + sections.map(s => {
+    const items = (cards || []).filter(s.match);
+    const count = items.length;
+    const pending = items.filter(c => c.cls === 'red' || c.cls === 'amber').length;
+    const ratio = count > 0 ? Math.max(0, 1 - (pending / count)) : 1;
+    const offset = (82 - ratio * 82).toFixed(1);
+    return `<div class="life-card ${s.cls}" onclick="activateTab('${s.cls === 'money' ? 'budget' : s.cls === 'family' ? 'kids' : s.cls === 'work' ? 'documents' : 'planner'}')">
+      <div class="life-card-top">
+        <div class="life-icon-box"><svg viewBox="0 0 24 24">${s.icon}</svg></div>
+        <svg class="arc-ring" width="34" height="34" viewBox="0 0 34 34">
+          <circle class="arc-track" cx="17" cy="17" r="13" stroke="${s.track}"/>
+          <circle class="arc-progress" cx="17" cy="17" r="13" stroke="${s.stroke}" stroke-dashoffset="${offset}"/>
+        </svg>
+      </div>
+      <div class="life-label">${s.label}</div>
+      <div class="life-count">${pending || count}</div>
+      <div class="life-sub">${pending ? `pending` : (count ? 'all clear' : 'nothing yet')}</div>
+    </div>`;
+  }).join('') + `</div>`;
+}
+
 function _briefRow(card) {
   const onclickAttr = card.onclick ? card.onclick : (card.tab ? `activateTab('${card.tab}')` : '');
   const icon = _briefIcon(card);
@@ -7049,19 +7296,69 @@ function renderToday() {
     ? cards.map(_briefRow).join('')
     : `<div class="brief-row"><div class="brief-glyph green"><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></div><div class="brief-body"><div class="t">All clear</div><div class="s">Nothing needs your attention.</div></div></div>`;
 
+  // ── 2028 layout ──
+  const dateLine = today.toLocaleDateString('en-AU', { weekday:'long', month:'long', day:'numeric' });
+  const greetingTwoLine = greeting.replace(' ', '<br>');
+  const attentionCount = redCount + amberCount;
+  const aiBadgeText = attentionCount > 0
+    ? `${attentionCount} thing${attentionCount === 1 ? '' : 's'} need${attentionCount === 1 ? 's' : ''} attention`
+    : 'all clear today';
+  const completedCount = cards.filter(c => c.cls === 'green').length;
+  const upcomingCount  = cards.filter(c => c.cls === 'red' || c.cls === 'amber').length;
+  const taskCards = cards.slice(0, 5);
+  const tasksHtml = taskCards.length ? taskCards.map(c => {
+    const onclickAttr = c.onclick ? c.onclick : (c.tab ? `activateTab('${c.tab}')` : '');
+    const chipCls = _chipClassFor(c);
+    const chipLbl = _chipLabelFor(c);
+    const titleText = (c.title || '').replace(/<[^>]+>/g, '').trim();
+    return `<div class="task-row"${onclickAttr ? ` onclick="${onclickAttr}"` : ''}>
+      <div class="task-check pending-${chipCls}"></div>
+      <div class="task-text">
+        <div class="task-title">${titleText}</div>
+        ${c.sub ? `<div class="task-sub">${c.sub}</div>` : ''}
+      </div>
+      <div class="task-chip ${chipCls}">${chipLbl}</div>
+    </div>`;
+  }).join('') : `<div style="font-size:13px;color:#A1A1AA;padding:14px 0">Nothing on the list — enjoy.</div>`;
+
   document.getElementById('today-content').innerHTML = `
-    <div class="today-greeting">
-      <h2>${greeting}${name ? ', ' + name : ''}</h2>
-      <p id="today-briefing-text">${fallbackBrief}</p>
+    <div class="toto-header">
+      <div class="toto-header-date">${dateLine}</div>
+      <div class="toto-header-row">
+        <div>
+          <div class="toto-header-greeting">${greetingTwoLine}${name ? `<br><span style="font-size:18px;color:#A1A1AA;font-weight:500;letter-spacing:-0.3px">${name}</span>` : ''}</div>
+          <div class="ai-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="ai-badge-text">${aiBadgeText}</span>
+          </div>
+        </div>
+        <div class="toto-avatar" onclick="activateTab('settings')" title="Settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
     </div>
 
-    <div class="today-hero" onclick="activateTab('budget')">
-      <div class="today-hero-lbl">${heroNegative ? 'Over budget by' : 'Available this month'}</div>
-      <div class="today-hero-num${heroNegative ? ' negative' : ''}"><span class="small">$</span>${heroDollars}</div>
-      <div class="today-hero-of">${heroOfText}</div>
-      <div class="today-hero-bar">${barHtml}</div>
-      ${legendHtml ? `<div class="today-hero-legend">${legendHtml}</div>` : ''}
+    ${_renderWeekStrip()}
+
+    <div class="toto-stats-row">
+      <div class="toto-stat-card upcoming" onclick="document.querySelector('.toto-tasks')?.scrollIntoView({behavior:'smooth',block:'start'})">
+        <div class="toto-stat-label">Upcoming</div>
+        <div class="toto-stat-num-row">
+          <span class="toto-stat-num">${upcomingCount}</span>
+        </div>
+        <div class="toto-stat-sub">need attention</div>
+      </div>
+      <div class="toto-stat-card completed">
+        <div class="toto-stat-label">On track</div>
+        <div class="toto-stat-num-row">
+          <span class="toto-stat-num">${completedCount}</span>
+        </div>
+        <div class="toto-stat-sub">going well</div>
+      </div>
     </div>
+
+    <div class="toto-sec-header"><span class="toto-sec-title">Life areas</span><span class="toto-sec-link">See all</span></div>
+    ${_renderLifeAreas(cards)}
 
     <div id="setup-progress-card">${renderSetupProgress()}</div>
 
@@ -7069,8 +7366,29 @@ function renderToday() {
 
     ${lifeScoreHtml}
 
-    <div class="today-seclabel"><span class="lbl">Today's briefing</span></div>
-    <div class="today-brief">${briefHtml}</div>`;
+    <div class="toto-tasks">
+      <div class="toto-tasks-header" style="padding:18px 0 6px">
+        <span class="toto-sec-title">Today</span>
+        <button class="toto-add-btn" onclick="openPlannerModal&&openPlannerModal(null,(new Date()).toISOString().slice(0,10))" aria-label="Add task">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+      ${tasksHtml}
+    </div>
+
+    <div class="intel-card" onclick="document.getElementById('intel-body')?.scrollIntoView({behavior:'smooth'})">
+      <div class="intel-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2v6"/><path d="M12 16v6"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="M2 12h6"/><path d="M16 12h6"/><path d="m4.93 19.07 4.24-4.24"/><path d="m14.83 9.17 4.24-4.24"/></svg>
+      </div>
+      <div class="intel-content">
+        <div class="intel-badge">
+          <span class="intel-dot"></span>
+          <span class="intel-badge-label">Toto Intelligence</span>
+        </div>
+        <div class="intel-body" id="today-briefing-text">${fallbackBrief}</div>
+      </div>
+      <svg class="intel-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
 
   // Async AI briefing — replaces the template text if API key available
   _fetchAIBriefing(cards, surplus, daysLeft, todayMeals, health);
@@ -17838,27 +18156,26 @@ if ('serviceWorker' in navigator) {
     <button class="toto-send-btn" id="toto-send" onclick="sendTotoMessage()">Send</button>
   </div>
 </div>
-<!-- ─── Floating bottom nav (mobile only) ─────── -->
+<!-- ─── Floating bottom nav pill (Toto 2028) ─── -->
 <nav class="bottom-nav" id="bottom-nav">
   <button class="bn-item" data-tab="today" onclick="activateTab('today')">
-    <svg class="bn-ico"><use href="#i-sun"/></svg>
+    <svg class="bn-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
     <span>Today</span>
   </button>
   <button class="bn-item" data-tab="budget" onclick="activateTab('budget')">
-    <svg class="bn-ico"><use href="#i-wallet"/></svg>
+    <svg class="bn-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V8a2 2 0 0 0-2-2H5a2 2 0 0 1 0-4h14v4"/><path d="M3 6v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
     <span>Wallet</span>
   </button>
+  <button class="bn-fab" onclick="(function(){ const t=document.body.dataset.section; if(t==='wallet'){openAddIncome&&openAddIncome();} else if(t==='plan'){openPlannerModal&&openPlannerModal(null,(new Date()).toISOString().slice(0,10));} else {openPlannerModal&&openPlannerModal(null,(new Date()).toISOString().slice(0,10));} })()" aria-label="Add">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
   <button class="bn-item" data-tab="planner" onclick="activateTab('planner')">
-    <svg class="bn-ico"><use href="#i-calendar"/></svg>
+    <svg class="bn-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     <span>Plan</span>
   </button>
   <button class="bn-item" data-tab="documents" onclick="activateTab('documents')">
-    <svg class="bn-ico"><use href="#i-home"/></svg>
+    <svg class="bn-ico" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Home</span>
-  </button>
-  <button class="bn-item" data-tab="settings" onclick="activateTab('settings')">
-    <svg class="bn-ico"><use href="#i-settings"/></svg>
-    <span>Settings</span>
   </button>
 </nav>
 
