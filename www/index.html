@@ -914,6 +914,117 @@
     .intel-body { font-size:14px; font-weight:500; color:#FAFAFA; line-height:1.4; }
     .intel-chevron { flex-shrink:0; color:#52525B; }
 
+    /* ═══════════════════════════════════════════════════════════
+       2028 components for Wallet / Plan / Home / Me screens
+       ═════════════════════════════════════════════════════════── */
+
+    /* In-screen header used by Wallet/Plan/Home/Me */
+    .scr-header { padding: 14px 24px 0; }
+    .scr-header-date { font-size:13px; font-weight:500; color:#A1A1AA; margin-bottom:4px; font-family:'SF Mono', ui-monospace, monospace; }
+    .scr-header-row { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    .scr-header-title { font-size:30px; font-weight:700; color:#18181B; letter-spacing:-0.8px; }
+    .scr-avatar { width:42px; height:42px; background:#5B4CF5; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; }
+    .scr-avatar svg { stroke:#fff; }
+
+    /* Generic 2028 chip (Work/Study/Social/Family/Money) */
+    .t-chip { font-size:10px; font-weight:600; letter-spacing:0.8px; border-radius:8px; padding:3px 8px; text-transform:uppercase; font-family:'SF Mono', ui-monospace, monospace; flex-shrink:0; display:inline-block; }
+    .t-chip.work   { background:#FEF3C7; color:#92400E; }
+    .t-chip.study  { background:#F5F0FF; color:#4C1D95; }
+    .t-chip.social { background:#FFF1F3; color:#BE123C; }
+    .t-chip.family { background:#EDFFF6; color:#065F46; }
+    .t-chip.money  { background:#F0EEFF; color:#3730A3; }
+
+    /* ── Wallet ── */
+    .balance-card { margin: 14px 20px 0; background:#18181B; border-radius:26px; padding:22px; color:#FAFAFA; }
+    .balance-label { font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#A8A6C0; font-family:'SF Mono', ui-monospace, monospace; margin-bottom:8px; }
+    .balance-amount { font-size:38px; font-weight:700; letter-spacing:-1px; line-height:1; }
+    .balance-sub { font-size:12px; color:#A8A6C0; margin-top:4px; }
+    .balance-row { display:flex; gap:18px; margin-top:18px; padding-top:16px; border-top:0.5px solid rgba(255,255,255,0.08); }
+    .balance-col { flex:1; }
+    .balance-col-label { font-size:10px; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; color:#A8A6C0; font-family:'SF Mono', ui-monospace, monospace; }
+    .balance-col-val { font-size:18px; font-weight:600; color:#fff; margin-top:3px; }
+    .balance-col-val.red { color:#F87171; }
+
+    .quick-actions { display:flex; gap:8px; padding:14px 20px 0; overflow-x:auto; }
+    .quick-actions::-webkit-scrollbar { display:none; }
+    .qa-btn { flex:1; min-width:64px; background:#FFFFFF; border:0.5px solid #E8E6F0; border-radius:18px; padding:12px 8px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
+    .qa-btn:active { transform:scale(0.97); }
+    .qa-btn-icon { width:32px; height:32px; background:#F0EEFF; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+    .qa-btn-label { font-size:11px; font-weight:500; color:#18181B; }
+
+    .tx-list { padding:0 20px; }
+    .tx-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:0.5px solid #F0EFF8; cursor:pointer; }
+    .tx-row:last-child { border-bottom:none; }
+    .tx-icon { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .tx-icon.food   { background:#FFF8EC; }
+    .tx-icon.health { background:#F5F0FF; }
+    .tx-icon.car    { background:#FFF1F3; }
+    .tx-icon.shop   { background:#ECFDF5; }
+    .tx-icon.bill   { background:#F0EEFF; }
+    .tx-name { font-size:14px; font-weight:500; color:#18181B; line-height:1.3; }
+    .tx-sub { font-size:11px; color:#A1A1AA; margin-top:2px; font-family:'SF Mono', ui-monospace, monospace; }
+    .tx-amount { font-size:14px; font-weight:600; flex-shrink:0; font-variant-numeric:tabular-nums; }
+    .tx-amount.expense { color:#18181B; }
+    .tx-amount.income  { color:#10B981; }
+
+    /* ── Plan ── */
+    .month-nav { display:flex; align-items:center; justify-content:space-between; padding:14px 24px 0; }
+    .month-nav-btn { width:32px; height:32px; border-radius:50%; background:#F2F1F8; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; }
+    .month-nav-title { font-size:18px; font-weight:600; color:#18181B; letter-spacing:-0.3px; }
+    .mini-cal { margin:14px 20px 0; background:#FFFFFF; border:0.5px solid #E8E6F0; border-radius:22px; padding:14px; }
+    .cal-days-header { display:grid; grid-template-columns:repeat(7,1fr); gap:0; margin-bottom:6px; }
+    .cal-day-init { text-align:center; font-size:9px; font-weight:600; letter-spacing:0.5px; color:#A1A1AA; font-family:'SF Mono', ui-monospace, monospace; padding:4px 0; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+    .cal-cell { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:13px; font-weight:500; color:#18181B; border-radius:10px; cursor:pointer; position:relative; padding-top:2px; }
+    .cal-cell.muted { color:#D4D4D8; }
+    .cal-cell.has-dot::after { content:""; width:4px; height:4px; border-radius:50%; background:#5B4CF5; margin-top:2px; }
+    .cal-cell.today { background:#5B4CF5; color:#fff; }
+    .cal-cell.today.has-dot::after { background:#fff; }
+
+    .event-list { padding:8px 20px 0; }
+    .event-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:0.5px solid #F0EFF8; cursor:pointer; }
+    .event-row:last-child { border-bottom:none; }
+    .event-time { font-size:11px; font-weight:600; color:#A1A1AA; font-family:'SF Mono', ui-monospace, monospace; min-width:38px; }
+    .event-bar { width:3px; align-self:stretch; border-radius:2px; flex-shrink:0; }
+    .event-bar.work   { background:#F59E0B; }
+    .event-bar.study  { background:#7C3AED; }
+    .event-bar.social { background:#F43F5E; }
+    .event-bar.family { background:#10B981; }
+    .event-bar.money  { background:#5B4CF5; }
+    .event-content { flex:1; min-width:0; }
+    .event-name { font-size:14px; font-weight:500; color:#18181B; line-height:1.3; }
+    .event-meta { font-size:11px; color:#A1A1AA; margin-top:2px; font-family:'SF Mono', ui-monospace, monospace; }
+    .add-btn-circle { width:28px; height:28px; border-radius:50%; background:#5B4CF5; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(91,76,245,0.35); border:none; }
+
+    /* ── Home (documents) ── */
+    .home-hero { margin:14px 20px 0; background:#FFFFFF; border:0.5px solid #E8E6F0; border-radius:26px; padding:20px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    .home-hero-label { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:#A1A1AA; font-family:'SF Mono', ui-monospace, monospace; margin-bottom:4px; }
+    .home-hero-val { font-size:24px; font-weight:700; color:#18181B; letter-spacing:-0.5px; line-height:1.1; }
+    .home-hero-sub { font-size:12px; color:#A1A1AA; margin-top:3px; }
+    .home-hero-badge { background:#ECFDF5; border-radius:18px; padding:10px 14px; text-align:center; flex-shrink:0; }
+    .home-hero-badge-val { font-size:22px; color:#10B981; font-weight:700; line-height:1; }
+    .home-hero-badge-label { font-size:10px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; color:#10B981; font-family:'SF Mono', ui-monospace, monospace; margin-top:3px; }
+    .home-grid { padding:10px 20px 0; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .home-card { background:#FFFFFF; border:0.5px solid #E8E6F0; border-radius:22px; padding:16px; cursor:pointer; transition:transform 0.12s; }
+    .home-card:active { transform:scale(0.98); }
+    .home-card-icon { width:36px; height:36px; background:#F0EEFF; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+    .home-card-title { font-size:14px; font-weight:600; color:#18181B; line-height:1.2; }
+    .home-card-sub { font-size:11px; color:#A1A1AA; margin-top:2px; }
+    .home-card-val { font-size:20px; font-weight:700; color:#18181B; margin-top:8px; letter-spacing:-0.5px; }
+
+    /* ── Me (settings) ── */
+    .settings-profile { margin:14px 20px 0; background:#FFFFFF; border:0.5px solid #E8E6F0; border-radius:24px; padding:18px; display:flex; gap:14px; align-items:center; }
+    .profile-avatar-lg { width:54px; height:54px; border-radius:50%; background:#F0EEFF; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+    .profile-name { font-size:16px; font-weight:700; color:#18181B; letter-spacing:-0.2px; }
+    .profile-email { font-size:12px; color:#A1A1AA; margin-top:2px; }
+    .settings-group { margin:8px 20px 0; background:#FFFFFF; border:0.5px solid #E8E6F0; border-radius:20px; overflow:hidden; }
+    .settings-row { display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:0.5px solid #F0EFF8; cursor:pointer; }
+    .settings-row:last-child { border-bottom:none; }
+    .settings-row-icon { width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:#F0EEFF; }
+    .settings-row-label { font-size:14px; font-weight:500; color:#18181B; }
+    .settings-row-sub { font-size:11px; color:#A1A1AA; margin-top:2px; font-family:'SF Mono', ui-monospace, monospace; }
+    .settings-signout { width:calc(100% - 40px); margin:16px 20px; background:#FFF1F3; border:1px solid #FECDD3; border-radius:16px; padding:14px; font-size:14px; font-weight:600; color:#BE123C; cursor:pointer; font-family:inherit; }
+
     /* ─── Floating nav pill (replaces glass nav) ─── */
     .bottom-nav {
       background: #FFFFFF !important;
@@ -10055,7 +10166,32 @@ function renderSettings() {
 
   const petIcons = { dog:'🐕', cat:'🐈', bird:'🐦' };
 
-  let html =
+  // ── 2028: profile hero on top of accordion settings ──
+  const settingsDateLine = new Date().toLocaleDateString('en-AU', { weekday:'long', month:'long', day:'numeric' });
+  const adultName = (state.settings?.adultName) || (state.settings?.adults?.[0]?.name) || 'You';
+  const adultEmail = (state.settings?.email) || '';
+  const profileInitial = adultName.charAt(0).toUpperCase();
+  const scrHeader = `
+    <div class="scr-header">
+      <div class="scr-header-date">${settingsDateLine}</div>
+      <div class="scr-header-row">
+        <div class="scr-header-title">Me</div>
+        <div class="scr-avatar" title="Profile">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="settings-profile">
+      <div class="profile-avatar-lg">${profileInitial}</div>
+      <div>
+        <div class="profile-name">${adultName}</div>
+        ${adultEmail ? `<div class="profile-email">${adultEmail}</div>` : ''}
+        <div style="margin-top:6px"><span class="t-chip work" style="font-size:10px">Admin</span></div>
+      </div>
+    </div>
+    <div class="toto-sec-header" style="margin-top:6px"><span class="toto-sec-title">All settings</span></div>`;
+
+  let html = scrHeader +
     acc('ai', '🤖 AI Assistant (Toto)', 'Powers cost estimation, Toto chat, and CSV import analysis', `
       <div class="section-body">
         <div style="margin-bottom:8px;font-size:13px;font-weight:600">Anthropic API Key</div>
@@ -10743,9 +10879,59 @@ function renderBudget() {
 
   let html = '';
 
+  // ── 2028: Wallet header + balance card + quick actions ──
+  const dateLine = new Date().toLocaleDateString('en-AU', { weekday:'long', month:'long', day:'numeric' });
+  html += `
+    <div class="scr-header">
+      <div class="scr-header-date">${dateLine}</div>
+      <div class="scr-header-row">
+        <div class="scr-header-title">Wallet</div>
+        <div class="scr-avatar" onclick="activateTab('settings')" title="Settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="balance-card" onclick="toggleBudgetDetail()">
+      <div class="balance-label">${surplus >= 0 ? 'Monthly balance' : 'Over budget'}</div>
+      <div class="balance-amount">${aud(Math.abs(surplus))}</div>
+      <div class="balance-sub">${monthLabel(selectedBudgetMonth)}</div>
+      <div class="balance-row">
+        <div class="balance-col">
+          <div class="balance-col-label">Income</div>
+          <div class="balance-col-val">${aud(totalIncome)}</div>
+        </div>
+        <div class="balance-col">
+          <div class="balance-col-label">Spent</div>
+          <div class="balance-col-val${totalActual > totalBudgetExpenses ? ' red' : ''}">${aud(totalActual)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <div class="qa-btn" onclick="openAddIncome&&openAddIncome()">
+        <div class="qa-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <span class="qa-btn-label">Add</span>
+      </div>
+      <div class="qa-btn" onclick="toggleBudgetDetail()">
+        <div class="qa-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <span class="qa-btn-label">Insights</span>
+      </div>
+      <div class="qa-btn" onclick="document.getElementById('bills-section')?.scrollIntoView({behavior:'smooth'})">
+        <div class="qa-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><path d="M4 2v20l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2V2l-2 2-2-2-2 2-2-2-2 2-2-2-2 2Z"/><path d="M16 8H8M16 12H8M13 16H8"/></svg></div>
+        <span class="qa-btn-label">Bills</span>
+      </div>
+      <div class="qa-btn" onclick="activateTab('today')">
+        <div class="qa-btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B4CF5" stroke-width="1.8" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+        <span class="qa-btn-label">Goals</span>
+      </div>
+    </div>
+
+    <div class="toto-sec-header" style="margin-top:6px"><span class="toto-sec-title">Budget detail</span></div>`;
+
   // Month picker
   html += `
-    <div class="month-picker" style="margin-bottom:16px">
+    <div class="month-picker" style="margin:8px 20px 16px">
       <button class="month-btn" onclick="prevMonth()">&#8249;</button>
       <div class="month-picker-label">${monthLabel(selectedBudgetMonth)}</div>
       <button class="month-btn" onclick="nextMonth()">&#8250;</button>
@@ -12798,8 +12984,40 @@ function renderDocuments() {
     return new Date(d.expiryDate) < today;
   }).length;
 
+  // ── 2028 header (date + "Home" title + avatar) ──
+  const homeDateLine = today.toLocaleDateString('en-AU', { weekday:'long', month:'long', day:'numeric' });
+  const homeHeaderHtml = `
+    <div class="scr-header">
+      <div class="scr-header-date">${homeDateLine}</div>
+      <div class="scr-header-row">
+        <div class="scr-header-title">Home</div>
+        <div class="scr-avatar" onclick="activateTab('settings')" title="Settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+    </div>`;
+
+  // ── 2028 household hero card ──
+  const householdName = (state.settings?.householdName) || 'Household';
+  const memberCount = (state.kids?.allowances?.length || 0) + 2;
+  const allGood = expired === 0 && expiringSoon === 0;
+  const homeHeroHtml = `
+    <div class="home-hero">
+      <div>
+        <div class="home-hero-label">Household</div>
+        <div class="home-hero-val">${householdName}</div>
+        <div class="home-hero-sub">${memberCount} members</div>
+      </div>
+      <div class="home-hero-badge" style="${allGood ? '' : 'background:#FFF8EC'}">
+        <div class="home-hero-badge-val" style="${allGood ? '' : 'color:#F59E0B'}">${allGood ? '✓' : '!'}</div>
+        <div class="home-hero-badge-label" style="${allGood ? '' : 'color:#F59E0B'}">${allGood ? 'All good' : `${expired + expiringSoon} due`}</div>
+      </div>
+    </div>`;
+
   if (docs.length === 0) {
     document.getElementById('documents-content').innerHTML = `
+      ${homeHeaderHtml}
+      ${homeHeroHtml}
       <div class="empty" style="margin-top:24px">
         <div class="empty-icon">📋</div>
         <p>No documents tracked yet. Add insurance policies, warranties, passports and more.</p>
@@ -12809,8 +13027,9 @@ function renderDocuments() {
   }
 
   // Summary bar
-  let html = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+  let html = homeHeaderHtml + homeHeroHtml + `
+    <div class="toto-sec-header" style="margin-top:6px"><span class="toto-sec-title">Documents</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:8px 20px 16px;flex-wrap:wrap;gap:10px">
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${expired > 0 ? `<span class="veh-badge red">${expired} expired</span>` : ''}
         ${expiringSoon > 0 ? `<span class="veh-badge amber">${expiringSoon} expiring soon</span>` : ''}
@@ -12818,7 +13037,7 @@ function renderDocuments() {
       </div>
       <button class="btn btn-primary btn-sm" onclick="openDocForm()">+ Add Document</button>
     </div>
-    <input class="doc-search" type="text" maxlength="200" placeholder="Search documents…" value="${_docSearch}" oninput="_docSearch=this.value;renderDocuments()">`;
+    <input class="doc-search" type="text" maxlength="200" placeholder="Search documents…" value="${_docSearch}" oninput="_docSearch=this.value;renderDocuments()" style="margin:0 20px;width:calc(100% - 40px)">`;
 
   // Group by category
   const byCategory = {};
@@ -16725,8 +16944,19 @@ function renderPlanner() {
   const nudgeOpen = _plannerCollapseState['nudge'];
   const todayMonth = today.slice(0,7);
 
+  const dateLine = new Date().toLocaleDateString('en-AU', { weekday:'long', month:'long', day:'numeric' });
   el.innerHTML = `
     <div style="position:relative;display:flex;flex-direction:column;height:100%;overflow:hidden">
+
+      <div class="scr-header">
+        <div class="scr-header-date">${dateLine}</div>
+        <div class="scr-header-row">
+          <div class="scr-header-title">Plan</div>
+          <div class="scr-avatar" onclick="activateTab('settings')" title="Settings">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+      </div>
 
       <!-- Combined header card -->
       <div class="pl-subheader">
