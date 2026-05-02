@@ -217,22 +217,23 @@ body[data-section] {
 
 /* ── BUDGET / WALLET screen ──────────────────────────────── */
 .summary-hero {
-  background: var(--primary) !important;
+  background: #18181B !important;
   border-radius: 24px !important;
   border: none !important;
-  box-shadow: 0 8px 24px rgba(91,76,245,0.20) !important;
+  box-shadow: 0 8px 32px -8px rgba(22,20,15,.28), 0 2px 8px rgba(22,20,15,.14) !important;
 }
 
-.summary-hero::before { display: none !important; }
+.summary-hero::before { display: block !important; }
 
 .summary-mini-grid {
   gap: 10px !important;
 }
 
 .summary-mini {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 18px !important;
+  background: var(--paper, #fff) !important;
+  border: 1px solid var(--hairline-soft, #F4EFE5) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 4px rgba(22,20,15,.04), 0 8px 24px -8px rgba(22,20,15,.09) !important;
 }
 
 .summary-mini-num { font-weight: 700 !important; }
@@ -325,7 +326,7 @@ body[data-section] {
 }
 
 /* ── Forms / inputs ─────────────────────────────────────── */
-.form-input, .form-select, input[type="text"], input[type="number"],
+.form-input, .form-select, input[type="text"]:not(.qah-bare), input[type="number"],
 input[type="date"], input[type="email"], select, textarea {
   border: 1px solid var(--border) !important;
   border-radius: 12px !important;
@@ -334,10 +335,21 @@ input[type="date"], input[type="email"], select, textarea {
   font-family: inherit !important;
 }
 
-.form-input:focus, .form-select:focus, input:focus, select:focus, textarea:focus {
+.form-input:focus, .form-select:focus, input:not(.qah-bare):focus, select:focus, textarea:focus {
   border-color: var(--primary) !important;
   outline: none !important;
   box-shadow: 0 0 0 3px rgba(91,76,245,0.12) !important;
+}
+
+/* Quick-add hub bare input — no border/bg, parent row handles styling */
+.qah-bare {
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  padding: 0 !important;
 }
 
 /* ── Tables ──────────────────────────────────────────────── */
@@ -536,16 +548,9 @@ progress, .progress-bar {
   letter-spacing: 0.5px !important;
 }
 
-/* Kill old box-shadows, replace with cleaner version */
-.section, .summary-hero, .today-hero, .brief-row, .alloc-section,
-.summary-mini, .modal, .bottom-nav, .qa-fab {
+/* Kill old box-shadows on non-card elements */
+.section, .today-hero, .brief-row, .alloc-section,
+.modal, .bottom-nav, .qa-fab {
   box-shadow: none !important;
 }
 
-.section, .summary-mini, .alloc-section, .brief-row {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
-}
-
-.summary-hero, .today-hero {
-  box-shadow: 0 8px 24px rgba(91,76,245,0.20) !important;
-}
