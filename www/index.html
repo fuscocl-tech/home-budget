@@ -2765,11 +2765,12 @@
     .pl-agenda-dot.now { background:currentColor; }
     .pl-agenda-line { flex:1; width:1.5px; background:rgba(24,24,27,.1); margin-top:3px; border-radius:1px; min-height:12px; }
     .pl-agenda-ev:last-child .pl-agenda-line { display:none; }
-    .pl-agenda-card { flex:1; min-width:0; background:#fff; border-radius:14px; padding:12px 14px; border:1px solid rgba(24,24,27,.06); box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 3px rgba(22,20,15,.05); cursor:pointer; transition:transform .12s; }
+    .pl-agenda-card { flex:1; min-width:0; border-radius:14px; padding:12px 14px; border:1px solid rgba(24,24,27,.06); box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 3px rgba(22,20,15,.05); cursor:pointer; transition:transform .12s; }
     .pl-agenda-card:active { transform:scale(.98); }
     .pl-agenda-card-title { font-size:14px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .pl-agenda-card-meta { font-size:11px; color:var(--muted); margin-top:3px; display:flex; align-items:center; gap:6px; }
+    .pl-agenda-card-meta { font-size:11px; color:var(--muted); margin-top:3px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .pl-agenda-who-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
+    .pl-agenda-cat-pill { display:inline-flex; align-items:center; gap:3px; font-family:var(--mono); font-size:10px; font-weight:700; border-radius:99px; padding:2px 8px; margin-top:4px; }
 
     /* Nudge tiles */
     .pl-nudge-tile { display:flex; align-items:center; gap:12px; background:#fff; border-radius:14px; padding:12px 14px; border:1px solid rgba(24,24,27,.06); box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 1px 3px rgba(22,20,15,.05); margin-bottom:8px; }
@@ -3360,22 +3361,23 @@
     .section-pill.active { background:var(--section-accent, #FF3B3B); color:#fff; border-color:var(--section-accent, #FF3B3B); }
 
     /* ─── Type A / Life Score ────────────── */
-    .life-score-card { border-radius:14px; padding:20px; margin-bottom:20px; border:4px solid rgba(255,255,255,0.7); background:transparent; }
-    .life-score-header { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
-    .life-score-ring { position:relative; width:64px; height:64px; flex-shrink:0; }
-    .life-score-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
-    .life-score-title { font-size:16px; font-weight:800; }
-    .life-score-sub { font-size:12px; color:var(--text-muted); margin-top:2px; }
-    .life-dim { margin-bottom:10px; }
-    .life-dim-row { display:flex; justify-content:space-between; align-items:center; font-size:12px; margin-bottom:3px; }
-    .life-dim-name { font-weight:600; }
-    .life-dim-pct { font-weight:700; }
-    .life-dim-bar { height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
-    .life-dim-fill { height:100%; border-radius:3px; transition:width 0.4s; }
-    .life-dim-tip { font-size:10px; color:var(--text-muted); margin-top:2px; }
+    .life-score-card { background:var(--paper); border-radius:var(--r-lg); padding:18px 20px; margin-bottom:12px; border:1px solid var(--hairline-soft); box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 4px rgba(22,20,15,.04),0 8px 24px -8px rgba(22,20,15,.09); }
+    .life-score-header { display:flex; align-items:center; gap:14px; cursor:pointer; user-select:none; }
+    .life-score-ring { position:relative; width:56px; height:56px; flex-shrink:0; }
+    .life-score-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; font-family:var(--mono,monospace); }
+    .life-score-title { font-size:16px; font-weight:800; color:var(--ink); letter-spacing:-.01em; }
+    .life-score-sub { font-size:12px; color:var(--ink-soft,var(--text-muted)); margin-top:3px; }
+    .life-dim { padding:10px 0; border-bottom:1px solid var(--hairline-soft); }
+    .life-dim:last-child { border-bottom:none; }
+    .life-dim-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+    .life-dim-name { font-size:13px; font-weight:700; color:var(--ink); letter-spacing:-.01em; font-family:var(--sans); }
+    .life-dim-pct { font-family:var(--mono); font-size:12px; font-weight:700; }
+    .life-dim-bar { height:4px; background:var(--hairline); border-radius:99px; overflow:hidden; }
+    .life-dim-fill { height:100%; border-radius:99px; transition:width 0.4s; }
+    .life-dim-tip { font-size:11px; color:var(--muted); margin-top:4px; display:flex; align-items:center; gap:6px; font-family:var(--sans); }
 
-    .mission-card { border-radius:14px; padding:18px 20px; margin-bottom:16px; background:linear-gradient(135deg, var(--section-accent, #FF3B3B), var(--section-accent-2, #f97316)); color:#fff; cursor:pointer; transition:box-shadow 0.2s; }
-    .mission-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.18); }
+    .mission-card { border-radius:var(--r-lg); padding:18px 20px; margin-bottom:12px; background:linear-gradient(135deg, var(--iris-1), var(--iris-2)); color:#fff; cursor:pointer; transition:box-shadow 0.2s; box-shadow:0 4px 20px -4px var(--purple-glow,rgba(91,76,245,.3)); }
+    .mission-card:hover { box-shadow:0 6px 24px -4px var(--purple-glow,rgba(91,76,245,.4)); }
     .mission-label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; opacity:0.7; margin-bottom:6px; }
     .mission-title { font-size:15px; font-weight:800; margin-bottom:4px; }
     .mission-sub { font-size:12px; opacity:0.75; }
@@ -8748,75 +8750,141 @@ function calcLifeScore() {
   const today = new Date();
   const curMonth = selectedBudgetMonth;
 
-  // 1. Budget (0-100): has income + expenses + actuals logged this month
+  // ── Household context ─────────────────────────────────────────
+  const adults    = (state.householdProfile?.members || []).filter(m => m.role === 'adult');
+  const kidProfiles = state.kids?.profiles || [];
+  const hasKids   = kidProfiles.length > 0;
+  const householdSize = Math.max(1, adults.length) + kidProfiles.length;
+
+  // ── 1. Budget ─────────────────────────────────────────────────
   const md = getMonthData(curMonth);
-  const hasIncome = md.income.length > 0;
+  const hasIncome   = md.income.length > 0;
   const hasExpenses = md.expenses.length > 0;
-  const hasActuals = md.expenses.some(e => getActualEntries(e.id, curMonth).length > 0);
+  const hasActuals  = md.expenses.some(e => getActualEntries(e.id, curMonth).length > 0);
   const budgetScore = (hasIncome ? 30 : 0) + (hasExpenses ? 30 : 0) + (hasActuals ? 40 : 0);
   dims.push({ key: 'budget', label: 'Budget', score: budgetScore,
     tip: !hasIncome ? 'Add your income sources' : !hasExpenses ? 'Add your expenses' : !hasActuals ? 'Log actual spending this month' : 'On track',
     tab: 'budget' });
 
-  // 2. Meals (0-100): this week planned + shopping list
-  const weekKey = _mealWeekKey(0);
+  // ── 2. Meals — target scaled to household size ────────────────
+  // Solo: only dinners matter (7). Small family (2–3): 14. Full family (4+): 21.
+  const weekKey  = _mealWeekKey(0);
   const mealPlan = state.meals?.plan?.[weekKey] || {};
-  let mealsFilled = 0, mealsTotal = 21;
-  for (let d = 0; d < 7; d++) { const dp = mealPlan[d] || {}; if (dp.b) mealsFilled++; if (dp.l) mealsFilled++; if (dp.d) mealsFilled++; }
-  const mealsPct = Math.round(mealsFilled / mealsTotal * 80);
-  const hasShoppingList = (state.meals?.shopping || []).length > 0;
-  const mealsScore = mealsPct + (hasShoppingList ? 20 : 0);
+  let mealsFilled = 0;
+  const mealsTarget = householdSize === 1 ? 7 : householdSize <= 3 ? 14 : 21;
+  for (let d = 0; d < 7; d++) {
+    const dp = mealPlan[d] || {};
+    if (householdSize === 1) { if (dp.d) mealsFilled++; }
+    else if (householdSize <= 3) { if (dp.l) mealsFilled++; if (dp.d) mealsFilled++; }
+    else { if (dp.b) mealsFilled++; if (dp.l) mealsFilled++; if (dp.d) mealsFilled++; }
+  }
+  const mealsPct = Math.round(mealsFilled / mealsTarget * 80);
+  // Shopping list: now reads from state.lists.food (new system)
+  const foodItems      = state.lists?.food?.items || [];
+  const activeFood     = foodItems.filter(i => i.state === 'active').length;
+  const gotItFood      = foodItems.filter(i => i.state === 'got_it').length;
+  const hasActiveList  = activeFood > 0 || gotItFood > 0;
+  const mealsScore     = mealsPct + (hasActiveList ? 20 : 0);
   dims.push({ key: 'meals', label: 'Meals', score: Math.min(100, mealsScore),
-    tip: mealsFilled === 0 ? 'Plan this week\'s meals' : mealsFilled < 14 ? `${mealsFilled}/21 meals planned` : !hasShoppingList ? 'Generate your shopping list' : 'Meals sorted',
+    tip: mealsFilled === 0 ? 'Plan this week\'s meals' : mealsFilled < mealsTarget ? `${mealsFilled}/${mealsTarget} meals planned` : !hasActiveList ? 'Add items to your shopping list' : 'Meals sorted',
     tab: 'meals' });
 
-  // 3. Home (0-100): maintenance up to date + vehicles + documents
-  const maintItems = state.maintenance || [];
+  // ── 3. Home ───────────────────────────────────────────────────
+  const maintItems   = state.maintenance || [];
   const maintOverdue = maintItems.filter(m => { const d = _maintDaysUntil(m); return d !== null && d < 0; }).length;
-  const maintScore = maintItems.length === 0 ? 30 : Math.max(0, 100 - maintOverdue * 25);
+  const maintScore   = maintItems.length === 0 ? 30 : Math.max(0, 100 - maintOverdue * 25);
   const vehicleItems = state.vehicles || [];
-  const vehIssues = vehicleItems.filter(v => {
+  const vehIssues    = vehicleItems.filter(v => {
     if (v.regoExpiry && Math.ceil((new Date(v.regoExpiry) - today) / 86400000) < 30) return true;
     if (v.insurance?.renewalDate && Math.ceil((new Date(v.insurance.renewalDate) - today) / 86400000) < 30) return true;
     return false;
   }).length;
-  const docItems = state.documents || [];
+  const docItems    = state.documents || [];
   const docExpiring = docItems.filter(d => d.expiryDate && Math.ceil((new Date(d.expiryDate) - today) / 86400000) < 30).length;
-  const homeScore = Math.max(0, Math.min(100, Math.round((maintScore * 0.4) + ((vehicleItems.length > 0 ? Math.max(0, 100 - vehIssues * 30) : 50) * 0.3) + ((docItems.length > 0 ? Math.max(0, 100 - docExpiring * 20) : 50) * 0.3))));
+  const vehWeight   = vehicleItems.length > 0 ? 0.3 : 0;
+  const docWeight   = 0.3;
+  const maintWeight = 1 - vehWeight - docWeight;
+  const homeScore   = Math.max(0, Math.min(100, Math.round(
+    (maintScore * maintWeight) +
+    (vehicleItems.length > 0 ? Math.max(0, 100 - vehIssues * 30) * vehWeight : 0) +
+    ((docItems.length > 0 ? Math.max(0, 100 - docExpiring * 20) : 50) * docWeight)
+  )));
   dims.push({ key: 'home', label: 'Home', score: homeScore,
     tip: maintOverdue > 0 ? `${maintOverdue} maintenance overdue` : vehIssues > 0 ? 'Vehicle rego or insurance expiring' : docExpiring > 0 ? 'Documents expiring soon' : maintItems.length === 0 ? 'Add maintenance items to track' : 'Home is sorted',
     tab: 'maintenance' });
 
-  // 4. Family (0-100): kids lunchbox + pantry
-  const lbProfiles = state.meals?.lunchbox?.profiles || [];
-  const lbPlans = state.meals?.lunchbox?.plans || {};
-  const lbWeekKey = _mealWeekKey(0);
-  let lbFilled = 0, lbTotal = lbProfiles.length * 20; // 5 days x 4 slots
-  lbProfiles.forEach(p => {
-    const plan = (lbPlans[lbWeekKey] || {})[p.id] || {};
-    for (let d = 0; d < 5; d++) { const dp = plan[d] || {}; if (dp.main) lbFilled++; if (dp.snack) lbFilled++; if (dp.fruit) lbFilled++; if (dp.drink) lbFilled++; }
-  });
-  const pantryItems = state.meals?.pantry || [];
-  const pantryNeed = pantryItems.filter(i => i.status === 'need' || i.status === 'low').length;
-  const familyScore = Math.min(100, Math.round(
-    (lbProfiles.length > 0 ? (lbTotal > 0 ? lbFilled / lbTotal * 50 : 50) : 50) +
-    (pantryItems.length > 0 ? Math.max(0, 50 - pantryNeed * 10) : 25)
-  ));
-  dims.push({ key: 'family', label: 'Family', score: familyScore,
-    tip: lbProfiles.length > 0 && lbFilled === 0 ? 'Plan school lunches this week' : pantryNeed > 0 ? `${pantryNeed} pantry items need restocking` : pantryItems.length === 0 ? 'Set up your pantry stocktake' : 'Family is sorted',
-    tab: lbProfiles.length > 0 ? 'lunchbox' : 'pantry' });
+  // ── 4. Family — only included if household has kids ───────────
+  if (hasKids) {
+    const lbPlans  = state.meals?.lunchbox?.plans || {};
+    const lbWeekKey = _mealWeekKey(0);
+    let lbFilled = 0, lbTotal = kidProfiles.length * 20;
+    kidProfiles.forEach(p => {
+      const plan = (lbPlans[lbWeekKey] || {})[p.id] || {};
+      for (let d = 0; d < 5; d++) { const dp = plan[d] || {}; if (dp.main) lbFilled++; if (dp.snack) lbFilled++; if (dp.fruit) lbFilled++; if (dp.drink) lbFilled++; }
+    });
+    // Chore completion today
+    const todayKey   = typeof _routineTodayKey === 'function' ? _routineTodayKey() : new Date().toISOString().slice(0,10).replace(/-/g,'');
+    const chores     = state.kids?.chores || [];
+    const completions = state.kids?.completions || [];
+    const pendingApprovals = completions.filter(c => c.status === 'pending').length;
+    const approvedToday    = completions.filter(c => c.status === 'approved' && c.completedAt?.startsWith(new Date().toISOString().slice(0,10))).length;
+    const choreScore = chores.length === 0 ? 50 : Math.max(0, 100 - pendingApprovals * 10 + approvedToday * 5);
+    const lbScore    = lbTotal > 0 ? Math.round(lbFilled / lbTotal * 100) : 50;
+    const familyScore = Math.min(100, Math.round(lbScore * 0.5 + Math.min(100, choreScore) * 0.5));
+    dims.push({ key: 'family', label: 'Family', score: familyScore,
+      tip: lbFilled === 0 ? 'Plan school lunches this week' : pendingApprovals > 0 ? `${pendingApprovals} chore approval${pendingApprovals !== 1 ? 's' : ''} waiting` : 'Family is sorted',
+      tab: 'kids' });
+  }
 
-  // 5. Goals (0-100): has goals + making progress
-  const goals = state.goals || [];
+  // ── 5. Goals ──────────────────────────────────────────────────
+  const goals       = state.goals || [];
   const activeGoals = goals.filter(g => g.status === 'active');
   const avgProgress = activeGoals.length > 0
-    ? activeGoals.reduce((s, g) => s + Math.min((g.saved || 0) / (g.target || 1), 1), 0) / activeGoals.length * 100
+    ? activeGoals.reduce((s, g) => s + Math.min((g.saved || g.currentAmount || 0) / (g.target || g.targetAmount || 1), 1), 0) / activeGoals.length * 100
     : 0;
   const goalsScore = goals.length === 0 ? 20 : Math.round(30 + avgProgress * 0.7);
   dims.push({ key: 'goals', label: 'Goals', score: Math.min(100, goalsScore),
     tip: goals.length === 0 ? 'Set a savings or spending goal' : avgProgress < 30 ? 'Make progress on your goals' : 'Goals progressing well',
     tab: 'goals' });
 
+  // ── 6. Habits — adult routine completion + streak ─────────────
+  const myRoutines = typeof _routinesForCurrentUser === 'function' ? _routinesForCurrentUser() : [];
+  if (myRoutines.length > 0) {
+    const todayKey = typeof _routineTodayKey === 'function' ? _routineTodayKey() : new Date().toISOString().slice(0,10).replace(/-/g,'');
+    const completedRoutines = myRoutines.filter(r => {
+      const done  = (r.completions?.[todayKey] || []).length;
+      return r.steps.length > 0 && done === r.steps.length;
+    });
+    const completionPct = Math.round(completedRoutines.length / myRoutines.length * 100);
+    // Best streak across all routines
+    const bestStreak = myRoutines.reduce((best, r) => {
+      const s = typeof _routineStreak === 'function' ? _routineStreak(r) : 0;
+      return Math.max(best, s);
+    }, 0);
+    const streakPts  = Math.min(40, Math.round(bestStreak / 10 * 40));
+    const setupPts   = 20;
+    const habitsScore = Math.min(100, setupPts + Math.round(completionPct * 0.4) + streakPts);
+    dims.push({ key: 'habits', label: 'Habits', score: habitsScore,
+      tip: completedRoutines.length === 0 ? 'Complete a routine today' : bestStreak < 3 ? 'Keep your streak going' : `${bestStreak}-day streak — keep it up`,
+      tab: 'routines' });
+  }
+
+  // ── 7. Plan — calendar + bills + documents ────────────────────
+  const todayStr    = new Date().toISOString().slice(0,10);
+  const in7         = new Date(Date.now() + 7*86400000).toISOString().slice(0,10);
+  const eventsAhead = (state.planner?.events || []).filter(e => e.date >= todayStr && e.date <= in7).length;
+  const billsOverdue = (state.bills || []).filter(b => { const d = billDaysUntil(b); return d !== null && d < 0; }).length;
+  const docsExpired  = (state.documents || []).filter(d => d.expiryDate && new Date(d.expiryDate) < today).length;
+  const planScore    = Math.min(100, Math.round(
+    (eventsAhead > 0 ? 40 : 10) +
+    Math.max(0, 30 - billsOverdue * 15) +
+    Math.max(0, 30 - docsExpired * 15)
+  ));
+  dims.push({ key: 'plan', label: 'Plan', score: planScore,
+    tip: billsOverdue > 0 ? `${billsOverdue} bill${billsOverdue !== 1 ? 's' : ''} overdue` : docsExpired > 0 ? `${docsExpired} document${docsExpired !== 1 ? 's' : ''} expired` : eventsAhead === 0 ? 'Add something to your calendar' : 'Plan looks good',
+    tab: 'planner' });
+
+  // ── Total = average of all active dims ────────────────────────
   const total = Math.round(dims.reduce((s, d) => s + d.score, 0) / dims.length);
   return { total, dims };
 }
@@ -8824,56 +8892,63 @@ function calcLifeScore() {
 function generateMission() {
   const life = calcLifeScore();
   const today = new Date().toISOString().slice(0, 10);
-
-  // Don't repeat dismissed mission today
   const dismissed = state.settings?.typeADismissedMission || '';
-
-  // Find the weakest dimension
   const sorted = [...life.dims].sort((a, b) => a.score - b.score);
-
-  // Generate specific missions based on weakest areas
   const missions = [];
 
   sorted.forEach(dim => {
     if (dim.key === 'budget' && dim.score < 70) {
       if (!getMonthData(selectedBudgetMonth).income.length)
-        missions.push({ id: 'add-income', title: 'Add your income sources', sub: 'Takes about 1 minute', tab: 'budget', guide: null, impact: 40 });
+        missions.push({ id: 'add-income', title: 'Add your income sources', sub: 'Takes about 1 minute', tab: 'budget', impact: 40 });
       else if (!getMonthData(selectedBudgetMonth).expenses.length)
-        missions.push({ id: 'add-expenses', title: 'Set up your monthly expenses', sub: 'List your regular costs', tab: 'budget', guide: null, impact: 35 });
+        missions.push({ id: 'add-expenses', title: 'Set up your monthly expenses', sub: 'List your regular costs', tab: 'budget', impact: 35 });
       else
-        missions.push({ id: 'log-actuals', title: 'Log this month\'s actual spending', sub: 'Import a bank CSV or add manually', tab: 'budget', guide: 'tracking', impact: 30 });
+        missions.push({ id: 'log-actuals', title: 'Log this month\'s actual spending', sub: 'Import a bank statement or add manually', tab: 'budget', impact: 30 });
     }
     if (dim.key === 'meals' && dim.score < 70) {
       const weekKey = _mealWeekKey(0);
-      const plan = state.meals?.plan?.[weekKey] || {};
-      const filled = Object.values(plan).reduce((s, d) => s + (d.b ? 1 : 0) + (d.l ? 1 : 0) + (d.d ? 1 : 0), 0);
-      if (filled < 7)
-        missions.push({ id: 'plan-dinners', title: 'Plan this week\'s dinners', sub: 'Just the evening meals — takes 2 minutes', tab: 'meals', guide: null, impact: 25 });
-      else
-        missions.push({ id: 'shopping-list', title: 'Generate your shopping list', sub: 'Turn your meal plan into a list', tab: 'meals', guide: null, impact: 15 });
+      const plan    = state.meals?.plan?.[weekKey] || {};
+      const dinnersFilled = Object.values(plan).filter(d => d.d).length;
+      const foodItems = (state.lists?.food?.items || []).filter(i => i.state === 'active').length;
+      if (dinnersFilled < 3)
+        missions.push({ id: 'plan-dinners', title: 'Plan this week\'s dinners', sub: 'Just the evening meals — takes 2 minutes', tab: 'meals', impact: 25 });
+      else if (foodItems === 0)
+        missions.push({ id: 'shopping-list', title: 'Add items to your shopping list', sub: 'Start with essentials you need this week', tab: 'lists', impact: 15 });
     }
     if (dim.key === 'home' && dim.score < 70) {
       const overdue = (state.maintenance || []).filter(m => { const d = _maintDaysUntil(m); return d !== null && d < 0; });
       if (overdue.length)
-        missions.push({ id: 'maint-overdue', title: `Mark ${escHtml(overdue[0].name)} as done`, sub: 'Overdue — clear it from your list', onclick: `markMaintDone(${overdue[0].id})`, impact: 20 });
+        missions.push({ id: 'maint-overdue', title: `Clear overdue: ${escHtml(overdue[0].name)}`, sub: 'Mark it done or reschedule', tab: 'maintenance', impact: 20 });
       else if (!(state.maintenance || []).length)
-        missions.push({ id: 'setup-maint', title: 'Set up household maintenance', sub: 'Add common items like gutters, pest control', tab: 'maintenance', guide: null, impact: 20 });
+        missions.push({ id: 'setup-maint', title: 'Set up household maintenance', sub: 'Add items like gutters, pest control, smoke alarms', tab: 'maintenance', impact: 20 });
     }
     if (dim.key === 'family' && dim.score < 70) {
-      const pantryNeed = (state.meals?.pantry || []).filter(i => i.status === 'need' || i.status === 'low').length;
-      if (pantryNeed > 0)
-        missions.push({ id: 'pantry-shop', title: `Restock ${pantryNeed} pantry items`, sub: 'Add them to your shopping list', tab: 'pantry', guide: null, impact: 15 });
-      else if (!(state.meals?.pantry || []).length)
-        missions.push({ id: 'setup-pantry', title: 'Do a quick pantry stocktake', sub: 'Track what\'s in your kitchen', tab: 'pantry', guide: null, impact: 15 });
-      else {
-        const lbProfiles = state.meals?.lunchbox?.profiles || [];
-        if (lbProfiles.length > 0)
-          missions.push({ id: 'plan-lunchbox', title: 'Plan school lunches this week', sub: 'AI can do it in one tap', tab: 'lunchbox', guide: null, impact: 20 });
-      }
+      const pending = (state.kids?.completions || []).filter(c => c.status === 'pending').length;
+      const lbProfiles = state.kids?.profiles || [];
+      if (pending > 0)
+        missions.push({ id: 'approve-chores', title: `Review ${pending} chore approval${pending !== 1 ? 's' : ''}`, sub: 'Kids are waiting for your sign-off', tab: 'kids', impact: 20 });
+      else if (lbProfiles.length > 0)
+        missions.push({ id: 'plan-lunchbox', title: 'Plan school lunches this week', sub: 'AI can do it in one tap', tab: 'lunchbox', impact: 18 });
     }
     if (dim.key === 'goals' && dim.score < 50) {
       if (!(state.goals || []).length)
-        missions.push({ id: 'add-goal', title: 'Set your first savings goal', sub: 'Holiday fund, emergency savings, or debt payoff', tab: 'goals', guide: 'goals', impact: 15 });
+        missions.push({ id: 'add-goal', title: 'Set your first savings goal', sub: 'Holiday fund, emergency savings, or debt payoff', tab: 'goals', impact: 15 });
+    }
+    if (dim.key === 'habits' && dim.score < 70) {
+      const myRoutines = typeof _routinesForCurrentUser === 'function' ? _routinesForCurrentUser() : [];
+      if (myRoutines.length === 0)
+        missions.push({ id: 'create-routine', title: 'Create your first daily routine', sub: 'Morning or evening — takes 2 minutes to set up', tab: 'routines', impact: 25 });
+      else
+        missions.push({ id: 'complete-routine', title: 'Complete a routine today', sub: 'Tap each step as you go', tab: 'today', impact: 20 });
+    }
+    if (dim.key === 'plan' && dim.score < 70) {
+      const todayStr = new Date().toISOString().slice(0,10);
+      const in7      = new Date(Date.now() + 7*86400000).toISOString().slice(0,10);
+      const eventsAhead = (state.planner?.events || []).filter(e => e.date >= todayStr && e.date <= in7).length;
+      if (eventsAhead === 0)
+        missions.push({ id: 'add-event', title: 'Add something to your calendar', sub: 'Even one event this week helps keep life organised', tab: 'planner', impact: 15 });
+      else
+        missions.push({ id: 'review-bills', title: 'Review upcoming bills', sub: 'Make sure nothing catches you off guard', tab: 'bills', impact: 15 });
     }
   });
 
@@ -9064,43 +9139,52 @@ function completeWeeklyReset() {
 }
 
 function _renderLifeScore() {
-  const life = calcLifeScore();
-  const circ = 2 * Math.PI * 26;
-  const arc = (life.total / 100 * circ).toFixed(1);
-  const color = life.total >= 80 ? '#10b981' : life.total >= 60 ? '#0891b2' : life.total >= 40 ? '#f59e0b' : '#ef4444';
+  const life  = calcLifeScore();
+  const circ  = 2 * Math.PI * 22;
+  const arc   = (life.total / 100 * circ).toFixed(1);
+  // Use app design tokens — iris for high, amber for mid, ember for low
+  const ringColor = life.total >= 80 ? 'var(--good,#10b981)' : life.total >= 60 ? 'var(--iris-2)' : life.total >= 40 ? 'var(--amber,#f59e0b)' : 'var(--ember,#f97316)';
+  const tagline   = life.total >= 80 ? 'Crushing it — keep going' : life.total >= 60 ? 'Good shape — a few things to tidy' : life.total >= 40 ? 'Getting there — some gaps to fill' : 'Just getting started';
+  const chevron   = _typeADimsExpanded ? '▲' : '▼';
 
-  let dimsHtml = life.dims.map(d => {
-    const pct = d.score;
-    const barColor = pct >= 75 ? '#10b981' : pct >= 50 ? '#0891b2' : pct >= 30 ? '#f59e0b' : '#ef4444';
+  const dimsHtml = life.dims.map(d => {
+    const barColor = d.score >= 75 ? 'var(--good,#10b981)' : d.score >= 50 ? 'var(--iris-2)' : d.score >= 30 ? 'var(--amber,#f59e0b)' : 'var(--ember,#f97316)';
+    const pctColor = d.score >= 75 ? 'var(--good,#10b981)' : d.score >= 50 ? 'var(--iris-1)' : d.score >= 30 ? 'var(--amber,#f59e0b)' : 'var(--ember,#f97316)';
     return `<div class="life-dim">
       <div class="life-dim-row">
         <span class="life-dim-name">${d.label}</span>
-        <span class="life-dim-pct" style="color:${barColor}">${pct}%</span>
+        <span class="life-dim-pct" style="color:${pctColor}">${d.score}%</span>
       </div>
-      <div class="life-dim-bar"><div class="life-dim-fill" style="width:${pct}%;background:${barColor}"></div></div>
-      <div class="life-dim-tip">${d.tip}${d.score < 70 ? ` <span style="color:var(--section-accent,#FF3B3B);font-weight:700;cursor:pointer" onclick="activateTab('${d.tab}')">Fix →</span>` : ''}
+      <div class="life-dim-bar"><div class="life-dim-fill" style="width:${d.score}%;background:${barColor}"></div></div>
+      <div class="life-dim-tip">
+        ${d.tip}
+        ${d.score < 70 && d.tab ? `<span style="color:var(--iris-1);font-weight:700;cursor:pointer" onclick="activateTab('${d.tab}')">Fix →</span>` : ''}
+      </div>
     </div>`;
   }).join('');
 
   return `<div class="life-score-card">
-    <div class="life-score-header">
+    <div class="life-score-header" onclick="_typeADimsExpanded=!_typeADimsExpanded;renderToday()">
       <div class="life-score-ring">
-        <svg viewBox="0 0 64 64" width="64" height="64">
-          <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border)" stroke-width="6"/>
-          <circle cx="32" cy="32" r="26" fill="none" stroke="${color}" stroke-width="6" stroke-dasharray="${arc} ${circ}" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+        <svg viewBox="0 0 56 56" width="56" height="56">
+          <circle cx="28" cy="28" r="22" fill="none" stroke="var(--hairline)" stroke-width="5"/>
+          <circle cx="28" cy="28" r="22" fill="none" stroke="${ringColor}" stroke-width="5"
+            stroke-dasharray="${arc} ${circ}" stroke-linecap="round" transform="rotate(-90 28 28)"/>
         </svg>
-        <div class="life-score-num" style="color:${color}">${life.total}</div>
+        <div class="life-score-num" style="color:${ringColor}">${life.total}</div>
       </div>
-      <div>
-        <div class="life-score-title">Life Score</div>
-        <div class="life-score-sub">${life.total >= 80 ? 'Crushing it — keep going' : life.total >= 60 ? 'Good shape — a few things to tidy' : life.total >= 40 ? 'Getting there — some gaps to fill' : 'Just getting started — let\'s build momentum'}</div>
-        ${state.settings?.typeAStreak > 1 ? `<div class="streak-badge" style="margin-top:6px">🔥 ${state.settings.typeAStreak} week streak</div>` : ''}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:16px;font-weight:800;color:var(--ink);letter-spacing:-.01em;font-family:var(--sans)">Life Score</div>
+        <div style="font-size:12px;color:var(--ink-soft);margin-top:3px;font-family:var(--sans)">${tagline}</div>
+        ${state.settings?.typeAStreak > 1 ? `<div style="margin-top:5px;display:inline-flex;align-items:center;gap:5px;background:var(--amber-soft,#FFF7ED);border-radius:99px;padding:2px 10px"><span style="font-size:12px">🔥</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ember,#f97316)">${state.settings.typeAStreak} week streak</span></div>` : ''}
       </div>
+      <span style="font-size:10px;color:var(--muted);flex-shrink:0">${chevron}</span>
     </div>
-    ${dimsHtml}
-    <div style="margin-top:14px;text-align:center">
-      <button class="btn btn-primary btn-sm" onclick="openWeeklyReset()" style="width:100%;justify-content:center">Weekly Reset — 5 minutes</button>
-    </div>
+    ${_typeADimsExpanded ? `
+      <div style="margin-top:14px;border-top:1px solid var(--hairline-soft);padding-top:4px">
+        ${dimsHtml}
+        <button onclick="openWeeklyReset()" style="margin-top:14px;width:100%;padding:10px;background:linear-gradient(135deg,var(--iris-1),var(--iris-2));color:#fff;border:none;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);letter-spacing:.01em">Weekly Reset — 5 minutes</button>
+      </div>` : ''}
   </div>`;
 }
 
@@ -9415,45 +9499,65 @@ function renderToday() {
   // ── Build cards ──
   const cards = [];
 
-  // PRIORITY CARD — highest urgency item
+  // PRIORITY + SLIPPING — paired square tiles
   const billsDue = (state.bills || []).map(b => ({ ...b, days: billDaysUntil(b) })).filter(b => b.days !== null && b.days <= 2).sort((a,b) => a.days - b.days);
   const maintOverdue = (state.maintenance || []).filter(m => { const d = _maintDaysUntil(m); return d !== null && d < 0; });
   const docsExpired = (state.documents || []).filter(d => d.expiryDate && new Date(d.expiryDate) < now);
-  if (billsDue.length > 0) {
-    const b = billsDue[0];
-    const urgencyLabel = b.days === 0 ? 'DUE TODAY' : b.days === 1 ? 'DUE TOMORROW' : `DUE IN ${b.days} DAYS`;
-    const amtStr = b.amount ? ` · $${parseFloat(b.amount).toLocaleString('en-AU', {minimumFractionDigits:2,maximumFractionDigits:2})}` : '';
-    cards.push({ type: 'priority', urgency: b.days === 0 ? 3 : 2,
-      html: `<div class="td-card td-card-priority">
-        <div class="td-card-meta">
-          <span class="td-meta-dot"></span>
-          <span style="color:var(--iris-2);font-weight:700">HEADS UP</span>
-          <span style="color:var(--muted)">·</span>
-          <span style="color:var(--iris-2);font-weight:700">${urgencyLabel}</span>
+  const regoExpired = (state.vehicles || []).filter(v => v.regoExpiry && new Date(v.regoExpiry) < now);
+  const slipping = [];
+  (state.documents||[]).forEach(d => { if (d.expiryDate && new Date(d.expiryDate) < now) slipping.push({ label: escHtml(d.name), sub: 'Document expired', cls: 'alert', tab: 'documents' }); });
+  (state.maintenance||[]).forEach(m => { const d = _maintDaysUntil(m); if (d !== null && d < 0) slipping.push({ label: escHtml(m.name), sub: `${Math.abs(d)}d overdue`, cls: 'watch', tab: 'maintenance' }); });
+  (state.vehicles||[]).forEach(v => { if (v.regoExpiry && new Date(v.regoExpiry) < now) slipping.push({ label: escHtml(v.name)+' rego', sub: 'Expired', cls: 'alert', tab: 'vehicles' }); });
+
+  const hasHeadsUp = billsDue.length > 0;
+  const hasSlipping = slipping.length > 0;
+
+  if (hasHeadsUp || hasSlipping) {
+    // Heads Up tile
+    const huSubLabel = billsDue.length === 1
+      ? (billsDue[0].days === 0 ? 'due today' : billsDue[0].days === 1 ? 'due tomorrow' : `due in ${billsDue[0].days} days`)
+      : `bill${billsDue.length !== 1 ? 's' : ''} due soon`;
+    const huTile = hasHeadsUp ? `
+      <div onclick="_tdOpenHeadsUpSheet()" style="flex:1;min-width:0;background:var(--purple-soft);border-radius:var(--r-lg);padding:16px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:140px;border:1px solid rgba(91,76,245,.15);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 8px rgba(91,76,245,.08);position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(91,76,245,.18) 0%,transparent 70%);pointer-events:none"></div>
+        <div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--iris-2);margin-bottom:6px">Heads Up</div>
+          <div style="font-size:36px;font-weight:800;color:var(--iris-1);letter-spacing:-.05em;line-height:1">${billsDue.length}</div>
+          <div style="font-size:12px;color:var(--iris-2);margin-top:3px">${huSubLabel}</div>
         </div>
-        <div class="td-card-headline" style="font-size:24px;margin:10px 0 6px">${escHtml(b.name)}<span style="font-family:var(--mono)">${amtStr}</span></div>
-        ${b.notes ? `<div class="td-card-detail" style="font-family:var(--mono);margin-bottom:4px">${escHtml(b.notes)}</div>` : ''}
-        <button class="td-card-action td-action-iris" style="margin-top:18px;padding:11px 22px;font-size:14px;border-radius:99px" onclick="activateTab('bills')">Pay now →</button>
-        ${billsDue.length > 1 ? `<div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:10px">${billsDue.length-1} more bill${billsDue.length>2?'s':''} due soon</div>` : ''}
-      </div>` });
-  } else if (maintOverdue.length > 0) {
-    const m = maintOverdue[0];
-    cards.push({ type: 'priority', urgency: 2,
-      html: `<div class="td-card td-card-priority">
-        <div class="td-card-meta"><span class="td-meta-dot"></span><span style="color:var(--iris-2);font-weight:700">OVERDUE</span></div>
-        <div class="td-card-headline" style="font-size:22px;margin:10px 0 6px">${escHtml(m.name)}</div>
-        ${m.provider ? `<div class="td-card-detail" style="font-family:var(--mono)">${escHtml(m.provider)}</div>` : ''}
-        <button class="td-card-action td-action-iris" style="margin-top:18px" onclick="activateTab('maintenance')">View →</button>
-      </div>` });
-  } else if (docsExpired.length > 0) {
-    const d = docsExpired[0];
-    cards.push({ type: 'priority', urgency: 2,
-      html: `<div class="td-card td-card-priority">
-        <div class="td-card-meta"><span class="td-meta-dot"></span><span style="color:var(--iris-2);font-weight:700">EXPIRED</span></div>
-        <div class="td-card-headline" style="font-size:22px;margin:10px 0 6px">${escHtml(d.name)}</div>
-        <div class="td-card-detail" style="font-family:var(--mono)">${d.provider ? escHtml(d.provider) : 'Document'}</div>
-        <button class="td-card-action td-action-iris" style="margin-top:18px" onclick="activateTab('documents')">View →</button>
-      </div>` });
+        <div style="font-size:12px;font-weight:700;color:var(--iris-1)">View all →</div>
+      </div>` : `
+      <div style="flex:1;min-width:0;background:#F0FDF4;border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;justify-content:space-between;min-height:140px;border:1px solid rgba(16,185,129,.18);box-shadow:0 1px 0 rgba(255,255,255,.9) inset">
+        <div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#059669;margin-bottom:6px">Heads Up</div>
+          <div style="font-size:36px;font-weight:800;color:var(--good);letter-spacing:-.05em;line-height:1">✓</div>
+          <div style="font-size:12px;color:#059669;margin-top:3px">no bills due</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--good)">All clear</div>
+      </div>`;
+
+    // Slipping tile
+    const slTile = hasSlipping ? `
+      <div onclick="_tdOpenSlippingSheet()" style="flex:1;min-width:0;background:#FFF4EE;border-radius:var(--r-lg);padding:16px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:140px;border:1px solid rgba(249,115,22,.18);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 8px rgba(249,115,22,.06);position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(249,115,22,.15) 0%,transparent 70%);pointer-events:none"></div>
+        <div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#c2410c;margin-bottom:6px">Slipping</div>
+          <div style="font-size:36px;font-weight:800;color:var(--ember);letter-spacing:-.05em;line-height:1">${slipping.length}</div>
+          <div style="font-size:12px;color:#c2410c;margin-top:3px">item${slipping.length !== 1 ? 's' : ''} overdue</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--ember)">View all →</div>
+      </div>` : `
+      <div style="flex:1;min-width:0;background:#F0FDF4;border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;justify-content:space-between;min-height:140px;border:1px solid rgba(16,185,129,.18);box-shadow:0 1px 0 rgba(255,255,255,.9) inset">
+        <div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#059669;margin-bottom:6px">Slipping</div>
+          <div style="font-size:36px;font-weight:800;color:var(--good);letter-spacing:-.05em;line-height:1">✓</div>
+          <div style="font-size:12px;color:#059669;margin-top:3px">all clear</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:var(--good)">Nothing overdue</div>
+      </div>`;
+
+    cards.push({ type: 'priority', urgency: billsDue.length > 0 ? 3 : hasSlipping ? 2 : 0,
+      html: `<div style="display:flex;gap:12px;margin-bottom:12px">${huTile}${slTile}</div>` });
   }
 
   // SCHEDULE CARD — today's events (or tomorrow if evening)
@@ -9470,20 +9574,24 @@ function renderToday() {
       const evMins = ev.time ? parseInt(ev.time.split(':')[0])*60 + parseInt(ev.time.split(':')[1]) : -1;
       const isNow = scheduleDate === todayStr && evMins >= 0 && nowMins >= evMins && nowMins < evMins + 90;
       const isLast = i === Math.min(todayEvs.length, 4) - 1;
+      const catBg   = cat.color || '#f1f5f9';
+      const catText = cat.text  || '#475569';
+      const catBorder = catText.replace(/^#/, '');
       return `<div class="pl-agenda-ev" style="margin-bottom:${isLast?'0':'8px'}">
         <div class="pl-agenda-time-col">
           <span class="pl-agenda-time">${timeLabel}</span>
         </div>
         <div class="pl-agenda-timeline">
-          <div class="pl-agenda-dot${isNow?' now':''}" style="color:${mb.dot}"></div>
+          <div class="pl-agenda-dot${isNow?' now':''}" style="color:${catText};background:${isNow?catText:catBg}"></div>
           ${isLast ? '' : '<div class="pl-agenda-line"></div>'}
         </div>
-        <div class="pl-agenda-card" onclick="activateTab('planner');setTimeout(()=>_plannerOpenDetail&&_plannerOpenDetail('${ev.id}'),120)">
+        <div class="pl-agenda-card" style="background:${catBg};border-color:${catText}22" onclick="activateTab('planner');setTimeout(()=>_plannerOpenDetail&&_plannerOpenDetail('${ev.id}'),120)">
           <div class="pl-agenda-card-title">${escHtml(ev.title)}</div>
           <div class="pl-agenda-card-meta">
             <span class="pl-agenda-who-dot" style="background:${mb.dot}"></span>
-            <span>${who}${cat.label ? ` · ${cat.emoji} ${cat.label}` : ''}</span>
+            <span>${who}</span>
           </div>
+          ${cat.label ? `<div class="pl-agenda-cat-pill" style="background:${catText}1a;color:${catText}">${cat.emoji} ${cat.label}</div>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -9587,32 +9695,14 @@ function renderToday() {
       </div>`;
     }).join('');
 
-    const k = state.kids;
-    const pendingApprovals = k ? ((k.completions||[]).filter(c=>c.status==='pending').length + (k.redemptions||[]).filter(r=>r.status==='pending').length) : 0;
-    cards.push({ type: 'kids', urgency: pendingApprovals > 0 ? 1 : 0,
+    cards.push({ type: 'kids', urgency: 0,
       html: `<div class="td-card td-card-kids" style="padding:16px 18px">
         <div class="td-card-meta" style="margin-bottom:10px"><span class="td-meta-label">My Routines</span><span class="td-meta-count">${visibleRoutines.length}</span></div>
         ${routineCards}
-        ${pendingApprovals > 0 ? `<button class="td-card-action" style="margin-top:10px" onclick="activateTab('kids')">${pendingApprovals} kid approval${pendingApprovals!==1?'s':''} waiting →</button>` : ''}
       </div>` });
   }
 
-  // SLIPPING CARD — overdue items
-  const slipping = [];
-  (state.documents||[]).forEach(d => { if (d.expiryDate && new Date(d.expiryDate) < now) slipping.push({ label: escHtml(d.name), sub: 'Document expired', cls: 'alert' }); });
-  (state.maintenance||[]).forEach(m => { const d = _maintDaysUntil(m); if (d !== null && d < 0) slipping.push({ label: escHtml(m.name), sub: `${Math.abs(d)}d overdue`, cls: 'watch' }); });
-  (state.vehicles||[]).forEach(v => { if (v.regoExpiry && new Date(v.regoExpiry) < now) slipping.push({ label: escHtml(v.name)+' rego', sub: 'Expired', cls: 'alert' }); });
-  if (slipping.length > 0) {
-    const rows = slipping.slice(0,3).map(s => `<div class="td-slip-row">
-      <span class="td-slip-dot td-slip-dot-${s.cls}"></span>
-      <div class="td-slip-body"><div class="td-slip-label">${s.label}</div><div class="td-slip-sub">${s.sub}</div></div>
-    </div>`).join('');
-    cards.push({ type: 'slipping', urgency: 1,
-      html: `<div class="td-card td-card-slip">
-        <div class="td-card-meta"><span class="td-meta-label">Slipping</span><span class="td-meta-count td-meta-count-watch">${slipping.length}</span></div>
-        ${rows}
-      </div>` });
-  }
+  // slipping array built above in paired tiles block
 
   // UPCOMING CARD — next 7 days
   const in7 = new Date(now.getTime() + 7*86400000).toISOString().slice(0,10);
@@ -9755,9 +9845,16 @@ function renderToday() {
     </div>
 
     ${setupHtml}
+    ${state.settings?.typeAMode ? `
+      ${_renderLifeScore()}
+      ${_renderMissionCard()}
+    ` : ''}
     ${cardsHtml}
     ${calmState}
   `;
+
+  // Type A mission escalation check
+  if (state.settings?.typeAMode) _checkMissionEscalation();
 
   // Async AI briefing
   if (typeof _fetchAIBriefing === 'function') {
@@ -9766,6 +9863,90 @@ function renderToday() {
     const todayMeals = mealWeekKey ? (state.meals?.plan?.[mealWeekKey]?.[now.getDay()===0?6:now.getDay()-1]) || {} : {};
     _fetchAIBriefing(cards.map(c=>({title:c.type})), surplus, daysLeft, todayMeals, health);
   }
+}
+
+function _tdOpenHeadsUpSheet() {
+  const now = new Date();
+  const billsDue = (state.bills || []).map(b => ({ ...b, days: billDaysUntil(b) })).filter(b => b.days !== null && b.days <= 2).sort((a,b) => a.days - b.days);
+  if (!billsDue.length) return;
+  const totalDue = billsDue.reduce((s,b) => s + (parseFloat(b.amount)||0), 0);
+  const rows = billsDue.map(b => {
+    const dayLabel = b.days === 0 ? 'Due today' : b.days === 1 ? 'Tomorrow' : `In ${b.days} days`;
+    const badgeCls = b.days === 0 ? 'background:#FEF2F2;color:#b91c1c' : b.days === 1 ? 'background:#FFF4EE;color:#c2410c' : 'background:var(--paper);color:var(--muted)';
+    const amt = b.amount ? `$${parseFloat(b.amount).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}` : '';
+    const dotGlow = b.days === 0 ? 'box-shadow:0 0 0 3px rgba(239,68,68,.2)' : b.days === 1 ? 'box-shadow:0 0 0 3px rgba(249,115,22,.2)' : '';
+    return `<div style="display:flex;align-items:center;padding:13px 18px;border-bottom:1px solid var(--hairline);gap:14px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${b.days===0?'#ef4444':b.days===1?'var(--ember)':'var(--iris-2)'};flex-shrink:0;${dotGlow}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--ink)">${escHtml(b.name)}</div>
+        ${b.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono)">${escHtml(b.notes)}</div>` : ''}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        ${amt ? `<div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--iris-1)">${amt}</div>` : ''}
+        <div style="display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;border-radius:99px;padding:2px 8px;margin-top:3px;${badgeCls}">${dayLabel}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const footer = `<div style="padding:14px 18px;border-top:1px solid var(--hairline);display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">Total due</div>
+      <div style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--ink)">$${totalDue.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+    </div>
+    <button onclick="activateTab('bills');_tdCloseSheet()" style="background:linear-gradient(135deg,var(--iris-1),var(--iris-2));color:#fff;border:none;border-radius:99px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer">Pay bills →</button>
+  </div>`;
+  _tdOpenSheet('Heads Up', rows + footer);
+}
+
+function _tdOpenSlippingSheet() {
+  const now = new Date();
+  const slipping = [];
+  (state.documents||[]).forEach(d => { if (d.expiryDate && new Date(d.expiryDate) < now) slipping.push({ label: d.name, sub: 'Documents', badge: 'Expired', cls: 'alert', tab: 'documents' }); });
+  (state.maintenance||[]).forEach(m => { const d = _maintDaysUntil(m); if (d !== null && d < 0) slipping.push({ label: m.name, sub: 'Maintenance', badge: `${Math.abs(d)}d overdue`, cls: 'watch', tab: 'maintenance' }); });
+  (state.vehicles||[]).forEach(v => { if (v.regoExpiry && new Date(v.regoExpiry) < now) slipping.push({ label: v.name+' rego', sub: 'Vehicles', badge: 'Expired', cls: 'alert', tab: 'vehicles' }); });
+  if (!slipping.length) return;
+  const rows = slipping.map(s => {
+    const dotColor = s.cls === 'alert' ? '#ef4444' : 'var(--ember)';
+    const dotGlow  = s.cls === 'alert' ? 'box-shadow:0 0 0 3px rgba(239,68,68,.15)' : 'box-shadow:0 0 0 3px rgba(249,115,22,.18)';
+    const badgeBg  = s.cls === 'alert' ? 'background:#FEF2F2;color:#b91c1c' : 'background:#FFF4EE;color:#c2410c';
+    return `<div onclick="activateTab('${s.tab}');_tdCloseSheet()" style="display:flex;align-items:center;padding:13px 18px;border-bottom:1px solid var(--hairline);gap:14px;cursor:pointer">
+      <div style="width:8px;height:8px;border-radius:50%;background:${dotColor};flex-shrink:0;${dotGlow}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--ink)">${escHtml(s.label)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono)">${s.sub}</div>
+      </div>
+      <div style="display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;border-radius:99px;padding:2px 8px;${badgeBg}">${s.badge}</div>
+    </div>`;
+  }).join('');
+  const footer = `<div style="padding:14px 18px;border-top:1px solid var(--hairline);display:flex;justify-content:flex-end">
+    <button onclick="_tdCloseSheet()" style="background:linear-gradient(135deg,#ea6c0a,var(--ember));color:#fff;border:none;border-radius:99px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer">Done</button>
+  </div>`;
+  _tdOpenSheet('Slipping', rows + footer);
+}
+
+function _tdOpenSheet(title, bodyHtml) {
+  let el = document.getElementById('td-sheet-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'td-sheet-overlay';
+    el.style.cssText = 'position:fixed;inset:0;z-index:1200;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(0,0,0,.4)';
+    el.onclick = (e) => { if (e.target === el) _tdCloseSheet(); };
+    document.body.appendChild(el);
+  }
+  el.innerHTML = `
+    <div id="td-sheet-panel" style="background:var(--pearl);border-radius:24px 24px 0 0;max-height:80vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,16px)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 18px 14px;border-bottom:1px solid var(--hairline);flex-shrink:0">
+        <div style="width:36px;height:4px;background:var(--hairline);border-radius:99px;position:absolute;top:10px;left:50%;transform:translateX(-50%)"></div>
+        <div style="font-size:17px;font-weight:800;color:var(--ink);letter-spacing:-.015em">${escHtml(title)}</div>
+        <button onclick="_tdCloseSheet()" style="background:var(--paper);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:15px;color:var(--muted);display:flex;align-items:center;justify-content:center">×</button>
+      </div>
+      <div style="overflow-y:auto;flex:1">${bodyHtml}</div>
+    </div>`;
+  el.style.display = 'flex';
+}
+
+function _tdCloseSheet() {
+  const el = document.getElementById('td-sheet-overlay');
+  if (el) el.style.display = 'none';
 }
 
 function _tdToggleStep(routineId, stepId) {
@@ -20889,6 +21070,7 @@ let _plannerExpanded = new Set();
 let _plannerView = 'week'; // 'week' | 'month'
 let _plannerFilterMembers = new Set();
 let _plannerCollapseState = { 'life-areas': false, 'nudge': false };
+let _typeADimsExpanded = false;
 let _plannerDetailEvId = null;
 
 const PLANNER_MEMBER_PALETTE = [
@@ -21664,20 +21846,23 @@ function _renderPlannerAgenda(dateStr) {
       const nowMins = new Date().getHours()*60 + new Date().getMinutes();
       const evMins = ev.time ? parseInt(ev.time.split(':')[0])*60 + parseInt(ev.time.split(':')[1]) : -1;
       const isNow = dateStr === new Date().toISOString().slice(0,10) && evMins >= 0 && nowMins >= evMins && nowMins < evMins + 90;
+      const catBg   = cat.color || '#f1f5f9';
+      const catText = cat.text  || '#475569';
       return `<div class="pl-agenda-ev">
         <div class="pl-agenda-time-col">
           <span class="pl-agenda-time">${timeLabel}</span>
         </div>
         <div class="pl-agenda-timeline">
-          <div class="pl-agenda-dot${isNow?' now':''}" style="color:${mb.dot}"></div>
+          <div class="pl-agenda-dot${isNow?' now':''}" style="color:${catText};background:${isNow?catText:catBg}"></div>
           <div class="pl-agenda-line"></div>
         </div>
-        <div class="pl-agenda-card" onclick="_plannerOpenDetail('${ev.id}')">
+        <div class="pl-agenda-card" style="background:${catBg};border-color:${catText}22" onclick="_plannerOpenDetail('${ev.id}')">
           <div class="pl-agenda-card-title">${escHtml(ev.title)}</div>
           <div class="pl-agenda-card-meta">
             <span class="pl-agenda-who-dot" style="background:${mb.dot}"></span>
-            <span>${who} · ${cat.emoji} ${cat.label}</span>
+            <span>${who}</span>
           </div>
+          ${cat.label ? `<div class="pl-agenda-cat-pill" style="background:${catText}1a;color:${catText}">${cat.emoji} ${cat.label}</div>` : ''}
         </div>
       </div>`;
     }).join('')}</div>`;
@@ -22925,10 +23110,16 @@ function _devLoadWallet() {
   state.budget.expenses.forEach(e => { actuals[e.id] = Math.round(parseFloat(e.amount) * (0.4 + Math.random() * 0.7)); });
   state.budget.actuals[curMo] = actuals;
 
+  const _bd = (offsetDays) => { const d = new Date(); d.setDate(d.getDate() + offsetDays); return d.getDate(); };
+  const _bm = (offsetDays) => { const d = new Date(); d.setDate(d.getDate() + offsetDays); return d.getMonth() + 1; };
   state.bills = [
-    { id: uid(), name: 'Council rates', amount: 420, dueDay: new Date().getDate() + 1, category: 'Other' },
-    { id: uid(), name: 'Water bill', amount: 185, dueDay: new Date().getDate() + 5, category: 'Utilities' },
-    { id: uid(), name: 'Home insurance', amount: 290, dueDay: 28, category: 'Insurance' },
+    { id: uid(), name: 'Electricity', amount: 180, dueDay: _bd(0), dueMonth: _bm(0), category: 'Utilities' },
+    { id: uid(), name: 'Council rates', amount: 420, dueDay: _bd(1), dueMonth: _bm(1), category: 'Other' },
+    { id: uid(), name: 'Phone plan', amount: 45, dueDay: _bd(2), dueMonth: _bm(2), category: 'Utilities' },
+    { id: uid(), name: 'Water bill', amount: 185, dueDay: _bd(4), dueMonth: _bm(4), category: 'Utilities' },
+    { id: uid(), name: 'Internet', amount: 89, dueDay: _bd(5), dueMonth: _bm(5), category: 'Utilities' },
+    { id: uid(), name: 'Spotify', amount: 12, dueDay: _bd(6), dueMonth: _bm(6), category: 'Subscriptions' },
+    { id: uid(), name: 'Home insurance', amount: 290, dueDay: _bd(14), dueMonth: _bm(14), category: 'Insurance' },
   ];
   state.goals = [
     { id: uid(), name: 'Emergency fund', type: 'emergency', targetAmount: 25000, currentAmount: 11200, deadline: '' },
@@ -23074,18 +23265,23 @@ function _devLoadHome() {
   const today = new Date().toISOString().slice(0,10);
   const in14 = new Date(Date.now()+14*86400000).toISOString().slice(0,10);
   const in60 = new Date(Date.now()+60*86400000).toISOString().slice(0,10);
-  const past = new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+  const past7  = new Date(Date.now()-7*86400000).toISOString().slice(0,10);
+  const past30 = new Date(Date.now()-30*86400000).toISOString().slice(0,10);
+  const past90 = new Date(Date.now()-90*86400000).toISOString().slice(0,10);
   state.documents = [
     { id: uid(), name: 'Passport — Robert', provider: 'DFAT', expiryDate: in14 },
     { id: uid(), name: 'Home insurance', provider: 'NRMA', expiryDate: in60 },
-    { id: uid(), name: 'Working with children check', provider: 'Service NSW', expiryDate: past },
+    { id: uid(), name: 'Working with children check', provider: 'Service NSW', expiryDate: past30 },
+    { id: uid(), name: 'First aid certificate', provider: 'St John', expiryDate: past7 },
   ];
   state.vehicles = [
     { id: uid(), name: 'Tesla Model 3', make: 'Tesla', model: 'Model 3', plate: 'ABC123', regoExpiry: in60, insurance: { provider: 'NRMA', renewalDate: in60 } },
-    { id: uid(), name: 'Toyota RAV4', make: 'Toyota', model: 'RAV4', plate: 'XYZ789', regoExpiry: in14, insurance: { provider: 'AAMI', renewalDate: in60 } },
+    { id: uid(), name: 'Toyota RAV4', make: 'Toyota', model: 'RAV4', plate: 'XYZ789', regoExpiry: past7, insurance: { provider: 'AAMI', renewalDate: in60 } },
   ];
   state.maintenance = [
-    { id: uid(), name: 'Gutter clean', provider: 'Jim\'s', nextDue: past, frequency: 'Biannual', notes: 'Both sides' },
+    { id: uid(), name: 'Gutter clean', provider: "Jim's", nextDue: past90, frequency: 'Biannual', notes: 'Both sides' },
+    { id: uid(), name: 'Car service — RAV4', provider: 'Toyota Service', nextDue: past30, frequency: 'Annual', notes: '15,000km service' },
+    { id: uid(), name: 'Termite inspection', provider: 'Rentokil', nextDue: past7, frequency: 'Annual', notes: '' },
     { id: uid(), name: 'HVAC filter', provider: '', nextDue: in14, frequency: 'Quarterly', notes: '' },
     { id: uid(), name: 'Smoke alarm test', provider: '', nextDue: in60, frequency: 'Annual', notes: '' },
   ];

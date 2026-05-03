@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOTO — Type A Mode Evolution</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pearl:        #FAFAF7;
+      --paper:        #F4F3F0;
+      --bg:           #ECEAE4;
+      --ink:          #18181B;
+      --ink-soft:     #52525B;
+      --muted:        #A1A1AA;
+      --hairline:     rgba(24,24,27,.09);
+      --iris-1:       #5B4CF5;
+      --iris-2:       #7C6FF7;
+      --iris-3:       #A89FF9;
+      --purple-soft:  #EEEAFF;
+      --ember:        #f97316;
+      --good:         #10b981;
+      --cyan:         #0891b2;
+      --amber:        #f59e0b;
+      --red:          #ef4444;
+      --sans:         'Inter', system-ui, sans-serif;
+      --mono:         'JetBrains Mono', ui-monospace, monospace;
+      --r:            14px;
+      --r-lg:         20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ────────────────────────────────────────── */
+    .top-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(236,234,228,.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--hairline);
+      padding: 0 24px;
+      display: flex; align-items: center;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .top-nav::-webkit-scrollbar { display: none; }
+    .nav-brand {
+      font-family: var(--mono); font-size: 13px; font-weight: 700;
+      letter-spacing: .06em; color: var(--iris-1);
+      padding: 16px 20px 16px 0; white-space: nowrap; flex-shrink: 0;
+      border-right: 1px solid var(--hairline); margin-right: 14px;
+    }
+    .nav-link {
+      font-size: 12px; font-weight: 600; color: var(--ink-soft);
+      padding: 16px 12px; white-space: nowrap; text-decoration: none;
+      border-bottom: 2px solid transparent; flex-shrink: 0;
+      transition: color .15s, border-color .15s;
+    }
+    .nav-link:hover { color: var(--iris-1); border-bottom-color: var(--iris-3); }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .page { max-width: 880px; margin: 0 auto; padding: 48px 24px 100px; }
+
+    .page-header { margin-bottom: 56px; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--iris-2); margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 38px; font-weight: 800; letter-spacing: -.03em;
+      color: var(--ink); line-height: 1.08; margin-bottom: 14px;
+    }
+    .lead { font-size: 15px; color: var(--ink-soft); max-width: 580px; line-height: 1.7; }
+
+    hr { border: none; border-top: 1px solid var(--hairline); margin: 64px 0 0; }
+
+    /* ── Section ────────────────────────────────────── */
+    .section { margin-top: 64px; scroll-margin-top: 72px; }
+    h2 { font-size: 26px; font-weight: 800; letter-spacing: -.025em; color: var(--ink); margin-bottom: 8px; }
+    h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -.01em; }
+    .sub  { font-size: 14px; color: var(--ink-soft); line-height: 1.65; max-width: 600px; margin-bottom: 28px; }
+
+    /* ── Grid ───────────────────────────────────────── */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 660px) { .g2, .g3 { grid-template-columns: 1fr; } }
+
+    /* ── Card ───────────────────────────────────────── */
+    .card {
+      background: var(--paper); border: 1px solid var(--hairline);
+      border-radius: var(--r-lg); padding: 20px;
+    }
+    .card-label {
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--hairline);
+    }
+    .row:last-child { border-bottom: none; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+    .txt { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+    .txt strong { color: var(--ink); font-weight: 600; }
+
+    /* ── Chips ──────────────────────────────────────── */
+    .chip {
+      display: inline-block; font-family: var(--mono); font-size: 11px;
+      background: #F0EEFF; color: var(--iris-1); border-radius: 6px; padding: 2px 6px;
+    }
+    .ch-good  { background: #ECFDF5; color: #047857; }
+    .ch-ember { background: #FFF4EE; color: #c2410c; }
+    .ch-ink   { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--hairline); }
+    .ch-cyan  { background: #ECFEFF; color: #155e75; }
+    .ch-red   { background: #FEF2F2; color: #991b1b; }
+    .ch-amber { background: #FFFBEB; color: #92400e; }
+
+    /* ── Phase badges ───────────────────────────────── */
+    .phase-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      border-radius: 99px; padding: 4px 12px; margin-bottom: 18px;
+    }
+    .phase-now    { background: #FEF2F2; color: #b91c1c; }
+    .phase-near   { background: #FFF4EE; color: #c2410c; }
+    .phase-mid    { background: #FFFBEB; color: #92400e; }
+    .phase-future { background: #EEEAFF; color: var(--iris-1); }
+
+    /* ── Evolution item ─────────────────────────────── */
+    .evo-item {
+      background: var(--pearl); border: 1px solid var(--hairline);
+      border-radius: var(--r-lg); padding: 22px 22px 20px;
+      margin-bottom: 14px;
+    }
+    .evo-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+    .evo-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .evo-title-block { flex: 1; }
+    .evo-title { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; margin-bottom: 3px; }
+    .evo-source { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: .04em; }
+    .evo-body { font-size: 13px; color: var(--ink-soft); line-height: 1.65; }
+    .evo-body + .evo-body { margin-top: 8px; }
+    .evo-mechanics {
+      margin-top: 14px; background: var(--paper);
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .evo-mech {
+      font-size: 12px; color: var(--ink-soft);
+      display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+    }
+    .evo-mech-dot { width: 5px; height: 5px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+
+    /* ── Score dimension visual ─────────────────────── */
+    .dim-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; border-radius: 99px;
+      padding: 5px 12px; margin: 3px;
+    }
+
+    /* ── Before/After ───────────────────────────────── */
+    .ba-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    @media (max-width: 560px) { .ba-wrap { grid-template-columns: 1fr; } }
+    .ba-block { border-radius: var(--r); padding: 14px; }
+    .ba-label { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .ba-text  { font-size: 12px; line-height: 1.6; }
+
+    /* ── Score arc mock ─────────────────────────────── */
+    .score-row {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--pearl); border: 1px solid var(--hairline);
+      border-radius: var(--r); padding: 14px 16px; margin-top: 12px;
+    }
+    .score-label { font-size: 13px; font-weight: 600; color: var(--ink); flex: 1; }
+    .score-val { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+    .score-bar-wrap { flex: 1; height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+    .score-bar { height: 100%; border-radius: 99px; }
+
+    /* ── Monetisation callout ───────────────────────── */
+    .mono-callout {
+      background: linear-gradient(135deg, var(--iris-1), #4338ca);
+      border-radius: var(--r-lg); padding: 28px; color: #fff; margin-top: 28px;
+    }
+    .mono-title { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 8px; }
+    .mono-body  { font-size: 14px; opacity: .85; line-height: 1.7; max-width: 540px; }
+    .mono-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .mono-chip {
+      background: rgba(255,255,255,.18); color: #fff;
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      border-radius: 99px; padding: 4px 12px;
+    }
+
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand">TOTO — Type A Evolution</div>
+  <a class="nav-link" href="#now">Fix now</a>
+  <a class="nav-link" href="#dimensions">New dimensions</a>
+  <a class="nav-link" href="#score">Score redesign</a>
+  <a class="nav-link" href="#missions">Smarter missions</a>
+  <a class="nav-link" href="#reset">Weekly reset</a>
+  <a class="nav-link" href="#future">Future features</a>
+  <a class="nav-link" href="#monetisation">Monetisation</a>
+</nav>
+
+<div class="page">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="eyebrow">Strategy · Type A Mode</div>
+    <h1>How Type A evolves</h1>
+    <p class="lead">
+      Type A Mode has solid bones — a life score, daily missions, and a weekly ritual. But several recently built features aren't connected to it yet, the scoring model has gaps, and the experience stops short of what it could be. This document outlines a phased evolution — from quick fixes to a genuinely differentiated coaching product.
+    </p>
+  </div>
+
+  <!-- ── Fix now ──────────────────────────────────────── -->
+  <div id="now" class="section">
+    <div class="phase-badge phase-now">● Fix now — before next release</div>
+    <h2>Things that are already broken</h2>
+    <p class="sub">These aren't enhancements — the current scoring model references data structures that have changed. They should be fixed before the mode is used by real users.</p>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#FEF2F2">🛒</div>
+        <div class="evo-title-block">
+          <div class="evo-title">Shopping list dimension uses the wrong data source</div>
+          <div class="evo-source">RECENTLY BUILT · Shopping Lists (Section 10)</div>
+        </div>
+      </div>
+      <div class="evo-body">The Family dimension currently checks <span class="chip">state.meals.shopping[]</span> (old system) and <span class="chip">state.meals.pantry[]</span> (also old) to evaluate household readiness. Both of these are now deprecated — all shopping data lives in <span class="chip">state.lists.food.items[]</span> with item states of <em>active</em>, <em>got_it</em>, and <em>not_found</em>. Pantry is no longer a separate array.</div>
+      <div class="evo-mechanics">
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--red)"></div>Current: checks <code>state.meals.shopping.length > 0</code> — always 0 now</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div>Fix: score based on <code>state.lists.food.items</code> — active count, got_it ratio, and whether the list is being used at all</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div>A well-stocked, active list (≥5 items, some got_it) = 80+ score. Empty list = 20.</div>
+      </div>
+    </div>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#FFF4EE">📋</div>
+        <div class="evo-title-block">
+          <div class="evo-title">Adult routines are not scored at all</div>
+          <div class="evo-source">RECENTLY BUILT · Routines on Today screen</div>
+        </div>
+      </div>
+      <div class="evo-body">Adult routines (My Routines on the Today screen) have a full completion and streak system — <span class="chip">routine.completions[todayKey]</span>, <span class="chip">_routineStreak(routine)</span> — but none of this feeds into the Life Score. A user who completes their morning routine every day gets no Life Score credit for it.</div>
+      <div class="evo-mechanics">
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--red)"></div>Current: routines have zero weight in any dimension</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div>Fix: add routine completion % to the Family or a new Habits dimension</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div>Data available: <code>_routineStreak(routine)</code>, <code>_routineCompletedToday(routine)</code></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── New dimensions ───────────────────────────────── -->
+  <hr />
+  <div id="dimensions" class="section">
+    <div class="phase-badge phase-near">● Near term — next 1–2 releases</div>
+    <h2>Two new dimensions</h2>
+    <p class="sub">The current 5-dimension model covers Budget, Meals, Home, Family, Goals. Two significant parts of the app — routines/habits and the calendar — contribute nothing to the score. These should become first-class dimensions.</p>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#EEEAFF">⚡</div>
+        <div class="evo-title-block">
+          <div class="evo-title">New dimension: Habits</div>
+          <div class="evo-source">SOURCES: state.routines · routine.completions · _routineStreak()</div>
+        </div>
+      </div>
+      <div class="evo-body">
+        Daily routine consistency is one of the most visible, high-frequency signals in the app. It's something users interact with every day on the Today screen — far more frequently than budgets or maintenance. Making it a scored dimension gives the score a daily heartbeat and makes Type A Mode feel live rather than weekly.
+      </div>
+      <div class="evo-mechanics">
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div><strong>+40 pts</strong> — Today's routines completed (% of active routines fully checked off)</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div><strong>+40 pts</strong> — Streak health: 0–10 day streak, scaled. 10+ days = full 40pts.</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div><strong>+20 pts</strong> — Has at least one routine set up with steps</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--muted)"></div>If no routines exist: 20pt default (not penalised, just not rewarded)</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--muted)"></div>Mission: "Complete your morning routine" → direct action, high frequency, immediately rewarding</div>
+      </div>
+    </div>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#F0FDF4">📅</div>
+        <div class="evo-title-block">
+          <div class="evo-title">New dimension: Plan</div>
+          <div class="evo-source">SOURCES: state.planner.events · bills · state.documents</div>
+        </div>
+      </div>
+      <div class="evo-body">
+        The Planner has been significantly upgraded — agenda view, member filtering, address fields, category colours. But it contributes nothing to the Life Score. A "Plan" dimension would reward households that are actively using their calendar and are on top of upcoming commitments — not just reacting to what's due today.
+      </div>
+      <div class="evo-mechanics">
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div><strong>+40 pts</strong> — Has events planned in the next 7 days</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div><strong>+30 pts</strong> — No bills overdue (all bills.days ≥ 0)</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div><strong>+30 pts</strong> — No documents expired</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--muted)"></div>Mission: "Add something to your calendar this week" or "Renew [expired doc]"</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--muted)"></div>This replaces the current situation where expired docs drag down the Home score — it's a more logical home for them</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:4px">
+      <div class="card-label">Revised 7-dimension model</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+        <div class="dim-pill" style="background:#ECFDF5;color:#047857">💰 Budget</div>
+        <div class="dim-pill" style="background:#FFF7ED;color:#9a3412">🍽 Meals</div>
+        <div class="dim-pill" style="background:#ECFEFF;color:#155e75">🏠 Home</div>
+        <div class="dim-pill" style="background:#FCE7F3;color:#9d174d">👨‍👩‍👧 Family</div>
+        <div class="dim-pill" style="background:#FEF9C3;color:#713f12">🎯 Goals</div>
+        <div class="dim-pill" style="background:#EEEAFF;color:var(--iris-1)">⚡ Habits <span style="font-size:11px;opacity:.6;margin-left:4px">new</span></div>
+        <div class="dim-pill" style="background:#F0FDF4;color:#166534">📅 Plan <span style="font-size:11px;opacity:.6;margin-left:4px">new</span></div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--muted)">Total still = average of all dimensions. Adding 2 new dimensions slightly dilutes each existing one — good, because it means a bad Budget week doesn't tank the whole score.</div>
+    </div>
+  </div>
+
+  <!-- ── Score redesign ────────────────────────────────── -->
+  <hr />
+  <div id="score" class="section">
+    <div class="phase-badge phase-near">● Near term</div>
+    <h2>Score model improvements</h2>
+    <p class="sub">The current scoring works but has some rough edges that would frustrate users in practice.</p>
+
+    <div class="g2">
+
+      <div class="evo-item" style="margin-bottom:0">
+        <div class="evo-header">
+          <div class="evo-icon" style="background:#FFF4EE">📸</div>
+          <div class="evo-title-block">
+            <div class="evo-title">Score history snapshots</div>
+          </div>
+        </div>
+        <div class="evo-body">The score is recalculated live but never saved. One weekly snapshot — stored at reset completion — would unlock a simple trend line. "8 weeks ago: 48% → today: 72%" is powerful motivation. Store as an array of <span class="chip">{ date, score }</span> objects in <span class="chip">state.settings.typeAHistory[]</span>.</div>
+        <div class="evo-mechanics">
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>Snapshot taken on Weekly Reset completion</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>Keep last 12 weeks (rolling window)</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>Simple sparkline on the Life Score card</div>
+        </div>
+      </div>
+
+      <div class="evo-item" style="margin-bottom:0">
+        <div class="evo-header">
+          <div class="evo-icon" style="background:#EEEAFF">🔍</div>
+          <div class="evo-title-block">
+            <div class="evo-title">Dimension drill-down</div>
+          </div>
+        </div>
+        <div class="evo-body">Right now the Life Score card shows a ring and a tagline. Tapping it should open a sheet showing all 7 dimensions — their individual scores, what's dragging each one down, and a direct action button. Users currently can't tell <em>why</em> their score is what it is.</div>
+        <div class="evo-mechanics">
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>Each dimension row shows its score, a mini bar, and the tip text</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>Tap a dimension row → navigate to that tab</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>Uses the same sheet pattern as Heads Up and Slipping</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="evo-item" style="margin-top:14px">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#F0FDF4">✅</div>
+        <div class="evo-title-block">
+          <div class="evo-title">Mission completion feedback loop</div>
+        </div>
+      </div>
+      <div class="evo-body">Completing a mission currently just resets the tracking state silently. The user gets no confirmation, no score delta, no celebration. This breaks the core reward loop — the whole point of a mission is that it moves the score. After completing a mission, show a brief toast or card: <em>"Budget dimension: +30 pts · Life Score: 58% → 72%"</em>.</div>
+      <div class="ba-wrap">
+        <div class="ba-block" style="background:#FEF2F2;border:1px solid rgba(239,68,68,.15)">
+          <div class="ba-label" style="color:#b91c1c">Current</div>
+          <div class="ba-text" style="color:var(--ink-soft)">User taps "Do it now" → navigates to Budget tab. No feedback. Score quietly changes on next render. User doesn't know it worked.</div>
+        </div>
+        <div class="ba-block" style="background:#ECFDF5;border:1px solid rgba(16,185,129,.18)">
+          <div class="ba-label" style="color:#047857">Proposed</div>
+          <div class="ba-text" style="color:var(--ink-soft)">User completes action → returns to Today → toast shows "Life Score went up 14 pts 🎉" with before/after. Score ring animates. Feels earned.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Smarter missions ──────────────────────────────── -->
+  <hr />
+  <div id="missions" class="section">
+    <div class="phase-badge phase-mid">● Medium term</div>
+    <h2>Smarter missions</h2>
+    <p class="sub">The current mission engine is rule-based and static. These improvements make it feel more responsive and personal without needing full AI.</p>
+
+    <div class="g2">
+
+      <div class="evo-item" style="margin-bottom:0">
+        <div class="evo-header">
+          <div class="evo-icon" style="background:#FFF7ED">🕐</div>
+          <div class="evo-title-block">
+            <div class="evo-title">Time-aware missions</div>
+          </div>
+        </div>
+        <div class="evo-body">Missions are currently the same regardless of when you open the app. A morning mission should be different from an evening one. On a Sunday evening the right mission is "plan next week's meals" — not "log your actuals".</div>
+        <div class="evo-mechanics">
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--amber)"></div>Morning: action-oriented — routines, logging, scheduling</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--amber)"></div>Evening: review-oriented — check tomorrow's calendar, plan lunchboxes</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--amber)"></div>Sunday: weekly focus — meal plan, reset, bills review</div>
+        </div>
+      </div>
+
+      <div class="evo-item" style="margin-bottom:0">
+        <div class="evo-header">
+          <div class="evo-icon" style="background:#EEEAFF">🎯</div>
+          <div class="evo-title-block">
+            <div class="evo-title">Mission streaks</div>
+          </div>
+        </div>
+        <div class="evo-body">Currently only the Weekly Reset earns a streak. Completing daily missions could earn their own streak — shown as a secondary badge on the Life Score card. "3-day mission streak" creates a daily pull that complements the weekly reset habit.</div>
+        <div class="evo-mechanics">
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>New key: <span class="chip">typeAMissionStreak</span> — increments on mission completion, resets if skipped 2 days running</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div>Shown as ⚡ badge alongside the 🔥 weekly streak</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="evo-item" style="margin-top:14px">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#ECFEFF">🤖</div>
+        <div class="evo-title-block">
+          <div class="evo-title">AI-generated mission explanations</div>
+          <div class="evo-source">USES: existing Toto AI assistant (Claude)</div>
+        </div>
+      </div>
+      <div class="evo-body">The current mission sub-text is hardcoded ("Import a bank CSV or add manually"). The existing AI assistant already knows the user's household state. It could generate a one-sentence personalised explanation: <em>"You haven't logged any spending this month — your budget score is stuck at 30% until you do."</em> This makes the mission feel like advice, not instructions.</div>
+      <div class="evo-mechanics">
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--cyan)"></div>Runs as a background call after mission card renders — same pattern as <code>_fetchAIBriefing()</code></div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--cyan)"></div>Falls back to existing hardcoded sub-text if the call fails or takes too long</div>
+        <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--muted)"></div>Could be gated behind a paid tier (Enhanced AI add-on)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Weekly reset evolution ────────────────────────── -->
+  <hr />
+  <div id="reset" class="section">
+    <div class="phase-badge phase-mid">● Medium term</div>
+    <h2>Weekly Reset evolution</h2>
+    <p class="sub">The 5-step reset wizard works, but it's static and doesn't reflect the household's actual state well enough. Two clear improvements.</p>
+
+    <div class="g2">
+
+      <div class="evo-item" style="margin-bottom:0">
+        <div class="evo-header">
+          <div class="evo-icon" style="background:#EEEAFF">📊</div>
+          <div class="evo-title-block">
+            <div class="evo-title">Add recently built sections to the reset</div>
+          </div>
+        </div>
+        <div class="evo-body">The reset was built before Shopping Lists and Planner were fully developed. It should now include:</div>
+        <div class="evo-mechanics">
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div><strong>Shopping list check</strong> — how many active items? Is the list up to date? Tap to open Lists.</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div><strong>Calendar review</strong> — does next week have events planned? Any conflicts? Tap to open Planner.</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--iris-2)"></div><strong>Kids check-in</strong> — any pending approvals? How are streaks tracking? Tap to open Kids.</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--muted)"></div>Steps that are already "all clear" could auto-collapse so the reset only shows what needs attention</div>
+        </div>
+      </div>
+
+      <div class="evo-item" style="margin-bottom:0">
+        <div class="evo-header">
+          <div class="evo-icon" style="background:#F0FDF4">✍️</div>
+          <div class="evo-title-block">
+            <div class="evo-title">AI weekly summary</div>
+            <div class="evo-source">USES: Claude · existing AI assistant</div>
+          </div>
+        </div>
+        <div class="evo-body">At the start of the reset, the AI generates a 2–3 sentence summary of the past week. This transforms the reset from a form into a coach check-in. Example: <em>"You had a strong week on budget — spending was 12% under. Meals were unplanned for 4 days. The kids completed 80% of their routines. This week: focus on meal planning first."</em></div>
+        <div class="evo-mechanics">
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div>Pulls from Life Score dimension tips, bills, planner events, kids completions</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--good)"></div>Async — shows a loading skeleton while generating, doesn't block the reset flow</div>
+          <div class="evo-mech"><div class="evo-mech-dot" style="background:var(--muted)"></div>Natural candidate for the Enhanced AI paid add-on</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Future features ───────────────────────────────── -->
+  <hr />
+  <div id="future" class="section">
+    <div class="phase-badge phase-future">◆ Future</div>
+    <h2>Future features that belong in Type A</h2>
+    <p class="sub">These are new product features that would be most powerful as part of Type A Mode — either unlocking new dimensions or creating new engagement loops.</p>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#FEF9C3">💬</div>
+        <div class="evo-title-block">
+          <div class="evo-title">Health &amp; Wellbeing dimension</div>
+        </div>
+      </div>
+      <div class="evo-body">If TOTO ever adds sleep, exercise, or mood tracking (even lightweight self-reported check-ins), it would be a natural 8th dimension. A daily "how are you feeling?" prompt on the Today screen — answered in one tap — gives the Life Score a personal layer beyond household logistics. Score based on consistency of check-ins + self-reported wellbeing trend.</div>
+    </div>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#EDE9FE">🏆</div>
+        <div class="evo-title-block">
+          <div class="evo-title">Family challenges</div>
+        </div>
+      </div>
+      <div class="evo-body">Type A already has missions for the adult. A natural extension is shared household challenges — things the whole family participates in. <em>"Complete every dinner this week as a family"</em>, <em>"Hit 80% on the Life Score for 4 consecutive weeks"</em>. These would show in the Kids section as well, reinforcing the connection between kids' chores and the household score.</div>
+    </div>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#F0FDF4">📈</div>
+        <div class="evo-title-block">
+          <div class="evo-title">Benchmarking &amp; community</div>
+          <div class="evo-source">ALIGNS WITH: growth strategy — referrals, community engagement</div>
+        </div>
+      </div>
+      <div class="evo-body">Anonymous opt-in benchmarking: <em>"Your household scores higher than 68% of families in the same life stage."</em> This connects to the growth strategy's community angle and gives the Life Score external reference. Referral bonus: when you refer someone, if their score improves, you both get streak credit.</div>
+    </div>
+
+    <div class="evo-item">
+      <div class="evo-header">
+        <div class="evo-icon" style="background:#EEEAFF">🔔</div>
+        <div class="evo-title-block">
+          <div class="evo-title">Proactive push notifications</div>
+        </div>
+      </div>
+      <div class="evo-body">Type A Mode users are the most engaged segment. They're the right audience for proactive nudges: <em>"Your Life Score dropped 8 points this week — your Meals score is dragging. Tap to fix it."</em> or <em>"You're 2 days from breaking your weekly reset streak."</em> These are high-value, low-noise notifications that justify the mode existing as a distinct tier.</div>
+    </div>
+
+  </div>
+
+  <!-- ── Monetisation ──────────────────────────────────── -->
+  <hr />
+  <div id="monetisation" class="section">
+    <div class="phase-badge phase-future">◆ Monetisation</div>
+    <h2>Type A as a paid product</h2>
+    <p class="sub">Type A Mode is currently free with no gate. Given its depth and the engagement it drives, it's a strong candidate for a paid tier — but the rollout matters.</p>
+
+    <div class="mono-callout">
+      <div class="mono-title">Type A Mode → "TOTO Pro"</div>
+      <div class="mono-body">
+        Type A Mode isn't just a settings toggle — it's a fundamentally different product experience. A user with Type A enabled gets a life coach in their pocket. That's a value proposition worth paying for, and it's distinct enough from the free tier to justify a separate brand within the product.
+        <br><br>
+        The existing monetisation strategy already includes "Enhanced AI" and "Periodic 2-week full unlock" as paid mechanics. Type A Mode is the natural home for both of these — the 2-week unlock becomes a 2-week TOTO Pro trial, and Enhanced AI adds the personalised mission explanations and weekly summaries described above.
+      </div>
+      <div class="mono-chips">
+        <div class="mono-chip">Life Score</div>
+        <div class="mono-chip">Daily Missions</div>
+        <div class="mono-chip">Weekly Reset</div>
+        <div class="mono-chip">Score History</div>
+        <div class="mono-chip">AI Weekly Summary</div>
+        <div class="mono-chip">AI Mission Explanations</div>
+        <div class="mono-chip">Push Nudges</div>
+        <div class="mono-chip">Family Challenges</div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-top:20px">
+      <div class="card">
+        <div class="card-label">Free tier keeps</div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Today screen — all reactive cards</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Planner, Budget, Kids, Lists, Meals, Home</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Basic routines + kids chores</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Heads Up + Slipping tiles</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Notifications, language support</div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">TOTO Pro adds</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Life Score with 7 dimensions</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Daily missions + mission streaks</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Weekly Reset wizard</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Score history trend line</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">AI-generated summaries + explanations</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Proactive push nudges</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Family challenges</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-label">Recommended rollout</div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>Now:</strong> Keep Type A free. Fix the broken scoring. Add the Habits and Plan dimensions. Make the mode feel polished and trustworthy first.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>Next:</strong> Add score history, dimension drill-down, and mission feedback. These are the features that make the score feel real. Ship a 2-week Pro trial.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>Later:</strong> Add AI summaries and push nudges. Gate these behind the paid tier. The free features are still compelling; the paid layer adds genuine intelligence.</div></div>
+      <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Don't gate the Life Score itself — it's the hook. Gate the intelligence layer around it (AI explanations, trend history, nudges). A user who can see their score but can't see why it's low is highly motivated to upgrade.</div></div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

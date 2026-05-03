@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heads Up — Card States</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────── */
+    :root {
+      --pearl:          #FAFAF7;
+      --paper:          #F4F3F0;
+      --ink:            #18181B;
+      --ink-soft:       #52525B;
+      --muted:          #A1A1AA;
+      --hairline:       rgba(24,24,27,.08);
+      --hairline-soft:  rgba(24,24,27,.05);
+      --iris-1:         #5B4CF5;
+      --iris-2:         #7C6FF7;
+      --iris-3:         #A89FF9;
+      --purple-soft:    #EEEAFF;
+      --purple-glow:    rgba(91,76,245,.22);
+      --ember:          #f97316;
+      --good:           #10b981;
+      --sans:           'Inter', system-ui, sans-serif;
+      --mono:           'SF Mono', ui-monospace, monospace;
+      --r-lg:           20px;
+    }
+
+    /* ── Reset / base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: #ECEAE4;
+      min-height: 100vh;
+      padding: 48px 20px 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Page layout ───────────────────────────────────────────── */
+    .page-col {
+      max-width: 390px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 40px;
+      font-family: var(--mono);
+    }
+
+    /* ── Variant label ─────────────────────────────────────────── */
+    .variant-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+
+    /* ── Card base ─────────────────────────────────────────────── */
+    .td-card-priority {
+      border-radius: 20px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+      background:
+        linear-gradient(var(--paper), var(--paper)) padding-box,
+        linear-gradient(135deg, var(--iris-1), var(--iris-3) 50%, var(--iris-2)) border-box;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,.9) inset,
+        0 8px 32px -8px var(--purple-glow),
+        0 2px 8px rgba(22,20,15,.06);
+      margin-bottom: 36px;
+    }
+
+    /* Radial glow in top-right corner */
+    .td-card-priority::before {
+      content: '';
+      position: absolute;
+      top: -32px;
+      right: -32px;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--purple-glow) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    /* ── Shared inner elements ─────────────────────────────────── */
+
+    /* Eyebrow row */
+    .card-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--iris-2);
+      box-shadow: 0 0 0 3px rgba(124,111,247,.22);
+      flex-shrink: 0;
+    }
+
+    .eyebrow-text {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--iris-2);
+    }
+    .eyebrow-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--iris-1);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 99px;
+      padding: 2px 9px;
+      letter-spacing: .02em;
+      line-height: 1.4;
+    }
+    .eyebrow-see-all {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--iris-1);
+      margin-left: auto;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    /* Primary action button */
+    .card-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+      border: none;
+      border-radius: 999px;
+      padding: 9px 18px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px -2px var(--purple-glow);
+      letter-spacing: .01em;
+      margin-top: 18px;
+      text-decoration: none;
+    }
+
+    .card-btn-arrow {
+      font-size: 14px;
+      line-height: 1;
+      opacity: .85;
+    }
+
+    /* ── Variant 1: Single bill ────────────────────────────────── */
+    .v1-bill-line {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .v1-bill-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.02em;
+      line-height: 1.1;
+    }
+
+    .v1-bill-amount {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* ── Variant 2: Multiple bills ─────────────────────────────── */
+    .bill-list {
+      list-style: none;
+      margin-top: 2px;
+    }
+
+    .bill-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .bill-row:last-child {
+      border-bottom: none;
+    }
+
+    .bill-row-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+
+    .bill-row-amount {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--iris-1);
+    }
+
+    .bill-total-line {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--hairline);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .01em;
+    }
+
+    /* ── Variant 3: Today + tomorrow ───────────────────────────── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      margin-top: 12px;
+    }
+
+    .section-label:first-of-type {
+      margin-top: 0;
+    }
+
+    .section-label-today {
+      color: var(--ember);
+    }
+
+    .section-label-tomorrow {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .v3-bill-list {
+      list-style: none;
+      margin-bottom: 0;
+    }
+
+    .v3-bill-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--hairline-soft);
+    }
+
+    .v3-bill-row:last-child {
+      border-bottom: none;
+    }
+
+    .v3-bill-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+
+    .v3-bill-name.tomorrow {
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+
+    .v3-bill-amount {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--iris-1);
+    }
+
+    .v3-bill-amount.tomorrow {
+      color: var(--muted);
+    }
+
+    /* ── Variant 4: Overdue ────────────────────────────────────── */
+    .v4-eyebrow-dot {
+      background: var(--ember);
+      box-shadow: 0 0 0 3px rgba(249,115,22,.2);
+    }
+
+    .v4-eyebrow-text {
+      color: var(--ember);
+    }
+
+    .v4-bill-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.02em;
+      line-height: 1.1;
+    }
+
+    .v4-btn {
+      background: linear-gradient(135deg, #ea6c0a, var(--ember));
+      box-shadow: 0 2px 10px -2px rgba(249,115,22,.28);
+    }
+
+    /* ── Divider section ───────────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(24,24,27,.09);
+      margin: 4px 0 36px;
+    }
+
+    /* ── Square paired tiles ───────────────────────────────────── */
+    .paired-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .sq-tile {
+      flex: 1;
+      min-width: 0;
+      border-radius: var(--r-lg);
+      padding: 16px;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      border: 1px solid transparent;
+      box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 8px rgba(22,20,15,.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Heads Up tile — iris */
+    .sq-tile-iris {
+      background: var(--purple-soft);
+      border-color: rgba(91,76,245,.15);
+    }
+    .sq-tile-iris::before {
+      content: '';
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(91,76,245,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Slipping tile — ember */
+    .sq-tile-ember {
+      background: #FFF4EE;
+      border-color: rgba(249,115,22,.18);
+    }
+    .sq-tile-ember::before {
+      content: '';
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(249,115,22,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* All clear — good */
+    .sq-tile-good {
+      background: #F0FDF4;
+      border-color: rgba(16,185,129,.18);
+    }
+
+    .sq-tile-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .sq-tile-eyebrow-iris  { color: var(--iris-2); }
+    .sq-tile-eyebrow-ember { color: #c2410c; }
+    .sq-tile-eyebrow-good  { color: #059669; }
+
+    .sq-tile-number {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -.05em;
+      line-height: 1;
+    }
+    .sq-tile-number-iris  { color: var(--iris-1); }
+    .sq-tile-number-ember { color: var(--ember); }
+    .sq-tile-number-good  { color: var(--good); }
+
+    .sq-tile-sub {
+      font-size: 12px;
+      margin-top: 3px;
+    }
+    .sq-tile-sub-iris  { color: var(--iris-2); }
+    .sq-tile-sub-ember { color: #c2410c; }
+    .sq-tile-sub-good  { color: #059669; }
+
+    .sq-tile-cta {
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .sq-tile-cta-iris  { color: var(--iris-1); }
+    .sq-tile-cta-ember { color: var(--ember); }
+    .sq-tile-cta-good  { color: var(--good); }
+
+    /* ── Detail sheet ──────────────────────────────────────────── */
+    .sheet-wrap {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      border: 1px solid var(--hairline);
+      box-shadow: 0 4px 24px rgba(22,20,15,.1);
+      margin-bottom: 36px;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .sheet-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.015em;
+    }
+
+    .sheet-close {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--iris-1);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .sheet-item {
+      display: flex;
+      align-items: center;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--hairline);
+      gap: 14px;
+    }
+    .sheet-item:last-child { border-bottom: none; }
+
+    .sheet-item-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sheet-item-dot-iris  { background: var(--iris-2); box-shadow: 0 0 0 3px rgba(124,111,247,.2); }
+    .sheet-item-dot-ember { background: var(--ember);  box-shadow: 0 0 0 3px rgba(249,115,22,.18); }
+    .sheet-item-dot-red   { background: #ef4444;       box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
+
+    .sheet-item-body { flex: 1; min-width: 0; }
+    .sheet-item-name { font-size: 14px; font-weight: 600; color: var(--ink); letter-spacing: -.01em; }
+    .sheet-item-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+
+    .sheet-item-right { text-align: right; flex-shrink: 0; }
+    .sheet-item-amount { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--iris-1); }
+    .sheet-item-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: 2px 8px;
+      margin-top: 3px;
+    }
+    .sheet-item-badge-today  { background: rgba(91,76,245,.12); color: var(--iris-1); }
+    .sheet-item-badge-tmrw   { background: var(--paper); color: var(--muted); }
+    .sheet-item-badge-ember  { background: #FFF4EE; color: #c2410c; }
+    .sheet-item-badge-red    { background: #FEF2F2; color: #b91c1c; }
+
+    .sheet-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sheet-total-label { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .sheet-total-amount { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--ink); }
+
+    .sheet-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+      border: none;
+      border-radius: 999px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .sheet-action-btn-ember {
+      background: linear-gradient(135deg, #ea6c0a, var(--ember));
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="page-col">
+
+  <p class="page-title">Heads Up — Card States</p>
+
+  <!-- ────────────────────────────────────────────────────────────
+       Variant 1 — Current: single bill due today
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Current — single bill</p>
+
+  <div class="td-card-priority">
+    <div class="card-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-text">Heads Up</span>
+      <span class="eyebrow-pill">1</span>
+      <span class="eyebrow-text">due today</span>
+    </div>
+    <div class="v1-bill-line">
+      <span class="v1-bill-name">Electricity bill</span>
+      <span class="v1-bill-amount">$180.00</span>
+    </div>
+    <a class="card-btn" href="#">
+      Pay now
+      <span class="card-btn-arrow">&#x2192;</span>
+    </a>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────────
+       Variant 2 — Proposed: multiple bills due today
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Proposed — multiple due today (3 bills, show 2 + see all)</p>
+
+  <div class="td-card-priority">
+    <div class="card-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-text">Heads Up</span>
+      <span class="eyebrow-pill">3</span>
+      <span class="eyebrow-text">due today</span>
+      <a class="eyebrow-see-all" href="#">See all →</a>
+    </div>
+
+    <ul class="bill-list">
+      <li class="bill-row">
+        <span class="bill-row-name">Electricity</span>
+        <span class="bill-row-amount">$180.00</span>
+      </li>
+      <li class="bill-row" style="border-bottom:none">
+        <span class="bill-row-name">Council rates</span>
+        <span class="bill-row-amount">$420.00</span>
+      </li>
+    </ul>
+
+    <div class="bill-total-line" style="margin-top:10px">+ 1 more · Total due: $695.00</div>
+
+    <a class="card-btn" href="#">
+      Pay now
+      <span class="card-btn-arrow">&#x2192;</span>
+    </a>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────────
+       Variant 3 — Proposed: today + tomorrow mix
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Proposed — today + tomorrow</p>
+
+  <div class="td-card-priority">
+    <div class="card-eyebrow">
+      <span class="eyebrow-dot"></span>
+      <span class="eyebrow-text">Heads Up</span>
+      <span class="eyebrow-pill">2</span>
+      <span class="eyebrow-text">due today</span>
+    </div>
+
+    <p class="section-label section-label-today">Due today</p>
+    <ul class="v3-bill-list">
+      <li class="v3-bill-row">
+        <span class="v3-bill-name">Electricity</span>
+        <span class="v3-bill-amount">$180.00</span>
+      </li>
+      <li class="v3-bill-row">
+        <span class="v3-bill-name">Council rates</span>
+        <span class="v3-bill-amount">$420.00</span>
+      </li>
+    </ul>
+
+    <p class="section-label section-label-tomorrow" style="margin-top:14px;">Due tomorrow</p>
+    <ul class="v3-bill-list">
+      <li class="v3-bill-row" style="border-bottom:none;">
+        <span class="v3-bill-name tomorrow">Water bill</span>
+        <span class="v3-bill-amount tomorrow">$95.00</span>
+      </li>
+    </ul>
+
+    <a class="card-btn" href="#">
+      Pay now
+      <span class="card-btn-arrow">&#x2192;</span>
+    </a>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────────
+       Variant 4 — Current: maintenance overdue
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Current — maintenance overdue</p>
+
+  <div class="td-card-priority">
+    <div class="card-eyebrow">
+      <span class="eyebrow-dot v4-eyebrow-dot"></span>
+      <span class="eyebrow-text v4-eyebrow-text">Overdue</span>
+    </div>
+    <div class="v4-bill-name">Car service</div>
+    <a class="card-btn v4-btn" href="#">
+      View
+      <span class="card-btn-arrow">&#x2192;</span>
+    </a>
+  </div>
+
+
+  <hr class="section-divider" />
+
+  <!-- ────────────────────────────────────────────────────────────
+       Proposed — Square tiles: Heads Up + Slipping (both active)
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Proposed — square tiles · both active</p>
+
+  <div class="paired-row">
+    <!-- Heads Up tile -->
+    <div class="sq-tile sq-tile-iris">
+      <div>
+        <div class="sq-tile-eyebrow sq-tile-eyebrow-iris">Heads Up</div>
+        <div class="sq-tile-number sq-tile-number-iris">4</div>
+        <div class="sq-tile-sub sq-tile-sub-iris">bills due soon</div>
+      </div>
+      <div class="sq-tile-cta sq-tile-cta-iris">View all →</div>
+    </div>
+
+    <!-- Slipping tile -->
+    <div class="sq-tile sq-tile-ember">
+      <div>
+        <div class="sq-tile-eyebrow sq-tile-eyebrow-ember">Slipping</div>
+        <div class="sq-tile-number sq-tile-number-ember">3</div>
+        <div class="sq-tile-sub sq-tile-sub-ember">items overdue</div>
+      </div>
+      <div class="sq-tile-cta sq-tile-cta-ember">View all →</div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────────
+       Proposed — Square tiles: Heads Up only (slipping clear)
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Proposed — square tiles · slipping all clear</p>
+
+  <div class="paired-row">
+    <div class="sq-tile sq-tile-iris">
+      <div>
+        <div class="sq-tile-eyebrow sq-tile-eyebrow-iris">Heads Up</div>
+        <div class="sq-tile-number sq-tile-number-iris">2</div>
+        <div class="sq-tile-sub sq-tile-sub-iris">bills due today</div>
+      </div>
+      <div class="sq-tile-cta sq-tile-cta-iris">View all →</div>
+    </div>
+
+    <div class="sq-tile sq-tile-good">
+      <div>
+        <div class="sq-tile-eyebrow sq-tile-eyebrow-good">Slipping</div>
+        <div class="sq-tile-number sq-tile-number-good">✓</div>
+        <div class="sq-tile-sub sq-tile-sub-good">all clear</div>
+      </div>
+      <div class="sq-tile-cta sq-tile-cta-good">Nothing overdue</div>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- ────────────────────────────────────────────────────────────
+       Detail sheet — Heads Up list (tap on tile)
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Detail sheet — Heads Up · 4 items</p>
+
+  <div class="sheet-wrap">
+    <div class="sheet-header">
+      <div class="sheet-title">Heads Up</div>
+      <a class="sheet-close" href="#">Done</a>
+    </div>
+
+    <div class="sheet-item">
+      <div class="sheet-item-dot sheet-item-dot-iris"></div>
+      <div class="sheet-item-body">
+        <div class="sheet-item-name">Electricity</div>
+        <div class="sheet-item-sub">Energy Australia</div>
+      </div>
+      <div class="sheet-item-right">
+        <div class="sheet-item-amount">$180.00</div>
+        <div class="sheet-item-badge sheet-item-badge-today">Due today</div>
+      </div>
+    </div>
+
+    <div class="sheet-item">
+      <div class="sheet-item-dot sheet-item-dot-iris"></div>
+      <div class="sheet-item-body">
+        <div class="sheet-item-name">Council rates</div>
+        <div class="sheet-item-sub">City of Adelaide</div>
+      </div>
+      <div class="sheet-item-right">
+        <div class="sheet-item-amount">$420.00</div>
+        <div class="sheet-item-badge sheet-item-badge-today">Due today</div>
+      </div>
+    </div>
+
+    <div class="sheet-item">
+      <div class="sheet-item-dot sheet-item-dot-iris" style="background:var(--iris-3);box-shadow:none"></div>
+      <div class="sheet-item-body">
+        <div class="sheet-item-name">Water bill</div>
+        <div class="sheet-item-sub">SA Water</div>
+      </div>
+      <div class="sheet-item-right">
+        <div class="sheet-item-amount">$95.00</div>
+        <div class="sheet-item-badge sheet-item-badge-tmrw">Tomorrow</div>
+      </div>
+    </div>
+
+    <div class="sheet-item">
+      <div class="sheet-item-dot sheet-item-dot-iris" style="background:var(--iris-3);box-shadow:none"></div>
+      <div class="sheet-item-body">
+        <div class="sheet-item-name">Phone plan</div>
+        <div class="sheet-item-sub">Telstra</div>
+      </div>
+      <div class="sheet-item-right">
+        <div class="sheet-item-amount">$45.00</div>
+        <div class="sheet-item-badge sheet-item-badge-tmrw">In 2 days</div>
+      </div>
+    </div>
+
+    <div class="sheet-footer">
+      <div>
+        <div class="sheet-total-label">Total due</div>
+        <div class="sheet-total-amount">$740.00</div>
+      </div>
+      <button class="sheet-action-btn">Pay bills →</button>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────────────────────────────────
+       Detail sheet — Slipping list (tap on tile)
+  ─────────────────────────────────────────────────────────────── -->
+  <p class="variant-label">Detail sheet — Slipping · 3 items</p>
+
+  <div class="sheet-wrap">
+    <div class="sheet-header">
+      <div class="sheet-title">Slipping</div>
+      <a class="sheet-close" href="#">Done</a>
+    </div>
+
+    <div class="sheet-item">
+      <div class="sheet-item-dot sheet-item-dot-red"></div>
+      <div class="sheet-item-body">
+        <div class="sheet-item-name">Passport — Sarah</div>
+        <div class="sheet-item-sub">Documents</div>
+      </div>
+      <div class="sheet-item-right">
+        <div class="sheet-item-badge sheet-item-badge-red">Expired</div>
+      </div>
+    </div>
+
+    <div class="sheet-item">
+      <div class="sheet-item-dot sheet-item-dot-ember"></div>
+      <div class="sheet-item-body">
+        <div class="sheet-item-name">Car service</div>
+        <div class="sheet-item-sub">Maintenance</div>
+      </div>
+      <div class="sheet-item-right">
+        <div class="sheet-item-badge sheet-item-badge-ember">14d overdue</div>
+      </div>
+    </div>
+
+    <div class="sheet-item">
+      <div class="sheet-item-dot sheet-item-dot-red"></div>
+      <div class="sheet-item-body">
+        <div class="sheet-item-name">Ford Focus rego</div>
+        <div class="sheet-item-sub">Vehicles</div>
+      </div>
+      <div class="sheet-item-right">
+        <div class="sheet-item-badge sheet-item-badge-red">Expired</div>
+      </div>
+    </div>
+
+    <div class="sheet-footer" style="justify-content:flex-end">
+      <button class="sheet-action-btn sheet-action-btn-ember">View details →</button>
+    </div>
+  </div>
+
+</div><!-- /page-col -->
+
+</body>
+</html>

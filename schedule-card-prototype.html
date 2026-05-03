@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule Card — Colour Options</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pearl:       #FAFAF7;
+      --paper:       #F4F3F0;
+      --bg:          #ECEAE4;
+      --ink:         #18181B;
+      --ink-soft:    #52525B;
+      --muted:       #A1A1AA;
+      --hairline:    rgba(24,24,27,.08);
+      --iris-1:      #5B4CF5;
+      --iris-2:      #7C6FF7;
+      --iris-3:      #A89FF9;
+      --sans:        'Inter', system-ui, sans-serif;
+      --mono:        'JetBrains Mono', ui-monospace, monospace;
+      --r-lg:        20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 48px 20px 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-col { max-width: 390px; margin: 0 auto; }
+
+    .page-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-family: var(--mono);
+    }
+
+    .page-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .variant-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: var(--mono);
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+
+    .colour-note {
+      font-size: 11px;
+      color: var(--ink-soft);
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 28px;
+      line-height: 1.6;
+      font-family: var(--mono);
+    }
+    .colour-note strong { color: var(--ink); }
+
+    /* ── Shared card shell ─────────────────────────────── */
+    .sc-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(22,20,15,.06);
+      margin-bottom: 36px;
+    }
+
+    .sc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid rgba(24,24,27,.06);
+    }
+
+    .sc-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .sc-count {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 99px;
+      padding: 1px 8px;
+      color: var(--ink);
+      font-size: 10px;
+    }
+
+    .sc-see-all { font-size: 12px; font-weight: 700; color: var(--iris-2); cursor: pointer; }
+
+    .sc-body { padding: 12px 16px; }
+
+    /* ── Agenda row shared ─────────────────────────────── */
+    .ag-ev {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .ag-ev:last-child { margin-bottom: 0; }
+
+    .ag-time-col {
+      width: 56px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-top: 6px;
+    }
+    .ag-time {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .ag-timeline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 16px;
+      flex-shrink: 0;
+      padding-top: 5px;
+    }
+    .ag-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--iris-2);
+      background: var(--pearl);
+      flex-shrink: 0;
+    }
+    .ag-line {
+      width: 1px;
+      flex: 1;
+      min-height: 22px;
+      background: var(--hairline);
+      margin: 3px 0;
+    }
+
+    /* ── OPTION CURRENT — plain white card ─────────────── */
+    .ev-card-plain {
+      flex: 1;
+      background: var(--paper);
+      border-radius: 12px;
+      padding: 9px 13px;
+      border: 1px solid var(--hairline);
+    }
+    .ev-title { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -.01em; }
+    .ev-meta  { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .ev-who-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── OPTION 1+3 — left border + category pill ──────── */
+    .ev-card-border {
+      flex: 1;
+      background: var(--paper);
+      border-radius: 12px;
+      padding: 9px 13px;
+      border: 1px solid var(--hairline);
+      border-left-width: 3px;
+    }
+    .cat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 99px;
+      padding: 2px 8px;
+      margin-top: 5px;
+    }
+
+    /* ── OPTION 2+3 — tinted background + category pill ── */
+    .ev-card-tinted {
+      flex: 1;
+      border-radius: 12px;
+      padding: 9px 13px;
+      border: 1px solid transparent;
+    }
+
+    /* ── Divider ───────────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid rgba(24,24,27,.09);
+      margin: 4px 0 36px;
+    }
+
+    /* ── Category key ──────────────────────────────────── */
+    .cat-key {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .cat-key-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-family: var(--mono);
+      font-weight: 600;
+      border-radius: 99px;
+      padding: 3px 10px;
+    }
+
+  </style>
+</head>
+<body>
+<div class="page-col">
+
+  <p class="page-title">Schedule Card — Colour Options</p>
+  <p class="page-desc">Three variants using the same events. Category colours come from PLANNER_CATS — each category has a predefined background tint and text/border colour baked into the app.</p>
+
+  <!-- Category colour key -->
+  <div class="cat-key">
+    <div class="cat-key-item" style="background:#fce7f3;color:#9d174d">👨‍👩‍👧 Family</div>
+    <div class="cat-key-item" style="background:#fff7ed;color:#9a3412">🏫 School</div>
+    <div class="cat-key-item" style="background:#dbeafe;color:#1e40af">💼 Work</div>
+    <div class="cat-key-item" style="background:#dcfce7;color:#166534">🏠 Home</div>
+    <div class="cat-key-item" style="background:#fef2f2;color:#991b1b">🏥 Health</div>
+    <div class="cat-key-item" style="background:#ede9fe;color:#5b21b6">🎉 Social</div>
+    <div class="cat-key-item" style="background:#f1f5f9;color:#475569">📦 Other</div>
+  </div>
+
+  <div class="colour-note">
+    <strong>How category colours are defined:</strong><br>
+    Each category in <code>PLANNER_CATS</code> has a <code>color</code> (bg tint) and <code>text</code> (border/text colour) — e.g. Family = <span style="background:#fce7f3;color:#9d174d;border-radius:4px;padding:1px 5px">pink</span>, Health = <span style="background:#fef2f2;color:#991b1b;border-radius:4px;padding:1px 5px">red</span>. These same colours are used in the Planner tab. No new colours needed.
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────
+       CURRENT — plain white cards (baseline)
+  ──────────────────────────────────────────────────────── -->
+  <p class="variant-label">Current — plain cards (baseline)</p>
+
+  <div class="sc-card">
+    <div class="sc-header">
+      <div class="sc-meta">Tomorrow <span class="sc-count">3</span></div>
+      <span class="sc-see-all">See all →</span>
+    </div>
+    <div class="sc-body">
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">8:30am</span></div>
+        <div class="ag-timeline"><div class="ag-dot"></div><div class="ag-line"></div></div>
+        <div class="ev-card-plain">
+          <div class="ev-title">School drop-off</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#db2777"></div>Amy · 🏫 School
+          </div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">6:00pm</span></div>
+        <div class="ag-timeline"><div class="ag-dot"></div><div class="ag-line"></div></div>
+        <div class="ev-card-plain">
+          <div class="ev-title">Parent–teacher night</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#db2777"></div>Amy, Johnny · 👨‍👩‍👧 Family
+          </div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">10:00am</span></div>
+        <div class="ag-timeline"><div class="ag-dot"></div></div>
+        <div class="ev-card-plain">
+          <div class="ev-title">Grocery run</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#2563eb"></div>Robert · 🏠 Home
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────
+       OPTION 1+3 — Left colour border + category pill
+  ──────────────────────────────────────────────────────── -->
+  <hr class="section-divider" />
+  <p class="variant-label">Option 1 + 3 — Left border · Category pill</p>
+
+  <div class="sc-card">
+    <div class="sc-header">
+      <div class="sc-meta">Tomorrow <span class="sc-count">3</span></div>
+      <span class="sc-see-all">See all →</span>
+    </div>
+    <div class="sc-body">
+
+      <!-- School -->
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">8:30am</span></div>
+        <div class="ag-timeline">
+          <div class="ag-dot" style="border-color:#9a3412"></div>
+          <div class="ag-line"></div>
+        </div>
+        <div class="ev-card-border" style="border-left-color:#9a3412">
+          <div class="ev-title">School drop-off</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#db2777"></div>Amy
+          </div>
+          <div class="cat-pill" style="background:#fff7ed;color:#9a3412">🏫 School</div>
+        </div>
+      </div>
+
+      <!-- Family -->
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">6:00pm</span></div>
+        <div class="ag-timeline">
+          <div class="ag-dot" style="border-color:#9d174d"></div>
+          <div class="ag-line"></div>
+        </div>
+        <div class="ev-card-border" style="border-left-color:#9d174d">
+          <div class="ev-title">Parent–teacher night</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#db2777"></div>Amy, Johnny
+          </div>
+          <div class="cat-pill" style="background:#fce7f3;color:#9d174d">👨‍👩‍👧 Family</div>
+        </div>
+      </div>
+
+      <!-- Home -->
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">10:00am</span></div>
+        <div class="ag-timeline">
+          <div class="ag-dot" style="border-color:#166534"></div>
+        </div>
+        <div class="ev-card-border" style="border-left-color:#166534">
+          <div class="ev-title">Grocery run</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#2563eb"></div>Robert
+          </div>
+          <div class="cat-pill" style="background:#dcfce7;color:#166534">🏠 Home</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────
+       OPTION 2+3 — Tinted background + category pill
+  ──────────────────────────────────────────────────────── -->
+  <hr class="section-divider" />
+  <p class="variant-label">Option 2 + 3 — Tinted card · Category pill</p>
+
+  <div class="sc-card">
+    <div class="sc-header">
+      <div class="sc-meta">Tomorrow <span class="sc-count">3</span></div>
+      <span class="sc-see-all">See all →</span>
+    </div>
+    <div class="sc-body">
+
+      <!-- School -->
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">8:30am</span></div>
+        <div class="ag-timeline">
+          <div class="ag-dot" style="border-color:#9a3412;background:#fff7ed"></div>
+          <div class="ag-line"></div>
+        </div>
+        <div class="ev-card-tinted" style="background:#fff7ed;border-color:rgba(154,52,18,.15)">
+          <div class="ev-title">School drop-off</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#db2777"></div>Amy
+          </div>
+          <div class="cat-pill" style="background:rgba(154,52,18,.12);color:#9a3412">🏫 School</div>
+        </div>
+      </div>
+
+      <!-- Family -->
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">6:00pm</span></div>
+        <div class="ag-timeline">
+          <div class="ag-dot" style="border-color:#9d174d;background:#fce7f3"></div>
+          <div class="ag-line"></div>
+        </div>
+        <div class="ev-card-tinted" style="background:#fce7f3;border-color:rgba(157,23,77,.15)">
+          <div class="ev-title">Parent–teacher night</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#db2777"></div>Amy, Johnny
+          </div>
+          <div class="cat-pill" style="background:rgba(157,23,77,.12);color:#9d174d">👨‍👩‍👧 Family</div>
+        </div>
+      </div>
+
+      <!-- Home -->
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">10:00am</span></div>
+        <div class="ag-timeline">
+          <div class="ag-dot" style="border-color:#166534;background:#dcfce7"></div>
+        </div>
+        <div class="ev-card-tinted" style="background:#dcfce7;border-color:rgba(22,101,52,.15)">
+          <div class="ev-title">Grocery run</div>
+          <div class="ev-meta">
+            <div class="ev-who-dot" style="background:#2563eb"></div>Robert
+          </div>
+          <div class="cat-pill" style="background:rgba(22,101,52,.12);color:#166534">🏠 Home</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────
+       OPTION 1+3 — Busy day (5 events, mixed categories)
+  ──────────────────────────────────────────────────────── -->
+  <hr class="section-divider" />
+  <p class="variant-label">Option 1 + 3 — Busy day stress test (5 events)</p>
+
+  <div class="sc-card">
+    <div class="sc-header">
+      <div class="sc-meta">Today <span class="sc-count">5</span></div>
+      <span class="sc-see-all">See all →</span>
+    </div>
+    <div class="sc-body">
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">7:00am</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#9a3412"></div><div class="ag-line"></div></div>
+        <div class="ev-card-border" style="border-left-color:#9a3412">
+          <div class="ev-title">School drop-off</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#db2777"></div>Amy</div>
+          <div class="cat-pill" style="background:#fff7ed;color:#9a3412">🏫 School</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">9:30am</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#1e40af;background:var(--iris-2)" ></div><div class="ag-line"></div></div>
+        <div class="ev-card-border" style="border-left-color:#1e40af">
+          <div class="ev-title">Team standup</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#2563eb"></div>Robert</div>
+          <div class="cat-pill" style="background:#dbeafe;color:#1e40af">💼 Work</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">12:00pm</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#991b1b"></div><div class="ag-line"></div></div>
+        <div class="ev-card-border" style="border-left-color:#991b1b">
+          <div class="ev-title">GP appointment</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#d97706"></div>Johnny</div>
+          <div class="cat-pill" style="background:#fef2f2;color:#991b1b">🏥 Health</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">3:30pm</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#9a3412"></div><div class="ag-line"></div></div>
+        <div class="ev-card-border" style="border-left-color:#9a3412">
+          <div class="ev-title">Soccer training</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#d97706"></div>Johnny</div>
+          <div class="cat-pill" style="background:#fff7ed;color:#9a3412">🏫 School</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">7:00pm</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#9d174d"></div></div>
+        <div class="ev-card-border" style="border-left-color:#9d174d">
+          <div class="ev-title">Family dinner</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#2563eb"></div>Everyone</div>
+          <div class="cat-pill" style="background:#fce7f3;color:#9d174d">👨‍👩‍👧 Family</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────
+       OPTION 2+3 — Busy day stress test
+  ──────────────────────────────────────────────────────── -->
+  <hr class="section-divider" />
+  <p class="variant-label">Option 2 + 3 — Busy day stress test (5 events)</p>
+
+  <div class="sc-card">
+    <div class="sc-header">
+      <div class="sc-meta">Today <span class="sc-count">5</span></div>
+      <span class="sc-see-all">See all →</span>
+    </div>
+    <div class="sc-body">
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">7:00am</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#9a3412;background:#fff7ed"></div><div class="ag-line"></div></div>
+        <div class="ev-card-tinted" style="background:#fff7ed;border-color:rgba(154,52,18,.15)">
+          <div class="ev-title">School drop-off</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#db2777"></div>Amy</div>
+          <div class="cat-pill" style="background:rgba(154,52,18,.12);color:#9a3412">🏫 School</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">9:30am</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#1e40af;background:#dbeafe"></div><div class="ag-line"></div></div>
+        <div class="ev-card-tinted" style="background:#dbeafe;border-color:rgba(30,64,175,.15)">
+          <div class="ev-title">Team standup</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#2563eb"></div>Robert</div>
+          <div class="cat-pill" style="background:rgba(30,64,175,.12);color:#1e40af">💼 Work</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">12:00pm</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#991b1b;background:#fef2f2"></div><div class="ag-line"></div></div>
+        <div class="ev-card-tinted" style="background:#fef2f2;border-color:rgba(153,27,27,.15)">
+          <div class="ev-title">GP appointment</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#d97706"></div>Johnny</div>
+          <div class="cat-pill" style="background:rgba(153,27,27,.12);color:#991b1b">🏥 Health</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">3:30pm</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#9a3412;background:#fff7ed"></div><div class="ag-line"></div></div>
+        <div class="ev-card-tinted" style="background:#fff7ed;border-color:rgba(154,52,18,.15)">
+          <div class="ev-title">Soccer training</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#d97706"></div>Johnny</div>
+          <div class="cat-pill" style="background:rgba(154,52,18,.12);color:#9a3412">🏫 School</div>
+        </div>
+      </div>
+
+      <div class="ag-ev">
+        <div class="ag-time-col"><span class="ag-time">7:00pm</span></div>
+        <div class="ag-timeline"><div class="ag-dot" style="border-color:#9d174d;background:#fce7f3"></div></div>
+        <div class="ev-card-tinted" style="background:#fce7f3;border-color:rgba(157,23,77,.15)">
+          <div class="ev-title">Family dinner</div>
+          <div class="ev-meta"><div class="ev-who-dot" style="background:#2563eb"></div>Everyone</div>
+          <div class="cat-pill" style="background:rgba(157,23,77,.12);color:#9d174d">👨‍👩‍👧 Family</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
