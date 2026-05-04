@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOTO — Today Screen Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pearl:        #FAFAF7;
+      --paper:        #F4F3F0;
+      --bg:           #ECEAE4;
+      --ink:          #18181B;
+      --ink-soft:     #52525B;
+      --muted:        #A1A1AA;
+      --hairline:     rgba(24,24,27,.09);
+      --iris-1:       #5B4CF5;
+      --iris-2:       #7C6FF7;
+      --iris-3:       #A89FF9;
+      --purple-soft:  #EEEAFF;
+      --purple-glow:  rgba(91,76,245,.18);
+      --ember:        #f97316;
+      --good:         #10b981;
+      --amber:        #f59e0b;
+      --red:          #ef4444;
+      --sans:         'Inter', system-ui, sans-serif;
+      --mono:         'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+      --r:            16px;
+      --r-lg:         20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Sticky nav ─────────────────────────────────── */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(236,234,228,.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--hairline);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .top-nav::-webkit-scrollbar { display: none; }
+
+    .nav-brand {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: var(--iris-1);
+      padding: 16px 20px 16px 0;
+      white-space: nowrap;
+      flex-shrink: 0;
+      border-right: 1px solid var(--hairline);
+      margin-right: 12px;
+    }
+
+    .nav-link {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      padding: 16px 12px;
+      white-space: nowrap;
+      cursor: pointer;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+      flex-shrink: 0;
+    }
+    .nav-link:hover { color: var(--iris-1); border-bottom-color: var(--iris-3); }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px 100px;
+    }
+
+    .page-header {
+      margin-bottom: 56px;
+    }
+
+    .page-eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--iris-2);
+      margin-bottom: 10px;
+    }
+
+    .page-title {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--ink);
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+
+    .page-desc {
+      font-size: 15px;
+      color: var(--ink-soft);
+      max-width: 560px;
+      line-height: 1.65;
+    }
+
+    /* ── Section heading ─────────────────────────────── */
+    .section-anchor {
+      display: block;
+      margin-top: 64px;
+      margin-bottom: 28px;
+      scroll-margin-top: 72px;
+    }
+
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 99px;
+      padding: 5px 14px 5px 8px;
+      margin-bottom: 14px;
+    }
+
+    .badge-order {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--iris-1);
+      color: #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .badge-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      letter-spacing: .02em;
+    }
+
+    .section-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -.025em;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+      max-width: 540px;
+    }
+
+    /* ── Content grid ────────────────────────────────── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 680px) {
+      .content-grid { grid-template-columns: 1fr; }
+    }
+
+    .content-grid.full { grid-template-columns: 1fr; }
+
+    /* ── Info card ───────────────────────────────────── */
+    .info-card {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-lg);
+      padding: 20px;
+    }
+
+    .info-card-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .info-row:last-child { border-bottom: none; }
+
+    .info-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .info-dot-iris  { background: var(--iris-2); }
+    .info-dot-ember { background: var(--ember); }
+    .info-dot-good  { background: var(--good); }
+    .info-dot-amber { background: var(--amber); }
+    .info-dot-ink   { background: var(--ink-soft); }
+
+    .info-text {
+      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+    .info-text strong { color: var(--ink); font-weight: 600; }
+
+    /* ── Code chip ───────────────────────────────────── */
+    .chip {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      background: #F0EEFF;
+      color: var(--iris-1);
+      border-radius: 6px;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+    .chip-ember {
+      background: #FFF4EE;
+      color: #c2410c;
+    }
+    .chip-good {
+      background: #ECFDF5;
+      color: #047857;
+    }
+    .chip-ink {
+      background: var(--paper);
+      color: var(--ink-soft);
+    }
+
+    /* ── Mock phone card ─────────────────────────────── */
+    .mock-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      padding: 18px;
+      border: 1px solid var(--hairline);
+      box-shadow: 0 2px 16px rgba(22,20,15,.07);
+    }
+
+    /* ── Heads Up card mock ──────────────────────────── */
+    .hu-card {
+      background: linear-gradient(var(--paper),var(--paper)) padding-box,
+                  linear-gradient(135deg, var(--iris-1), var(--iris-3) 50%, var(--iris-2)) border-box;
+      border: 1px solid transparent;
+      border-radius: var(--r-lg);
+      padding: 20px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 8px 24px -8px var(--purple-glow);
+      position: relative;
+      overflow: hidden;
+    }
+    .hu-card::before {
+      content: '';
+      position: absolute;
+      top: -24px; right: -24px;
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--purple-glow) 0%, transparent 68%);
+      pointer-events: none;
+    }
+    .hu-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .hu-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--iris-2);
+      box-shadow: 0 0 0 3px rgba(124,111,247,.22);
+    }
+    .hu-dot-ember {
+      background: var(--ember);
+      box-shadow: 0 0 0 3px rgba(249,115,22,.2);
+    }
+    .hu-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--iris-2);
+    }
+    .hu-label-ember { color: var(--ember); }
+    .hu-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--iris-1);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 99px;
+      padding: 2px 8px;
+    }
+    .hu-see-all {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--iris-1);
+      margin-left: auto;
+    }
+    .hu-headline {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.02em;
+      line-height: 1.1;
+    }
+    .hu-amount {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+    .hu-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+      border: none;
+      border-radius: 999px;
+      padding: 9px 18px;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+    .hu-btn-ember { background: linear-gradient(135deg, #ea6c0a, var(--ember)); }
+    .hu-list { list-style: none; margin-top: 2px; }
+    .hu-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .hu-row:last-child { border-bottom: none; }
+    .hu-row-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+    .hu-row-amt  { font-family: var(--mono); font-size: 13px; color: var(--iris-1); }
+    .hu-more {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    /* ── Schedule card mock ──────────────────────────── */
+    .sc-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      overflow: hidden;
+    }
+    .sc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid rgba(24,24,27,.06);
+    }
+    .sc-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sc-count {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 99px;
+      padding: 1px 7px;
+      color: var(--ink);
+      font-size: 10px;
+    }
+    .sc-see-all { font-size: 12px; font-weight: 700; color: var(--iris-2); }
+    .sc-body { padding: 12px 16px; }
+    .sc-ev {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .sc-ev:last-child { margin-bottom: 0; }
+    .sc-time-col {
+      width: 52px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .sc-time {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .sc-timeline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 16px;
+      flex-shrink: 0;
+    }
+    .sc-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--iris-2);
+      background: var(--pearl);
+      flex-shrink: 0;
+    }
+    .sc-dot.now { background: var(--iris-2); }
+    .sc-line {
+      width: 1px;
+      flex: 1;
+      min-height: 20px;
+      background: var(--hairline);
+      margin: 3px 0;
+    }
+    .sc-ev-card {
+      flex: 1;
+      background: var(--paper);
+      border-radius: 10px;
+      padding: 8px 12px;
+      border: 1px solid var(--hairline);
+    }
+    .sc-ev-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .sc-ev-meta  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .sc-who-dot  {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* ── Money card mock ─────────────────────────────── */
+    .mo-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      padding: 18px;
+    }
+    .mo-row { display: flex; align-items: flex-start; justify-content: space-between; }
+    .mo-amount { font-size: 30px; font-weight: 800; letter-spacing: -.04em; color: var(--ink); line-height: 1; }
+    .mo-currency { font-size: 18px; }
+    .mo-suffix { font-size: 14px; font-weight: 500; color: var(--muted); }
+    .mo-status {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      background: #ECFDF5;
+      color: var(--good);
+      border-radius: 99px;
+      padding: 4px 10px;
+      letter-spacing: .04em;
+    }
+    .mo-status.watch {
+      background: #FFF4EE;
+      color: var(--ember);
+    }
+    .mo-bar {
+      height: 4px;
+      background: var(--hairline);
+      border-radius: 99px;
+      margin: 12px 0 10px;
+      overflow: hidden;
+    }
+    .mo-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--iris-2), var(--iris-3));
+    }
+    .mo-flags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .mo-flag {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 99px;
+      padding: 3px 9px;
+    }
+    .mo-flag.watch { color: #c2410c; background: #FFF4EE; border-color: rgba(249,115,22,.18); }
+
+    /* ── Routine card mock ───────────────────────────── */
+    .rt-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      padding: 18px;
+    }
+    .rt-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .rt-emoji { font-size: 20px; }
+    .rt-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+    .rt-mono { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-left: 4px; }
+    .rt-progress-bar {
+      height: 3px;
+      background: var(--hairline);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .rt-progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--iris-2), var(--iris-3));
+    }
+    .rt-fraction { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: auto; }
+    .rt-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--hairline);
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+    .rt-step:last-child { margin-bottom: 0; }
+    .rt-check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--hairline);
+      flex-shrink: 0;
+    }
+    .rt-check.done {
+      background: var(--good);
+      border-color: var(--good);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+    }
+    .rt-step-label { font-size: 13px; color: var(--ink); }
+    .rt-step-label.done { text-decoration: line-through; color: var(--muted); }
+    .rt-dur { font-family: var(--mono); font-size: 10px; color: var(--muted); margin-left: auto; }
+
+    /* ── Slipping card mock ──────────────────────────── */
+    .sl-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      padding: 18px;
+    }
+    .sl-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .sl-row:last-child { border-bottom: none; }
+    .sl-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sl-dot-alert { background: var(--red); }
+    .sl-dot-watch { background: var(--amber); }
+    .sl-label { font-size: 13px; font-weight: 600; color: var(--ink); }
+    .sl-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* ── Upcoming card mock ──────────────────────────── */
+    .up-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      padding: 18px;
+    }
+    .up-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--hairline);
+      cursor: pointer;
+    }
+    .up-row:last-child { border-bottom: none; }
+    .up-date { font-family: var(--mono); font-size: 11px; color: var(--muted); width: 68px; flex-shrink: 0; }
+    .up-title { font-size: 13px; font-weight: 600; color: var(--ink); flex: 1; }
+
+    /* ── Win card mock ───────────────────────────────── */
+    .win-card {
+      background: linear-gradient(135deg, #F0FDF4, #ECFDF5);
+      border-radius: var(--r-lg);
+      border: 1px solid rgba(16,185,129,.18);
+      padding: 20px;
+    }
+    .win-headline {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    /* ── Paired tiles mock ───────────────────────────── */
+    .paired-tiles {
+      display: flex;
+      gap: 12px;
+    }
+    .ptile {
+      flex: 1;
+      border-radius: var(--r-lg);
+      padding: 16px;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid transparent;
+      box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 8px rgba(22,20,15,.05);
+    }
+    .ptile-iris {
+      background: var(--purple-soft);
+      border-color: rgba(91,76,245,.12);
+    }
+    .ptile-amber {
+      background: #FFF7ED;
+      border-color: rgba(249,115,22,.15);
+    }
+    .ptile-green {
+      background: #F0FDF4;
+      border-color: rgba(16,185,129,.15);
+    }
+    .ptile-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .ptile-eyebrow-iris  { color: var(--iris-2); }
+    .ptile-eyebrow-amber { color: #c2410c; }
+    .ptile-eyebrow-green { color: #059669; }
+    .ptile-number {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1;
+    }
+    .ptile-number-iris  { color: var(--iris-1); }
+    .ptile-number-amber { color: var(--ember); }
+    .ptile-number-green { color: var(--good); }
+    .ptile-sub { font-size: 12px; margin-top: 2px; }
+    .ptile-sub-iris  { color: var(--iris-2); }
+    .ptile-sub-amber { color: #c2410c; }
+    .ptile-sub-green { color: #059669; }
+    .ptile-cta { font-size: 12px; font-weight: 700; }
+    .ptile-cta-iris  { color: var(--iris-1); }
+    .ptile-cta-amber { color: var(--ember); }
+    .ptile-cta-green { color: var(--good); }
+
+    /* ── Greeting mock ───────────────────────────────── */
+    .greet-block {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      padding: 20px;
+    }
+    .greet-date  { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .greet-line  { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; }
+    .greet-iris  { color: var(--iris-1); }
+    .greet-brief { font-size: 13px; color: var(--ink-soft); margin-top: 4px; }
+
+    /* ── Setup progress mock ─────────────────────────── */
+    .sp-card {
+      background: var(--pearl);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--hairline);
+      padding: 18px;
+    }
+    .sp-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sp-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .sp-count { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .sp-bar {
+      height: 4px; background: var(--hairline); border-radius: 99px;
+      overflow: hidden; margin-top: 14px;
+    }
+    .sp-bar-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--iris-2), var(--iris-3));
+    }
+
+    /* ── Card meta shared ────────────────────────────── */
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .card-meta-label { color: var(--muted); }
+    .card-meta-count {
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      border-radius: 99px;
+      padding: 1px 7px;
+      color: var(--ink);
+    }
+    .card-meta-count.watch {
+      background: #FFF4EE;
+      color: #c2410c;
+      border-color: rgba(249,115,22,.18);
+    }
+
+    /* ── Divider ─────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--hairline);
+      margin: 48px 0 0;
+    }
+
+    /* ── Sort order table ────────────────────────────── */
+    .sort-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 16px;
+    }
+    .sort-table th {
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-bottom: 2px solid var(--hairline);
+    }
+    .sort-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--hairline);
+      color: var(--ink-soft);
+    }
+    .sort-table tr:last-child td { border-bottom: none; }
+    .sort-table .order-num {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--iris-1);
+    }
+    .sort-table .type-name {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Sticky nav ─────────────────────────────────────── -->
+<nav class="top-nav">
+  <div class="nav-brand">TOTO — Today Screen</div>
+  <a class="nav-link" href="#overview">Overview</a>
+  <a class="nav-link" href="#greeting">Greeting</a>
+  <a class="nav-link" href="#setup">Setup Progress</a>
+  <a class="nav-link" href="#priority">Heads Up</a>
+  <a class="nav-link" href="#schedule">Schedule</a>
+  <a class="nav-link" href="#money">Money</a>
+  <a class="nav-link" href="#routines">Routines</a>
+  <a class="nav-link" href="#slipping">Slipping</a>
+  <a class="nav-link" href="#upcoming">Coming Up</a>
+  <a class="nav-link" href="#win">Win</a>
+  <a class="nav-link" href="#paired">Lists + Kids</a>
+  <a class="nav-link" href="#sort-order">Sort Order</a>
+</nav>
+
+<div class="page">
+
+  <!-- ── Page header ──────────────────────────────────── -->
+  <div class="page-header">
+    <div class="page-eyebrow">Product Reference · v1</div>
+    <h1 class="page-title">Today Screen Tiles</h1>
+    <p class="page-desc">
+      Every tile that can appear on the Today screen — what data it reads, when it shows, how it works, and where it navigates. Cards are assembled dynamically at render time and sorted by a fixed priority order.
+    </p>
+  </div>
+
+  <!-- ── Overview ─────────────────────────────────────── -->
+  <div id="overview" class="section-anchor">
+    <h2 class="section-title">How the Today screen works</h2>
+    <p class="section-subtitle">Each render call builds a fresh <code style="font-family:var(--mono);font-size:13px">cards[]</code> array, sorts it, then writes the result into <code style="font-family:var(--mono);font-size:13px">#today-content</code>. Nothing is cached between renders.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-card">
+      <div class="info-card-label">Render trigger</div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>renderToday()</strong> is called whenever the user taps the Today tab, or when any card action (e.g. dismissing setup) triggers it directly.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-ink"></div>
+        <div class="info-text">All state is read from the global <span class="chip">state</span> object (persisted to Firestore + localStorage via <span class="chip">saveData(state)</span>).</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-ink"></div>
+        <div class="info-text">Cards are conditionally included — if the condition returns no data the card is simply omitted from the array.</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-label">Day-part detection</div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>overnight</strong> — 12am–4:59am</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>morning</strong> — 5am–11:59am</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>afternoon</strong> — 12pm–4:59pm</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>evening</strong> — 5pm–8:59pm</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>night</strong> — 9pm–11:59pm</div>
+      </div>
+      <div class="info-row" style="padding-top:10px">
+        <div class="info-dot info-dot-amber"></div>
+        <div class="info-text">Evening and night shift the Schedule card and greeting to show tomorrow's data instead of today's.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Greeting ──────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="greeting" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">G</div>
+      <div class="badge-label">Always present — not a card</div>
+    </div>
+    <h2 class="section-title">Greeting + Briefing</h2>
+    <p class="section-subtitle">Rendered above the cards area on every load. Not included in the sortable cards array.</p>
+  </div>
+
+  <div class="content-grid">
+    <div>
+      <div class="greet-block">
+        <div class="greet-date">THURSDAY, 1 MAY</div>
+        <div class="greet-line">Good morning, <span class="greet-iris">Robert.</span></div>
+        <div class="greet-brief">Electricity bill is due today.</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-label">Data sources</div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>Name</strong> — resolves from Firebase <span class="chip">_currentUser.displayName</span>, then <span class="chip">state.settings.adultName</span>, then <span class="chip">state.settings.adults[0].name</span>, then <span class="chip">state.householdProfile.members</span> (first adult).</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>Date line</strong> — current device date, formatted <span class="chip chip-ink">THURSDAY, 1 MAY</span> via <span class="chip">toLocaleDateString('en-AU')</span>.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>Greeting word</strong> — time-aware: Good morning / Good afternoon / Wind down / Tomorrow at a glance / Still up.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-amber"></div>
+        <div class="info-text"><strong>Briefing line</strong> — single sentence generated from card state: mentions upcoming bill if overdue, or number of calendar events if ≥3, otherwise shows a calm message like "Quiet day ahead."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Setup Progress ────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="setup" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">0</div>
+      <div class="badge-label">Conditional — new households</div>
+    </div>
+    <h2 class="section-title">Setup Progress</h2>
+    <p class="section-subtitle">Guides new users through configuring their household. Dismisses permanently once the user taps "Dismiss" or all tasks are complete.</p>
+  </div>
+
+  <div class="content-grid">
+    <div>
+      <div class="sp-card">
+        <div class="sp-row">
+          <div>
+            <div class="sp-name">Finish setting up Toto</div>
+            <div class="sp-count">2 of 6 complete</div>
+          </div>
+          <div style="position:relative;width:52px;height:52px;flex-shrink:0">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(24,24,27,.08)" stroke-width="4"/>
+              <circle cx="26" cy="26" r="22" fill="none" stroke="#7C6FF7" stroke-width="4"
+                stroke-dasharray="138.2" stroke-dashoffset="115.2"
+                stroke-linecap="round" transform="rotate(-90 26 26)"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--iris-1)">33%</div>
+          </div>
+        </div>
+        <div class="sp-bar">
+          <div class="sp-bar-fill" style="width:33%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-label">Conditions &amp; behaviour</div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>Shown when</strong> — <span class="chip">state.setupProgressDismissed</span> is falsy AND at least one setup task is incomplete.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text"><strong>Tasks tracked</strong> — household profile, first adult, first child (if applicable), first bill, first calendar event, first budget entry. Derived by <span class="chip">setupProgressTasks()</span>.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-good"></div>
+        <div class="info-text"><strong>Collapsed by default</strong> — shows headline + circular progress + progress bar only. Tap to expand the full task list.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-good"></div>
+        <div class="info-text"><strong>Completed state</strong> — when all tasks done, replaces the card with a confetti card that the user can dismiss.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-amber"></div>
+        <div class="info-text"><strong>Dismiss</strong> — sets <span class="chip">state.setupProgressDismissed = true</span> and saves. Card never reappears.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Priority / Heads Up ───────────────────────────── -->
+  <hr class="divider" />
+  <div id="priority" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">1</div>
+      <div class="badge-label">Conditional · Priority card</div>
+    </div>
+    <h2 class="section-title">Heads Up</h2>
+    <p class="section-subtitle">The single highest-urgency item. Only one priority card renders at a time, in this order: bills due ≤2 days → maintenance overdue → documents expired.</p>
+  </div>
+
+  <div class="content-grid">
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Single bill -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">Single bill due today</div>
+        <div class="hu-card">
+          <div class="hu-eyebrow">
+            <div class="hu-dot"></div>
+            <span class="hu-label">Heads Up</span>
+            <span class="hu-pill">1</span>
+            <span class="hu-label">due today</span>
+          </div>
+          <div class="hu-headline">Electricity bill<span class="hu-amount">$180.00</span></div>
+          <button class="hu-btn">Pay now <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- Multiple bills -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">3 bills due today (2 shown + see all)</div>
+        <div class="hu-card">
+          <div class="hu-eyebrow">
+            <div class="hu-dot"></div>
+            <span class="hu-label">Heads Up</span>
+            <span class="hu-pill">3</span>
+            <span class="hu-label">due today</span>
+            <span class="hu-see-all">See all →</span>
+          </div>
+          <ul class="hu-list">
+            <li class="hu-row">
+              <span class="hu-row-name">Electricity</span>
+              <span class="hu-row-amt">$180.00</span>
+            </li>
+            <li class="hu-row" style="border-bottom:none">
+              <span class="hu-row-name">Council rates</span>
+              <span class="hu-row-amt">$420.00</span>
+            </li>
+          </ul>
+          <div class="hu-more">+ 1 more · Total due: $695.00</div>
+          <button class="hu-btn">Pay now <span>→</span></button>
+        </div>
+      </div>
+
+      <!-- Overdue maintenance -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">Maintenance overdue (no bills due)</div>
+        <div class="hu-card">
+          <div class="hu-eyebrow">
+            <div class="hu-dot hu-dot-ember"></div>
+            <span class="hu-label hu-label-ember">Overdue</span>
+          </div>
+          <div class="hu-headline">Car service</div>
+          <button class="hu-btn hu-btn-ember">View <span>→</span></button>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Data sources</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">state.bills[]</span> — filtered to bills where <span class="chip">billDaysUntil(b) ≤ 2</span> and not null. Sorted by days ascending.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><span class="chip">state.maintenance[]</span> — filtered where <span class="chip">_maintDaysUntil(m) &lt; 0</span> (past due).</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text"><span class="chip">state.documents[]</span> — filtered where <span class="chip">expiryDate &lt; now</span>.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Display rules</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>Bills trigger first.</strong> If any bills are due within 2 days, the card shows. Maintenance and document expiry are only shown if there are no upcoming bills.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>Single bill:</strong> shows bill name + amount as headline with "Pay now →" button.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>Multiple bills:</strong> count in iris pill, first 2 shown in list, "+ N more · Total due $X" footer if there are more than 2, "See all →" link in eyebrow.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><strong>Overdue maintenance:</strong> ember colour scheme, shows first overdue item, "View →" navigates to Maintenance tab.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text"><strong>Expired documents:</strong> same iris style, shows document name + "View →" to Documents tab.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Navigation</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">"Pay now →" → <span class="chip">activateTab('bills')</span></div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text">"View →" (maintenance) → <span class="chip">activateTab('maintenance')</span></div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">"View →" (documents) → <span class="chip">activateTab('documents')</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Schedule ──────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="schedule" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">2</div>
+      <div class="badge-label">Conditional · schedule</div>
+    </div>
+    <h2 class="section-title">Schedule</h2>
+    <p class="section-subtitle">Today's (or tomorrow's) planner events shown in an agenda timeline. Switches to tomorrow during evening and night hours.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="sc-card">
+      <div class="sc-header">
+        <div class="sc-meta">
+          <span class="card-meta-label">Today</span>
+          <span class="sc-count">3</span>
+        </div>
+        <span class="sc-see-all">See all →</span>
+      </div>
+      <div class="sc-body">
+
+        <div class="sc-ev">
+          <div class="sc-time-col"><span class="sc-time">9:00 am</span></div>
+          <div class="sc-timeline">
+            <div class="sc-dot now"></div>
+            <div class="sc-line"></div>
+          </div>
+          <div class="sc-ev-card">
+            <div class="sc-ev-title">School drop-off</div>
+            <div class="sc-ev-meta">
+              <span class="sc-who-dot" style="background:#7C6FF7"></span>Robert · 🏫 Education
+            </div>
+          </div>
+        </div>
+
+        <div class="sc-ev">
+          <div class="sc-time-col"><span class="sc-time">12:30 pm</span></div>
+          <div class="sc-timeline">
+            <div class="sc-dot"></div>
+            <div class="sc-line"></div>
+          </div>
+          <div class="sc-ev-card">
+            <div class="sc-ev-title">Dentist — Riley</div>
+            <div class="sc-ev-meta">
+              <span class="sc-who-dot" style="background:#F59E0B"></span>Riley · 🏥 Health
+            </div>
+          </div>
+        </div>
+
+        <div class="sc-ev">
+          <div class="sc-time-col"><span class="sc-time">6:00 pm</span></div>
+          <div class="sc-timeline">
+            <div class="sc-dot"></div>
+          </div>
+          <div class="sc-ev-card">
+            <div class="sc-ev-title">Family dinner</div>
+            <div class="sc-ev-meta">
+              <span class="sc-who-dot" style="background:#10B981"></span>Everyone · 🍽 Meal
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Data sources</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">state.planner.events[]</span> — filtered by <span class="chip">_plannerEventsForDate(date)</span>.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><strong>Date used:</strong> today's date during morning/afternoon; tomorrow's date during evening/night.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">Member dot colour from <span class="chip">_plannerEvPrimaryMember(ev).dot</span>. Label from <span class="chip">_plannerEvWhoLabel(ev)</span>.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">Category emoji + label from <span class="chip">PLANNER_CATS[ev.category]</span>.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Display rules</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Only shown if at least one event exists for the target date.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Capped at 4 events in the Today view. "See all →" navigates to the full Planner.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>Current event dot:</strong> dot fills solid when <span class="chip">nowMins</span> is within the event's start time ± 90 minutes.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">All-day events show "All day" as the time label.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Navigation</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">"See all →" → <span class="chip">activateTab('planner')</span></div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Tapping an event card → opens the event detail sheet via <span class="chip">_plannerOpenDetail(ev.id)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Money ─────────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="money" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">3</div>
+      <div class="badge-label">Conditional · money</div>
+    </div>
+    <h2 class="section-title">Money</h2>
+    <p class="section-subtitle">Current month's budget snapshot — how much is left (or over) and what percentage of the budget has been spent.</p>
+  </div>
+
+  <div class="content-grid">
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">On track</div>
+        <div class="mo-card">
+          <div class="card-meta" style="margin-bottom:10px">
+            <span class="card-meta-label">May 2026</span>
+          </div>
+          <div class="mo-row">
+            <div>
+              <div class="mo-amount"><span class="mo-currency">$</span>840<span class="mo-suffix"> left</span></div>
+            </div>
+            <span class="mo-status">On track</span>
+          </div>
+          <div class="mo-bar"><div class="mo-bar-fill" style="width:58%"></div></div>
+          <div class="mo-flags">
+            <span class="mo-flag mo-flag watch">Electricity due today</span>
+            <span class="mo-flag">23 days left</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">Over budget</div>
+        <div class="mo-card">
+          <div class="card-meta" style="margin-bottom:10px">
+            <span class="card-meta-label">May 2026</span>
+          </div>
+          <div class="mo-row">
+            <div>
+              <div class="mo-amount"><span class="mo-currency">$</span>215<span class="mo-suffix"> over</span></div>
+            </div>
+            <span class="mo-status watch">Over budget</span>
+          </div>
+          <div class="mo-bar"><div class="mo-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--ember),#fb923c)"></div></div>
+          <div class="mo-flags">
+            <span class="mo-flag">23 days left</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Data sources</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">getMonthData(selectedBudgetMonth)</span> — returns income + expenses arrays for the selected month.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">monthlyTotal(income)</span> / <span class="chip">monthlyTotal(expenses)</span> — converts all frequencies to monthly equivalents and sums.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">getActual(e.id, month)</span> — sum of real transactions recorded for each expense category.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text">Bill flags are pulled from the same <span class="chip">billsDue</span> array used by the priority card, showing bills due today/tomorrow/in N days.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Display rules</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>Only shown if</strong> at least one income or expense entry exists (<span class="chip">totalIncome &gt; 0 || totalExpenses &gt; 0</span>).</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text"><strong>On track</strong> — surplus ≥ 0. Shows amount in green-tinted pill.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><strong>Over budget</strong> — surplus &lt; 0. Pill switches to ember, suffix changes to "over", bar fills amber.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">Progress bar = <span class="chip">totalActual / totalExpenses * 100</span>, capped at 100%.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">"N days left" flag always shown. Bill warning flags shown for any bills due within 2 days.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Navigation</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Tapping anywhere on the card → <span class="chip">activateTab('budget')</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Routines ──────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="routines" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">4</div>
+      <div class="badge-label">Conditional · kids (type)</div>
+    </div>
+    <h2 class="section-title">My Routines</h2>
+    <p class="section-subtitle">The logged-in user's personal routines that are active right now or within the next 90 minutes. Inline step checklist with progress bar.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="rt-card">
+      <div class="card-meta"><span class="card-meta-label">My Routines</span><span class="card-meta-count">1</span></div>
+      <div style="background:var(--paper);border-radius:14px;padding:14px;border:1px solid var(--hairline)">
+        <div class="rt-header">
+          <span class="rt-emoji">🌅</span>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center">
+              <span class="rt-name">Morning routine</span>
+              <span class="rt-mono">7:00</span>
+            </div>
+            <div class="rt-progress-bar"><div class="rt-progress-fill" style="width:33%"></div></div>
+          </div>
+          <span class="rt-fraction">1/3</span>
+        </div>
+        <div>
+          <div class="rt-step">
+            <div class="rt-check done">✓</div>
+            <span class="rt-step-label done">Make bed</span>
+            <span class="rt-dur">2m</span>
+          </div>
+          <div class="rt-step">
+            <div class="rt-check"></div>
+            <span class="rt-step-label">Shower</span>
+            <span class="rt-dur">10m</span>
+          </div>
+          <div class="rt-step">
+            <div class="rt-check"></div>
+            <span class="rt-step-label">Pack bag</span>
+            <span class="rt-dur">5m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Data sources</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">_routinesForCurrentUser()</span> — routines assigned to the logged-in user, filtered by <span class="chip">_routineMatchesDate(r, todayStr)</span> (day-of-week or date match).</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">r.completions[todayKey][]</span> — array of completed step IDs for today's date key (format <span class="chip">YYYYMMDD</span>).</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><span class="chip">r.triggerTime</span> — HH:MM string. If absent, routine is always visible.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Time window filter</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">A routine is visible if current time ≥ <span class="chip">triggerTime − 90 min</span> AND &lt; <span class="chip">triggerTime + 360 min</span> (6 hours).</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text">A routine that has already been started today (has any completions) is always shown even if outside the time window.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">Routines outside the window show a locked state with no step list and an availability label.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Interactions</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Tapping a step calls <span class="chip">_tdToggleStep(routineId, stepId)</span> — toggles completion in <span class="chip">r.completions[todayKey]</span> and re-renders.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text">When all steps complete, card turns green with "✓ Done" label.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text">If any kids have pending approvals, a "N approvals waiting →" button appears below routines, navigating to <span class="chip">activateTab('kids')</span>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slipping ──────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="slipping" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">5</div>
+      <div class="badge-label">Conditional · slipping</div>
+    </div>
+    <h2 class="section-title">Slipping</h2>
+    <p class="section-subtitle">A compact list of items that have already expired or gone overdue — documents, maintenance tasks, and vehicle registrations.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="sl-card">
+      <div class="card-meta"><span class="card-meta-label">Slipping</span><span class="card-meta-count watch">3</span></div>
+      <div class="sl-row">
+        <div class="sl-dot sl-dot-alert"></div>
+        <div>
+          <div class="sl-label">Passport — Sarah</div>
+          <div class="sl-sub">Document expired</div>
+        </div>
+      </div>
+      <div class="sl-row">
+        <div class="sl-dot sl-dot-watch"></div>
+        <div>
+          <div class="sl-label">Car service</div>
+          <div class="sl-sub">14d overdue</div>
+        </div>
+      </div>
+      <div class="sl-row">
+        <div class="sl-dot sl-dot-alert"></div>
+        <div>
+          <div class="sl-label">Ford Focus rego</div>
+          <div class="sl-sub">Expired</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Data sources</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-red" style="background:var(--red)"></div>
+          <div class="info-text"><span class="chip">state.documents[]</span> — any document where <span class="chip">expiryDate &lt; now</span>. Shows "Document expired" sub-label.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><span class="chip">state.maintenance[]</span> — any maintenance item where <span class="chip">_maintDaysUntil(m) &lt; 0</span>. Shows "Xd overdue" sub-label.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-red" style="background:var(--red)"></div>
+          <div class="info-text"><span class="chip">state.vehicles[]</span> — any vehicle where <span class="chip">regoExpiry &lt; now</span>. Shows "[Vehicle name] rego — Expired".</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Display rules</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Only shown if at least one slipping item exists across all three sources.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Capped at 3 items in the card. Count badge shows total number.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-red" style="background:var(--red)"></div>
+          <div class="info-text"><strong>Alert dot</strong> (red) — expired documents and rego.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><strong>Watch dot</strong> (amber) — overdue maintenance.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Count badge on the card header is styled <span class="chip chip-ember">watch</span> (amber) when items exist.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Navigation</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Tapping the card → navigates to the relevant section (Documents / Maintenance / Vehicles) depending on the first item type.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Upcoming ──────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="upcoming" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">6</div>
+      <div class="badge-label">Conditional · upcoming</div>
+    </div>
+    <h2 class="section-title">Coming Up</h2>
+    <p class="section-subtitle">Planner events and bills due in the next 3–7 days. A forward-looking nudge so nothing sneaks up on you.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="up-card">
+      <div class="card-meta"><span class="card-meta-label">Coming up</span><span class="card-meta-count">3</span></div>
+      <div>
+        <div class="up-row">
+          <span class="up-date">Sat 3 May</span>
+          <span class="up-title">Soccer carnival</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(24,24,27,.18)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="up-row">
+          <span class="up-date">In 4d</span>
+          <span class="up-title" style="display:flex;align-items:baseline;gap:6px">Phone bill <span style="font-family:var(--mono);color:var(--muted);font-size:12px">$45</span></span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(24,24,27,.18)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="up-row" style="border-bottom:none">
+          <span class="up-date">Sun 7 May</span>
+          <span class="up-title">Mother's Day lunch</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(24,24,27,.18)" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Data sources</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">state.planner.events[]</span> — filtered to <span class="chip">event.date &gt; today AND ≤ today + 7 days</span>, sorted by date, capped at 3.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><span class="chip">state.bills[]</span> — filtered to bills where <span class="chip">billDaysUntil(b) &gt; 2 AND ≤ 7</span>.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Display rules</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Only shown if at least one upcoming event or bill exists in the 3–7 day window.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Events and bills are combined and capped at 4 rows total.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">Events show the formatted date (e.g. "Sat 3 May") and event title. Bills show "In Nd" and bill name + amount in muted mono.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">If an event has a time, it's shown below the date in iris mono.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Navigation</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Tapping an event row → <span class="chip">activateTab('planner')</span> + opens event detail via <span class="chip">_plannerOpenDetail(ev.id)</span></div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text">Tapping a bill row → <span class="chip">activateTab('bills')</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Win ───────────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="win" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">7</div>
+      <div class="badge-label">Conditional · win</div>
+    </div>
+    <h2 class="section-title">Win</h2>
+    <p class="section-subtitle">Celebrates when a child has maintained a routine streak of 3 or more days. Positive reinforcement for the household.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="win-card">
+      <div class="card-meta"><span class="card-meta-label" style="color:var(--good)">Win</span></div>
+      <div class="win-headline">Riley did every routine. 5 days running.</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Data sources</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text"><span class="chip">state.kids.profiles[]</span> — all child profiles in the household.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text"><span class="chip">state.routineAssignments[]</span> — routine assignments per child. Cross-referenced with <span class="chip">state.routines[]</span>.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text"><span class="chip">_assignmentStreak(assignment, stepCount)</span> — calculates consecutive days all steps were completed.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Display rules</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text">Only shown if at least one child has a streak of <strong>3 or more days</strong>.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text">Shows the first qualifying child's name and their best streak count.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-ink"></div>
+          <div class="info-text">Rendered with a green-tinted background. No action button — it's celebratory only.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Lists + Kids paired ───────────────────────────── -->
+  <hr class="divider" />
+  <div id="paired" class="section-anchor">
+    <div class="section-badge">
+      <div class="badge-order">8</div>
+      <div class="badge-label">Always present · lists (type)</div>
+    </div>
+    <h2 class="section-title">Lists + Kids</h2>
+    <p class="section-subtitle">Two square notification tiles side-by-side. Shopping list is always shown. Kids tile only shows if the household has at least one child profile.</p>
+  </div>
+
+  <div class="content-grid">
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- No approvals -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">Kids all clear</div>
+        <div class="paired-tiles">
+          <div class="ptile ptile-iris">
+            <div>
+              <div class="ptile-eyebrow ptile-eyebrow-iris">Shopping List</div>
+              <div class="ptile-number ptile-number-iris">7</div>
+              <div class="ptile-sub ptile-sub-iris">items · 3 in trolley</div>
+            </div>
+            <div class="ptile-cta ptile-cta-iris">View list →</div>
+          </div>
+          <div class="ptile ptile-green">
+            <div>
+              <div class="ptile-eyebrow ptile-eyebrow-green">Kids</div>
+              <div class="ptile-number ptile-number-green">✓</div>
+              <div class="ptile-sub ptile-sub-green">all clear</div>
+            </div>
+            <div class="ptile-cta ptile-cta-green">View kids →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending approvals -->
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.06em;text-transform:uppercase">Kids need approval</div>
+        <div class="paired-tiles">
+          <div class="ptile ptile-iris">
+            <div>
+              <div class="ptile-eyebrow ptile-eyebrow-iris">Shopping List</div>
+              <div class="ptile-number ptile-number-iris">12</div>
+              <div class="ptile-sub ptile-sub-iris">items</div>
+            </div>
+            <div class="ptile-cta ptile-cta-iris">View list →</div>
+          </div>
+          <div class="ptile ptile-amber">
+            <div>
+              <div class="ptile-eyebrow ptile-eyebrow-amber">Kids</div>
+              <div class="ptile-number ptile-number-amber">3</div>
+              <div class="ptile-sub ptile-sub-amber">approvals pending</div>
+            </div>
+            <div class="ptile-cta ptile-cta-amber">Review →</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="info-card">
+        <div class="info-card-label">Shopping List tile — data</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><span class="chip">state.lists.food.items[]</span> — the food shopping list.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>Active count</strong> — items where <span class="chip">item.state === 'active'</span> (not yet got).</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>In trolley count</strong> — items where <span class="chip">item.state === 'got_it'</span>. Shown as "+ N in trolley" sub-label.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Always rendered, even if active count is 0.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Kids tile — data &amp; states</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text"><strong>Only shown</strong> if <span class="chip">state.kids.profiles.length &gt; 0</span>.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><strong>Pending count</strong> — sum of <span class="chip">state.kids.completions[]</span> with status <span class="chip">'pending'</span> PLUS <span class="chip">state.kids.redemptions[]</span> with status <span class="chip">'pending'</span>.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text"><strong>Amber state</strong> — when pending &gt; 0. Shows count, "approvals pending", ember colour scheme, "Review →" CTA.</div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-good"></div>
+          <div class="info-text"><strong>Green state</strong> — when pending = 0. Shows "✓", "all clear", green colour scheme, "View kids →" CTA.</div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-label">Navigation</div>
+        <div class="info-row">
+          <div class="info-dot info-dot-iris"></div>
+          <div class="info-text">Shopping tile → sets <span class="chip">_listsActiveType='food'</span>, <span class="chip">_listsView='list'</span>, then <span class="chip">activateTab('lists')</span></div>
+        </div>
+        <div class="info-row">
+          <div class="info-dot info-dot-amber"></div>
+          <div class="info-text">Kids tile → <span class="chip">activateTab('kids')</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Sort Order ─────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="sort-order" class="section-anchor">
+    <h2 class="section-title">Card sort order</h2>
+    <p class="section-subtitle">Cards are sorted by a fixed <span class="chip">typeOrder</span> map. Cards of the same type would sort by insertion order (though each type produces at most one card).</p>
+  </div>
+
+  <div class="content-grid full">
+    <div class="info-card" style="padding:0;overflow:hidden">
+      <table class="sort-table">
+        <thead>
+          <tr>
+            <th>Position</th>
+            <th>Card type</th>
+            <th>Title shown</th>
+            <th>Condition to appear</th>
+            <th>Navigates to</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="order-num">G</td>
+            <td class="type-name">Greeting</td>
+            <td>— (always present, above cards)</td>
+            <td>Always rendered</td>
+            <td>n/a</td>
+          </tr>
+          <tr>
+            <td class="order-num">0*</td>
+            <td class="type-name">Setup Progress</td>
+            <td>Finish setting up Toto</td>
+            <td>Not dismissed + at least 1 task incomplete</td>
+            <td>Relevant settings section per task</td>
+          </tr>
+          <tr>
+            <td class="order-num">1</td>
+            <td class="type-name">priority</td>
+            <td>Heads Up / Overdue / Expired</td>
+            <td>Bills ≤2 days, OR maintenance overdue, OR docs expired</td>
+            <td>Bills / Maintenance / Documents</td>
+          </tr>
+          <tr>
+            <td class="order-num">2</td>
+            <td class="type-name">schedule</td>
+            <td>Today / Tomorrow</td>
+            <td>At least 1 planner event for today (or tomorrow if evening/night)</td>
+            <td>Planner tab; event detail sheet</td>
+          </tr>
+          <tr>
+            <td class="order-num">3</td>
+            <td class="type-name">money</td>
+            <td>[Month Year]</td>
+            <td>At least 1 income or expense entry in budget</td>
+            <td>Budget tab</td>
+          </tr>
+          <tr>
+            <td class="order-num">4</td>
+            <td class="type-name">lists (routines)</td>
+            <td>My Routines</td>
+            <td>At least 1 routine visible in current time window</td>
+            <td>Kids tab (for approvals)</td>
+          </tr>
+          <tr>
+            <td class="order-num">5</td>
+            <td class="type-name">slipping</td>
+            <td>Slipping</td>
+            <td>At least 1 expired doc, overdue maintenance, or expired rego</td>
+            <td>Documents / Maintenance / Vehicles</td>
+          </tr>
+          <tr>
+            <td class="order-num">6</td>
+            <td class="type-name">upcoming</td>
+            <td>Coming up</td>
+            <td>At least 1 planner event or bill in the 3–7 day window</td>
+            <td>Planner (events); Bills (bills)</td>
+          </tr>
+          <tr>
+            <td class="order-num">7</td>
+            <td class="type-name">win</td>
+            <td>Win</td>
+            <td>At least 1 child with a routine streak ≥ 3 days</td>
+            <td>n/a (celebratory only)</td>
+          </tr>
+          <tr>
+            <td class="order-num">8</td>
+            <td class="type-name">lists (paired tiles)</td>
+            <td>Shopping List + Kids</td>
+            <td>Always rendered (Kids tile only if child profiles exist)</td>
+            <td>Lists tab (shopping); Kids tab</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="margin-top:20px">
+    <div class="info-card">
+      <div class="info-card-label">Notes</div>
+      <div class="info-row">
+        <div class="info-dot info-dot-ink"></div>
+        <div class="info-text">* Setup Progress is rendered separately before the sorted cards array and is not part of the typeOrder sort.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-ink"></div>
+        <div class="info-text">The <strong>calm state</strong> — "You're sorted. See you tomorrow." — appears when the cards array has 1 or fewer items.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-iris"></div>
+        <div class="info-text">An async AI briefing (<span class="chip">_fetchAIBriefing()</span>) runs after the DOM is written and may update the briefing line with a personalised summary.</div>
+      </div>
+      <div class="info-row">
+        <div class="info-dot info-dot-ink"></div>
+        <div class="info-text">All card renders are wrapped in <span class="chip">safeRender()</span> — errors are silently swallowed so a broken card never breaks the whole Today screen.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

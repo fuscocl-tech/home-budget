@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOTO — Type A Mode Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pearl:       #FAFAF7;
+      --paper:       #F4F3F0;
+      --bg:          #ECEAE4;
+      --ink:         #18181B;
+      --ink-soft:    #52525B;
+      --muted:       #A1A1AA;
+      --hairline:    rgba(24,24,27,.09);
+      --iris-1:      #5B4CF5;
+      --iris-2:      #7C6FF7;
+      --iris-3:      #A89FF9;
+      --purple-soft: #EEEAFF;
+      --ember:       #f97316;
+      --good:        #10b981;
+      --cyan:        #0891b2;
+      --amber:       #f59e0b;
+      --red:         #ef4444;
+      --sans:        'Inter', system-ui, sans-serif;
+      --mono:        'JetBrains Mono', ui-monospace, monospace;
+      --r:           14px;
+      --r-lg:        20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ─────────────────────────────────────────── */
+    .top-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(236,234,228,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--hairline);
+      padding: 0 24px;
+      display: flex; align-items: center; gap: 0;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .top-nav::-webkit-scrollbar { display: none; }
+    .nav-brand {
+      font-family: var(--mono); font-size: 13px; font-weight: 700;
+      letter-spacing: .06em; color: var(--iris-1);
+      padding: 16px 20px 16px 0; white-space: nowrap; flex-shrink: 0;
+      border-right: 1px solid var(--hairline); margin-right: 12px;
+    }
+    .nav-link {
+      font-size: 12px; font-weight: 600; color: var(--ink-soft);
+      padding: 16px 12px; white-space: nowrap; cursor: pointer;
+      text-decoration: none; border-bottom: 2px solid transparent;
+      flex-shrink: 0; transition: color .15s, border-color .15s;
+    }
+    .nav-link:hover { color: var(--iris-1); border-bottom-color: var(--iris-3); }
+
+    /* ── Layout ──────────────────────────────────────── */
+    .page { max-width: 860px; margin: 0 auto; padding: 48px 24px 100px; }
+
+    .page-header { margin-bottom: 56px; }
+    .page-eyebrow {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; color: var(--iris-2); margin-bottom: 10px;
+    }
+    .page-title {
+      font-size: 36px; font-weight: 800; letter-spacing: -.03em;
+      color: var(--ink); line-height: 1.1; margin-bottom: 14px;
+    }
+    .page-desc { font-size: 15px; color: var(--ink-soft); max-width: 560px; line-height: 1.65; }
+
+    /* ── Section ─────────────────────────────────────── */
+    .section { margin-top: 64px; scroll-margin-top: 72px; }
+    .section-title {
+      font-size: 24px; font-weight: 800; letter-spacing: -.025em;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    .section-sub { font-size: 14px; color: var(--ink-soft); line-height: 1.6; max-width: 580px; margin-bottom: 28px; }
+
+    hr.divider { border: none; border-top: 1px solid var(--hairline); margin: 60px 0 0; }
+
+    /* ── Grid ────────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* ── Info card ───────────────────────────────────── */
+    .card {
+      background: var(--paper); border: 1px solid var(--hairline);
+      border-radius: var(--r-lg); padding: 20px;
+    }
+    .card-label {
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+    }
+    .row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--hairline);
+    }
+    .row:last-child { border-bottom: none; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0;
+    }
+    .text { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+    .text strong { color: var(--ink); font-weight: 600; }
+
+    /* ── Chip ────────────────────────────────────────── */
+    .chip {
+      display: inline-block; font-family: var(--mono); font-size: 11px;
+      background: #F0EEFF; color: var(--iris-1); border-radius: 6px; padding: 2px 6px;
+    }
+    .chip-good  { background: #ECFDF5; color: #047857; }
+    .chip-ember { background: #FFF4EE; color: #c2410c; }
+    .chip-ink   { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--hairline); }
+    .chip-cyan  { background: #ECFEFF; color: #155e75; }
+    .chip-red   { background: #FEF2F2; color: #991b1b; }
+
+    /* ── Score dimension card ────────────────────────── */
+    .dim-card {
+      background: var(--pearl); border: 1px solid var(--hairline);
+      border-radius: var(--r); padding: 16px;
+    }
+    .dim-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .dim-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+    .dim-score {
+      font-family: var(--mono); font-size: 13px; font-weight: 700;
+      background: var(--paper); border: 1px solid var(--hairline);
+      border-radius: 99px; padding: 2px 10px;
+    }
+    .dim-bar { height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; margin-bottom: 10px; }
+    .dim-bar-fill { height: 100%; border-radius: 99px; }
+    .dim-tip { font-size: 11px; color: var(--muted); font-family: var(--mono); line-height: 1.5; }
+    .dim-factors { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+    .dim-factor { font-size: 12px; color: var(--ink-soft); display: flex; align-items: flex-start; gap: 6px; }
+
+    /* ── Mission card mock ───────────────────────────── */
+    .mission-mock {
+      background: linear-gradient(135deg, #0891b2, #0e7490);
+      border-radius: var(--r-lg); padding: 20px; color: #fff;
+    }
+    .mission-eyebrow {
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; opacity: .7; margin-bottom: 8px;
+    }
+    .mission-title { font-size: 17px; font-weight: 800; line-height: 1.3; margin-bottom: 4px; }
+    .mission-sub   { font-size: 12px; opacity: .75; margin-bottom: 16px; }
+    .mission-impact { font-family: var(--mono); font-size: 11px; opacity: .6; margin-bottom: 16px; }
+    .mission-btns { display: flex; gap: 8px; }
+    .mission-btn {
+      flex: 1; text-align: center; padding: 9px 14px; border-radius: 99px;
+      font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+    }
+
+    /* ── Lifecycle timeline ──────────────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-row { display: flex; gap: 16px; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; width: 36px; flex-shrink: 0; }
+    .tl-circle {
+      width: 32px; height: 32px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-family: var(--mono);
+      font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .tl-line { width: 2px; flex: 1; min-height: 20px; background: var(--hairline); margin: 4px 0; }
+    .tl-body { flex: 1; padding: 4px 0 28px; }
+    .tl-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .tl-desc  { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+
+    /* ── Roadmap ─────────────────────────────────────── */
+    .roadmap-item {
+      background: var(--pearl); border: 1px solid var(--hairline);
+      border-radius: var(--r); padding: 16px 18px; margin-bottom: 10px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .roadmap-badge {
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      border-radius: 99px; padding: 3px 10px; white-space: nowrap; flex-shrink: 0;
+    }
+    .roadmap-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .roadmap-desc  { font-size: 12px; color: var(--ink-soft); line-height: 1.5; }
+
+    /* ── Life score display mock ─────────────────────── */
+    .score-display {
+      background: var(--pearl); border: 1px solid var(--hairline);
+      border-radius: var(--r-lg); padding: 20px; display: flex; align-items: center; gap: 16px;
+    }
+    .score-ring {
+      width: 72px; height: 72px; position: relative; flex-shrink: 0;
+    }
+    .score-num {
+      position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; font-weight: 900;
+    }
+
+  </style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-brand">TOTO — Type A Mode</div>
+  <a class="nav-link" href="#overview">Overview</a>
+  <a class="nav-link" href="#life-score">Life Score</a>
+  <a class="nav-link" href="#dimensions">Dimensions</a>
+  <a class="nav-link" href="#missions">Missions</a>
+  <a class="nav-link" href="#weekly-reset">Weekly Reset</a>
+  <a class="nav-link" href="#streak">Streak</a>
+  <a class="nav-link" href="#state">State</a>
+  <a class="nav-link" href="#roadmap">Roadmap</a>
+</nav>
+
+<div class="page">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="page-eyebrow">Feature Reference · Type A Mode</div>
+    <h1 class="page-title">Type A Mode</h1>
+    <p class="page-desc">
+      An opt-in overlay that transforms TOTO from a passive dashboard into an active life coach. When enabled, it adds a Life Score, daily missions, and a weekly reset ritual — all designed to guide the user toward a more organised household one step at a time.
+    </p>
+  </div>
+
+  <!-- ── Overview ────────────────────────────────────── -->
+  <div id="overview" class="section">
+    <h2 class="section-title">What it is</h2>
+    <p class="section-sub">Type A Mode is a user-controlled mode toggled in Settings. It does not affect any existing features — it only adds to them.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">Mode off (default)</div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">Today screen shows reactive cards only — what's happening now, what's due, what's slipping.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">No Life Score, no missions, no weekly nudge.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">User drives their own organisation rhythm.</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Mode on</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Life Score</strong> — a 0–100% health metric across 5 life dimensions, always visible on the Today screen.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Daily Mission</strong> — one specific, high-impact action for the user to take today, targeted at their weakest area.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Weekly Reset</strong> — a 5-step guided ritual to review and plan for the week ahead.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Streak</strong> — tracks consecutive weeks the user completes their weekly reset.</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-label">How to enable</div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Settings → <strong>Type A Mode</strong> accordion → toggle <em>Enable Type A Mode</em>. Calls <span class="chip">updateSetting('typeAMode', true)</span> which sets <span class="chip">state.settings.typeAMode = true</span> and persists to Firestore.</div></div>
+      <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">The Settings panel shows the current Life Score percentage immediately after enabling so the user gets instant feedback.</div></div>
+    </div>
+  </div>
+
+  <!-- ── Life Score ───────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="life-score" class="section">
+    <h2 class="section-title">Life Score</h2>
+    <p class="section-sub">A single 0–100% number that represents how organised the household is right now. Calculated fresh on every render from live state — never stored.</p>
+
+    <div class="grid-2">
+      <div>
+        <!-- Score mock -->
+        <div class="score-display">
+          <div class="score-ring">
+            <svg width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="26" fill="none" stroke="rgba(24,24,27,.08)" stroke-width="6"/>
+              <circle cx="36" cy="36" r="26" fill="none" stroke="#0891b2" stroke-width="6"
+                stroke-dasharray="163.4" stroke-dashoffset="45.8"
+                stroke-linecap="round" transform="rotate(-90 36 36)"/>
+            </svg>
+            <div class="score-num" style="color:#0891b2">72</div>
+          </div>
+          <div>
+            <div style="font-size:18px;font-weight:800;color:var(--ink)">Life Score</div>
+            <div style="font-size:13px;color:var(--ink-soft);margin-top:3px">Good shape — a few things to tidy</div>
+            <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:#FFF7ED;border-radius:99px;padding:3px 10px">
+              <span style="font-size:13px">🔥</span>
+              <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:#c2410c">3 week streak</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="card-label">Score bands</div>
+          <div class="row"><div class="dot" style="background:var(--good)"></div><div class="text"><strong>80–100%</strong> — "Crushing it — keep going"</div></div>
+          <div class="row"><div class="dot" style="background:var(--cyan)"></div><div class="text"><strong>60–79%</strong> — "Good shape — a few things to tidy"</div></div>
+          <div class="row"><div class="dot" style="background:var(--amber)"></div><div class="text"><strong>40–59%</strong> — "Getting there — some gaps to fill"</div></div>
+          <div class="row"><div class="dot" style="background:var(--red)"></div><div class="text"><strong>0–39%</strong> — "Just getting started — let's build momentum"</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">How it's calculated</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Five dimensions each scored 0–100 independently via <span class="chip">calcLifeScore()</span>.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Total = simple average of all five dimension scores: <span class="chip">Math.round(sum / 5)</span>.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Recalculated on every <span class="chip">renderToday()</span> call — always reflects current state.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">The score is <strong>never stored</strong> in state. It's a derived value, not a persisted one.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">Ring colour: green ≥80, cyan ≥60, amber ≥40, red below 40.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">The same score is also displayed in the Settings panel for quick reference without navigating to Today.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Dimensions ───────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="dimensions" class="section">
+    <h2 class="section-title">The 5 Dimensions</h2>
+    <p class="section-sub">Each dimension maps to a section of the app. Scores are weighted by data completeness and recency — not just whether the feature has been touched.</p>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- Budget -->
+      <div class="dim-card">
+        <div class="dim-header">
+          <div class="dim-name">💰 Budget</div>
+          <div class="dim-score" style="color:var(--iris-1)">0–100</div>
+        </div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:70%;background:var(--cyan)"></div></div>
+        <div class="dim-factors">
+          <div class="dim-factor"><span class="chip chip-ink">+30</span> Has income sources set up</div>
+          <div class="dim-factor"><span class="chip chip-ink">+30</span> Has expense categories set up</div>
+          <div class="dim-factor"><span class="chip chip-ink">+40</span> Has actual spending logged this month</div>
+        </div>
+        <div class="dim-tip" style="margin-top:10px">Navigates to: <span class="chip">budget</span> tab · Mission triggers at score &lt; 70</div>
+      </div>
+
+      <!-- Meals -->
+      <div class="dim-card">
+        <div class="dim-header">
+          <div class="dim-name">🍽 Meals</div>
+          <div class="dim-score" style="color:var(--cyan)">0–100</div>
+        </div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:55%;background:var(--amber)"></div></div>
+        <div class="dim-factors">
+          <div class="dim-factor"><span class="chip chip-ink">up to +80</span> Proportion of this week's 21 meal slots filled (breakfast/lunch/dinner × 7 days)</div>
+          <div class="dim-factor"><span class="chip chip-ink">+20</span> Shopping list exists</div>
+        </div>
+        <div class="dim-tip" style="margin-top:10px">Navigates to: <span class="chip">meals</span> tab · Mission triggers at score &lt; 70</div>
+      </div>
+
+      <!-- Home -->
+      <div class="dim-card">
+        <div class="dim-header">
+          <div class="dim-name">🏠 Home</div>
+          <div class="dim-score" style="color:var(--good)">0–100</div>
+        </div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:85%;background:var(--good)"></div></div>
+        <div class="dim-factors">
+          <div class="dim-factor"><span class="chip chip-ink">40% weight</span> Maintenance — starts at 100, loses 25pts per overdue item. If no items exist: 30pts baseline.</div>
+          <div class="dim-factor"><span class="chip chip-ink">30% weight</span> Vehicles — 100 if no issues, loses 30pts per rego/insurance expiring within 30 days.</div>
+          <div class="dim-factor"><span class="chip chip-ink">30% weight</span> Documents — 100 if no issues, loses 20pts per document expiring within 30 days.</div>
+        </div>
+        <div class="dim-tip" style="margin-top:10px">Navigates to: <span class="chip">maintenance</span> tab · Mission triggers at score &lt; 70</div>
+      </div>
+
+      <!-- Family -->
+      <div class="dim-card">
+        <div class="dim-header">
+          <div class="dim-name">👨‍👩‍👧 Family</div>
+          <div class="dim-score" style="color:var(--amber)">0–100</div>
+        </div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:45%;background:var(--amber)"></div></div>
+        <div class="dim-factors">
+          <div class="dim-factor"><span class="chip chip-ink">50% weight</span> Lunchbox — proportion of this week's school lunch slots filled. If no lunchbox profiles: 50pt default.</div>
+          <div class="dim-factor"><span class="chip chip-ink">50% weight</span> Pantry — starts at 50, loses 10pts per item marked "need" or "low". If no pantry set up: 25pt default.</div>
+        </div>
+        <div class="dim-tip" style="margin-top:10px">Navigates to: <span class="chip">lunchbox</span> or <span class="chip">pantry</span> · Mission triggers at score &lt; 70</div>
+      </div>
+
+      <!-- Goals -->
+      <div class="dim-card">
+        <div class="dim-header">
+          <div class="dim-name">🎯 Goals</div>
+          <div class="dim-score" style="color:var(--red)">0–100</div>
+        </div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width:30%;background:var(--red)"></div></div>
+        <div class="dim-factors">
+          <div class="dim-factor"><span class="chip chip-ink">baseline 20</span> No goals set</div>
+          <div class="dim-factor"><span class="chip chip-ink">30 + avg %</span> Has goals: 30 base + up to 70 more based on average progress across active goals</div>
+        </div>
+        <div class="dim-tip" style="margin-top:10px">Navigates to: <span class="chip">goals</span> tab · Mission triggers at score &lt; 50</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Missions ──────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="missions" class="section">
+    <h2 class="section-title">Daily Missions</h2>
+    <p class="section-sub">Each day, Type A mode surfaces one specific, actionable task targeted at the user's weakest dimension. It's always the highest-impact thing they could do right now.</p>
+
+    <div class="grid-2">
+      <div>
+        <!-- Mission card mock -->
+        <div class="mission-mock">
+          <div class="mission-eyebrow">⚡ Today's Mission</div>
+          <div class="mission-title">Log this month's actual spending</div>
+          <div class="mission-sub">Import a bank CSV or add manually</div>
+          <div class="mission-impact">+30 pts to Life Score · Budget dimension</div>
+          <div class="mission-btns">
+            <button class="mission-btn" style="background:rgba(255,255,255,.2);color:#fff">Skip</button>
+            <button class="mission-btn" style="background:#fff;color:#0891b2">Do it now</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <div class="card-label">Mission escalation</div>
+          <div class="row"><div class="dot" style="background:var(--cyan)"></div><div class="text"><strong>Day 1</strong> — Mission card shown on Today screen. No pressure.</div></div>
+          <div class="row"><div class="dot" style="background:var(--amber)"></div><div class="text"><strong>Day 2+</strong> — A modal lightbox appears 1.5 seconds after app load showing how many days the mission has been ignored.</div></div>
+          <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">User can always tap <strong>Skip</strong> to dismiss for today. The dismissed mission ID is stored so a new mission is shown tomorrow.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">How missions are selected</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">All 5 dimensions are scored and sorted weakest-first.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Each dimension generates specific candidate missions based on the exact gap (e.g. "no income set up" vs "no actuals logged" are different Budget missions).</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Candidates are filtered to remove today's already-dismissed mission.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Sorted by <strong>impact score</strong> — the mission with the highest potential Life Score gain wins.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">If no missions are available (everything in good shape), nothing is shown.</div></div>
+
+        <div class="card-label" style="margin-top:18px">Impact scores by mission type</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Add income sources: <strong>+40</strong></div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Set up expenses: <strong>+35</strong></div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Log actuals: <strong>+30</strong></div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Plan dinners: <strong>+25</strong></div></div>
+        <div class="row"><div class="dot" style="background:var(--cyan)"></div><div class="text">Mark maintenance done / set up lunchbox: <strong>+20</strong></div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">Pantry, shopping list, goals: <strong>+15</strong></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Weekly Reset ──────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="weekly-reset" class="section">
+    <h2 class="section-title">Weekly Reset</h2>
+    <p class="section-sub">A 5-step guided ritual the user can run once a week to review the past week and prepare for the next. Completing it earns a streak point.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">The 5 steps</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Step 1 — Budget review:</strong> Shows month-to-date spending vs budget. Tap "Review budget" or skip.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Step 2 — Meal plan:</strong> Shows how many of next week's 21 meal slots are filled. Tap to go plan.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Step 3 — Pantry check:</strong> Shows how many pantry items need restocking. Tap to run stocktake.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Step 4 — Upcoming bills:</strong> Lists bills due in the next 7 days with total amount.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><strong>Step 5 — Maintenance:</strong> Shows overdue maintenance count. Tap to review.</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="text"><strong>Done:</strong> Tap "I'm reset" — streak increments, <span class="chip">typeALastResetDate</span> updates.</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Behaviour details</div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">Each step can be individually skipped — the card fades to 40% opacity. The user doesn't have to complete every step.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">Tapping a step action navigates the user to the relevant tab and closes the reset overlay.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Opened via a "Weekly Reset" button on the Today screen (Type A mode only).</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">The overlay closes if the user taps outside it.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text">Data shown in each step is calculated live from <span class="chip">state</span> at the moment of opening — always current.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Streak ────────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="streak" class="section">
+    <h2 class="section-title">Streak System</h2>
+    <p class="section-sub">Tracks how many consecutive weeks the user has completed their Weekly Reset. Shown as a 🔥 badge on the Life Score card.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">How streak is tracked</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">state.settings.typeAStreak</span> — integer, number of consecutive weeks.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">state.settings.typeALastResetDate</span> — ISO date of last completed reset.</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="text"><strong>Continued:</strong> If the last reset was ≤9 days ago, streak increments by 1.</div></div>
+        <div class="row"><div class="dot" style="background:var(--red)"></div><div class="text"><strong>Broken:</strong> If last reset was >9 days ago, streak resets to 1 (not 0 — the current reset counts).</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">9-day window (not 7) gives a 2-day grace period for users who do their reset on a different day each week.</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Display</div>
+        <div class="row"><div class="dot" style="background:var(--amber)"></div><div class="text">Shown as <span class="chip chip-ember">🔥 N week streak</span> badge on the Life Score card — only if streak > 1.</div></div>
+        <div class="row"><div class="dot" style="background:var(--amber)"></div><div class="text">Also shown in the Settings panel Type A accordion when Type A Mode is active.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">Streak of 1 is not shown — it would feel hollow after just one reset. Starts displaying from week 2.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── State ─────────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="state" class="section">
+    <h2 class="section-title">State &amp; Storage</h2>
+    <p class="section-sub">All Type A settings live under <span class="chip">state.settings</span> and are persisted to Firestore via <span class="chip">saveData(state)</span>.</p>
+
+    <div class="card">
+      <div class="card-label">Keys</div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">typeAMode</span> — boolean. Default: <strong>false</strong>. Master switch for the entire feature.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">typeAStreak</span> — integer. Default: <strong>0</strong>. Consecutive weekly reset count.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">typeALastResetDate</span> — ISO date string. Default: <strong>''</strong>. Date of last completed Weekly Reset.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">typeAMissionId</span> — string. Default: <strong>''</strong>. ID of the mission currently being tracked.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">typeAMissionShownDate</span> — ISO date string. Default: <strong>''</strong>. Date the current mission was first shown — used to calculate days ignored for escalation.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="text"><span class="chip">typeADismissedMission</span> — string. Default: <strong>''</strong>. ID of the mission the user dismissed today — excluded from selection until a new mission is generated.</div></div>
+      <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="text">All keys are initialised in <span class="chip">_applyMigrations()</span> so they always exist regardless of when the user first signed up.</div></div>
+    </div>
+  </div>
+
+  <!-- ── Roadmap ───────────────────────────────────────── -->
+  <hr class="divider" />
+  <div id="roadmap" class="section">
+    <h2 class="section-title">How it should evolve</h2>
+    <p class="section-sub">Type A Mode has a strong foundation but several gaps where the experience could be meaningfully improved. These are roughly in priority order.</p>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#EEEAFF;color:var(--iris-1)">High priority</div>
+      <div>
+        <div class="roadmap-title">Shopping list integration into Family dimension</div>
+        <div class="roadmap-desc">The Family score currently uses the old <span class="chip">meals.shopping</span> and <span class="chip">meals.pantry</span> arrays. Now that shopping has moved to <span class="chip">state.lists.food</span>, the dimension score should reflect the new system — active items, got-it count, and list completeness. The pantry concept has also merged into the food list so the scoring logic needs updating.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#EEEAFF;color:var(--iris-1)">High priority</div>
+      <div>
+        <div class="roadmap-title">Routines as a scored dimension</div>
+        <div class="roadmap-desc">Routines are a significant part of the app but have no representation in the Life Score. Adding a <strong>Habits</strong> or <strong>Routines</strong> dimension (e.g. % of today's routines completed, streak of consistent days) would make the score more meaningful for daily users and give Type A mode a daily touchpoint beyond just planning tasks.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#FFF4EE;color:#c2410c">Medium priority</div>
+      <div>
+        <div class="roadmap-title">Mission completion feedback</div>
+        <div class="roadmap-desc">Right now, completing a mission just resets the tracking. There's no celebration or score delta shown. A "Life Score went up X points" confirmation — even just a brief toast — would make the action feel rewarding and reinforce the connection between missions and the score.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#FFF4EE;color:#c2410c">Medium priority</div>
+      <div>
+        <div class="roadmap-title">Score history chart</div>
+        <div class="roadmap-desc">The score is calculated live but never stored. Periodically snapshotting it (e.g. weekly at reset completion) would allow a simple trend line — "your score has improved from 54% to 72% over the last 8 weeks." This is powerful motivation and pairs naturally with the streak badge.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#FFF4EE;color:#c2410c">Medium priority</div>
+      <div>
+        <div class="roadmap-title">Per-dimension detail view</div>
+        <div class="roadmap-desc">Tapping a dimension in the Life Score breakdown could open a sheet showing exactly why the score is what it is — which items are dragging it down, with direct action buttons. Right now users see the score but can't easily trace where to go to improve it.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#F0FDF4;color:#047857">Future</div>
+      <div>
+        <div class="roadmap-title">AI-generated weekly summary</div>
+        <div class="roadmap-desc">At weekly reset, the AI could generate a 2–3 sentence personalised summary: "You had a strong week on budget but meals planning slipped. The kids' routines were 80% complete. This week, focus on setting up next week's dinners." This would make the reset feel like a coach check-in rather than a form to fill.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#F0FDF4;color:#047857">Future</div>
+      <div>
+        <div class="roadmap-title">Household vs individual scoring</div>
+        <div class="roadmap-desc">Currently the score is for the whole household. As multi-user support matures, it could split into personal accountability (routines, goals) vs shared household health (meals, maintenance, budget). The partner's contributions would show as their avatar's progress toward shared goals.</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-badge" style="background:#F0FDF4;color:#047857">Future / Monetisation</div>
+      <div>
+        <div class="roadmap-title">Type A Mode as a paid tier</div>
+        <div class="roadmap-desc">Type A Mode is currently free and always-on for anyone who enables it. Given its depth — Life Score, missions, weekly reset, streak — it has strong potential as a paid add-on or a feature unlocked at a higher subscription tier. The toggle in Settings is already isolated, making a paywall straightforward to add. Consider a free trial period (e.g. 2-week unlock) to drive conversion.</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
