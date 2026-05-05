@@ -16,6 +16,12 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: resolve(__dirname, 'src/index.html'),
+      output: {
+        // Split Firebase into its own chunk so the app code loads faster
+        manualChunks(id) {
+          if (id.includes('firebase')) return 'firebase';
+        },
+      },
     },
   },
   server: {
