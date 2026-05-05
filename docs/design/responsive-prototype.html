@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOTO — Responsive Layout Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens (matches app exactly) ────────────────── */
+    :root {
+      --pearl:        #FAFAF7;
+      --paper:        #F4F3F0;
+      --bg:           #ECEAE4;
+      --ink:          #18181B;
+      --ink-soft:     #52525B;
+      --muted:        #A1A1AA;
+      --hairline:     rgba(24,24,27,.09);
+      --hairline-soft:rgba(24,24,27,.05);
+      --iris-1:       #5B4CF5;
+      --iris-2:       #7C6FF7;
+      --iris-3:       #A89FF9;
+      --purple-soft:  #EEEAFF;
+      --purple-glow:  rgba(91,76,245,.22);
+      --ember:        #f97316;
+      --good:         #10b981;
+      --amber:        #f59e0b;
+      --nav-bg:       rgba(22,20,15,.92);
+      --sans:         'Inter', system-ui, sans-serif;
+      --mono:         'JetBrains Mono', ui-monospace, monospace;
+      --r-lg:         20px;
+      --sidebar-w:    220px;
+      --sidebar-icon: 64px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Page wrapper (the prototype viewer) ───────────────── */
+    body {
+      font-family: var(--sans);
+      background: #D4D0C8;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Prototype header ───────────────────────────────────── */
+    .proto-header {
+      background: var(--ink);
+      color: #fff;
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .proto-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      opacity: .7;
+    }
+    .proto-tabs {
+      display: flex;
+      gap: 6px;
+    }
+    .proto-tab {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 99px;
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.5);
+      cursor: pointer;
+      background: none;
+      font-family: var(--sans);
+      transition: all .15s;
+    }
+    .proto-tab.active {
+      background: var(--iris-1);
+      border-color: var(--iris-1);
+      color: #fff;
+    }
+
+    /* ── Viewport frames ────────────────────────────────────── */
+    .proto-stage {
+      padding: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: calc(100vh - 60px);
+    }
+
+    .frame-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    .frame-wrap.active { display: flex; }
+
+    .frame-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+    }
+
+    /* Device chrome */
+    .device {
+      background: #1a1a1a;
+      border-radius: 40px;
+      padding: 10px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.3);
+      position: relative;
+    }
+    .device-phone  { width: 390px; }
+    .device-tablet { width: 820px; }
+    .device-desktop{ width: 1140px; border-radius: 16px; }
+
+    .device-screen {
+      background: var(--bg);
+      border-radius: 30px;
+      overflow: hidden;
+      position: relative;
+    }
+    .device-phone  .device-screen { height: 780px; border-radius: 30px; }
+    .device-tablet .device-screen { height: 680px; border-radius: 20px; }
+    .device-desktop .device-screen { height: 700px; border-radius: 8px; }
+
+    /* Status bar */
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+    .status-time { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--ink); }
+    .status-notch {
+      width: 80px; height: 24px;
+      background: #1a1a1a;
+      border-radius: 99px;
+      position: absolute;
+      top: 10px; left: 50%; transform: translateX(-50%);
+    }
+    .device-tablet .status-notch,
+    .device-desktop .status-notch { display: none; }
+    .status-icons { display: flex; gap: 5px; align-items: center; font-size: 11px; color: var(--ink); }
+
+    /* ═══════════════════════════════════════════════════════
+       APP SHELL — shared across all breakpoints
+    ══════════════════════════════════════════════════════════ */
+    .app-shell {
+      display: flex;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar (tablet + desktop) ─────────────────────────── */
+    .app-sidebar {
+      background: var(--ink);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: width .25s ease;
+    }
+
+    /* Icon-only sidebar (tablet) */
+    .shell-tablet .app-sidebar { width: var(--sidebar-icon); }
+    /* Full sidebar (desktop) */
+    .shell-desktop .app-sidebar { width: var(--sidebar-w); }
+    /* Hidden on phone */
+    .shell-phone .app-sidebar { display: none; }
+
+    .sidebar-logo {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      gap: 10px;
+      overflow: hidden;
+    }
+    .sidebar-logo-mark {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .sidebar-logo-text {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .shell-tablet .sidebar-logo-text { display: none; }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 8px 0;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+
+    .snav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      cursor: pointer;
+      color: rgba(255,255,255,.5);
+      border-radius: 10px;
+      margin: 2px 8px;
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .snav-item:hover { background: rgba(255,255,255,.1); color: rgba(255,255,255,.85); }
+    .snav-item.active { background: rgba(91,76,245,.3); color: var(--iris-3); }
+    .snav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; flex-shrink: 0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .snav-label { opacity: 1; }
+    .shell-tablet .snav-label { display: none; }
+    .shell-tablet .snav-item { justify-content: center; padding: 12px 0; margin: 2px 6px; }
+
+    .snav-section {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.25);
+      padding: 12px 16px 4px;
+      margin-top: 4px;
+    }
+    .shell-tablet .snav-section { display: none; }
+
+    .sidebar-add {
+      padding: 12px 8px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      flex-shrink: 0;
+    }
+    .sidebar-add-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+      border: none;
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--sans);
+      box-shadow: 0 4px 16px var(--purple-glow);
+    }
+    .sidebar-add-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; flex-shrink: 0; stroke-width: 2.5; }
+    .shell-tablet .sidebar-add-btn-label { display: none; }
+
+    .sidebar-user {
+      padding: 12px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sidebar-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--iris-2), var(--iris-3));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .sidebar-user-name { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.8); white-space: nowrap; }
+    .sidebar-user-role { font-size: 10px; color: rgba(255,255,255,.4); font-family: var(--mono); }
+    .shell-tablet .sidebar-user-name,
+    .shell-tablet .sidebar-user-role { display: none; }
+
+    /* ── Main content ────────────────────────────────────────── */
+    .app-main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* ── Top bar (tablet + desktop only) ─────────────────────── */
+    .app-topbar {
+      height: 56px;
+      background: rgba(250,250,247,.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .shell-phone .app-topbar { display: none; }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+    .topbar-actions { display: flex; gap: 8px; }
+    .topbar-btn {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      background: var(--paper);
+      border: 1px solid var(--hairline);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* ── Page content area ───────────────────────────────────── */
+    .app-content {
+      flex: 1;
+      padding: 20px 16px 100px;
+      max-width: 100%;
+    }
+    .shell-tablet .app-content { padding: 24px 28px 48px; max-width: 680px; }
+    .shell-desktop .app-content { padding: 28px 36px 48px; max-width: 720px; }
+
+    /* Desktop two-column layout for specific screens */
+    .shell-desktop .two-col-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      max-width: 100%;
+    }
+
+    /* ── Bottom nav (phone only) ─────────────────────────────── */
+    .app-bottom-nav {
+      position: absolute;
+      bottom: 14px;
+      left: 14px; right: 14px;
+      height: 62px;
+      background: var(--nav-bg);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 99px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 6px;
+      z-index: 100;
+    }
+    .shell-tablet .app-bottom-nav,
+    .shell-desktop .app-bottom-nav { display: none; }
+
+    .bn-item {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 8px 4px;
+      border: none; background: none;
+      cursor: pointer;
+      color: rgba(255,255,255,.4);
+      font-family: var(--sans);
+      border-radius: 99px;
+    }
+    .bn-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .bn-label { font-size: 9px; font-weight: 600; letter-spacing: .01em; }
+    .bn-item.active { color: #fff; }
+    .bn-fab {
+      flex: 0 0 44px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--iris-2), var(--iris-3));
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px var(--purple-glow);
+    }
+    .bn-fab svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+    /* ── Shared card styles ──────────────────────────────────── */
+    .td-card {
+      background: var(--paper);
+      border-radius: 18px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      border: 1px solid var(--hairline-soft);
+      box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 8px rgba(22,20,15,.05);
+    }
+    .card-eyebrow {
+      font-family: var(--mono);
+      font-size: 9px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .card-count {
+      background: var(--paper); border: 1px solid var(--hairline);
+      border-radius: 99px; padding: 1px 7px;
+      color: var(--ink); font-size: 9px;
+    }
+    .card-title { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; margin-bottom: 3px; }
+    .card-sub   { font-size: 11px; color: var(--ink-soft); }
+    .card-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-top: 10px; background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+      color: #fff; border-radius: 99px; padding: 7px 14px;
+      font-size: 11px; font-weight: 700; border: none; cursor: pointer;
+      font-family: var(--sans);
+    }
+
+    .paired-tiles { display: flex; gap: 10px; margin-bottom: 10px; }
+    .ptile {
+      flex: 1; border-radius: 16px; padding: 12px;
+      min-height: 100px; display: flex; flex-direction: column; justify-content: space-between;
+      border: 1px solid transparent;
+    }
+    .ptile-iris  { background: var(--purple-soft); border-color: rgba(91,76,245,.15); }
+    .ptile-ember { background: #FFF4EE; border-color: rgba(249,115,22,.18); }
+    .ptile-ey { font-family: var(--mono); font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+    .ptile-num { font-size: 26px; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+    .ptile-sub { font-size: 9px; margin-top: 2px; }
+    .ptile-cta { font-size: 9px; font-weight: 700; margin-top: 8px; }
+
+    .agenda-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .agenda-time { font-family: var(--mono); font-size: 9px; color: var(--muted); width: 38px; text-align: right; padding-top: 4px; flex-shrink: 0; }
+    .agenda-dot-col { display: flex; flex-direction: column; align-items: center; width: 12px; flex-shrink: 0; padding-top: 3px; }
+    .agenda-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .agenda-line { width: 1px; flex: 1; min-height: 16px; background: var(--hairline); margin: 2px 0; }
+    .agenda-card { flex: 1; border-radius: 10px; padding: 7px 10px; border: 1px solid rgba(0,0,0,.06); }
+    .agenda-card-title { font-size: 11px; font-weight: 700; color: var(--ink); }
+    .agenda-card-meta  { font-size: 9px; color: var(--muted); margin-top: 2px; }
+    .agenda-pill {
+      display: inline-flex; align-items: center; gap: 2px;
+      font-size: 8px; font-weight: 700; border-radius: 99px;
+      padding: 2px 6px; margin-top: 4px;
+    }
+
+    /* Detail panel (desktop only) */
+    .detail-panel {
+      background: var(--paper);
+      border-radius: 18px;
+      border: 1px solid var(--hairline);
+      overflow: hidden;
+      height: fit-content;
+    }
+    .detail-panel-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .detail-panel-title { font-size: 13px; font-weight: 800; color: var(--ink); }
+    .detail-panel-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-bottom: 1px solid var(--hairline);
+      font-size: 11px; color: var(--ink-soft);
+    }
+    .detail-panel-row:last-child { border-bottom: none; }
+
+    /* Money card */
+    .money-card { background: var(--ink); border-radius: 18px; padding: 16px; margin-bottom: 10px; color: #fff; }
+    .money-card-month { font-family: var(--mono); font-size: 9px; opacity: .5; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    .money-card-amount { font-size: 28px; font-weight: 800; letter-spacing: -.04em; }
+    .money-card-suffix { font-size: 13px; font-weight: 500; opacity: .5; margin-left: 6px; }
+    .money-card-bar { height: 3px; background: rgba(255,255,255,.2); border-radius: 99px; margin-top: 10px; overflow: hidden; }
+    .money-card-fill { height: 100%; border-radius: 99px; background: var(--iris-2); }
+
+    /* Greeting */
+    .greeting { padding: 4px 0 16px; }
+    .greeting-date { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .greeting-line { font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; }
+    .greeting-iris { color: var(--iris-1); }
+    .greeting-brief { font-size: 11px; color: var(--ink-soft); margin-top: 3px; }
+
+    /* Phone header */
+    .phone-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px 4px;
+    }
+    .phone-logo { font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--ink); font-family: var(--sans); }
+    .phone-icons { display: flex; gap: 6px; }
+    .phone-icon {
+      width: 26px; height: 26px; border-radius: 9px;
+      background: var(--paper); border: 1px solid var(--hairline);
+      display: flex; align-items: center; justify-content: center; font-size: 11px;
+    }
+    .phone-icon-iris { background: var(--purple-soft); border-color: rgba(91,76,245,.2); }
+
+    /* Life score mini */
+    .life-mini {
+      background: var(--paper); border-radius: 14px; padding: 12px 14px;
+      border: 1px solid var(--hairline); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .life-mini-title { font-size: 12px; font-weight: 800; color: var(--ink); }
+    .life-mini-sub   { font-size: 9px; color: var(--muted); margin-top: 1px; }
+    .life-mini-chevron { margin-left: auto; font-size: 9px; color: var(--muted); }
+
+    /* Breakpoint annotation */
+    .bp-annotation {
+      position: absolute;
+      bottom: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,.4);
+      white-space: nowrap;
+      letter-spacing: .04em;
+    }
+
+    /* Section sub-nav */
+    .section-pills {
+      display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .section-pill {
+      font-size: 11px; font-weight: 700;
+      padding: 5px 12px; border-radius: 99px;
+      background: var(--paper); border: 1px solid var(--hairline);
+      color: var(--ink-soft); cursor: pointer;
+    }
+    .section-pill.active {
+      background: var(--iris-1); color: #fff; border-color: var(--iris-1);
+    }
+
+    /* Scrollable content sim */
+    .scroll-fade {
+      position: absolute; bottom: 70px; left: 0; right: 0; height: 40px;
+      background: linear-gradient(transparent, var(--bg));
+      pointer-events: none;
+    }
+    .shell-tablet .scroll-fade,
+    .shell-desktop .scroll-fade { bottom: 0; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Prototype chrome ─────────────────────────────────────── -->
+<div class="proto-header">
+  <div class="proto-title">TOTO — Responsive Layout Prototype</div>
+  <div class="proto-tabs">
+    <button class="proto-tab active" onclick="showFrame('phone')">📱 Phone</button>
+    <button class="proto-tab" onclick="showFrame('tablet')">⬜ Tablet</button>
+    <button class="proto-tab" onclick="showFrame('desktop')">🖥 Desktop</button>
+  </div>
+</div>
+
+<div class="proto-stage">
+
+  <!-- ══════════════════════════════════════
+       PHONE — bottom nav pill, full width
+  ═══════════════════════════════════════════ -->
+  <div class="frame-wrap active" id="frame-phone">
+    <div class="frame-label">Phone · &lt; 640px · bottom nav pill</div>
+    <div style="position:relative">
+      <div class="device device-phone">
+        <div class="device-screen">
+          <div class="status-bar">
+            <span class="status-time">9:41</span>
+            <div class="status-notch"></div>
+            <div class="status-icons">
+              <span>●●●</span><span>WiFi</span><span>🔋</span>
+            </div>
+          </div>
+          <!-- App shell: phone -->
+          <div class="app-shell shell-phone" style="height:calc(780px - 44px)">
+            <div class="app-main">
+              <!-- Phone-specific header -->
+              <div class="phone-header">
+                <span class="phone-logo">TOTO</span>
+                <div class="phone-icons">
+                  <div class="phone-icon phone-icon-iris">🐕</div>
+                  <div class="phone-icon">ℹ</div>
+                  <div class="phone-icon" style="border-radius:50%">👤</div>
+                </div>
+              </div>
+              <div class="app-content" style="padding-top:8px">
+                <!-- Greeting -->
+                <div class="greeting">
+                  <div class="greeting-date">SATURDAY, 4 MAY</div>
+                  <div class="greeting-line">Good morning, <span class="greeting-iris">Robert.</span></div>
+                  <div class="greeting-brief">Electricity bill is due today.</div>
+                </div>
+                <!-- Heads Up + Slipping -->
+                <div class="paired-tiles">
+                  <div class="ptile ptile-iris">
+                    <div>
+                      <div class="ptile-ey" style="color:var(--iris-2)">Heads Up</div>
+                      <div class="ptile-num" style="color:var(--iris-1)">4</div>
+                      <div class="ptile-sub" style="color:var(--iris-2)">bills due soon</div>
+                    </div>
+                    <div class="ptile-cta" style="color:var(--iris-1)">View all →</div>
+                  </div>
+                  <div class="ptile ptile-ember">
+                    <div>
+                      <div class="ptile-ey" style="color:#c2410c">Slipping</div>
+                      <div class="ptile-num" style="color:var(--ember)">3</div>
+                      <div class="ptile-sub" style="color:#c2410c">items overdue</div>
+                    </div>
+                    <div class="ptile-cta" style="color:var(--ember)">View all →</div>
+                  </div>
+                </div>
+                <!-- Schedule card -->
+                <div class="td-card" style="padding:0;overflow:hidden">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;border-bottom:1px solid var(--hairline)">
+                    <div class="card-eyebrow" style="margin-bottom:0">TODAY <span class="card-count">3</span></div>
+                    <span style="font-size:10px;font-weight:700;color:var(--iris-2)">See all →</span>
+                  </div>
+                  <div style="padding:10px 12px">
+                    <div class="agenda-row">
+                      <div class="agenda-time">8:30am</div>
+                      <div class="agenda-dot-col">
+                        <div class="agenda-dot" style="background:#fff7ed;border:2px solid #9a3412"></div>
+                        <div class="agenda-line"></div>
+                      </div>
+                      <div class="agenda-card" style="background:#fff7ed;border-color:rgba(154,52,18,.15)">
+                        <div class="agenda-card-title">School drop-off</div>
+                        <div class="agenda-card-meta">Amy</div>
+                        <div class="agenda-pill" style="background:rgba(154,52,18,.12);color:#9a3412">🏫 School</div>
+                      </div>
+                    </div>
+                    <div class="agenda-row" style="margin-bottom:0">
+                      <div class="agenda-time">6:00pm</div>
+                      <div class="agenda-dot-col">
+                        <div class="agenda-dot" style="background:#fce7f3;border:2px solid #9d174d"></div>
+                      </div>
+                      <div class="agenda-card" style="background:#fce7f3;border-color:rgba(157,23,77,.15)">
+                        <div class="agenda-card-title">Family dinner</div>
+                        <div class="agenda-card-meta">Everyone</div>
+                        <div class="agenda-pill" style="background:rgba(157,23,77,.12);color:#9d174d">👨‍👩‍👧 Family</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Money card -->
+                <div class="money-card">
+                  <div class="money-card-month">May 2026</div>
+                  <div class="money-card-amount">$840<span class="money-card-suffix">left</span></div>
+                  <div class="money-card-bar"><div class="money-card-fill" style="width:58%"></div></div>
+                </div>
+              </div>
+            </div>
+            <!-- Bottom nav -->
+            <div class="app-bottom-nav">
+              <button class="bn-item active">
+                <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span class="bn-label">Today</span>
+              </button>
+              <button class="bn-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span class="bn-label">Plan</span>
+              </button>
+              <button class="bn-fab">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button class="bn-item">
+                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                <span class="bn-label">Wallet</span>
+              </button>
+              <button class="bn-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                <span class="bn-label">Me</span>
+              </button>
+            </div>
+            <div class="scroll-fade"></div>
+          </div>
+        </div>
+      </div>
+      <div class="bp-annotation">390 × 780px · Bottom nav pill · Full-width content</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TABLET — icon sidebar, top bar
+  ═══════════════════════════════════════════ -->
+  <div class="frame-wrap" id="frame-tablet">
+    <div class="frame-label">Tablet · 640px–1024px · icon sidebar + top bar</div>
+    <div style="position:relative">
+      <div class="device device-tablet">
+        <div class="device-screen">
+          <div class="status-bar" style="height:32px;padding:0 16px">
+            <span class="status-time" style="font-size:11px">9:41</span>
+            <div class="status-icons">
+              <span>WiFi</span><span>🔋</span>
+            </div>
+          </div>
+          <div class="app-shell shell-tablet" style="height:calc(680px - 32px)">
+
+            <!-- Icon sidebar -->
+            <div class="app-sidebar">
+              <div class="sidebar-logo">
+                <div class="sidebar-logo-mark">🐕</div>
+              </div>
+              <div class="sidebar-nav">
+                <div class="snav-item active">
+                  <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                </div>
+              </div>
+              <div class="sidebar-add">
+                <button class="sidebar-add-btn">
+                  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+              </div>
+              <div class="sidebar-user">
+                <div class="sidebar-avatar">RG</div>
+              </div>
+            </div>
+
+            <!-- Main -->
+            <div class="app-main">
+              <div class="app-topbar">
+                <div class="topbar-title">Today</div>
+                <div class="topbar-actions">
+                  <div class="topbar-btn">🐕</div>
+                  <div class="topbar-btn">ℹ</div>
+                </div>
+              </div>
+              <div class="app-content">
+                <div class="greeting" style="padding-bottom:12px">
+                  <div class="greeting-date">SATURDAY, 4 MAY</div>
+                  <div class="greeting-line">Good morning, <span class="greeting-iris">Robert.</span></div>
+                  <div class="greeting-brief">Electricity bill is due today.</div>
+                </div>
+                <div class="paired-tiles">
+                  <div class="ptile ptile-iris">
+                    <div>
+                      <div class="ptile-ey" style="color:var(--iris-2)">Heads Up</div>
+                      <div class="ptile-num" style="color:var(--iris-1)">4</div>
+                      <div class="ptile-sub" style="color:var(--iris-2)">bills due soon</div>
+                    </div>
+                    <div class="ptile-cta" style="color:var(--iris-1)">View all →</div>
+                  </div>
+                  <div class="ptile ptile-ember">
+                    <div>
+                      <div class="ptile-ey" style="color:#c2410c">Slipping</div>
+                      <div class="ptile-num" style="color:var(--ember)">3</div>
+                      <div class="ptile-sub" style="color:#c2410c">items overdue</div>
+                    </div>
+                    <div class="ptile-cta" style="color:var(--ember)">View all →</div>
+                  </div>
+                </div>
+                <div class="td-card" style="padding:0;overflow:hidden">
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--hairline)">
+                    <div class="card-eyebrow" style="margin-bottom:0">TODAY <span class="card-count">3</span></div>
+                    <span style="font-size:11px;font-weight:700;color:var(--iris-2)">See all →</span>
+                  </div>
+                  <div style="padding:12px 14px">
+                    <div class="agenda-row">
+                      <div class="agenda-time">8:30am</div>
+                      <div class="agenda-dot-col"><div class="agenda-dot" style="background:#fff7ed;border:2px solid #9a3412"></div><div class="agenda-line"></div></div>
+                      <div class="agenda-card" style="background:#fff7ed;border-color:rgba(154,52,18,.15)">
+                        <div class="agenda-card-title">School drop-off</div>
+                        <div class="agenda-card-meta">Amy · 🏫 School</div>
+                      </div>
+                    </div>
+                    <div class="agenda-row" style="margin-bottom:0">
+                      <div class="agenda-time">6:00pm</div>
+                      <div class="agenda-dot-col"><div class="agenda-dot" style="background:#fce7f3;border:2px solid #9d174d"></div></div>
+                      <div class="agenda-card" style="background:#fce7f3;border-color:rgba(157,23,77,.15)">
+                        <div class="agenda-card-title">Family dinner</div>
+                        <div class="agenda-card-meta">Everyone · 👨‍👩‍👧 Family</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="money-card">
+                  <div class="money-card-month">May 2026</div>
+                  <div class="money-card-amount">$840<span class="money-card-suffix">left</span></div>
+                  <div class="money-card-bar"><div class="money-card-fill" style="width:58%"></div></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="bp-annotation">820px · Icon sidebar (64px) · Top bar · Content max-width 680px</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       DESKTOP — full sidebar, two columns
+  ═══════════════════════════════════════════ -->
+  <div class="frame-wrap" id="frame-desktop">
+    <div class="frame-label">Desktop · &gt; 1024px · full sidebar + optional two-column</div>
+    <div style="position:relative">
+      <div class="device device-desktop">
+        <div class="device-screen">
+          <div class="status-bar" style="height:0"></div>
+          <div class="app-shell shell-desktop" style="height:700px">
+
+            <!-- Full sidebar -->
+            <div class="app-sidebar">
+              <div class="sidebar-logo">
+                <div class="sidebar-logo-mark">🐕</div>
+                <div class="sidebar-logo-text">TOTO</div>
+              </div>
+              <div class="sidebar-nav">
+                <div class="snav-section">Main</div>
+                <div class="snav-item active">
+                  <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  <span class="snav-label">Today</span>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  <span class="snav-label">Plan</span>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                  <span class="snav-label">Wallet</span>
+                </div>
+                <div class="snav-section">Household</div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  <span class="snav-label">Kids</span>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                  <span class="snav-label">Lists</span>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                  <span class="snav-label">Home</span>
+                </div>
+                <div class="snav-section">Settings</div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                  <span class="snav-label">Me</span>
+                </div>
+                <div class="snav-item">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                  <span class="snav-label">Settings</span>
+                </div>
+              </div>
+              <div class="sidebar-add">
+                <button class="sidebar-add-btn">
+                  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span class="sidebar-add-btn-label">Quick add</span>
+                </button>
+              </div>
+              <div class="sidebar-user">
+                <div class="sidebar-avatar">RG</div>
+                <div>
+                  <div class="sidebar-user-name">Robert Gentilcore</div>
+                  <div class="sidebar-user-role">Gentilcore family</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Main + detail panel -->
+            <div class="app-main">
+              <div class="app-topbar">
+                <div>
+                  <div class="topbar-title">Today</div>
+                </div>
+                <div class="topbar-actions">
+                  <div class="topbar-btn">🐕</div>
+                  <div class="topbar-btn">ℹ</div>
+                  <div class="topbar-btn" style="border-radius:50%">RG</div>
+                </div>
+              </div>
+              <div class="app-content">
+                <div class="two-col-layout">
+                  <!-- Left: main feed -->
+                  <div>
+                    <div class="greeting" style="padding-bottom:12px">
+                      <div class="greeting-date">SATURDAY, 4 MAY</div>
+                      <div class="greeting-line" style="font-size:22px">Good morning, <span class="greeting-iris">Robert.</span></div>
+                      <div class="greeting-brief">Electricity bill is due today.</div>
+                    </div>
+                    <div class="paired-tiles">
+                      <div class="ptile ptile-iris">
+                        <div>
+                          <div class="ptile-ey" style="color:var(--iris-2)">Heads Up</div>
+                          <div class="ptile-num" style="color:var(--iris-1)">4</div>
+                          <div class="ptile-sub" style="color:var(--iris-2)">bills due soon</div>
+                        </div>
+                        <div class="ptile-cta" style="color:var(--iris-1)">View all →</div>
+                      </div>
+                      <div class="ptile ptile-ember">
+                        <div>
+                          <div class="ptile-ey" style="color:#c2410c">Slipping</div>
+                          <div class="ptile-num" style="color:var(--ember)">3</div>
+                          <div class="ptile-sub" style="color:#c2410c">items overdue</div>
+                        </div>
+                        <div class="ptile-cta" style="color:var(--ember)">View all →</div>
+                      </div>
+                    </div>
+                    <div class="td-card" style="padding:0;overflow:hidden">
+                      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--hairline)">
+                        <div class="card-eyebrow" style="margin-bottom:0">TODAY <span class="card-count">3</span></div>
+                        <span style="font-size:11px;font-weight:700;color:var(--iris-2)">See all →</span>
+                      </div>
+                      <div style="padding:12px 16px">
+                        <div class="agenda-row">
+                          <div class="agenda-time">8:30am</div>
+                          <div class="agenda-dot-col"><div class="agenda-dot" style="background:#fff7ed;border:2px solid #9a3412"></div><div class="agenda-line"></div></div>
+                          <div class="agenda-card" style="background:#fff7ed;border-color:rgba(154,52,18,.15)">
+                            <div class="agenda-card-title">School drop-off</div>
+                            <div class="agenda-card-meta">Amy · 🏫 School</div>
+                          </div>
+                        </div>
+                        <div class="agenda-row" style="margin-bottom:0">
+                          <div class="agenda-time">6:00pm</div>
+                          <div class="agenda-dot-col"><div class="agenda-dot" style="background:#fce7f3;border:2px solid #9d174d"></div></div>
+                          <div class="agenda-card" style="background:#fce7f3;border-color:rgba(157,23,77,.15)">
+                            <div class="agenda-card-title">Family dinner</div>
+                            <div class="agenda-card-meta">Everyone · 👨‍👩‍👧 Family</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="money-card">
+                      <div class="money-card-month">May 2026</div>
+                      <div class="money-card-amount">$840<span class="money-card-suffix">left</span></div>
+                      <div class="money-card-bar"><div class="money-card-fill" style="width:58%"></div></div>
+                    </div>
+                  </div>
+
+                  <!-- Right: detail panel -->
+                  <div>
+                    <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">UPCOMING</div>
+                    <div class="detail-panel">
+                      <div class="detail-panel-header">
+                        <div class="detail-panel-title">This week</div>
+                      </div>
+                      <div class="detail-panel-row">
+                        <span style="font-size:14px">📅</span>
+                        <div style="flex:1">
+                          <div style="font-size:11px;font-weight:700;color:var(--ink)">Soccer carnival</div>
+                          <div style="font-size:9px;color:var(--muted)">Sat 3 May · 9:00am</div>
+                        </div>
+                      </div>
+                      <div class="detail-panel-row">
+                        <span style="font-size:14px">💸</span>
+                        <div style="flex:1">
+                          <div style="font-size:11px;font-weight:700;color:var(--ink)">Phone plan · $45</div>
+                          <div style="font-size:9px;color:var(--muted)">In 2 days</div>
+                        </div>
+                      </div>
+                      <div class="detail-panel-row">
+                        <span style="font-size:14px">📅</span>
+                        <div style="flex:1">
+                          <div style="font-size:11px;font-weight:700;color:var(--ink)">Mother's Day lunch</div>
+                          <div style="font-size:9px;color:var(--muted)">Sun 4 May</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 10px">TYPE A · LIFE SCORE</div>
+                    <div class="life-mini">
+                      <svg viewBox="0 0 56 56" width="40" height="40">
+                        <circle cx="28" cy="28" r="22" fill="none" stroke="var(--hairline)" stroke-width="5"/>
+                        <circle cx="28" cy="28" r="22" fill="none" stroke="var(--iris-2)" stroke-width="5"
+                          stroke-dasharray="98 138.2" stroke-linecap="round" transform="rotate(-90 28 28)"/>
+                        <text x="28" y="33" text-anchor="middle" font-size="11" font-weight="900" fill="var(--iris-2)">72</text>
+                      </svg>
+                      <div>
+                        <div class="life-mini-title">Life Score</div>
+                        <div class="life-mini-sub">Good shape — a few things to tidy</div>
+                      </div>
+                      <span class="life-mini-chevron">▼</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="bp-annotation">1140px · Full sidebar (220px) · Two-column layout · Content + detail panel</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showFrame(id) {
+    document.querySelectorAll('.frame-wrap').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.proto-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('frame-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>

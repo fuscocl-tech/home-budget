@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toto — Product Specification</title>
+<style>
+  :root {
+    --purple: #5B4CF5;
+    --purple-light: #F0EEFF;
+    --purple-mid: #DDD6FE;
+    --green: #10b981;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --text: #18181B;
+    --muted: #71717A;
+    --border: #E4E4E7;
+    --bg: #FAFAF8;
+    --surface: #ffffff;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }
+
+  /* NAV */
+  .toc { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 24px 0 40px; z-index: 100; }
+  .toc-logo { display: flex; align-items: center; gap: 10px; padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+  .toc-logo-icon { width: 32px; height: 32px; background: var(--purple); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .toc-logo-text { font-size: 16px; font-weight: 800; color: var(--text); }
+  .toc-logo-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .toc a { display: block; padding: 6px 20px; font-size: 12px; color: var(--muted); text-decoration: none; font-weight: 500; transition: color .15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .toc a:hover { color: var(--purple); }
+  .toc a.active { color: var(--purple); font-weight: 700; background: var(--purple-light); border-right: 3px solid var(--purple); }
+  .toc-section { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: #A1A1AA; padding: 14px 20px 4px; }
+
+  /* MAIN */
+  .main { margin-left: 240px; padding: 48px 64px 120px; max-width: 960px; }
+  @media (max-width: 800px) { .toc { display: none; } .main { margin-left: 0; padding: 24px 20px 80px; } }
+
+  /* SECTIONS */
+  .spec-section { margin-bottom: 64px; }
+  h1 { font-size: 38px; font-weight: 900; letter-spacing: -1.2px; color: var(--text); margin-bottom: 8px; }
+  .spec-tagline { font-size: 18px; color: var(--muted); margin-bottom: 40px; line-height: 1.5; }
+  h2 { font-size: 24px; font-weight: 800; letter-spacing: -.5px; color: var(--text); margin-bottom: 16px; padding-top: 8px; border-top: 2px solid var(--border); padding-top: 24px; }
+  h3 { font-size: 17px; font-weight: 700; color: var(--text); margin: 24px 0 10px; }
+  h4 { font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 8px; }
+  p { color: #3F3F46; margin-bottom: 12px; }
+  ul, ol { padding-left: 22px; margin-bottom: 12px; color: #3F3F46; }
+  li { margin-bottom: 4px; }
+  code { font-family: 'SF Mono', ui-monospace, monospace; font-size: 12px; background: #F4F4F5; color: #7C3AED; padding: 2px 6px; border-radius: 5px; }
+  pre { background: #18181B; color: #e4e4e7; padding: 20px 24px; border-radius: var(--radius); overflow-x: auto; margin-bottom: 16px; font-size: 12px; line-height: 1.7; }
+  pre code { background: none; color: #e4e4e7; padding: 0; font-size: 12px; }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+  .badge-purple { background: var(--purple-light); color: var(--purple); }
+  .badge-green { background: #EDFFF6; color: #065F46; }
+  .badge-amber { background: #FFFBEB; color: #854d0e; }
+  .badge-red { background: #FFF1F3; color: #BE123C; }
+  .badge-grey { background: #F4F4F5; color: #71717A; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 12px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .card h3 { margin-top: 0; font-size: 15px; }
+  .card p { margin-bottom: 0; font-size: 13px; color: var(--muted); }
+
+  /* STATUS PILLS */
+  .status-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+
+  /* TABLES */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+  th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 2px solid var(--border); background: #FAFAFA; }
+  td { padding: 10px 14px; border-bottom: 1px solid #F4F4F5; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAF8; }
+
+  /* DECISION CALLOUTS */
+  .callout { display: flex; gap: 14px; padding: 16px 20px; border-radius: var(--radius); margin-bottom: 16px; }
+  .callout-purple { background: var(--purple-light); border: 1px solid var(--purple-mid); }
+  .callout-green { background: #EDFFF6; border: 1px solid #A7F3D0; }
+  .callout-amber { background: #FFFBEB; border: 1px solid #FDE68A; }
+  .callout-red { background: #FFF1F3; border: 1px solid #FECDD3; }
+  .callout-icon { font-size: 20px; flex-shrink: 0; }
+  .callout-body { flex: 1; }
+  .callout-body strong { display: block; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .callout-body p { font-size: 13px; margin: 0; }
+
+  /* SEPARATOR */
+  .sep { height: 1px; background: var(--border); margin: 48px 0; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, var(--purple), #7C3AED); border-radius: 20px; padding: 40px; margin-bottom: 48px; color: #fff; }
+  .hero h1 { color: #fff; font-size: 42px; margin-bottom: 6px; }
+  .hero p { color: rgba(255,255,255,.8); font-size: 16px; margin-bottom: 20px; }
+  .hero-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .hero-meta span { background: rgba(255,255,255,.15); padding: 5px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; color: #fff; }
+
+  /* NAV DIAGRAM */
+  .nav-diagram { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .nav-pill { padding: 8px 16px; border-radius: 99px; font-size: 13px; font-weight: 600; border: 2px solid; }
+  .nav-pill-active { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .nav-pill-wallet { background: #EFF6FF; color: #1d4ed8; border-color: #BFDBFE; }
+  .nav-pill-plan { background: #F0FDF4; color: #15803d; border-color: #A7F3D0; }
+  .nav-pill-home { background: #FFF7ED; color: #c2410c; border-color: #FED7AA; }
+  .nav-pill-me { background: #F4F4F5; color: #52525b; border-color: #D4D4D8; }
+
+  /* AGE BRACKETS */
+  .age-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .age-card { border-radius: 12px; padding: 16px; text-align: center; }
+  .age-tiny  { background: #FFF7ED; border: 1px solid #FED7AA; }
+  .age-early { background: #EDFFF6; border: 1px solid #A7F3D0; }
+  .age-indep { background: var(--purple-light); border: 1px solid var(--purple-mid); }
+  .age-tween { background: #F4F4F5; border: 1px solid #D4D4D8; }
+  .age-card .emoji { font-size: 28px; margin-bottom: 6px; }
+  .age-card .range { font-size: 13px; font-weight: 800; }
+  .age-card .name { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .age-card .notes { font-size: 11px; color: var(--muted); margin-top: 8px; text-align: left; }
+
+  /* FLOW STEPS */
+  .flow { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+  .flow-step { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #F4F4F5; }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-num { width: 28px; height: 28px; border-radius: 50%; background: var(--purple); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .flow-body strong { display: block; font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .flow-body p { font-size: 13px; margin: 0; color: var(--muted); }
+
+  /* PRINT */
+  @media print {
+    .toc { display: none; }
+    .main { margin: 0; padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TABLE OF CONTENTS -->
+<nav class="toc">
+  <div class="toc-logo">
+    <div class="toc-logo-icon">🐕</div>
+    <div>
+      <div class="toc-logo-text">Toto</div>
+      <div class="toc-logo-sub">Product Spec v1.0</div>
+    </div>
+  </div>
+  <div class="toc-section">Overview</div>
+  <a href="#overview">Product Vision</a>
+  <a href="#users">Target Users</a>
+  <a href="#tech">Technical Stack</a>
+
+  <div class="toc-section">Navigation</div>
+  <a href="#nav-adult">Adult Navigation</a>
+  <a href="#nav-child">Child Navigation</a>
+  <a href="#device-profiles">Device Profiles</a>
+
+  <div class="toc-section">Adult Features</div>
+  <a href="#wallet">Wallet</a>
+  <a href="#plan">Plan</a>
+  <a href="#home">Home</a>
+  <a href="#kids-admin">Kids Admin</a>
+  <a href="#routines-admin">Routines</a>
+  <a href="#settings">Settings & Me</a>
+
+  <div class="toc-section">Child Features</div>
+  <a href="#age-brackets">Age Brackets</a>
+  <a href="#child-today">Today Screen</a>
+  <a href="#child-calendar">Calendar</a>
+  <a href="#child-prizes">Prize Store</a>
+  <a href="#child-pins">PINs & Access</a>
+
+  <div class="toc-section">Data Models</div>
+  <a href="#data-state">State Structure</a>
+  <a href="#data-routines">Routines & Recurrence</a>
+  <a href="#data-kids">Kids & Completions</a>
+  <a href="#data-events">Child Events</a>
+
+  <div class="toc-section">Architecture</div>
+  <a href="#arch-storage">Storage & Sync</a>
+  <a href="#arch-auth">Auth & Households</a>
+  <a href="#arch-rendering">Rendering</a>
+
+  <div class="toc-section">Decisions</div>
+  <a href="#decisions">Resolved Decisions</a>
+  <a href="#deferred">Deferred / Future</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>🐕 Toto</h1>
+    <p>Family household management — routines, finances, and kids all in one place.</p>
+    <div class="hero-meta">
+      <span>PWA + iOS (Capacitor)</span>
+      <span>Vanilla JS · Firebase · localStorage</span>
+      <span>Single file · ~21,500 lines</span>
+      <span>Spec v1.0 · May 2026</span>
+    </div>
+  </div>
+
+  <!-- ── OVERVIEW ────────────────────────────────── -->
+  <div class="spec-section" id="overview">
+    <h2>Product Vision</h2>
+    <p>Toto is a family household management app that brings together two distinct but connected experiences: a <strong>financial and household planning tool</strong> for adults, and a <strong>fun, age-appropriate activity tracker</strong> for children.</p>
+    <p>Adults manage budgets, bills, routines, chores, meals, vehicles, documents, and events. Children log in on the same device, see only what's relevant to them — their routines, chores, and calendar — and earn points toward prizes they can redeem with parent approval.</p>
+    <p>The single shared device model is a core design constraint. Toto assumes families share an iPad or phone and routes each user to the right experience based on device profile and PIN.</p>
+  </div>
+
+  <!-- ── USERS ────────────────────────────────────── -->
+  <div class="spec-section" id="users">
+    <h2>Target Users</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>👨‍👩‍👧 Parents / Adults</h3>
+        <p>Manage household finances, set up routines and chores, approve completions and prize redemptions, schedule events, track documents and vehicles.</p>
+      </div>
+      <div class="card">
+        <h3>🧒 Children (ages 1–16)</h3>
+        <p>Complete daily routines and chores, earn points, view their calendar, redeem prizes. Experience adapts to age bracket automatically.</p>
+      </div>
+      <div class="card">
+        <h3>📱 Shared Family Device</h3>
+        <p>Single iPad or phone used by the whole family. Profile selector on each open routes each person to their own view.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TECH STACK ───────────────────────────────── -->
+  <div class="spec-section" id="tech">
+    <h2>Technical Stack</h2>
+    <table>
+      <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+      <tr><td>Frontend</td><td>Vanilla JS, HTML, CSS</td><td>Single <code>index.html</code> file, ~21,500 lines, no build step</td></tr>
+      <tr><td>Storage (local)</td><td>localStorage</td><td>Key: <code>home_finance_v1</code> — fast, offline-capable</td></tr>
+      <tr><td>Storage (cloud)</td><td>Firebase Firestore</td><td>Real-time sync for multi-user households; path: <code>/households/{ownerUID}</code></td></tr>
+      <tr><td>Auth</td><td>Firebase Auth + Google Sign-In</td><td>Guest mode available for offline-first exploration</td></tr>
+      <tr><td>Mobile wrapper</td><td>Capacitor (iOS)</td><td>PWA wrapped for App Store distribution; <code>npm run sim</code> syncs to Xcode</td></tr>
+      <tr><td>PIN security</td><td>Web Crypto API (SHA-256)</td><td>Client-side hash — no plaintext PINs stored</td></tr>
+    </table>
+
+    <h3>Data Flow</h3>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><div class="flow-body"><strong>App opens</strong><p>Reads localStorage → calls <code>_applyMigrations()</code> → calls <code>handleDeviceRouting()</code></p></div></div>
+      <div class="flow-step"><div class="flow-num">2</div><div class="flow-body"><strong>Firebase connects</strong><p>Real-time listener attached on <code>/households/{uid}</code> — remote changes update local state and re-render</p></div></div>
+      <div class="flow-step"><div class="flow-num">3</div><div class="flow-body"><strong>Any state change</strong><p><code>saveData(state)</code> → writes to localStorage + Firestore simultaneously</p></div></div>
+      <div class="flow-step"><div class="flow-num">4</div><div class="flow-body"><strong>Tab switch</strong><p><code>activateTab(tab)</code> → shows correct panel, updates nav active states, calls <code>renderAll()</code></p></div></div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ── ADULT NAVIGATION ─────────────────────────── -->
+  <div class="spec-section" id="nav-adult">
+    <h2>Adult Navigation</h2>
+    <p>On mobile, adults navigate via a floating bottom pill nav. On desktop, a collapsible sidebar replaces it. Three main sections group the sub-tabs:</p>
+
+    <div class="nav-diagram">
+      <div class="nav-pill nav-pill-active">☀️ Today</div>
+      <div class="nav-pill nav-pill-wallet">💰 Wallet</div>
+      <div class="nav-pill nav-pill-plan">📅 Plan</div>
+      <div class="nav-pill nav-pill-home">🏠 Home</div>
+      <div class="nav-pill nav-pill-me">👤 Me</div>
+    </div>
+
+    <p>Within each section, <strong>horizontal pill tabs</strong> appear below the section header to switch between sub-screens. These are static HTML — injected once and never re-rendered.</p>
+
+    <table>
+      <tr><th>Section</th><th>Sub-tabs</th></tr>
+      <tr><td><strong>Wallet</strong></td><td>Budget · Bills · Net Worth · Goals · Insights · Build</td></tr>
+      <tr><td><strong>Plan</strong></td><td>Planner · Forecast · Meals · Lunchbox · Pantry · Routines</td></tr>
+      <tr><td><strong>Home</strong></td><td>Documents · Vehicles · Maintenance · Kids</td></tr>
+      <tr><td><strong>Me</strong></td><td>Settings, profile, household management</td></tr>
+    </table>
+  </div>
+
+  <!-- ── CHILD NAVIGATION ─────────────────────────── -->
+  <div class="spec-section" id="nav-child">
+    <h2>Child Navigation</h2>
+    <p>When a child logs in, the entire adult UI is replaced by a full-screen child overlay. Navigation is a <strong>three-tab bottom bar</strong> at the base of the screen.</p>
+
+    <div class="nav-diagram">
+      <div class="nav-pill nav-pill-active">☀️ Today</div>
+      <div class="nav-pill nav-pill-wallet">📅 Calendar</div>
+      <div class="nav-pill nav-pill-plan">🏆 Prizes</div>
+    </div>
+
+    <table>
+      <tr><th>Tab</th><th>Content</th><th>Ages</th></tr>
+      <tr><td><strong>Today</strong></td><td>Routines, chores, today's events, lunchbox, prize store teaser</td><td>All (5+)</td></tr>
+      <tr><td><strong>Calendar</strong></td><td>7-day strip (default) and month grid; expandable day schedule</td><td>5+ (month hidden for 5–8)</td></tr>
+      <tr><td><strong>Prizes</strong></td><td>Balance hero card, prize list, redemption history</td><td>All (5+)</td></tr>
+    </table>
+
+    <div class="callout callout-purple">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-body">
+        <strong>Tiny Tots (1–5)</strong>
+        <p>No bottom nav at all. Today screen only, with simplified large-target UI managed entirely by the adult.</p>
+      </div>
+    </div>
+
+    <h3>Prizes Badge</h3>
+    <p>The Prizes tab shows a red badge when the child has unread notifications (approved/declined redemptions) or newly affordable prizes. The badge clears automatically when the child opens the Prizes tab.</p>
+  </div>
+
+  <!-- ── DEVICE PROFILES ──────────────────────────── -->
+  <div class="spec-section" id="device-profiles">
+    <h2>Device Profiles</h2>
+    <p>Each device has a stored profile that determines what opens on app launch.</p>
+
+    <table>
+      <tr><th>Profile</th><th>Behaviour on open</th><th>PIN required</th></tr>
+      <tr><td><strong>Adult</strong></td><td>Straight to full adult app</td><td>No</td></tr>
+      <tr><td><strong>Shared</strong></td><td>Profile selector overlay — all household members listed; user selects themselves</td><td>Per-child if set</td></tr>
+      <tr><td><strong>Kid (specific)</strong></td><td>Straight to that child's view</td><td>Yes, if PIN set</td></tr>
+    </table>
+
+    <h3>Routing Logic</h3>
+    <pre><code>handleDeviceRouting()
+  ├─ No device set → showDeviceSetup()
+  ├─ device = 'adult' → full app
+  ├─ device = 'shared' → showProfileSelector()
+  └─ device = kidId
+       ├─ PIN set + not in session → showPinScreen()
+       └─ No PIN or session active → showChildView()</code></pre>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ── WALLET ───────────────────────────────────── -->
+  <div class="spec-section" id="wallet">
+    <h2>Wallet</h2>
+    <p>Financial management hub. Tracks income, spending, bills, net worth, savings goals, and financial health.</p>
+
+    <h3>Budget</h3>
+    <ul>
+      <li>Monthly income sources with frequency (weekly/fortnightly/monthly/annual)</li>
+      <li>Expense categories with budgeted amounts and actual spending tracker</li>
+      <li>Budget vs actual comparison with colour-coded variance bars</li>
+      <li>Category groups (Living Room, Kitchen etc.) with expandable drill-down</li>
+      <li>Month selector — view any past or future month</li>
+      <li>Surplus/deficit hero card at top showing current month balance</li>
+    </ul>
+
+    <h3>Bills</h3>
+    <ul>
+      <li>Recurring bills with due day, amount, category</li>
+      <li>Days-until-due calculation with urgent/upcoming status</li>
+      <li>Overdue detection and Today screen alerts</li>
+    </ul>
+
+    <h3>Net Worth</h3>
+    <ul>
+      <li>Assets list (property, vehicles, savings, investments)</li>
+      <li>Liabilities list (mortgages, loans, credit cards)</li>
+      <li>Net worth snapshots over time (historical tracking)</li>
+      <li>Target net worth goal with year</li>
+    </ul>
+
+    <h3>Goals</h3>
+    <ul>
+      <li>Named savings goals with target amount, current amount, deadline</li>
+      <li>Emergency fund template</li>
+      <li>Progress bars and completion percentage</li>
+    </ul>
+
+    <h3>Insights</h3>
+    <ul>
+      <li>Financial health score (grade A–F) across 5 dimensions: savings, tracking, net worth, emergency fund, goals</li>
+      <li>Spending pattern analysis</li>
+      <li>Actionable recommendations based on weakest dimension</li>
+      <li>AI briefing (requires API key) — one sentence daily summary</li>
+    </ul>
+
+    <h3>Build</h3>
+    <ul>
+      <li>Construction/home project contract tracking</li>
+      <li>Payment stages, variations, and extras</li>
+      <li>Progress tracking against contract milestones</li>
+    </ul>
+  </div>
+
+  <!-- ── PLAN ─────────────────────────────────────── -->
+  <div class="spec-section" id="plan">
+    <h2>Plan</h2>
+
+    <h3>Planner</h3>
+    <p>Calendar-based event planner for household events. Week strip (default) and month grid views. Tapping a day opens a bottom sheet showing all events for that day.</p>
+    <ul>
+      <li>Events assigned to specific household members or "Everyone"</li>
+      <li>Life area categories (Health, Family, Work, Finance, Social, Other)</li>
+      <li>Cost estimates per event — accepted estimates push to Budget</li>
+      <li>Rich recurrence (same engine as Routines — see below)</li>
+      <li>Event detail sheet with share functionality (SMS, WhatsApp, Email)</li>
+      <li>Nudge system — upcoming events surfaced on Today screen</li>
+    </ul>
+
+    <div class="callout callout-green">
+      <div class="callout-icon">🔗</div>
+      <div class="callout-body">
+        <strong>Shared Recurrence Engine</strong>
+        <p>"Everyone" planner events automatically surface in all children's calendars. Same <code>_recurrenceMatchesDate()</code> function handles Planner events, Routines, and Child Events.</p>
+      </div>
+    </div>
+
+    <h3>Forecast</h3>
+    <p>Future cash flow projections based on income, expenses, and planned events.</p>
+
+    <h3>Meals</h3>
+    <ul>
+      <li>Weekly meal plan grid (breakfast, lunch, dinner for each day)</li>
+      <li>Shopping list generator from meal plan</li>
+      <li>AI meal suggestions (if API key configured)</li>
+    </ul>
+
+    <h3>Lunchbox</h3>
+    <ul>
+      <li>Per-child weekly lunchbox planner</li>
+      <li>Four slots per day: main, snack, fruit, drink</li>
+      <li>Content surfaces read-only on child's Today screen</li>
+    </ul>
+
+    <h3>Pantry</h3>
+    <p>Grocery inventory tracker with restock alerts.</p>
+
+    <h3>Routines</h3>
+    <p>Covered in detail in the <a href="#routines-admin">Routines section</a> below.</p>
+  </div>
+
+  <!-- ── HOME ─────────────────────────────────────── -->
+  <div class="spec-section" id="home">
+    <h2>Home</h2>
+
+    <h3>Documents</h3>
+    <ul>
+      <li>Important document tracking (passport, insurance, licence, etc.)</li>
+      <li>Expiry date alerts — overdue (red) and expiring soon within 30 days (amber)</li>
+      <li>Provider notes</li>
+    </ul>
+
+    <h3>Vehicles</h3>
+    <ul>
+      <li>Vehicle records with make, model, plate</li>
+      <li>Registration expiry tracking with alerts at 30 days</li>
+      <li>Insurance renewal tracking</li>
+    </ul>
+
+    <h3>Maintenance</h3>
+    <ul>
+      <li>Home maintenance task list with due dates and frequency</li>
+      <li>Provider tracking (plumber, electrician, etc.)</li>
+      <li>Overdue and upcoming-14-days alerts on Today screen</li>
+      <li>Mark-done button with automatic reschedule</li>
+    </ul>
+
+    <h3>Kids</h3>
+    <p>Entry point to the Kids admin section — see below.</p>
+  </div>
+
+  <!-- ── KIDS ADMIN ───────────────────────────────── -->
+  <div class="spec-section" id="kids-admin">
+    <h2>Kids Admin</h2>
+    <p>Five tabs under Home › Kids for managing the children's experience:</p>
+
+    <table>
+      <tr><th>Tab</th><th>Purpose</th></tr>
+      <tr><td><strong>Overview</strong></td><td>Child profile cards — name, emoji, age, current point balance, recent activity</td></tr>
+      <tr><td><strong>Chores</strong></td><td>Create and assign chores to specific children or all. Set points and frequency.</td></tr>
+      <tr><td><strong>Prize Shelf</strong></td><td>Create prizes with emoji, name, and point cost. Children can redeem.</td></tr>
+      <tr><td><strong>Approvals</strong></td><td>Unified queue: pending chore completions + pending prize redemptions. Approve or decline.</td></tr>
+      <tr><td><strong>Events</strong></td><td>Create calendar events for children. One-time or recurring. Household-wide or per-child.</td></tr>
+    </table>
+
+    <h3>Chore Completion Flow</h3>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><div class="flow-body"><strong>Child marks chore done</strong><p>Creates <code>completion</code> record with status <code>pending</code></p></div></div>
+      <div class="flow-step"><div class="flow-num">2</div><div class="flow-body"><strong>Parent reviews in Approvals tab</strong><p>Badge shows count of pending items</p></div></div>
+      <div class="flow-step"><div class="flow-num">3</div><div class="flow-body"><strong>Parent approves or declines</strong><p>On approval: points added to child balance. Child notified.</p></div></div>
+    </div>
+
+    <h3>Prize Redemption Flow</h3>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">1</div><div class="flow-body"><strong>Child taps affordable prize</strong><p>Confirmation screen shows prize name, emoji, point cost</p></div></div>
+      <div class="flow-step"><div class="flow-num">2</div><div class="flow-body"><strong>Child taps "Send request"</strong><p>Creates <code>redemption</code> record with status <code>pending</code></p></div></div>
+      <div class="flow-step"><div class="flow-num">3</div><div class="flow-body"><strong>Parent approves or declines in Approvals tab</strong><p>On approval: points deducted. Child notified via notification badge.</p></div></div>
+    </div>
+
+    <h3>Point Balance Calculation</h3>
+    <pre><code>balance = Σ(approved completions × chore.points)
+         - Σ(approved redemptions × prize.pointCost)</code></pre>
+  </div>
+
+  <!-- ── ROUTINES ADMIN ───────────────────────────── -->
+  <div class="spec-section" id="routines-admin">
+    <h2>Routines</h2>
+    <p>Adult-created task sequences that children complete on a schedule. Supports rich recurrence, per-child assignment, and individual exceptions.</p>
+
+    <h3>Routine Record</h3>
+    <pre><code>Routine {
+  id, name, emoji
+  ownerType: 'adult' | 'household'
+  ownerId, sharedWith: uid[]
+  steps: [{
+    id, label, emoji, points, durationMin, notes
+  }]
+  pointsPerCompletion   // bonus on full completion
+  triggerTime           // e.g. "06:00" — determines time-lock on child view
+  recurrence: {
+    type: 'daily' | 'weekdays' | 'weekends' | 'specific_days' | 'interval' | 'one_time'
+    days?: number[]         // [0–6] for specific_days (0 = Sun)
+    intervalDays?: number   // for interval type
+    startDate: ISODate
+    endDate?: ISODate        // absent = recurs indefinitely
+  }
+  skippedDates: ISODate[]
+  pausePeriods: [{ from: ISODate, to: ISODate, reason?: string }]
+  lastEditedAt: ISO8601
+}</code></pre>
+
+    <h3>Recurrence Types</h3>
+    <table>
+      <tr><th>Type</th><th>Description</th><th>Default</th></tr>
+      <tr><td><code>daily</code></td><td>Every day</td><td>✓ Pre-selected</td></tr>
+      <tr><td><code>weekdays</code></td><td>Monday – Friday only</td><td></td></tr>
+      <tr><td><code>weekends</code></td><td>Saturday – Sunday only</td><td></td></tr>
+      <tr><td><code>specific_days</code></td><td>Adult selects 1+ days from day-picker (Su Mo Tu We Th Fr Sa)</td><td></td></tr>
+      <tr><td><code>interval</code></td><td>Every N days from start date (e.g. every 2 days)</td><td></td></tr>
+      <tr><td><code>one_time</code></td><td>Single specified date only</td><td></td></tr>
+    </table>
+
+    <h3>Recurrence Engine</h3>
+    <p>Shared pure function used by Routines, Child Events, and Planner events:</p>
+    <pre><code>_recurrenceMatchesDate(recurrence, dateStr)
+  → checks startDate / endDate bounds
+  → evaluates type (daily/weekdays/weekends/specific_days/interval/one_time)
+  → returns boolean
+
+_routineMatchesDate(routine, dateStr)
+  → checks pausePeriods (date in range? → false)
+  → checks skippedDates (date in array? → false)
+  → calls _recurrenceMatchesDate()</code></pre>
+
+    <h3>Skip a Single Day</h3>
+    <ul>
+      <li>"Skip this day" action on any routine instance from adult view</li>
+      <li>Date added to <code>skippedDates[]</code></li>
+      <li>Adult calendar shows muted/strikethrough on skipped dates</li>
+      <li>Can be un-skipped from same menu</li>
+      <li>Child view: skipped routines simply don't appear — no explanation shown to child</li>
+    </ul>
+
+    <h3>Pause a Routine</h3>
+    <ul>
+      <li>"Pause routine" in edit menu — select from/to date range + optional reason label</li>
+      <li>Multiple non-overlapping pause periods supported</li>
+      <li>Resumes automatically when pause period ends</li>
+      <li>Can be ended early from routine detail screen</li>
+      <li>Child view: paused routines don't appear during the window</li>
+    </ul>
+
+    <h3>Routine Assignment</h3>
+    <pre><code>RoutineAssignment {
+  id
+  routineId
+  childId
+  completionState: {
+    'YYYY-MM-DD': [stepId, ...]   // steps completed on that date
+  }
+}</code></pre>
+    <p>Each child has an independent <code>RoutineAssignment</code> — one child completing a routine does not affect another's record.</p>
+
+    <h3>Daily Reset</h3>
+    <p>Completion state resets each day. Reset time: midnight (configurable per household — suggested option of e.g. 6am). Historical completion data is preserved in the <code>completionState</code> map; only the current day's key is used for today's display.</p>
+
+    <h3>Recurrence UI (Adult)</h3>
+    <ul>
+      <li>"Repeat" control in routine create/edit flow</li>
+      <li>Specific days: day-of-week picker appears (Su Mo Tu We Th Fr Sa, toggleable)</li>
+      <li>Optional end date picker, labelled "Ends on… (optional)"</li>
+      <li>Plain-language summary: <em>"Repeats every Monday, Wednesday and Friday starting 1 May"</em></li>
+    </ul>
+
+    <h3>Adult Routine Card Actions</h3>
+    <p>Each routine card in the adult Routines screen has icon buttons for:</p>
+    <div class="status-row">
+      <span class="badge badge-grey">✏️ Edit</span>
+      <span class="badge badge-grey">🗑 Delete</span>
+      <span class="badge badge-amber">⏭ Skip today</span>
+      <span class="badge badge-amber">⏸ Pause</span>
+      <span class="badge badge-purple">↺ Reset today</span>
+    </div>
+  </div>
+
+  <!-- ── SETTINGS & ME ────────────────────────────── -->
+  <div class="spec-section" id="settings">
+    <h2>Settings & Me</h2>
+    <ul>
+      <li>Adult name and email display</li>
+      <li>Household name configuration</li>
+      <li>Household member management (adults and kids)</li>
+      <li>Household invite system — generate invite tokens for additional adults</li>
+      <li>Device profile assignment (adult / shared / assign to specific child)</li>
+      <li>Per-child PIN setup, change, and reset</li>
+      <li>Notification style preference (focus/timeline/stack/banners)</li>
+      <li>Export backup (JSON download)</li>
+      <li>Import backup</li>
+      <li>Sign out</li>
+      <li>Category colour customisation</li>
+      <li>AI API key configuration (for briefing and meal suggestions)</li>
+    </ul>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ── AGE BRACKETS ─────────────────────────────── -->
+  <div class="spec-section" id="age-brackets">
+    <h2>Age Brackets</h2>
+    <p>Age bracket is derived automatically from the child's date of birth set in their profile. The UI adapts without any manual selection.</p>
+
+    <div class="age-grid">
+      <div class="age-card age-tiny">
+        <div class="emoji">🍼</div>
+        <div class="range">1–5</div>
+        <div class="name">Tiny Tots</div>
+        <ul class="notes">
+          <li>Today screen only</li>
+          <li>No calendar, no nav bar</li>
+          <li>Heavy emoji, no text labels</li>
+          <li>Stars/stickers instead of points</li>
+          <li>Adult manages everything</li>
+          <li>Large tap targets</li>
+        </ul>
+      </div>
+      <div class="age-card age-early">
+        <div class="emoji">📖</div>
+        <div class="range">5–8</div>
+        <div class="name">Early Readers</div>
+        <ul class="notes">
+          <li>Three-tab nav</li>
+          <li>7-day calendar only</li>
+          <li>Month view hidden</li>
+          <li>Short text + emojis</li>
+          <li>Large friendly typography</li>
+          <li>Points as fun counter</li>
+        </ul>
+      </div>
+      <div class="age-card age-indep">
+        <div class="emoji">🚀</div>
+        <div class="range">8–12</div>
+        <div class="name">Independents</div>
+        <ul class="notes">
+          <li>Three-tab nav</li>
+          <li>Full 7-day + month calendar</li>
+          <li>Standard text + emojis</li>
+          <li>Full Prize Store visible</li>
+          <li>Denser layout OK</li>
+          <li><strong>Primary build target</strong></li>
+        </ul>
+      </div>
+      <div class="age-card age-tween">
+        <div class="emoji">🎧</div>
+        <div class="range">12–16</div>
+        <div class="name">Tweens</div>
+        <ul class="notes">
+          <li>Three-tab nav (dark theme)</li>
+          <li>Full calendar</li>
+          <li>Less cartoonish</li>
+          <li>Emoji less prominent</li>
+          <li>Closer to adult layout</li>
+          <li>Mature tone</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout callout-amber">
+      <div class="callout-icon">🚧</div>
+      <div class="callout-body">
+        <strong>Build priority</strong>
+        <p>Design and implement 5–8 and 8–12 brackets first as the primary use case. Tiny Tots and Tweens can follow in a subsequent release. The data model and component structure must account for all four from the start.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHILD TODAY ───────────────────────────────── -->
+  <div class="spec-section" id="child-today">
+    <h2>Child Today Screen</h2>
+    <p>When a child logs in they land on the Today screen — a personalised dashboard surfacing everything relevant to them for that day. Not a simplified adult view; a purpose-built kid experience.</p>
+
+    <h3>Layout (top to bottom, scrollable)</h3>
+    <table>
+      <tr><th>Section</th><th>Content</th><th>Visibility</th></tr>
+      <tr><td>Header</td><td>Child avatar + name + time-aware greeting + points nudge</td><td>Always</td></tr>
+      <tr><td>📋 My Routines</td><td>Morning, Evening, Custom routines. Time-aware active/locked state.</td><td>Always (if assigned)</td></tr>
+      <tr><td>🧹 Chores</td><td>Today's assigned chores with emoji, name, point value</td><td>Hidden if no chores today</td></tr>
+      <tr><td>📅 Today's Events</td><td>Time-sorted events for today (from Child Events + "Everyone" planner events)</td><td>Hidden if no events</td></tr>
+      <tr><td>🥪 Lunchbox</td><td>Read-only chips: emoji + item label</td><td>Hidden if no content entered</td></tr>
+      <tr><td>🏆 Prize Store Teaser</td><td>Balance + affordability summary; taps to Prizes tab</td><td>Always</td></tr>
+    </table>
+
+    <h3>Routine Time-Aware Display</h3>
+    <ul>
+      <li><strong>Active routine</strong> (current time window): Fully expanded, all steps tappable</li>
+      <li><strong>Non-active routines</strong>: Collapsed, greyed out. Header tappable to preview. Steps NOT tappable. Lock label shown: e.g. "🔒 Available tonight"</li>
+      <li>On step completion: tick animation + points flash</li>
+      <li>On full routine completion: celebration animation (confetti/stars)</li>
+      <li>Completed steps: remain visible but struck through</li>
+    </ul>
+
+    <h3>Personalisation</h3>
+    <ul>
+      <li>Time-aware greeting: Good morning / Good afternoon / Good evening</li>
+      <li>Points nudge if earned today: <em>"You've earned ⭐ 15 points today — keep going!"</em></li>
+      <li>Full completion state: all routines + chores done → full-screen celebration replaces normal view</li>
+    </ul>
+
+    <h3>Adult Read-Only Mode</h3>
+    <p>Adults can view a read-only snapshot of any child's Today screen from the parent-facing view. All interactive elements are disabled. Useful for checking progress without asking the child.</p>
+  </div>
+
+  <!-- ── CHILD CALENDAR ────────────────────────────── -->
+  <div class="spec-section" id="child-calendar">
+    <h2>Child Calendar</h2>
+    <p>Read-only calendar showing the child's week and month ahead. All content is adult-managed.</p>
+
+    <h3>Views</h3>
+    <table>
+      <tr><th>View</th><th>Default</th><th>Description</th></tr>
+      <tr><td><strong>7-day strip</strong></td><td>✓</td><td>Rolling 7-day window from today. Each day is a column. Today highlighted. Swipe/arrows to move in 7-day increments.</td></tr>
+      <tr><td><strong>Month grid</strong></td><td></td><td>Standard monthly grid. Dot indicators per content type. Tapping a day expands inline detail below — no navigation away.</td></tr>
+    </table>
+
+    <h3>Colour Coding (matches Today screen)</h3>
+    <div class="status-row">
+      <span class="badge badge-purple">🟣 Routine</span>
+      <span class="badge badge-red">🩷 Chore</span>
+      <span class="badge badge-green">🟢 Event</span>
+    </div>
+
+    <h3>Day Detail (inline panel below grid)</h3>
+    <p>When a day is tapped, a detail list appears with items ordered chronologically. Each item shows:</p>
+    <ul>
+      <li>Emoji + title</li>
+      <li>Time (if set)</li>
+      <li>Type tag (Routine / Chore / Event)</li>
+      <li>Recurrence tag if applicable (e.g. 🔁 Daily, 🔁 Thursdays)</li>
+      <li>Brief subtitle — task summary for routines, notes/location for events</li>
+    </ul>
+    <p>Routine cards in the day detail are expandable — child can see and tap individual steps to mark them complete. Points are only awarded if the date is today.</p>
+
+    <h3>What Appears on the Calendar</h3>
+    <ul>
+      <li>Routines assigned to this child that match the date's recurrence (not skipped/paused)</li>
+      <li>Child Events assigned to this child, all children, or household-wide</li>
+      <li>Planner events with <code>memberIds</code> containing <code>'everyone'</code></li>
+      <li>Chores assigned for that date</li>
+    </ul>
+
+    <h3>"See My Week" Shortcut</h3>
+    <p>A button on the Today screen links directly to the Calendar tab pre-loaded on the 7-day view.</p>
+  </div>
+
+  <!-- ── PRIZE STORE ───────────────────────────────── -->
+  <div class="spec-section" id="child-prizes">
+    <h2>Prize Store (Child)</h2>
+    <p>Dedicated Prizes tab in the child's navigation bar.</p>
+
+    <h3>Layout</h3>
+    <ul>
+      <li><strong>Balance hero card</strong> — gradient purple card showing current point balance prominently</li>
+      <li><strong>Prize list</strong> — all available prizes:
+        <ul>
+          <li>Can afford: filled purple "Redeem" button, prominent</li>
+          <li>Can't afford: muted style, point cost shown, clearly not yet redeemable</li>
+        </ul>
+      </li>
+      <li><strong>Recent redemptions</strong> — last 8 redemptions with status (Approved ✓ / Waiting ⏳ / Declined)</li>
+    </ul>
+
+    <h3>Notifications cleared on visit</h3>
+    <p>All unread approval/decline notifications for this child are marked as read when they open the Prizes tab. The badge clears.</p>
+  </div>
+
+  <!-- ── CHILD PINS ────────────────────────────────── -->
+  <div class="spec-section" id="child-pins">
+    <h2>Child PINs & Access</h2>
+
+    <table>
+      <tr><th>Feature</th><th>Detail</th></tr>
+      <tr><td>PIN length</td><td>4 digits</td></tr>
+      <tr><td>Storage</td><td>SHA-256 hash of <code>'toto-pin-' + pin</code> — no plaintext stored</td></tr>
+      <tr><td>Attempts</td><td>Per-child attempt tracking; hard lock after N failed attempts</td></tr>
+      <tr><td>Hard lock reset</td><td>Parent clears from Kids admin — child cannot self-unlock</td></tr>
+      <tr><td>Session</td><td>Once PIN entered successfully, session persists in localStorage for that device</td></tr>
+      <tr><td>Optional</td><td>PIN is optional — child can access without one if parent hasn't set it</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ── STATE STRUCTURE ──────────────────────────── -->
+  <div class="spec-section" id="data-state">
+    <h2>State Structure</h2>
+    <p>All app data lives in a single <code>state</code> object. Persisted to localStorage and Firestore on every mutation via <code>saveData(state)</code>.</p>
+    <pre><code>state {
+  // Household
+  householdProfile: {
+    members: [{ role, name, age, emoji }]
+    pets: [], cars: 1
+    invites: [], authorizedUsers: [{ uid, name, email }]
+  }
+
+  // Budget / Finance
+  budget: {
+    income: [{ name, amount, frequency }]
+    expenses: [{ name, category, amount, frequency }]
+    actuals: { 'YYYY-MM': { expenseId: amount } }
+  }
+  bills: [{ id, name, amount, dueDay, category }]
+  netWorth: { assets, liabilities, snapshots, target }
+  goals: [{ id, name, targetAmount, currentAmount, deadline }]
+
+  // Planning
+  planner: { events: [{ id, title, category, date, time, recurrence, memberIds }] }
+  meals: { plan, shopping, lunchbox }
+
+  // Household
+  vehicles: [{ id, name, plate, rego, insurance }]
+  documents: [{ id, name, provider, expiryDate }]
+  maintenance: [{ id, name, dueDate, provider, frequency }]
+
+  // Kids zone
+  routines: [Routine]
+  routineAssignments: [RoutineAssignment]
+  childEvents: [ChildEvent]
+  kids: {
+    profiles: [{ id, name, age, emoji, pinHash, dob }]
+    chores: [{ id, name, emoji, assignedTo, points, frequency }]
+    prizes: [{ id, name, emoji, pointCost }]
+    completions: [{ id, kidId, choreId, status, ts }]
+    redemptions: [{ id, kidId, prizeId, status, ts }]
+    notifications: [{ id, kidId, message, read, ts }]
+  }
+
+  // App state
+  settings: { householdName, adultName, email, notifStyle, ... }
+  activityLog: [{ action, detail, ts }]
+  categoryGroups: [{ id, name, icon, categories }]
+}</code></pre>
+  </div>
+
+  <!-- ── ROUTINES DATA ─────────────────────────────── -->
+  <div class="spec-section" id="data-routines">
+    <h2>Routines & Recurrence Data</h2>
+    <pre><code>Routine {
+  id: string
+  name: string
+  emoji: string
+  ownerType: 'adult' | 'household'
+  ownerId: string
+  sharedWith: string[]
+  steps: [{
+    id: string
+    label: string
+    emoji: string
+    points: number
+    durationMin: number
+    notes?: string
+  }]
+  pointsPerCompletion: number
+  triggerTime?: string              // "HH:MM"
+  recurrence: {
+    type: 'daily' | 'weekdays' | 'weekends' | 'specific_days' | 'interval' | 'one_time'
+    days?: number[]                 // [0-6], 0=Sun
+    intervalDays?: number
+    startDate: string               // ISO date
+    endDate?: string                // ISO date; absent = indefinite
+  }
+  skippedDates: string[]            // ISO dates
+  pausePeriods: [{
+    from: string                    // ISO date
+    to: string                      // ISO date
+    reason?: string
+  }]
+  lastEditedAt: string              // ISO 8601
+}
+
+RoutineAssignment {
+  id: string
+  routineId: string
+  childId: string
+  completionState: {
+    [isoDate: string]: string[]     // stepIds completed on that date
+  }
+}</code></pre>
+  </div>
+
+  <!-- ── KIDS DATA ─────────────────────────────────── -->
+  <div class="spec-section" id="data-kids">
+    <h2>Kids & Completions Data</h2>
+    <pre><code>KidProfile {
+  id: string
+  name: string
+  emoji: string
+  dob: string                 // ISO date — drives age bracket
+  pinHash?: string            // SHA-256 of 'toto-pin-' + pin
+}
+
+Chore {
+  id: string
+  name: string
+  emoji: string
+  assignedTo: string | 'all' // kidId or 'all'
+  points: number
+  frequency: string
+  _isRoutine?: boolean        // synthetic chore from routine task
+}
+
+Completion {
+  id: string
+  kidId: string
+  choreId: string
+  status: 'pending' | 'approved' | 'declined'
+  ts: string                  // ISO 8601
+  completedAt?: string
+}
+
+Redemption {
+  id: string
+  kidId: string
+  prizeId: string
+  status: 'pending' | 'approved' | 'declined'
+  ts: string
+  approvedAt?: string
+}</code></pre>
+  </div>
+
+  <!-- ── CHILD EVENTS DATA ─────────────────────────── -->
+  <div class="spec-section" id="data-events">
+    <h2>Child Events Data</h2>
+    <pre><code>ChildEvent {
+  id: string
+  householdId: string
+  title: string
+  emoji: string               // adult selects from picker
+  date: string                // ISO date
+  time?: string               // "HH:MM"
+  notes?: string              // shown as subtitle on calendar
+  assignedTo: string[]        // kidId[] — or ['all']
+  isHouseholdWide: boolean    // true = appears on all children's calendars
+  recurrence?: {              // same model as Routine.recurrence
+    type, days?, intervalDays?, startDate, endDate?
+  }
+  createdBy: string           // userId of adult
+}</code></pre>
+
+    <div class="callout callout-green">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-body">
+        <strong>Events have no tasks, no completion state, no points.</strong>
+        <p>They are purely informational calendar entries. Examples: soccer training, birthday parties, school excursions, dental appointments.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ── STORAGE & SYNC ───────────────────────────── -->
+  <div class="spec-section" id="arch-storage">
+    <h2>Storage & Sync</h2>
+
+    <h3>localStorage (Primary)</h3>
+    <ul>
+      <li>Key: <code>home_finance_v1</code></li>
+      <li>Full state JSON — synchronous read/write</li>
+      <li>Fast, offline-capable, always available</li>
+    </ul>
+
+    <h3>Firebase Firestore (Cloud)</h3>
+    <ul>
+      <li>Document path: <code>/households/{householdOwnerUID}</code></li>
+      <li>Real-time listener via <code>_startFirestoreSync()</code></li>
+      <li>Bi-directional: Firestore changes call <code>renderAll()</code>; local changes write back</li>
+      <li>Fallback: app works fully offline; syncs when reconnected</li>
+    </ul>
+
+    <h3>Data Migrations</h3>
+    <p><code>_applyMigrations(state)</code> runs on every load and handles:</p>
+    <ul>
+      <li>Backfilling <code>recurrence</code>, <code>skippedDates</code>, <code>pausePeriods</code> on legacy routines</li>
+      <li>Migrating old planner event <code>recurring</code> string to rich recurrence object</li>
+      <li>Deduplicating kid profiles by name (keeps most recent)</li>
+      <li>Converting legacy <code>adults</code>/<code>children</code> counts to rich <code>members[]</code> model</li>
+      <li>Initialising missing top-level keys (<code>childEvents</code>, <code>routineAssignments</code>, etc.)</li>
+    </ul>
+  </div>
+
+  <!-- ── AUTH ─────────────────────────────────────── -->
+  <div class="spec-section" id="arch-auth">
+    <h2>Auth & Households</h2>
+    <ul>
+      <li>Firebase Auth with Google Sign-In provider</li>
+      <li>Guest mode available — full offline exploration without sign-in</li>
+      <li>Household owner UID stored in <code>localStorage('toto_household_owner')</code></li>
+      <li>Additional adults invited via token system (stored in <code>householdProfile.invites</code>)</li>
+      <li>Invited adults are added to <code>authorizedUsers[]</code> after accepting invite</li>
+      <li>Multiple authorized users share the same Firestore household document</li>
+    </ul>
+  </div>
+
+  <!-- ── RENDERING ─────────────────────────────────── -->
+  <div class="spec-section" id="arch-rendering">
+    <h2>Rendering Architecture</h2>
+    <ul>
+      <li><code>renderAll()</code> — re-renders Today + whichever tab is currently active</li>
+      <li><code>activateTab(tab)</code> — switches visible panel, updates nav active states, calls <code>renderAll()</code></li>
+      <li>Each screen has a dedicated render function (<code>renderBudget()</code>, <code>renderKids()</code>, etc.) that writes HTML into its content div via <code>innerHTML</code></li>
+      <li>Static section headers (Wallet / Plan / Home) live in the HTML and are shown/hidden by <code>activateTab</code> — never injected dynamically, so <code>renderAll()</code> cannot wipe them</li>
+      <li>Child view is a separate full-screen overlay (<code>#child-view-overlay</code>) — swapped in when a child profile is active</li>
+    </ul>
+
+    <h3>Key Render Functions</h3>
+    <table>
+      <tr><th>Function</th><th>Screen</th></tr>
+      <tr><td><code>renderToday()</code></td><td>Adult Today dashboard</td></tr>
+      <tr><td><code>renderBudget()</code></td><td>Wallet › Budget</td></tr>
+      <tr><td><code>renderPlanner()</code></td><td>Plan › Planner</td></tr>
+      <tr><td><code>renderKids()</code></td><td>Home › Kids</td></tr>
+      <tr><td><code>renderRoutines()</code></td><td>Plan › Routines</td></tr>
+      <tr><td><code>showChildView(kidId)</code></td><td>Child overlay (Today tab)</td></tr>
+      <tr><td><code>_cvRenderCalendar(kid)</code></td><td>Child Calendar tab</td></tr>
+      <tr><td><code>_cvRenderPrizesTab(kid)</code></td><td>Child Prizes tab</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- ── RESOLVED DECISIONS ───────────────────────── -->
+  <div class="spec-section" id="decisions">
+    <h2>Resolved Decisions</h2>
+    <table>
+      <tr><th>Decision</th><th>Resolution</th></tr>
+      <tr><td>Prize redemption flow</td><td>Confirmation screen → child sends request → parent approves/declines in Approvals tab</td></tr>
+      <tr><td>Multiple routines in one day</td><td>All shown on Today screen; only time-appropriate routine is active; others collapsed/locked with clear label</td></tr>
+      <tr><td>Age brackets</td><td>4 brackets: 1–5, 5–8, 8–12, 12–16. Auto-derived from child's DOB. UI adapts automatically.</td></tr>
+      <tr><td>Completion persistence</td><td>Persists across app opens; resets daily. Stored on RoutineAssignment (per child), not on the routine definition.</td></tr>
+      <tr><td>Routine recurrence</td><td>Rich model: daily/weekdays/weekends/specific_days/interval/one_time. Skip individual dates. Pause for date ranges.</td></tr>
+      <tr><td>Planner recurrence</td><td>Aligned to Routine recurrence — same form UI, same engine, same data model.</td></tr>
+      <tr><td>Household-wide events</td><td>Toggle on event creation. Default is single-child. Can exclude individuals. Appears identically to child-specific events.</td></tr>
+      <tr><td>Child-added events</td><td>Out of scope for v1. Children cannot add events. May revisit for 12–16 bracket in future.</td></tr>
+      <tr><td>Notifications (shared device)</td><td>Option A: reminders sent to parent's device. In-app banners complement. Option C (per-child device) is documented as future state.</td></tr>
+      <tr><td>Lunchbox entry (adult-facing)</td><td>Existing feature — surfaces read-only in child's Today screen. No new adult build required.</td></tr>
+      <tr><td>Calendar navigation for early readers</td><td>7-day view only. Month view toggle hidden.</td></tr>
+      <tr><td>Section nav pills</td><td>Static HTML — injected once at page load, not dynamically on tab switch. Prevents re-render wipeout.</td></tr>
+      <tr><td>Post-redemption navigation</td><td>After redeeming (or cancelling), child returns to Prizes tab, not Today screen.</td></tr>
+    </table>
+  </div>
+
+  <!-- ── DEFERRED / FUTURE ─────────────────────────── -->
+  <div class="spec-section" id="deferred">
+    <h2>Deferred & Future Work</h2>
+
+    <h3>Known Gaps (Near-term)</h3>
+    <table>
+      <tr><th>Item</th><th>Detail</th></tr>
+      <tr><td>Recurrence UI in routine modal</td><td>Engine exists; confirm the adult routine create/edit form has the recurrence picker fully wired</td></tr>
+      <tr><td>Pause period management UI</td><td>Spec calls for listing and early-ending active/upcoming pause periods on routine detail screen</td></tr>
+      <tr><td>Configurable daily reset time</td><td>Completion state resets at midnight; spec allows adult-configurable time (e.g. 6am)</td></tr>
+      <tr><td>Routine end-date archiving</td><td>Routines with past endDate should be archived (not deleted); historical completion preserved</td></tr>
+      <tr><td>Adult read-only child calendar</td><td>Spec calls for adult to view any child's calendar from parent view; entry point not yet confirmed</td></tr>
+    </table>
+
+    <h3>Future / Deferred Features</h3>
+    <table>
+      <tr><th>Feature</th><th>Target</th></tr>
+      <tr><td>Per-child device registration (push notifications)</td><td>When child has their own dedicated device; falls back to Option A on shared devices</td></tr>
+      <tr><td>Child-added events</td><td>Future release; 12–16 age bracket only</td></tr>
+      <tr><td>Household-level calendar (all children combined)</td><td>Out of scope for Section 9; future adult view feature</td></tr>
+      <tr><td>Tiny Tots build</td><td>Second release; data model already supports it</td></tr>
+      <tr><td>Tweens build</td><td>Second release; CSS class structure already in place</td></tr>
+      <tr><td>Field configuration UI (admin)</td><td>Admin toggle for mandatory/optional/ignored idea fields in BABot integration</td></tr>
+    </table>
+  </div>
+
+  <div class="sep"></div>
+  <p style="color:#A1A1AA;font-size:12px;text-align:center">Toto Product Spec v1.0 · Generated May 2026 · <code>toto-product-spec.html</code></p>
+
+</div>
+</body>
+</html>

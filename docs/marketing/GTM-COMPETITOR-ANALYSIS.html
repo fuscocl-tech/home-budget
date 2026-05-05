@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — GTM Competitor Analysis</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    .hero {
+      background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+      padding: 56px 32px 48px;
+      text-align: center;
+      color: #fff;
+    }
+    .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      opacity: .8;
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -.01em;
+    }
+    .hero p {
+      font-size: 16px;
+      opacity: .85;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 13px;
+      opacity: .65;
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    section { margin-bottom: 56px; }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .section-sub {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    /* ── VS Banner ── */
+    .vs-banner {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+    .vs-side {
+      flex: 1;
+      padding: 28px 32px;
+    }
+    .vs-side.toto { background: linear-gradient(135deg,#f0fdfa,#ecfeff); }
+    .vs-side.fw   { background: linear-gradient(135deg,#fef9c3,#fef3c7); }
+    .vs-divider {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #1e293b;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      z-index: 1;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
+    .vs-logo {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .vs-logo.toto { color: #0d9488; }
+    .vs-logo.fw   { color: #d97706; }
+    .vs-tag {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+    .vs-desc { font-size: 14px; color: #374151; line-height: 1.6; }
+
+    /* ── Comparison Table ── */
+    .table-wrap {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+      margin-bottom: 12px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #f1f5f9; }
+    th {
+      padding: 14px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #64748b;
+      text-align: left;
+    }
+    th:not(:first-child) { text-align: center; width: 160px; }
+    td {
+      padding: 13px 20px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 14px;
+      color: #374151;
+      vertical-align: middle;
+    }
+    td:not(:first-child) { text-align: center; font-size: 18px; }
+    tr:hover td { background: #fafafa; }
+    .cat-header td {
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #94a3b8;
+      padding: 10px 20px;
+      border-top: 2px solid #e2e8f0;
+    }
+    .fw-win td:first-child { color: #92400e; font-weight: 600; }
+    .toto-note { font-size: 11px; color: #0d9488; font-weight: 600; display: block; margin-top: 2px; }
+
+    /* ── Score Cards ── */
+    .score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 600px) { .score-grid { grid-template-columns: 1fr; } }
+    .score-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+    .score-card.toto { border-top: 4px solid #0d9488; }
+    .score-card.fw   { border-top: 4px solid #f59e0b; }
+    .score-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .score-label { font-size: 13px; color: #374151; flex: 1; }
+    .score-bar-wrap { width: 100px; height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .score-bar { height: 100%; border-radius: 99px; }
+    .score-bar.toto { background: #0d9488; }
+    .score-bar.fw   { background: #f59e0b; }
+    .score-num { font-size: 12px; font-weight: 700; color: #64748b; width: 28px; text-align: right; }
+
+    /* ── Callout boxes ── */
+    .callout {
+      display: flex;
+      gap: 14px;
+      padding: 18px 20px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { font-size: 14px; color: #374151; line-height: 1.6; }
+    .callout-body strong { color: #1e293b; }
+    .callout.green  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .callout.yellow { background: #fefce8; border: 1px solid #fde68a; }
+    .callout.blue   { background: #f0f9ff; border: 1px solid #bae6fd; }
+    .callout.red    { background: #fef2f2; border: 1px solid #fecaca; }
+
+    /* ── GTM Pillars ── */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .pillar {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    }
+    .pillar-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: #0d9488;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .pillar h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .pillar p  { font-size: 13px; color: #64748b; line-height: 1.6; }
+
+    /* ── Positioning ── */
+    .positioning-box {
+      background: linear-gradient(135deg, #0d9488, #0891b2);
+      border-radius: 16px;
+      padding: 32px;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .positioning-box .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      opacity: .8;
+      margin-bottom: 10px;
+    }
+    .positioning-box blockquote {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.5;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ── Verdict ── */
+    .verdict {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+    .verdict h3 { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+    .verdict p  { font-size: 14px; color: #374151; line-height: 1.7; margin-bottom: 12px; }
+    .verdict p:last-child { margin-bottom: 0; }
+
+    hr { border: none; border-top: 1px solid #e2e8f0; margin: 40px 0; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 32px;
+      font-size: 12px;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="hero-label">Competitive Intelligence</div>
+  <h1>Toto vs FamilyWall</h1>
+  <p>A go-to-market analysis of how Toto compares against the leading family organisation app, and where our opportunity lies.</p>
+  <div class="hero-meta">Prepared April 2026 · Confidential</div>
+</div>
+
+<div class="container">
+
+  <!-- ── The Two Products ── -->
+  <section>
+    <h2>The Two Products</h2>
+    <p class="section-sub">A side-by-side look at how each product positions itself.</p>
+
+    <div class="vs-banner">
+      <div class="vs-side toto">
+        <div class="vs-logo toto">Toto</div>
+        <div class="vs-tag">Our product</div>
+        <div class="vs-desc">A finance-first family management app built for households with kids. Deep budgeting, kids' chores and rewards, meal planning, and household access management — all in one place.</div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side fw">
+        <div class="vs-logo fw">FamilyWall</div>
+        <div class="vs-tag">Competitor</div>
+        <div class="vs-desc">A broad family organisation and communication platform. Shared calendar, messaging, location tracking, and photo sharing — with budget and meal planning as premium bolt-ons.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Feature Comparison ── -->
+  <section>
+    <h2>Feature Comparison</h2>
+    <p class="section-sub">Where each product has coverage — and where the gaps are.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Toto</th>
+            <th>FamilyWall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="cat-header"><td colspan="3">Finance</td></tr>
+          <tr>
+            <td>Budget tracking (income &amp; expenses)<span class="toto-note">With actuals, monthly history &amp; presets</span></td>
+            <td>✅</td><td>⚠️</td>
+          </tr>
+          <tr>
+            <td>Net worth tracking<span class="toto-note">Assets, liabilities, snapshots</span></td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Bills &amp; subscriptions tracking</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Savings goals<span class="toto-note">Toto links goals to monthly surplus</span></td>
+            <td>✅</td><td>⚠️</td>
+          </tr>
+          <tr>
+            <td>Surplus intelligence (income − expenses)</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+
+          <tr class="cat-header"><td colspan="3">Kids</td></tr>
+          <tr>
+            <td>Kids chores &amp; reward points</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Prize store &amp; redemptions</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Child-safe view (restricted interface)</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Child PIN login</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Lunchbox planner</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+
+          <tr class="cat-header"><td colspan="3">Household Planning</td></tr>
+          <tr>
+            <td>Meal planner</td>
+            <td>✅</td><td>✅ (premium)</td>
+          </tr>
+          <tr>
+            <td>Grocery / shopping lists</td>
+            <td>✅</td><td>✅</td>
+          </tr>
+          <tr>
+            <td>Shared family calendar</td>
+            <td>✅</td><td>✅</td>
+          </tr>
+          <tr>
+            <td>Vehicles &amp; documents (rego, insurance)</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Home maintenance tracking</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+
+          <tr class="cat-header"><td colspan="3">Access &amp; Multi-User</td></tr>
+          <tr>
+            <td>Multi-device household profile routing</td>
+            <td>✅</td><td>❌</td>
+          </tr>
+          <tr>
+            <td>Per-household data isolation</td>
+            <td>✅</td><td>Unclear</td>
+          </tr>
+          <tr>
+            <td>Adult invite system</td>
+            <td>✅</td><td>✅</td>
+          </tr>
+
+          <tr class="cat-header fw-win"><td colspan="3">Where FamilyWall Leads</td></tr>
+          <tr class="fw-win">
+            <td>Family messaging (text, voice, video)</td>
+            <td>❌</td><td>✅</td>
+          </tr>
+          <tr class="fw-win">
+            <td>Real-time location tracking</td>
+            <td>❌</td><td>✅</td>
+          </tr>
+          <tr class="fw-win">
+            <td>Private photo &amp; video sharing</td>
+            <td>❌</td><td>✅</td>
+          </tr>
+          <tr class="fw-win">
+            <td>Google Calendar sync</td>
+            <td>❌</td><td>✅</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:12px;color:#94a3b8">⚠️ = basic / premium upsell only</div>
+  </section>
+
+  <!-- ── Capability Scores ── -->
+  <section>
+    <h2>Capability Scores</h2>
+    <p class="section-sub">Subjective depth rating (0–10) across key capability areas.</p>
+
+    <div class="score-grid">
+      <div class="score-card toto">
+        <h3>🏠 Toto</h3>
+        <div class="score-row"><span class="score-label">Financial management</span><div class="score-bar-wrap"><div class="score-bar toto" style="width:90%"></div></div><span class="score-num">9</span></div>
+        <div class="score-row"><span class="score-label">Kids features</span><div class="score-bar-wrap"><div class="score-bar toto" style="width:90%"></div></div><span class="score-num">9</span></div>
+        <div class="score-row"><span class="score-label">Household planning</span><div class="score-bar-wrap"><div class="score-bar toto" style="width:80%"></div></div><span class="score-num">8</span></div>
+        <div class="score-row"><span class="score-label">Multi-user access</span><div class="score-bar-wrap"><div class="score-bar toto" style="width:80%"></div></div><span class="score-num">8</span></div>
+        <div class="score-row"><span class="score-label">Communication</span><div class="score-bar-wrap"><div class="score-bar toto" style="width:10%"></div></div><span class="score-num">1</span></div>
+        <div class="score-row"><span class="score-label">Location / safety</span><div class="score-bar-wrap"><div class="score-bar toto" style="width:0%"></div></div><span class="score-num">0</span></div>
+      </div>
+      <div class="score-card fw">
+        <h3>🟡 FamilyWall</h3>
+        <div class="score-row"><span class="score-label">Financial management</span><div class="score-bar-wrap"><div class="score-bar fw" style="width:30%"></div></div><span class="score-num">3</span></div>
+        <div class="score-row"><span class="score-label">Kids features</span><div class="score-bar-wrap"><div class="score-bar fw" style="width:20%"></div></div><span class="score-num">2</span></div>
+        <div class="score-row"><span class="score-label">Household planning</span><div class="score-bar-wrap"><div class="score-bar fw" style="width:60%"></div></div><span class="score-num">6</span></div>
+        <div class="score-row"><span class="score-label">Multi-user access</span><div class="score-bar-wrap"><div class="score-bar fw" style="width:60%"></div></div><span class="score-num">6</span></div>
+        <div class="score-row"><span class="score-label">Communication</span><div class="score-bar-wrap"><div class="score-bar fw" style="width:90%"></div></div><span class="score-num">9</span></div>
+        <div class="score-row"><span class="score-label">Location / safety</span><div class="score-bar-wrap"><div class="score-bar fw" style="width:80%"></div></div><span class="score-num">8</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Where Toto Wins ── -->
+  <section>
+    <h2>Where Toto Wins</h2>
+    <p class="section-sub">Our four genuine competitive advantages.</p>
+
+    <div class="callout green">
+      <span class="callout-icon">💰</span>
+      <div class="callout-body"><strong>Financial depth.</strong> FamilyWall's budget feature is a shallow premium bolt-on. Toto is built finance-first — monthly budget with actuals, net worth tracking, bills, income management, surplus intelligence, and savings goals that respond to real financial data. For any family that wants to genuinely manage their money, FamilyWall is not a real option.</div>
+    </div>
+
+    <div class="callout green">
+      <span class="callout-icon">🧒</span>
+      <div class="callout-body"><strong>Kids as first-class citizens.</strong> FamilyWall treats kids as calendar entries. Toto gives children their own interface — chores, reward points, prize store, lunchbox planner, PIN login, and a child-safe view that hides adult finances. No mainstream family app does this well. It's a real differentiator.</div>
+    </div>
+
+    <div class="callout green">
+      <span class="callout-icon">🏡</span>
+      <div class="callout-body"><strong>Intelligent onboarding.</strong> Toto's onboarding captures the full household picture — adults, kids, home type, income, expenses — and uses it to personalise the entire product from day one. FamilyWall's setup is generic. Toto users feel like the app was built for their family specifically.</div>
+    </div>
+
+    <div class="callout green">
+      <span class="callout-icon">🇦🇺</span>
+      <div class="callout-body"><strong>Australian context.</strong> FamilyWall is globally generic. Toto can own the Australian family market with locally relevant features — fortnightly pay cycles, rego and CTP reminders, school-term lunchbox planning, Australian expense presets. No global competitor will optimise for this.</div>
+    </div>
+  </section>
+
+  <!-- ── Where FamilyWall Has an Edge ── -->
+  <section>
+    <h2>Where FamilyWall Has an Edge</h2>
+    <p class="section-sub">Honest gaps we need to watch.</p>
+
+    <div class="callout yellow">
+      <span class="callout-icon">💬</span>
+      <div class="callout-body"><strong>Communication layer.</strong> Family messaging, photo sharing, and voice messages are deeply embedded in FamilyWall. Families use this daily, which makes it extremely sticky. This is the hardest feature category to compete in — WhatsApp already owns family messaging for most Australians.</div>
+    </div>
+
+    <div class="callout yellow">
+      <span class="callout-icon">📅</span>
+      <div class="callout-body"><strong>Google Calendar sync.</strong> Families already live in Google Calendar. FamilyWall's integration is a strong retention hook — once your calendar is synced, you don't leave. Toto needs a credible answer here.</div>
+    </div>
+
+    <div class="callout yellow">
+      <span class="callout-icon">📍</span>
+      <div class="callout-body"><strong>Location tracking.</strong> Real-time family location and safe zone alerts are genuinely valued by parents of school-age kids. This is outside Toto's current scope but worth monitoring as a future feature.</div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ── Positioning ── -->
+  <section>
+    <h2>Recommended Positioning</h2>
+    <p class="section-sub">The market gap Toto should own.</p>
+
+    <div class="positioning-box">
+      <div class="eyebrow">Toto's positioning statement</div>
+      <blockquote>"The only family app that takes your finances as seriously as you do — built for households with kids, not just calendars."</blockquote>
+    </div>
+
+    <div class="callout blue">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body"><strong>Target segment:</strong> Dual-income Australian families with children aged 5–15 who are frustrated that their budgeting app (YNAB, Frollo, Pocketbook) has no concept of family life, and their family app (FamilyWall, Cozi) has no real financial depth. They exist in the gap between two categories and no product is serving them well.</div>
+    </div>
+  </section>
+
+  <!-- ── GTM Priorities ── -->
+  <section>
+    <h2>GTM Priorities</h2>
+    <p class="section-sub">Three focused bets for go-to-market.</p>
+
+    <div class="pillar-grid">
+      <div class="pillar">
+        <div class="pillar-num">1</div>
+        <h4>Finance-first acquisition</h4>
+        <p>Reach families through financial anxiety moments — mortgage stress, school fees, rising grocery costs. Content marketing around "family budget" and "household finances" outranks FamilyWall's "family organiser" framing in search intent and social sharing.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">2</div>
+        <h4>Kids chores as the viral hook</h4>
+        <p>Parents share the chores and rewards system with other parents — at school pickup, in parent Facebook groups, in team chats. This drives organic word-of-mouth with very low customer acquisition cost. The feature is also genuinely unique; no competitor does it well.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-num">3</div>
+        <h4>Hold on communication</h4>
+        <p>Don't try to beat FamilyWall on messaging. WhatsApp, iMessage, and Messenger already own that space. Position Toto as the financial and household management layer that sits alongside whatever chat app families already use — a complement, not a replacement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Verdict ── -->
+  <section>
+    <div class="verdict">
+      <h3>Bottom Line</h3>
+      <p>FamilyWall is a broad, shallow organiser that went wide to capture as many families as possible. It won on communication and scheduling but left financial management and kids features almost entirely unaddressed.</p>
+      <p>Toto's moat is <strong>financial depth + kids-first design</strong>. These two things are genuinely hard for FamilyWall to retrofit — their architecture and positioning are built around communication, not money management.</p>
+      <p>The risk: FamilyWall or a well-funded competitor adds these features. The opportunity: get to Australian families first, build deep habits around budgeting and kids routines, and become the financial home base that no one is currently occupying.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Toto — Confidential &amp; Commercially Sensitive · April 2026
+</footer>
+
+</body>
+</html>

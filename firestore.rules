@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ─────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isAuthorizedMember(uid) {
+      return isSignedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/families/$(uid)).data.householdProfile.authorizedUsers;
+    }
+
+    function canAccessHousehold(uid) {
+      return isOwner(uid) || isAuthorizedMember(uid);
+    }
+
+    function isAdminUser() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/admin_users/$(request.auth.uid));
+    }
+
+    // ── Household data ───────────────────────────────────────────────────
+    // The main family document — only the owner or an authorised member
+    // can read or write. No other user can access any family's data.
+    match /families/{uid} {
+      allow read:  if canAccessHousehold(uid);
+      allow write: if canAccessHousehold(uid);
+      allow create: if isOwner(uid);
+    }
+
+    // ── Admin reporting ──────────────────────────────────────────────────
+    // Aggregated nightly snapshots — admin users only, never individual users
+    match /analytics_snapshots/{docId} {
+      allow read:  if isAdminUser();
+      allow write: if false; // written only by Cloud Functions
+    }
+
+    // Admin user allowlist — self-read only, no self-write
+    match /admin_users/{uid} {
+      allow read:  if isSignedIn() && request.auth.uid == uid;
+      allow write: if false; // managed manually in Firebase Console
+    }
+
+    // ── Deny all else ────────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

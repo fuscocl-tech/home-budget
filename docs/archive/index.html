@@ -3913,9 +3913,86 @@
     }
     /* ── End Section 10 CSS ─────────────────────────────────── */
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase config injected before the module script so it can read window.__FIREBASE_CONFIG__ -->
+  <script>
+    window.__FIREBASE_CONFIG__ = {
+      apiKey: "AIzaSyBiQq8lIf5yCKGDyinGjLaeAE100u7vF90",
+      authDomain: "home-budget-b0f28.firebaseapp.com",
+      projectId: "home-budget-b0f28",
+      storageBucket: "home-budget-b0f28.firebasestorage.app",
+      messagingSenderId: "777614158624",
+      appId: "1:777614158624:web:a8636d1b5894ae4d3e8545"
+    };
+  </script>
+  <!-- Firebase v10 modular SDK — loaded as ESM, globals exposed for the classic script below -->
+  <script type="module">
+    import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider }
+                                        from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+    import { getFirestore, enableIndexedDbPersistence,
+             collection, doc, onSnapshot, getDoc, setDoc, deleteDoc }
+                                        from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+    const _app   = initializeApp(window.__FIREBASE_CONFIG__);
+    const _auth  = getAuth(_app);
+    const _db    = getFirestore(_app);
+
+    // Enable offline persistence before any reads/writes
+    enableIndexedDbPersistence(_db, { forceOwnership: false }).catch(err => {
+      if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+        console.warn('Firestore persistence error:', err.code);
+      }
+    });
+
+    // Expose a thin compatibility shim so the classic script below needs minimal changes.
+    // fbAuth mirrors the compat auth API; fbStore mirrors the compat firestore API.
+    window.fbAuth = {
+      _auth,
+      onAuthStateChanged: (cb) => onAuthStateChanged(_auth, cb),
+      signInWithPopup: (provider) => signInWithPopup(_auth, provider),
+      signOut: () => signOut(_auth),
+      GoogleAuthProvider,
+      get currentUser() { return _auth.currentUser; },
+    };
+    window.fbStore = {
+      _db,
+      collection: (path) => ({
+        doc: (id) => ({
+          _ref: doc(_db, path, id),
+          get:        ()      => getDoc(doc(_db, path, id)),
+          set:        (data)  => setDoc(doc(_db, path, id), data),
+          delete:     ()      => deleteDoc(doc(_db, path, id)),
+          onSnapshot: (cb, err) => onSnapshot(doc(_db, path, id), cb, err),
+        }),
+      }),
+    };
+
+    // Signal that Firebase is ready — the classic script defers its init until this fires
+    window.__firebaseReady = true;
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
+  <script
+    src="https://browser.sentry-cdn.com/8.28.0/bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    // Sentry is initialised here, before any app code runs, so it catches early errors.
+    // Replace the DSN with the real value from sentry.io → Project → Settings → Client Keys.
+    if (typeof Sentry !== 'undefined') {
+      Sentry.init({
+        dsn: 'REPLACE_WITH_SENTRY_DSN',
+        release: '1.0.0',
+        environment: location.hostname === 'localhost' ? 'development' : 'production',
+        // Only sample 20% of sessions for performance (errors always captured)
+        tracesSampleRate: 0.2,
+        ignoreErrors: [
+          // Firebase offline noise — not actionable
+          'Failed to get document because the client is offline',
+          'network-request-failed',
+        ],
+      });
+    }
+  </script>
 </head>
 <body data-section="today">
 
@@ -4373,19 +4450,22 @@ function openNavGroupFor(tab) {
 // ─────────────────────────────────────────────────
 // FIREBASE
 // ─────────────────────────────────────────────────
+// fbAuth and fbStore are set by the module script in <head>.
+// The module script fires 'firebase-ready' on window when done.
+// All Firebase-dependent code waits for that event before running.
+//
+// fbAuth shim API: onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, currentUser
+// fbStore shim API: .collection(path).doc(id).{get, set, delete, onSnapshot}
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBiQq8lIf5yCKGDyinGjLaeAE100u7vF90",
-  authDomain: "home-budget-b0f28.firebaseapp.com",
-  projectId: "home-budget-b0f28",
-  storageBucket: "home-budget-b0f28.firebasestorage.app",
-  messagingSenderId: "777614158624",
-  appId: "1:777614158624:web:a8636d1b5894ae4d3e8545"
-};
-
-firebase.initializeApp(firebaseConfig);
-const fbAuth  = firebase.auth();
-const fbStore = firebase.firestore();
+// Global error capture — catches unhandled promise rejections and JS exceptions
+// that fall outside safeRender. Sentry also installs its own handlers, but we
+// add a fallback console log so errors are visible without Sentry.
+window.addEventListener('unhandledrejection', e => {
+  console.error('[unhandledrejection]', e.reason);
+});
+window.addEventListener('error', e => {
+  console.error('[uncaughtError]', e.message, e.filename, e.lineno);
+});
 
 // ── Per-household Firestore path ──────────────────────────────────────────
 // Each household's data lives at families/{ownerUID}.
@@ -4397,7 +4477,7 @@ const PENDING_HOUSEHOLD_KEY  = 'toto_pending_household'; // set from invite URL
 function _getHouseholdOwnerUID() {
   // Invited member arriving via link: pending household takes priority
   return sessionStorage.getItem(PENDING_HOUSEHOLD_KEY)
-      || localStorage.getItem(HOUSEHOLD_OWNER_KEY)
+      || _secureGet(HOUSEHOLD_OWNER_KEY)
       || _currentUser?.uid
       || null;
 }
@@ -4409,7 +4489,7 @@ function _getHouseholdDocRef() {
 }
 
 function _setHouseholdOwner(uid) {
-  localStorage.setItem(HOUSEHOLD_OWNER_KEY, uid);
+  _secureSet(HOUSEHOLD_OWNER_KEY, uid);
   sessionStorage.removeItem(PENDING_HOUSEHOLD_KEY);
 }
 
@@ -4429,7 +4509,7 @@ function logActivity(action, detail) {
 }
 
 function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
+  const provider = new fbAuth.GoogleAuthProvider();
   fbAuth.signInWithPopup(provider).catch(err => {
     const el = document.getElementById('login-error');
     if (el) { el.textContent = err.message; el.style.display = ''; }
@@ -4443,7 +4523,13 @@ function guestMode() {
   if (!state.onboarded) {
     showOnboarding();
   } else {
-    renderAll();
+    const _hashTab = location.hash.slice(1);
+    if (_hashTab && document.getElementById('tab-' + _hashTab)) {
+      history.replaceState({ tab: _hashTab }, '', '#' + _hashTab);
+      _activateTabInternal(_hashTab);
+    } else {
+      renderAll();
+    }
     handleDeviceRouting();
   }
 }
@@ -4511,7 +4597,7 @@ function _startFirestoreSync() {
   if (_fsUnsubscribe) _fsUnsubscribe();
 
   // If this user has no stored household owner yet, they are the owner
-  if (!localStorage.getItem(HOUSEHOLD_OWNER_KEY) && !sessionStorage.getItem(PENDING_HOUSEHOLD_KEY)) {
+  if (!_secureGet(HOUSEHOLD_OWNER_KEY) && !sessionStorage.getItem(PENDING_HOUSEHOLD_KEY)) {
     _setHouseholdOwner(_currentUser.uid);
   }
 
@@ -4538,7 +4624,14 @@ function _startFirestoreSync() {
     }
     refreshReceiptCounts().then(() => {
       _autoCreateRecurringEvents();
-      renderAll();
+      // Apply URL hash route before renderAll so the correct tab renders first
+      const _hashTab = location.hash.slice(1);
+      if (_hashTab && document.getElementById('tab-' + _hashTab)) {
+        history.replaceState({ tab: _hashTab }, '', '#' + _hashTab);
+        _activateTabInternal(_hashTab);
+      } else {
+        renderAll();
+      }
       if (!state.onboarded) {
         showOnboarding();
       } else {
@@ -4559,12 +4652,14 @@ function _startFirestoreSync() {
   });
 }
 
-fbAuth.onAuthStateChanged(user => {
-  if (_guestMode && !user) return;
-  _currentUser = user;
-  const overlay       = document.getElementById('login-overlay');
-  const headerAvatar  = document.getElementById('header-avatar');
-  const headerSignOut = document.getElementById('header-sign-out');
+// Defer auth listener until the Firebase module script has set up fbAuth.
+function _initAuthListener() {
+  fbAuth.onAuthStateChanged(user => {
+    if (_guestMode && !user) return;
+    _currentUser = user;
+    const overlay       = document.getElementById('login-overlay');
+    const headerAvatar  = document.getElementById('header-avatar');
+    const headerSignOut = document.getElementById('header-sign-out');
 
   if (user) {
     if (overlay)       overlay.classList.add('hidden');
@@ -4584,7 +4679,15 @@ fbAuth.onAuthStateChanged(user => {
       if (tagline) tagline.style.display = 'none';
     }
   }
-});
+  });
+}
+
+// Start auth when Firebase module is ready (may already be ready if module ran first)
+if (window.__firebaseReady) {
+  _initAuthListener();
+} else {
+  window.addEventListener('firebase-ready', _initAuthListener, { once: true });
+}
 
 // ─────────────────────────────────────────────────
 // DATA
@@ -4996,15 +5099,61 @@ let _pinLockUntil       = 0;
 let _pinBuffer          = '';
 let _pinTargetId        = null;
 
-function getDeviceProfile()      { return localStorage.getItem(DEVICE_KEY); }
-function setDeviceProfile(val)   { localStorage.setItem(DEVICE_KEY, val); }
-function clearDeviceProfile()    { localStorage.removeItem(DEVICE_KEY); }
-function getKidSession()         { return localStorage.getItem(KID_SESSION_KEY); }
-function setKidSession(kidId)    { localStorage.setItem(KID_SESSION_KEY, kidId); }
-function clearKidSession()       { localStorage.removeItem(KID_SESSION_KEY); }
+// ── Secure storage abstraction ───────────────────────────────────────────────
+// On iOS (Capacitor native) we write to the Keychain via @capacitor/preferences.
+// On web we fall back to localStorage. Reads are synchronous (from an in-memory
+// cache pre-warmed at startup); writes are fire-and-forget async to both stores.
+const _secureCache = {};
 
-async function _hashPin(pin) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('toto-pin-' + pin));
+function _capacitorPrefs() {
+  return window.Capacitor?.Plugins?.Preferences ?? null;
+}
+
+async function _securePrewarm(keys) {
+  const prefs = _capacitorPrefs();
+  for (const key of keys) {
+    if (prefs) {
+      try {
+        const { value } = await prefs.get({ key });
+        _secureCache[key] = value;
+      } catch(_) {
+        _secureCache[key] = localStorage.getItem(key);
+      }
+    } else {
+      _secureCache[key] = localStorage.getItem(key);
+    }
+  }
+}
+
+function _secureGet(key)       { return key in _secureCache ? _secureCache[key] : localStorage.getItem(key); }
+function _secureSet(key, val)  {
+  _secureCache[key] = val;
+  localStorage.setItem(key, val);
+  const prefs = _capacitorPrefs();
+  if (prefs) prefs.set({ key, value: val }).catch(() => {});
+}
+function _secureClear(key)     {
+  delete _secureCache[key];
+  localStorage.removeItem(key);
+  const prefs = _capacitorPrefs();
+  if (prefs) prefs.remove({ key }).catch(() => {});
+}
+
+function getDeviceProfile()      { return _secureGet(DEVICE_KEY); }
+function setDeviceProfile(val)   { _secureSet(DEVICE_KEY, val); }
+function clearDeviceProfile()    { _secureClear(DEVICE_KEY); }
+function getKidSession()         { return _secureGet(KID_SESSION_KEY); }
+function setKidSession(kidId)    { _secureSet(KID_SESSION_KEY, String(kidId)); }
+function clearKidSession()       { _secureClear(KID_SESSION_KEY); }
+
+// Pre-warm cache immediately so synchronous getters work by the time auth resolves.
+_securePrewarm([HOUSEHOLD_OWNER_KEY, DEVICE_KEY, KID_SESSION_KEY]);
+
+async function _hashPin(pin, salt) {
+  // Salt should be the household owner UID so the same PIN hashes differently per household.
+  // 'toto-pin-' kept as fallback for legacy hashes before UID was available.
+  const saltStr = salt || 'toto-pin-';
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(saltStr + pin));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
@@ -5326,7 +5475,7 @@ function switchProfile() {
 async function setKidPin(kidId, pin) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
   if (!kid || pin.length !== 4) return;
-  kid.pinHash = await _hashPin(pin);
+  kid.pinHash = await _hashPin(pin, _getHouseholdOwnerUID());
   saveData(state);
 }
 
@@ -5412,7 +5561,7 @@ async function _adultPinSubmit() {
       return;
     }
     const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
-    adults[_adultPinTarget].pinHash = await _hashPin(_adultPinBuf);
+    adults[_adultPinTarget].pinHash = await _hashPin(_adultPinBuf, _getHouseholdOwnerUID());
     saveData(state);
     document.getElementById('adult-pin-modal').classList.add('hidden');
     renderSettings();
@@ -6952,27 +7101,27 @@ function _psoTourDone() {
 
 // ── Improved rate limiting: hard lock at 10 total attempts ──────────────
 function _getPinTotalAttempts(kidId) {
-  return parseInt(localStorage.getItem(PIN_TOTAL_ATT_KEY + kidId) || '0');
+  return parseInt(_secureGet(PIN_TOTAL_ATT_KEY + kidId) || '0');
 }
 function _incPinTotalAttempts(kidId) {
   const n = _getPinTotalAttempts(kidId) + 1;
-  localStorage.setItem(PIN_TOTAL_ATT_KEY + kidId, String(n));
+  _secureSet(PIN_TOTAL_ATT_KEY + kidId, String(n));
   return n;
 }
 function _resetPinAttempts(kidId) {
-  localStorage.removeItem(PIN_TOTAL_ATT_KEY + kidId);
-  localStorage.removeItem(PIN_HARD_LOCK_KEY  + kidId);
+  _secureClear(PIN_TOTAL_ATT_KEY + kidId);
+  _secureClear(PIN_HARD_LOCK_KEY  + kidId);
 }
 function _isPinHardLocked(kidId) {
-  return localStorage.getItem(PIN_HARD_LOCK_KEY + kidId) === '1';
+  return _secureGet(PIN_HARD_LOCK_KEY + kidId) === '1';
 }
 function _setPinHardLock(kidId) {
-  localStorage.setItem(PIN_HARD_LOCK_KEY + kidId, '1');
+  _secureSet(PIN_HARD_LOCK_KEY + kidId, '1');
 }
 
 // Override _verifyPin to use improved rate limiting
 async function _verifyPin() {
-  const hash = await _hashPin(_pinBuffer);
+  const hash = await _hashPin(_pinBuffer, _getHouseholdOwnerUID());
 
   // Adult PIN
   if (typeof _pinTargetId === 'string' && _pinTargetId.startsWith('adult:')) {
@@ -8305,11 +8454,20 @@ window.addEventListener('resize', () => {
   document.querySelectorAll('.section-pills-wrap').forEach(_updatePillsOverflow);
 });
 
-function activateTab(tab) {
+// ── URL-based routing ────────────────────────────────────────────────────────
+// Tab name lives in the URL hash: toto.app/#budget, toto.app/#planner, etc.
+// activateTab() pushes a history entry; popstate restores it so the back
+// button works. _activateTabInternal() does the DOM work without touching history.
+
+function _activateTabInternal(tab) {
+  // Normalise aliases
   if (tab === 'subscriptions') tab = 'bills';
-  if (tab === 'scenarios') tab = 'insights';
-  if (tab === 'money') tab = 'budget';
-  if (tab === 'dashboard') tab = 'budget';
+  if (tab === 'scenarios')     tab = 'insights';
+  if (tab === 'money')         tab = 'budget';
+  if (tab === 'dashboard')     tab = 'budget';
+
+  // Validate — fall back to today if the hash names an unknown panel
+  if (!document.getElementById('tab-' + tab)) tab = 'today';
 
   // Check unsaved settings before leaving
   if (_activeTab() === 'settings' && tab !== 'settings') _checkSettingsUnsaved(tab);
@@ -8340,18 +8498,42 @@ function activateTab(tab) {
     const hdr = document.getElementById(section + '-section-header');
     if (hdr) {
       hdr.classList.add('active');
-      // Update date in header
       const dateEl = document.getElementById(section + '-header-date');
       if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-AU', { weekday:'long', month:'long', day:'numeric' });
-      // Update active pill
       hdr.querySelectorAll('.section-pill').forEach(p => p.classList.toggle('active', p.dataset.pill === tab));
-      // Update overflow chevrons
       requestAnimationFrame(() => hdr.querySelectorAll('.section-pills-wrap').forEach(_updatePillsOverflow));
     }
   }
 
   renderAll();
 }
+
+function activateTab(tab) {
+  // Normalise before pushing to history so the hash is canonical
+  if (tab === 'subscriptions') tab = 'bills';
+  if (tab === 'scenarios')     tab = 'insights';
+  if (tab === 'money')         tab = 'budget';
+  if (tab === 'dashboard')     tab = 'budget';
+
+  const current = location.hash.slice(1) || 'today';
+  if (current !== tab) {
+    history.pushState({ tab }, '', '#' + tab);
+  }
+  _activateTabInternal(tab);
+}
+
+// Back/forward button support
+window.addEventListener('popstate', e => {
+  const tab = (e.state?.tab) || location.hash.slice(1) || 'today';
+  _activateTabInternal(tab);
+});
+
+// On first load: seed the history stack so the back button always has
+// somewhere to go within the app rather than leaving it immediately.
+(function _initRouteFromHash() {
+  const tab = location.hash.slice(1) || 'today';
+  history.replaceState({ tab }, '', tab === 'today' ? (location.pathname + location.search) : '#' + tab);
+})();
 
 document.querySelectorAll('.nav-item, .nav-text-item').forEach(el => {
   el.addEventListener('click', () => activateTab(el.dataset.tab));
@@ -13127,7 +13309,7 @@ function resetAllData() {
   }
   // Clear local storage (both data and household pointer)
   localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(HOUSEHOLD_OWNER_KEY);
+  _secureClear(HOUSEHOLD_OWNER_KEY);
   // Sign out and reload — will trigger fresh onboarding
   if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
   fbAuth.signOut().then(() => { window.location.reload(); });
@@ -17232,7 +17414,17 @@ function startHealthGuide(dimension) {
 }
 
 function safeRender(fn) {
-  try { fn(); } catch(e) { console.error('Render error in ' + fn.name + ':', e); }
+  try {
+    fn();
+  } catch(e) {
+    console.error('Render error in ' + fn.name + ':', e);
+    if (typeof Sentry !== 'undefined') {
+      Sentry.withScope(scope => {
+        scope.setTag('renderer', fn.name || 'anonymous');
+        Sentry.captureException(e);
+      });
+    }
+  }
 }
 
 // ── Routine daily reset ──────────────────────────────────

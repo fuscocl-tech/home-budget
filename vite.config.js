@@ -1,0 +1,31 @@
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+export default defineConfig({
+  root: 'src',
+  base: './',   // relative paths so Capacitor file:// URLs work
+  publicDir: resolve(__dirname, 'public'),
+  build: {
+    outDir: resolve(__dirname, 'www'),
+    emptyOutDir: true,
+    target: 'es2020',
+    cssCodeSplit: false,
+    sourcemap: true,
+    rollupOptions: {
+      input: resolve(__dirname, 'src/index.html'),
+      output: {
+        // Split Firebase into its own chunk so the app code loads faster
+        manualChunks(id) {
+          if (id.includes('firebase')) return 'firebase';
+        },
+      },
+    },
+  },
+  server: {
+    port: 5173,
+    open: false,
+  },
+});
