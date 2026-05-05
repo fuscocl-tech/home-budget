@@ -225,8 +225,8 @@ export function _devLoadRoutines() {
   const routines = [
     { id: r1id, name: 'Morning', emoji: '☀️', ownerType: 'adult', ownerId: 'dev', sharedWith: [], steps: adultMorning, pointsPerCompletion: 0, triggerTime: '07:00', recurrence: { type:'weekdays', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [], completions: {} },
     { id: r2id, name: 'Evening', emoji: '🌙', ownerType: 'adult', ownerId: 'dev', sharedWith: [], steps: adultEvening, pointsPerCompletion: 0, triggerTime: `${String(hour).padStart(2,'0')}:00`, recurrence: { type:'daily', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [], completions: {} },
-    { id: r3id, name: 'Morning routine', emoji: '🌤️', ownerType: 'household', ownerId: 'dev', sharedWith: [], steps: morningSteps, pointsPerCompletion: 10, triggerTime: '07:30', recurrence: { type:'weekdays', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [] },
-    { id: r4id, name: 'Evening routine', emoji: '🌙', ownerType: 'household', ownerId: 'dev', sharedWith: [], steps: eveningSteps, pointsPerCompletion: 10, triggerTime: `${String(hour).padStart(2,'0')}:00`, recurrence: { type:'daily', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [] },
+    { id: r3id, name: 'Morning routine', emoji: '🌤️', ownerType: 'household', ownerId: 'household', sharedWith: [], steps: morningSteps, pointsPerCompletion: 10, triggerTime: '07:30', recurrence: { type:'weekdays', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [] },
+    { id: r4id, name: 'Evening routine', emoji: '🌙', ownerType: 'household', ownerId: 'household', sharedWith: [], steps: eveningSteps, pointsPerCompletion: 10, triggerTime: `${String(hour).padStart(2,'0')}:00`, recurrence: { type:'daily', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [] },
   ];
   state.routines = [...(state.routines||[]).filter(r=>r.ownerType!=='adult'&&r.ownerType!=='household'), ...routines];
   // Assignments for kids

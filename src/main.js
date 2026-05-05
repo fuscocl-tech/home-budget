@@ -415,6 +415,13 @@ function _applyMigrations(d) {
     if (!d.lists[t].history) d.lists[t].history = [];
   });
 
+  // Fix household routines saved with ownerId="dev" by dev-tools fixture
+  if (d.routines) {
+    d.routines.forEach(function(r) {
+      if (r.ownerType === 'household' && r.ownerId !== 'household') r.ownerId = 'household';
+    });
+  }
+
   return d;
 }
 
