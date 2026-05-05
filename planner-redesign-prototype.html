@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Planner Redesign Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Design Tokens ─────────────────────────────────── */
+    :root {
+      --pearl:       #FAFAF9;
+      --paper:       #F4F3F0;
+      --ink:         #18181B;
+      --ink-soft:    #52525B;
+      --muted:       #A1A1AA;
+      --hairline:    rgba(24,24,27,.08);
+      --iris-1:      #5B4CF5;
+      --iris-2:      #7C6FF7;
+      --iris-3:      #A89FF9;
+      --purple-soft: #EEEAFF;
+      --lime:        #84cc16;
+      --ember:       #f97316;
+      --good:        #10b981;
+      --sans:        'Inter', system-ui, sans-serif;
+      --mono:        'SF Mono', ui-monospace, monospace;
+      --r-lg:        20px;
+      --shadow-sm:   0 1px 0 rgba(255,255,255,.9) inset,
+                     0 2px 4px rgba(22,20,15,.04),
+                     0 8px 24px -8px rgba(22,20,15,.09);
+      --page-bg:     #ECEAE4;
+    }
+
+    /* ── Reset ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--page-bg);
+      color: var(--ink);
+      font-size: 14px;
+      min-height: 100vh;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Page scaffold ──────────────────────────────────── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-header h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .page-header p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── View-toggle tabs (page level) ─────────────────── */
+    .view-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .view-tab {
+      border: none;
+      background: rgba(255,255,255,.6);
+      color: var(--ink-soft);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 22px;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background .18s, color .18s, box-shadow .18s;
+      box-shadow: 0 1px 3px rgba(22,20,15,.08);
+    }
+    .view-tab.active {
+      background: var(--iris-1);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(91,76,245,.35);
+    }
+
+    /* ── Stage (centers phone) ─────────────────────────── */
+    .stage {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ── Phone frame ────────────────────────────────────── */
+    .phone {
+      width: 375px;
+      min-height: 720px;
+      background: #FAFAF7;
+      border-radius: 44px;
+      box-shadow:
+        0 0 0 1px rgba(22,20,15,.07),
+        0 4px 6px rgba(22,20,15,.04),
+        0 20px 60px rgba(22,20,15,.16),
+        0 40px 100px -20px rgba(22,20,15,.22);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status bar notch */
+    .phone-notch {
+      height: 44px;
+      background: transparent;
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    .phone-notch .time {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+    }
+    .phone-notch .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .phone-notch .status-icons svg {
+      opacity: .75;
+    }
+
+    /* ── Scrollable phone body ──────────────────────────── */
+    .phone-frame::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 500px 350px at 80% -10%, rgba(180,122,255,0.10), transparent 60%),
+        radial-gradient(ellipse 400px 300px at 0% 110%, rgba(184,229,75,0.07), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 44px;
+    }
+    .phone-frame::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+      opacity: .025;
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: multiply;
+      border-radius: 44px;
+    }
+    .phone-body {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      position: relative;
+      z-index: 2;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 80px;
+    }
+    .phone-body::-webkit-scrollbar { display: none; }
+
+    /* ── Section: App header ────────────────────────────── */
+    .app-header {
+      padding: 8px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .app-header .breadcrumb {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: .03em;
+    }
+    .app-header .breadcrumb span {
+      color: var(--iris-1);
+    }
+    .header-left h2 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--paper);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: var(--shadow-sm);
+      transition: transform .15s;
+    }
+    .header-icon-btn:active { transform: scale(.94); }
+
+    /* ── Planner controls bar ───────────────────────────── */
+    /* Wallet-style month bar */
+    .planner-month-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px 10px;
+      border-bottom: 1px solid rgba(24,24,27,.06);
+    }
+    .planner-month-label {
+      font-family: var(--mono); font-size: 15px; font-weight: 600;
+      letter-spacing: -.01em; color: var(--ink);
+    }
+    .nav-arrow {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--paper); border: 1px solid rgba(24,24,27,.07);
+      font-size: 18px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      color: var(--muted);
+      box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 1px 3px rgba(22,20,15,.06);
+      transition: background .12s;
+    }
+    .nav-arrow:active { background: var(--hairline); }
+
+    /* View toggle + add row */
+    .planner-sub-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px 8px;
+    }
+    .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .view-pills {
+      display: flex;
+      background: var(--paper);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .view-pill {
+      border: none;
+      background: transparent;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      padding: 5px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background .15s, color .15s, box-shadow .15s;
+    }
+    .view-pill.active {
+      background: #fff;
+      color: var(--iris-1);
+      box-shadow: 0 1px 3px rgba(22,20,15,.1);
+    }
+    .add-btn-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--iris-1);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      line-height: 1;
+      box-shadow: 0 2px 8px rgba(91,76,245,.38);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .add-btn-circle:active {
+      transform: scale(.92);
+      box-shadow: 0 1px 4px rgba(91,76,245,.3);
+    }
+
+    /* ── Member filter chips ────────────────────────────── */
+    .member-row {
+      display: flex;
+      gap: 8px;
+      padding: 8px 20px 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .member-row::-webkit-scrollbar { display: none; }
+    .member-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px 5px 6px;
+      border-radius: 99px;
+      background: var(--paper);
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      transition: border-color .15s, color .15s, background .15s;
+      flex-shrink: 0;
+      box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 1px 2px rgba(22,20,15,.05);
+    }
+    .member-chip.active {
+      background: #fff;
+      color: var(--ink);
+      border-color: var(--iris-1);
+    }
+    .chip-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+      letter-spacing: -.01em;
+    }
+
+    /* ── Week strip ─────────────────────────────────────── */
+    .week-strip {
+      padding: 0 16px 14px;
+      display: none;
+    }
+    .week-strip.visible { display: block; }
+    .week-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0;
+      background: #EEEDF8;
+      border-radius: 18px;
+      padding: 6px;
+    }
+    .day-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 8px 2px 6px;
+      border-radius: 13px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .day-col.selected {
+      background: var(--iris-1);
+      box-shadow: 0 4px 12px rgba(91,76,245,.35);
+    }
+    .day-name {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      line-height: 1;
+    }
+    .day-col.selected .day-name { color: rgba(255,255,255,.7); }
+    .day-num-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .day-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      line-height: 1.1;
+    }
+    .day-col.selected .day-num { color: #fff; font-weight: 800; }
+    .day-col.today-col .day-num { color: var(--iris-1); }
+    .day-col.today-col.selected .day-num { color: #fff; }
+    .day-dot-row {
+      display: flex;
+      gap: 3px;
+      height: 5px;
+      align-items: center;
+      margin-top: 1px;
+    }
+    .day-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+    }
+    .day-col.selected .day-dot { background: rgba(255,255,255,.6) !important; }
+
+    /* ── Event list ─────────────────────────────────────── */
+    .event-list {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .event-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .event-list-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .event-count-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--iris-1);
+      background: var(--purple-soft);
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    .event-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+      border: 1px solid var(--hairline);
+      transition: transform .15s;
+      cursor: pointer;
+    }
+    .event-card:active { transform: scale(.98); }
+    .event-stripe {
+      width: 4px;
+      flex-shrink: 0;
+    }
+    .event-body {
+      flex: 1;
+      padding: 11px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .event-time {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      min-width: 38px;
+    }
+    .event-info {
+      flex: 1;
+    }
+    .event-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .event-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+    }
+    .who-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 99px;
+      background: var(--paper);
+      color: var(--ink-soft);
+    }
+    .event-emoji {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-right: 4px;
+    }
+
+    /* all-day event variant */
+    .event-card.all-day .event-time {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--muted);
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 20px;
+      gap: 10px;
+    }
+    .empty-illustration {
+      font-size: 44px;
+      opacity: .55;
+    }
+    .empty-state p {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+      text-align: center;
+    }
+
+    /* ── Month grid ─────────────────────────────────────── */
+    .month-grid-wrap {
+      padding: 0 16px;
+      display: none;
+    }
+    .month-grid-wrap.visible { display: block; }
+
+    .month-grid-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 4px;
+    }
+    .month-grid-headers span {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+    .month-cell {
+      min-height: 62px;
+      padding: 5px 4px 4px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .month-cell:hover { background: var(--paper); }
+    .month-cell.other-month .cell-date { color: var(--muted); opacity: .45; }
+    .cell-date {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .cell-date.today {
+      background: var(--iris-1);
+      color: #fff;
+    }
+    .event-pill {
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 2px 5px;
+      border-radius: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #fff;
+      max-width: 100%;
+    }
+    .overflow-label {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--muted);
+      padding-left: 2px;
+    }
+
+    /* ── Life areas section ─────────────────────────────── */
+    .life-areas-section {
+      padding: 20px 16px 0;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--ink);
+    }
+    .collapse-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--iris-1);
+      font-weight: 600;
+      font-family: var(--sans);
+      padding: 4px 0;
+    }
+    .life-areas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .life-area-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 1px 3px rgba(22,20,15,.05);
+      border: 1px solid rgba(24,24,27,.06);
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    .life-area-card:active { transform: scale(.97); }
+    .la-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .la-icon-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .la-label-block { flex: 1; min-width: 0; }
+    .la-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .la-count {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .la-next {
+      font-size: 10.5px;
+      color: var(--ink-soft);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+
+    /* ── Section wrapper card (matches wallet .td-card style) ── */
+    .pl-section-card {
+      background: var(--paper);
+      border-radius: 20px;
+      border: 1px solid rgba(24,24,27,.07);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,.9) inset,
+        0 2px 4px rgba(22,20,15,.04),
+        0 8px 24px -8px rgba(22,20,15,.09);
+      margin: 0 16px 16px;
+      overflow: hidden;
+    }
+    .pl-section-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid rgba(24,24,27,.06);
+    }
+    .pl-section-card-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pl-section-card-body {
+      padding: 12px;
+    }
+    .pl-collapse-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--iris-1);
+      font-family: var(--sans);
+      padding: 2px 0;
+      letter-spacing: .02em;
+    }
+    /* Inner nudge tiles */
+    .nudge-tile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      border: 1px solid rgba(24,24,27,.06);
+      box-shadow: 0 1px 0 rgba(255,255,255,.9) inset, 0 1px 3px rgba(22,20,15,.05);
+      margin-bottom: 8px;
+    }
+    .nudge-tile:last-child { margin-bottom: 0; }
+    .nudge-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .nudge-body { flex: 1; min-width: 0; }
+    .nudge-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+    .nudge-sub   { font-size: 11px; color: var(--muted); }
+    .nudge-day   { font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+    /* ── FAB ────────────────────────────────────────────── */
+    .fab {
+      position: absolute;
+      bottom: 22px;
+      right: 20px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--iris-1);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 26px;
+      line-height: 1;
+      box-shadow:
+        0 4px 14px rgba(91,76,245,.45),
+        0 1px 3px rgba(91,76,245,.2);
+      transition: transform .18s, box-shadow .18s;
+      z-index: 10;
+    }
+    .fab:active {
+      transform: scale(.9);
+      box-shadow: 0 2px 6px rgba(91,76,245,.35);
+    }
+
+    /* ── Bottom tab bar (decorative) ────────────────────── */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: rgba(250,250,249,.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 10px 14px;
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      padding: 6px 12px;
+    }
+    .tab-icon { font-size: 22px; }
+    .tab-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: .03em;
+      color: var(--muted);
+    }
+    .tab-item.active .tab-label { color: var(--iris-1); }
+    .tab-item.active .tab-icon { filter: none; }
+
+    /* ── Code snippet section (page level) ─────────────── */
+    .code-section {
+      max-width: 800px;
+      margin: 36px auto 0;
+      background: #1e1e2e;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(22,20,15,.14);
+    }
+    .code-section summary {
+      padding: 14px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cdd6f4;
+      cursor: pointer;
+      user-select: none;
+      background: #313244;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .code-section summary::before {
+      content: '‹/›';
+      font-size: 12px;
+      opacity: .6;
+    }
+    .code-section summary::-webkit-details-marker { display: none; }
+    .code-section pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 11.5px;
+      line-height: 1.7;
+      color: #cdd6f4;
+      font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+    }
+    .code-section .tok-comment { color: #6c7086; }
+    .code-section .tok-selector { color: #89b4fa; }
+    .code-section .tok-prop { color: #89dceb; }
+    .code-section .tok-val { color: #a6e3a1; }
+    .code-section .tok-string { color: #f9e2af; }
+    .code-section .tok-fn { color: #cba6f7; }
+    .code-section .tok-key { color: #f38ba8; }
+
+    /* ── Divider ────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--hairline);
+      margin: 4px 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1>Toto 2.0 — Planner Redesign</h1>
+    <p>Prototype · v0.1 · May 2026</p>
+  </div>
+
+  <!-- Page-level view toggle -->
+  <div class="view-tabs">
+    <button class="view-tab active" onclick="setPageView('week')" id="tab-week">Week View</button>
+    <button class="view-tab" onclick="setPageView('month')" id="tab-month">Month View</button>
+  </div>
+
+  <!-- Stage -->
+  <div class="stage">
+    <div class="phone">
+
+      <!-- Status bar -->
+      <div class="phone-notch">
+        <span class="time">9:41</span>
+        <div class="status-icons">
+          <!-- Signal bars -->
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+            <rect x="0" y="7" width="3" height="5" rx="1" fill="currentColor"/>
+            <rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="currentColor"/>
+            <rect x="9" y="2" width="3" height="10" rx="1" fill="currentColor"/>
+            <rect x="13.5" y="0" width="3" height="12" rx="1" fill="currentColor"/>
+          </svg>
+          <!-- WiFi -->
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+            <path d="M8 9.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="currentColor"/>
+            <path d="M3.5 6.5a6.5 6.5 0 019 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M1 4A9.5 9.5 0 0115 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+          </svg>
+          <!-- Battery -->
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+            <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity=".35"/>
+            <rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/>
+            <path d="M23 4.5v3a1.5 1.5 0 000-3z" fill="currentColor" opacity=".4"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- App header -->
+      <div class="app-header">
+        <div class="header-left">
+          <div class="breadcrumb">Today › <span>Plan</span></div>
+          <h2>Plan</h2>
+        </div>
+        <div class="header-actions">
+          <button class="header-icon-btn" title="Dog">🐕</button>
+          <button class="header-icon-btn" title="Profile" style="background: var(--iris-1);">
+            <span style="font-size:15px; color:#fff; font-weight:700;">R</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section pill nav -->
+      <div style="padding: 10px 16px 0;">
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none; border-bottom: 1px solid var(--hairline);">
+          <button style="flex-shrink:0; padding:6px 14px; border-radius:99px; font-size:13px; font-weight:700; border:1.5px solid var(--iris-1); background:transparent; color:var(--iris-1); cursor:pointer; white-space:nowrap;">Planner</button>
+          <button style="flex-shrink:0; padding:6px 14px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--ink-soft); cursor:pointer; white-space:nowrap;">Forecast</button>
+          <button style="flex-shrink:0; padding:6px 14px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--ink-soft); cursor:pointer; white-space:nowrap;">Meals</button>
+          <button style="flex-shrink:0; padding:6px 14px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--ink-soft); cursor:pointer; white-space:nowrap;">Lunchbox</button>
+          <button style="flex-shrink:0; padding:6px 14px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--ink-soft); cursor:pointer; white-space:nowrap;">Pantry</button>
+          <button style="flex-shrink:0; padding:6px 14px; border-radius:99px; font-size:13px; font-weight:600; border:1.5px solid transparent; background:transparent; color:var(--ink-soft); cursor:pointer; white-space:nowrap;">Routines</button>
+        </div>
+      </div>
+
+      <!-- Month bar (wallet style) -->
+      <div class="planner-month-bar">
+        <button class="nav-arrow" onclick="shiftMonth(-1)">&#8249;</button>
+        <div class="planner-month-label" id="month-title">May 2026</div>
+        <button class="nav-arrow" onclick="shiftMonth(1)">&#8250;</button>
+      </div>
+
+      <!-- View toggle + add -->
+      <div class="planner-sub-bar">
+        <div class="view-pills">
+          <button class="view-pill" id="pill-today" onclick="goToday()">Today</button>
+          <button class="view-pill active" id="pill-week" onclick="setPillView('week')">Week</button>
+          <button class="view-pill" id="pill-month" onclick="setPillView('month')">Month</button>
+        </div>
+        <button class="add-btn-circle" title="New event">+</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Member filter chips -->
+      <div class="member-row">
+        <button class="member-chip active" onclick="selectMember(this)">
+          <div class="chip-avatar" style="background:var(--purple-soft); color:var(--iris-1);">👨‍👩‍👧‍👦</div>
+          Everyone
+        </button>
+        <button class="member-chip" onclick="selectMember(this)">
+          <div class="chip-avatar" style="background:#fce7f3; color:#db2777; font-weight:800;">M</div>
+          Mum
+        </button>
+        <button class="member-chip" onclick="selectMember(this)">
+          <div class="chip-avatar" style="background:#dbeafe; color:#2563eb; font-weight:800;">D</div>
+          Dad
+        </button>
+        <button class="member-chip" onclick="selectMember(this)">
+          <div class="chip-avatar" style="background:#fef3c7; color:#d97706; font-weight:800;">Mi</div>
+          Mia
+        </button>
+        <button class="member-chip" onclick="selectMember(this)">
+          <div class="chip-avatar" style="background:#dcfce7; color:#16a34a; font-weight:800;">J</div>
+          Jake
+        </button>
+      </div>
+
+      <!-- ─── WEEK VIEW ────────────────────────────────── -->
+      <div class="week-strip visible" id="week-strip">
+        <div class="week-days" id="week-days-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div id="event-list-wrap" style="display:block;">
+        <div class="event-list" id="event-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- ─── MONTH VIEW ──────────────────────────────── -->
+      <div class="month-grid-wrap" id="month-grid-wrap">
+        <div class="month-grid-headers">
+          <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+        </div>
+        <div class="month-grid" id="month-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Life Areas -->
+      <div class="pl-section-card">
+        <div class="pl-section-card-header">
+          <div class="pl-section-card-title">
+            Life Areas
+            <span id="life-areas-count" style="font-size:11px;font-weight:700;background:var(--iris-1);color:#fff;padding:1px 8px;border-radius:99px;letter-spacing:0">7</span>
+          </div>
+          <button class="pl-collapse-btn" onclick="const b=this.closest('.pl-section-card').querySelector('.pl-section-card-body');const hide=b.style.display!=='none';b.style.display=hide?'none':'block';this.textContent=hide?'Show':'Hide'">Hide</button>
+        </div>
+        <div class="pl-section-card-body">
+          <div class="life-areas-grid" id="life-areas-grid"><!-- Populated by JS --></div>
+        </div>
+      </div>
+
+      <!-- Heads Up -->
+      <div class="pl-section-card">
+        <div class="pl-section-card-header">
+          <div class="pl-section-card-title">
+            Heads up 🐕
+            <span style="font-size:11px;font-weight:700;background:#f59e0b;color:#fff;padding:1px 8px;border-radius:99px;letter-spacing:0">3</span>
+          </div>
+          <button class="pl-collapse-btn" onclick="const b=this.closest('.pl-section-card').querySelector('.pl-section-card-body');const hide=b.style.display!=='none';b.style.display=hide?'none':'block';this.textContent=hide?'Show':'Hide'">Hide</button>
+        </div>
+        <div class="pl-section-card-body">
+          <div class="nudge-tile">
+            <div class="nudge-icon" style="background:#FFF7ED">🧾</div>
+            <div class="nudge-body">
+              <div class="nudge-title">Electricity bill due</div>
+              <div class="nudge-sub">$180 · due in <strong style="color:#f59e0b">2 days</strong></div>
+            </div>
+            <div class="nudge-day" style="color:#f59e0b">Wed</div>
+          </div>
+          <div class="nudge-tile">
+            <div class="nudge-icon" style="background:#ECFDF5">🏥</div>
+            <div class="nudge-body">
+              <div class="nudge-title">Dentist — Mia</div>
+              <div class="nudge-sub">2:00 PM · <strong style="color:var(--good)">Tomorrow</strong></div>
+            </div>
+            <div class="nudge-day" style="color:var(--good)">Tue</div>
+          </div>
+          <div class="nudge-tile">
+            <div class="nudge-icon" style="background:#EEF2FF">⚽</div>
+            <div class="nudge-body">
+              <div class="nudge-title">Jake soccer practice</div>
+              <div class="nudge-sub">4:00 PM · In <strong style="color:var(--iris-1)">3 days</strong></div>
+            </div>
+            <div class="nudge-day" style="color:var(--iris-1)">Thu</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom tab bar (decorative) -->
+      <div style="height:80px;"></div>
+      <div class="tab-bar">
+        <div class="tab-item">
+          <span class="tab-icon">🏠</span>
+          <span class="tab-label">Home</span>
+        </div>
+        <div class="tab-item active">
+          <span class="tab-icon">📅</span>
+          <span class="tab-label" style="color:var(--iris-1);">Plan</span>
+        </div>
+        <div class="tab-item">
+          <span class="tab-icon">💰</span>
+          <span class="tab-label">Budget</span>
+        </div>
+        <div class="tab-item">
+          <span class="tab-icon">✅</span>
+          <span class="tab-label">Tasks</span>
+        </div>
+        <div class="tab-item">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">More</span>
+        </div>
+      </div>
+
+      <!-- FAB -->
+      <button class="fab" title="Add event">+</button>
+
+    </div><!-- /phone -->
+  </div><!-- /stage -->
+
+  <!-- Code snippet section -->
+  <details class="code-section">
+    <summary>View Code Snippet — Week Strip, Event Cards &amp; Month Grid</summary>
+    <pre>
+<span class="tok-comment">/* ─────────────────────────────────────────────────
+   WEEK STRIP  — day column selector
+───────────────────────────────────────────────── */</span>
+<span class="tok-selector">.week-days</span> {
+  <span class="tok-prop">display</span>: <span class="tok-val">grid</span>;
+  <span class="tok-prop">grid-template-columns</span>: <span class="tok-fn">repeat</span>(<span class="tok-val">7, 1fr</span>);
+  <span class="tok-prop">gap</span>: <span class="tok-val">2px</span>;
+}
+<span class="tok-selector">.day-col</span> {
+  <span class="tok-prop">display</span>: <span class="tok-val">flex</span>;
+  <span class="tok-prop">flex-direction</span>: <span class="tok-val">column</span>;
+  <span class="tok-prop">align-items</span>: <span class="tok-val">center</span>;
+  <span class="tok-prop">gap</span>: <span class="tok-val">4px</span>;
+  <span class="tok-prop">padding</span>: <span class="tok-val">8px 4px</span>;
+  <span class="tok-prop">border-radius</span>: <span class="tok-val">12px</span>;
+  <span class="tok-prop">cursor</span>: <span class="tok-val">pointer</span>;
+  <span class="tok-prop">transition</span>: <span class="tok-val">background .15s</span>;
+}
+<span class="tok-selector">.day-col.selected</span> {
+  <span class="tok-prop">background</span>: <span class="tok-val">var(--iris-1)</span>;
+}
+<span class="tok-selector">.day-col.selected .day-name,
+.day-col.selected .day-num</span> { <span class="tok-prop">color</span>: <span class="tok-val">#fff</span>; }
+
+<span class="tok-selector">.today-ring</span> {
+  <span class="tok-prop">position</span>: <span class="tok-val">absolute</span>;
+  <span class="tok-prop">inset</span>: <span class="tok-val">0</span>;
+  <span class="tok-prop">border-radius</span>: <span class="tok-val">50%</span>;
+  <span class="tok-prop">background</span>: <span class="tok-val">var(--iris-1)</span>;
+}
+
+<span class="tok-comment">/* ─────────────────────────────────────────────────
+   EVENT CARDS  — Apple Calendar style
+───────────────────────────────────────────────── */</span>
+<span class="tok-selector">.event-card</span> {
+  <span class="tok-prop">background</span>: <span class="tok-val">#fff</span>;
+  <span class="tok-prop">border-radius</span>: <span class="tok-val">14px</span>;
+  <span class="tok-prop">box-shadow</span>: <span class="tok-val">var(--shadow-sm)</span>;
+  <span class="tok-prop">display</span>: <span class="tok-val">flex</span>;
+  <span class="tok-prop">overflow</span>: <span class="tok-val">hidden</span>;
+  <span class="tok-prop">border</span>: <span class="tok-val">1px solid var(--hairline)</span>;
+}
+<span class="tok-selector">.event-stripe</span> {
+  <span class="tok-prop">width</span>: <span class="tok-val">4px</span>;
+  <span class="tok-prop">flex-shrink</span>: <span class="tok-val">0</span>;
+  <span class="tok-comment">/* background set inline per-category color */</span>
+}
+<span class="tok-selector">.event-time</span> {
+  <span class="tok-prop">font-family</span>: <span class="tok-val">var(--mono)</span>;
+  <span class="tok-prop">font-size</span>: <span class="tok-val">12px</span>;
+  <span class="tok-prop">font-weight</span>: <span class="tok-val">600</span>;
+  <span class="tok-prop">min-width</span>: <span class="tok-val">38px</span>;
+  <span class="tok-prop">color</span>: <span class="tok-val">var(--ink-soft)</span>;
+}
+
+<span class="tok-comment">/* ─────────────────────────────────────────────────
+   MONTH GRID
+───────────────────────────────────────────────── */</span>
+<span class="tok-selector">.month-grid</span> {
+  <span class="tok-prop">display</span>: <span class="tok-val">grid</span>;
+  <span class="tok-prop">grid-template-columns</span>: <span class="tok-fn">repeat</span>(<span class="tok-val">7, 1fr</span>);
+  <span class="tok-prop">gap</span>: <span class="tok-val">2px</span>;
+}
+<span class="tok-selector">.month-cell</span> {
+  <span class="tok-prop">min-height</span>: <span class="tok-val">62px</span>;
+  <span class="tok-prop">padding</span>: <span class="tok-val">5px 4px 4px</span>;
+  <span class="tok-prop">border-radius</span>: <span class="tok-val">10px</span>;
+}
+<span class="tok-selector">.event-pill</span> {
+  <span class="tok-prop">font-size</span>: <span class="tok-val">9.5px</span>;
+  <span class="tok-prop">padding</span>: <span class="tok-val">2px 5px</span>;
+  <span class="tok-prop">border-radius</span>: <span class="tok-val">5px</span>;
+  <span class="tok-prop">color</span>: <span class="tok-val">#fff</span>;
+  <span class="tok-prop">overflow</span>: <span class="tok-val">hidden</span>;
+  <span class="tok-prop">text-overflow</span>: <span class="tok-val">ellipsis</span>;
+  <span class="tok-prop">white-space</span>: <span class="tok-val">nowrap</span>;
+}
+
+<span class="tok-comment">/* ─────────────────────────────────────────────────
+   JS: Day-column click handler
+───────────────────────────────────────────────── */</span>
+<span class="tok-fn">document</span>.<span class="tok-key">querySelectorAll</span>(<span class="tok-string">'.day-col'</span>).<span class="tok-key">forEach</span>(col =&gt; {
+  col.<span class="tok-key">addEventListener</span>(<span class="tok-string">'click'</span>, () =&gt; {
+    <span class="tok-fn">document</span>.<span class="tok-key">querySelectorAll</span>(<span class="tok-string">'.day-col'</span>)
+      .<span class="tok-key">forEach</span>(c =&gt; c.<span class="tok-key">classList</span>.<span class="tok-key">remove</span>(<span class="tok-string">'selected'</span>));
+    col.<span class="tok-key">classList</span>.<span class="tok-key">add</span>(<span class="tok-string">'selected'</span>);
+    <span class="tok-fn">renderEventList</span>(col.<span class="tok-key">dataset</span>.date);
+  });
+});
+    </pre>
+  </details>
+
+  <!-- ─── JavaScript ─────────────────────────────────── -->
+  <script>
+    /* ── Sample data ───────────────────────────────────── */
+    const EVENTS = [
+      { date: '2026-05-04', time: '08:30', title: 'School drop-off', who: 'Mia 🧒', category: 'Education', color: '#6366f1', emoji: '📚', allDay: false },
+      { date: '2026-05-04', time: '17:00', title: 'Gym',             who: 'Dad 🧑', category: 'Health',    color: '#10b981', emoji: '🏥', allDay: false },
+      { date: '2026-05-05', time: '14:00', title: 'Dentist — Mia',   who: 'Mia 🧒', category: 'Health',    color: '#10b981', emoji: '🏥', allDay: false },
+      { date: '2026-05-06', time: 'All day',title: 'Electricity bill due', who: 'Everyone 👨‍👩‍👧‍👦', category: 'Finance', color: '#f59e0b', emoji: '💰', allDay: true },
+      { date: '2026-05-07', time: '16:00', title: 'Jake soccer',     who: 'Jake 🧒', category: 'Social',   color: '#ec4899', emoji: '🎉', allDay: false },
+      { date: '2026-05-08', time: '19:30', title: 'Date night',      who: 'Mum + Dad', category: 'Social', color: '#ec4899', emoji: '🎉', allDay: false },
+      { date: '2026-05-09', time: '10:00', title: 'Groceries',       who: 'Mum 👩', category: 'Home',     color: '#84cc16', emoji: '🏠', allDay: false },
+    ];
+
+    const LIFE_AREAS = [
+      { name: 'Health',    emoji: '🏥', color: '#10b981', bg: '#d1fae5', count: 2, next: 'Dentist — Mia, 5 May' },
+      { name: 'Finance',   emoji: '💰', color: '#f59e0b', bg: '#fef3c7', count: 1, next: 'Electricity bill, 6 May' },
+      { name: 'Education', emoji: '📚', color: '#6366f1', bg: '#e0e7ff', count: 1, next: 'School drop-off, 4 May' },
+      { name: 'Social',    emoji: '🎉', color: '#ec4899', bg: '#fce7f3', count: 2, next: 'Jake soccer, 7 May' },
+      { name: 'Home',      emoji: '🏠', color: '#84cc16', bg: '#ecfccb', count: 1, next: 'Groceries, 9 May' },
+      { name: 'Travel',    emoji: '✈️', color: '#0ea5e9', bg: '#e0f2fe', count: 0, next: 'Nothing planned' },
+    ];
+
+    /* ── State ─────────────────────────────────────────── */
+    let currentView   = 'week'; // 'week' | 'month'
+    let currentMonth  = 4;      // 0-indexed, May = 4
+    let currentYear   = 2026;
+    let selectedDate  = '2026-05-05'; // Tuesday as default selected
+
+    const DAY_NAMES   = ['M','T','W','T','F','S','S'];
+    const MONTH_NAMES = ['January','February','March','April','May','June',
+                         'July','August','September','October','November','December'];
+
+    /* ── Helpers ───────────────────────────────────────── */
+    function pad(n) { return String(n).padStart(2,'0'); }
+    function isoDate(y,m,d) { return `${y}-${pad(m+1)}-${pad(d)}`; }
+    function todayISO() {
+      // prototype "today" = 2026-05-01
+      return '2026-05-01';
+    }
+
+    function eventsForDate(date) {
+      return EVENTS.filter(e => e.date === date);
+    }
+
+    /* ── Render month title ────────────────────────────── */
+    function renderMonthTitle() {
+      document.getElementById('month-title').textContent =
+        MONTH_NAMES[currentMonth] + ' ' + currentYear;
+    }
+
+    /* ── Render week strip ─────────────────────────────── */
+    function getWeekDates() {
+      // find Monday of the week containing selectedDate
+      const sel = new Date(selectedDate + 'T12:00:00');
+      const dow = sel.getDay(); // 0=Sun
+      const mondayOffset = dow === 0 ? -6 : 1 - dow;
+      const monday = new Date(sel);
+      monday.setDate(sel.getDate() + mondayOffset);
+      const days = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        days.push(d);
+      }
+      return days;
+    }
+
+    function renderWeekStrip() {
+      const days  = getWeekDates();
+      const today = todayISO();
+      const grid  = document.getElementById('week-days-grid');
+      grid.innerHTML = '';
+
+      days.forEach((d, i) => {
+        const iso = isoDate(d.getFullYear(), d.getMonth(), d.getDate());
+        const evs = eventsForDate(iso);
+        const isToday    = iso === today;
+        const isSelected = iso === selectedDate;
+
+        const col = document.createElement('div');
+        col.className = 'day-col' + (isSelected ? ' selected' : '') + (isToday ? ' today-col' : '');
+        col.dataset.date = iso;
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'day-name';
+        nameEl.textContent = DAY_NAMES[i];
+
+        const numWrap = document.createElement('div');
+        numWrap.className = 'day-num-wrap';
+
+        const numEl = document.createElement('div');
+        numEl.className = 'day-num';
+        numEl.textContent = d.getDate();
+        numWrap.appendChild(numEl);
+
+        const dotRow = document.createElement('div');
+        dotRow.className = 'day-dot-row';
+
+        evs.slice(0, 3).forEach(ev => {
+          const dot = document.createElement('div');
+          dot.className = 'day-dot';
+          dot.style.background = isSelected ? 'rgba(255,255,255,.6)' : ev.color;
+          dotRow.appendChild(dot);
+        });
+
+        col.appendChild(nameEl);
+        col.appendChild(numWrap);
+        col.appendChild(dotRow);
+
+        col.addEventListener('click', () => {
+          selectedDate = iso;
+          renderWeekStrip();
+          renderEventList();
+        });
+
+        grid.appendChild(col);
+      });
+    }
+
+    /* ── Render event list ─────────────────────────────── */
+    function renderEventList() {
+      const list = document.getElementById('event-list');
+      const evs  = eventsForDate(selectedDate);
+
+      // header
+      const selD   = new Date(selectedDate + 'T12:00:00');
+      const label  = selD.toLocaleDateString('en-AU',{ weekday:'long', day:'numeric', month:'long' });
+
+      list.innerHTML = `
+        <div class="event-list-header">
+          <span class="event-list-label">${label}</span>
+          ${evs.length ? `<span class="event-count-badge">${evs.length} event${evs.length>1?'s':''}</span>` : ''}
+        </div>`;
+
+      if (!evs.length) {
+        list.innerHTML += `
+          <div class="empty-state">
+            <div class="empty-illustration">🌿</div>
+            <p>Nothing on — enjoy the quiet</p>
+          </div>`;
+        return;
+      }
+
+      evs.forEach(ev => {
+        const card = document.createElement('div');
+        card.className = 'event-card' + (ev.allDay ? ' all-day' : '');
+        card.innerHTML = `
+          <div class="event-stripe" style="background:${ev.color};"></div>
+          <div class="event-body">
+            <div class="event-time">${ev.time}</div>
+            <div class="event-info">
+              <div class="event-title">${ev.title}</div>
+              <div class="event-meta">
+                <span class="who-chip">${ev.who}</span>
+              </div>
+            </div>
+            <div class="event-emoji">${ev.emoji}</div>
+          </div>`;
+        list.appendChild(card);
+      });
+    }
+
+    /* ── Render month grid ─────────────────────────────── */
+    function renderMonthGrid() {
+      const grid  = document.getElementById('month-grid');
+      const today = todayISO();
+      grid.innerHTML = '';
+
+      // first day of month (0=Sun … 6=Sat), shift to Mon-based
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const startOffset = firstDay === 0 ? 6 : firstDay - 1; // blanks before day 1
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const prevDays    = new Date(currentYear, currentMonth, 0).getDate();
+      const totalCells  = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement('div');
+
+        let dayNum, iso, isOther = false;
+        if (i < startOffset) {
+          dayNum  = prevDays - startOffset + i + 1;
+          const pm = currentMonth === 0 ? 11 : currentMonth - 1;
+          const py = currentMonth === 0 ? currentYear - 1 : currentYear;
+          iso = isoDate(py, pm, dayNum);
+          isOther = true;
+        } else if (i >= startOffset + daysInMonth) {
+          dayNum  = i - startOffset - daysInMonth + 1;
+          const nm = currentMonth === 11 ? 0 : currentMonth + 1;
+          const ny = currentMonth === 11 ? currentYear + 1 : currentYear;
+          iso = isoDate(ny, nm, dayNum);
+          isOther = true;
+        } else {
+          dayNum = i - startOffset + 1;
+          iso    = isoDate(currentYear, currentMonth, dayNum);
+        }
+
+        cell.className = 'month-cell' + (isOther ? ' other-month' : '');
+        cell.dataset.date = iso;
+
+        const dateEl = document.createElement('div');
+        dateEl.className = 'cell-date' + (iso === today ? ' today' : '');
+        dateEl.textContent = dayNum;
+        cell.appendChild(dateEl);
+
+        const dayEvs = eventsForDate(iso);
+        dayEvs.slice(0,2).forEach(ev => {
+          const pill = document.createElement('div');
+          pill.className = 'event-pill';
+          pill.style.background = ev.color;
+          pill.textContent = ev.title;
+          cell.appendChild(pill);
+        });
+        if (dayEvs.length > 2) {
+          const more = document.createElement('div');
+          more.className = 'overflow-label';
+          more.textContent = `+${dayEvs.length - 2} more`;
+          cell.appendChild(more);
+        }
+
+        cell.addEventListener('click', () => {
+          selectedDate = iso;
+          // switch to week view when clicking month cell
+          setPillView('week');
+          setPageView('week');
+          renderWeekStrip();
+          renderEventList();
+        });
+
+        grid.appendChild(cell);
+      }
+    }
+
+    /* ── Render life areas ─────────────────────────────── */
+    function renderLifeAreas() {
+      const grid = document.getElementById('life-areas-grid');
+      grid.innerHTML = '';
+      const totalLifeCount = LIFE_AREAS.reduce((s, la) => s + la.count, 0);
+      const lifeCountBadge = document.getElementById('life-areas-count');
+      if (lifeCountBadge) lifeCountBadge.textContent = totalLifeCount;
+      LIFE_AREAS.forEach(la => {
+        const card = document.createElement('div');
+        card.className = 'life-area-card';
+        card.innerHTML = `
+          <div class="la-top">
+            <div class="la-icon-circle" style="background:${la.bg};">${la.emoji}</div>
+            <div class="la-label-block">
+              <div class="la-name">${la.name}</div>
+              <div class="la-count">${la.count} event${la.count !== 1 ? 's' : ''} this month</div>
+            </div>
+          </div>
+          <div class="la-next">${la.next}</div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    /* ── View toggles ──────────────────────────────────── */
+    function setPageView(v) {
+      currentView = v;
+      document.getElementById('tab-week').classList.toggle('active', v === 'week');
+      document.getElementById('tab-month').classList.toggle('active', v === 'month');
+      const isToday = selectedDate === new Date().toISOString().slice(0,10);
+      document.getElementById('pill-week').classList.toggle('active', v === 'week' && !isToday);
+      document.getElementById('pill-month').classList.toggle('active', v === 'month');
+      document.getElementById('pill-today').classList.toggle('active', isToday);
+
+      document.getElementById('week-strip').classList.toggle('visible', v === 'week');
+      document.getElementById('event-list-wrap').style.display = v === 'week' ? 'block' : 'none';
+      document.getElementById('month-grid-wrap').classList.toggle('visible', v === 'month');
+
+      if (v === 'month') renderMonthGrid();
+    }
+
+    function setPillView(v) {
+      setPageView(v);
+    }
+
+    function goToday() {
+      const now = new Date();
+      currentMonth = now.getMonth();
+      currentYear  = now.getFullYear();
+      selectedDate = now.toISOString().slice(0, 10);
+      document.getElementById('month-title').textContent =
+        MONTH_NAMES[currentMonth] + ' ' + currentYear;
+      setPillView('week');
+      renderWeekStrip();
+      renderEventList();
+    }
+
+    function shiftMonth(delta) {
+      currentMonth += delta;
+      if (currentMonth > 11) { currentMonth = 0;  currentYear++; }
+      if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+      renderMonthTitle();
+      if (currentView === 'month') renderMonthGrid();
+    }
+
+    function selectMember(btn) {
+      document.querySelectorAll('.member-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function toggleLifeAreas(btn) {
+      const grid = document.getElementById('life-areas-grid');
+      const hidden = grid.style.display === 'none';
+      grid.style.display = hidden ? '' : 'none';
+      btn.textContent = hidden ? 'Hide' : 'Show';
+    }
+
+    /* ── Init ──────────────────────────────────────────── */
+    renderMonthTitle();
+    renderWeekStrip();
+    renderEventList();
+    renderLifeAreas();
+  </script>
+</body>
+</html>

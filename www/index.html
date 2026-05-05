@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Toto</title>
-  <link rel="manifest" href="/home-budget/manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#ffffff">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Toto">
-  <link rel="apple-touch-icon" href="/home-budget/icons/icon.svg">
+  <link rel="apple-touch-icon" href="./icons/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -20,19 +20,7 @@
       document.getElementById('reskin-css')?.remove();
     }
   </script>
-  <!-- styles imported via src/main.js -->
-  <!-- Firebase config injected before the module script so it can read window.__FIREBASE_CONFIG__ -->
-  <script>
-    window.__FIREBASE_CONFIG__ = {
-      apiKey: "AIzaSyBiQq8lIf5yCKGDyinGjLaeAE100u7vF90",
-      authDomain: "home-budget-b0f28.firebaseapp.com",
-      projectId: "home-budget-b0f28",
-      storageBucket: "home-budget-b0f28.firebasestorage.app",
-      messagingSenderId: "777614158624",
-      appId: "1:777614158624:web:a8636d1b5894ae4d3e8545"
-    };
-  </script>
-  <!-- Firebase v10 modular SDK — loaded as ESM, globals exposed for the classic script below -->
+  <!-- styles + Firebase bundled via src/main.js -->
   <script
     src="https://browser.sentry-cdn.com/8.28.0/bundle.min.js"
     crossorigin="anonymous"
@@ -55,8 +43,8 @@
       });
     }
   </script>
-  <script type="module" crossorigin src="/assets/index-DXSVfDBH.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/style-CR1KVgQc.css">
+  <script type="module" crossorigin src="./assets/index-CfiNunZn.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/style-CR1KVgQc.css">
 </head>
 <body data-section="today">
 

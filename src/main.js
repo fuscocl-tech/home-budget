@@ -1,4 +1,5 @@
 import './styles/main.css';
+import './firebase.js';
 import { freqToMonthly, billNextDue, billDaysUntil } from './utils.js';
 import { state, _initState, _replaceState, subscribe, getState, registerSectionRenderers } from './store.js';
 import {
@@ -40,10 +41,7 @@ function openNavGroupFor(tab) {
 // ─────────────────────────────────────────────────
 // FIREBASE
 // ─────────────────────────────────────────────────
-// fbAuth and fbStore are set by the module script in <head>.
-// The module script fires 'firebase-ready' on window when done.
-// All Firebase-dependent code waits for that event before running.
-//
+// fbAuth and fbStore are set by src/firebase.js, which is imported above.
 // fbAuth shim API: onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, currentUser
 // fbStore shim API: .collection(path).doc(id).{get, set, delete, onSnapshot}
 
@@ -272,12 +270,8 @@ function _initAuthListener() {
   });
 }
 
-// Start auth when Firebase module is ready (may already be ready if module ran first)
-if (window.__firebaseReady) {
-  _initAuthListener();
-} else {
-  window.addEventListener('firebase-ready', _initAuthListener, { once: true });
-}
+// src/firebase.js runs before this code so fbAuth is always available here.
+_initAuthListener();
 
 // ─────────────────────────────────────────────────
 // DATA

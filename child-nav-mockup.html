@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Child Navigation Mockup</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  background: #ECEAF5;
+  min-height: 100vh;
+  padding: 48px 20px 80px;
+}
+
+.page-title {
+  text-align: center; font-size: 26px; font-weight: 800;
+  color: #18181B; letter-spacing: -0.5px; margin-bottom: 4px;
+}
+.page-sub { text-align: center; font-size: 13px; color: #A1A1AA; margin-bottom: 48px; }
+
+.screens {
+  display: flex; gap: 28px; justify-content: center;
+  flex-wrap: wrap; max-width: 1600px; margin: 0 auto;
+}
+.screen-col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.screen-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: #A1A1AA;
+}
+
+/* Phone shell */
+.phone {
+  width: 320px; height: 672px; border-radius: 44px;
+  border: 1.5px solid #D4D0E8; overflow: hidden; position: relative;
+  display: flex; flex-direction: column; background: #f5f3ff;
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.6), 0 24px 64px rgba(91,76,245,0.15), 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Status bar */
+.status-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 44px;
+  padding: 12px 24px 0; display: flex; align-items: center;
+  justify-content: space-between; z-index: 10; pointer-events: none;
+}
+.status-time { font-size: 13px; font-weight: 600; color: #fff; font-family: ui-monospace, monospace; }
+.status-icons { display: flex; gap: 5px; align-items: center; }
+
+/* Child header */
+.cv-header {
+  background: linear-gradient(135deg, #5B4CF5 0%, #7C3AED 100%);
+  padding: 48px 20px 18px; flex-shrink: 0;
+}
+.cv-header.tween { background: #1e293b; }
+.cv-header-row { display: flex; align-items: center; justify-content: space-between; }
+.cv-avatar-wrap { display: flex; align-items: center; gap: 12px; }
+.cv-avatar { font-size: 36px; line-height: 1; }
+.cv-name { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+.cv-name.tween { font-size: 18px; font-weight: 700; }
+.cv-greeting { font-size: 13px; color: rgba(255,255,255,.75); margin-top: 1px; }
+.cv-greeting.tween { color: rgba(255,255,255,.45); }
+.cv-signout {
+  font-size: 12px; font-weight: 700;
+  background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.35);
+  border-radius: 99px; padding: 7px 14px; color: #fff; cursor: pointer;
+}
+.cv-nudge {
+  margin-top: 12px; background: rgba(255,255,255,.18);
+  border-radius: 12px; padding: 9px 14px;
+  font-size: 13px; font-weight: 600; color: #fff;
+}
+
+/* Content area */
+.cv-content {
+  flex: 1; overflow-y: auto; padding: 16px 14px 0;
+}
+
+/* Bottom nav */
+.cv-bottom-nav {
+  display: flex; background: #fff;
+  border-top: 1px solid #e2e8f0;
+  flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.cv-bottom-nav.tween { background: #0f172a; border-top-color: #1e293b; }
+
+.cv-nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; padding: 10px 0 12px;
+  font-size: 10px; font-weight: 600; color: #94a3b8;
+  border: none; background: none; cursor: pointer;
+  transition: color .15s; position: relative;
+}
+.cv-nav-item.active { color: #5B4CF5; }
+.cv-nav-item.active.tween-tab { color: #a78bfa; }
+.cv-nav-item.tween-tab { color: #475569; }
+.cv-nav-icon { font-size: 22px; line-height: 1; }
+.cv-nav-item.active::after {
+  content: '';
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 3px; border-radius: 99px 99px 0 0; background: #5B4CF5;
+}
+.cv-nav-item.active.tween-tab::after { background: #a78bfa; }
+.cv-nav-badge {
+  position: absolute; top: 8px; right: calc(50% - 16px);
+  background: #ef4444; color: #fff; font-size: 9px; font-weight: 800;
+  width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Today content ── */
+.cv2-group { margin-bottom: 18px; }
+.cv2-group-heading {
+  font-size: 10px; font-weight: 700; letter-spacing: .9px;
+  text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; padding-left: 2px;
+}
+.cv2-card { background: #fff; border-radius: 18px; border: 1px solid #e2e8f0; overflow: hidden; }
+.cv2-card--warm { background: #fffbf5; border-color: #fde68a; }
+.cv2-routine-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 15px 8px; }
+.cv2-routine-title { display: flex; align-items: center; gap: 8px; }
+.cv2-routine-name { font-size: 14px; font-weight: 700; color: #1e293b; }
+.cv2-routine-frac { font-size: 12px; color: #94a3b8; font-weight: 600; }
+.cv2-progress { height: 4px; background: #f1f5f9; margin: 0 15px 2px; }
+.cv2-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#5B4CF5,#7C3AED); }
+.cv2-steps { padding: 2px 0 6px; }
+.cv2-step { display: flex; align-items: center; gap: 11px; padding: 10px 15px; border-bottom: 1px solid #f8fafc; }
+.cv2-step:last-child { border-bottom: none; }
+.cv2-step-check { width: 25px; height: 25px; border-radius: 50%; flex-shrink: 0; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; }
+.cv2-step-check.done { border-color: #5B4CF5; background: #5B4CF5; }
+.cv2-step-emoji { font-size: 18px; flex-shrink: 0; }
+.cv2-step-label { flex: 1; font-size: 14px; font-weight: 500; color: #1e293b; }
+.cv2-step-label.done { color: #94a3b8; text-decoration: line-through; }
+.cv2-step-pts { background: #fef9c3; color: #854d0e; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 99px; flex-shrink: 0; }
+.cv2-chore { display: flex; align-items: center; gap: 11px; padding: 12px 15px; border-bottom: 1px solid #f8fafc; }
+.cv2-chore:last-child { border-bottom: none; }
+.cv2-chore-info { flex: 1; }
+.cv2-chore-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+.cv2-chore-pts { font-size: 12px; color: #64748b; margin-top: 2px; }
+.cv2-chore-btn { background: #5B4CF5; color: #fff; border: none; border-radius: 10px; padding: 9px 13px; font-size: 12px; font-weight: 700; }
+
+/* ── Calendar content ── */
+.cv-week-strip { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; margin-bottom: 14px; }
+.cv-week-cell { border-radius: 12px; padding: 9px 4px; text-align: center; background: #fff; border: 1px solid #f1f5f9; cursor: pointer; }
+.cv-week-cell.today { background: #5B4CF5; border-color: #5B4CF5; }
+.cv-week-dow { font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+.cv-week-cell.today .cv-week-dow { color: rgba(255,255,255,.7); }
+.cv-week-date { font-size: 15px; font-weight: 800; color: #1e293b; margin: 3px 0; }
+.cv-week-cell.today .cv-week-date { color: #fff; }
+.cv-cal-dot { width: 6px; height: 6px; border-radius: 50%; margin: 1px auto; }
+.cv-sched-section-hdr { font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #94a3b8; margin: 12px 0 6px 2px; }
+.cv-sched-item { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 8px; overflow: hidden; }
+.cv-sched-row { display: flex; align-items: center; gap: 10px; padding: 11px 13px; }
+.cv-sched-time { font-size: 11px; font-weight: 700; color: #94a3b8; min-width: 40px; flex-shrink: 0; text-align: right; }
+.cv-sched-bar { width: 3px; border-radius: 99px; align-self: stretch; flex-shrink: 0; min-height: 20px; }
+.cv-sched-emoji { font-size: 18px; flex-shrink: 0; }
+.cv-sched-body { flex: 1; min-width: 0; }
+.cv-sched-title { font-size: 13px; font-weight: 600; color: #1e293b; }
+.cv-sched-sub { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+.cv-sched-progress { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.cv-sched-prog-bar { width: 32px; height: 4px; background: #f1f5f9; border-radius: 99px; overflow: hidden; }
+.cv-sched-prog-fill { height: 100%; border-radius: 99px; background: #5B4CF5; }
+.cv-sched-expand-btn { background: none; border: none; font-size: 12px; color: #94a3b8; cursor: pointer; padding: 0 2px; }
+.cv-sched-steps { border-top: 1px solid #f1f5f9; padding: 4px 0 6px; }
+.cv-sched-step { display: flex; align-items: center; gap: 10px; padding: 9px 13px; border-bottom: 1px solid #f8fafc; }
+.cv-sched-step:last-child { border-bottom: none; }
+.cv-sched-step-check { width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; }
+.cv-sched-step-check.done { border-color: #5B4CF5; background: #5B4CF5; }
+.cv-sched-step-label { flex: 1; font-size: 12px; font-weight: 500; color: #1e293b; }
+.cv-sched-step-label.done { color: #94a3b8; text-decoration: line-through; }
+
+/* ── Prizes content ── */
+.cv2-prize-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 15px 12px; }
+.cv2-prize-header-title { font-size: 15px; font-weight: 700; color: #1e293b; }
+.cv2-bal-badge { background: linear-gradient(135deg,#5B4CF5,#7C3AED); color: #fff; font-size: 13px; font-weight: 800; padding: 6px 16px; border-radius: 99px; }
+.cv2-prize { display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-top: 1px solid #f8fafc; }
+.cv2-prize-emoji { font-size: 28px; flex-shrink: 0; }
+.cv2-prize-info { flex: 1; }
+.cv2-prize-name { font-size: 14px; font-weight: 600; color: #1e293b; }
+.cv2-prize-cost { font-size: 12px; color: #64748b; margin-top: 2px; }
+.cv2-prize-btn { border: none; border-radius: 10px; padding: 10px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.cv2-prize-btn.can { background: #5B4CF5; color: #fff; }
+.cv2-prize-btn.cant { background: #f1f5f9; color: #94a3b8; cursor: default; }
+
+/* Tween overrides */
+.tween-content { background: #f8fafc; }
+.tween-content .cv2-card { border-radius: 12px; }
+.tween-content .cv-sched-item { border-radius: 12px; }
+.tween-content .cv2-prize-btn.can { background: #1e293b; }
+.tween-content .cv2-bal-badge { background: #1e293b; }
+.tween-content .cv2-card--warm { background: #fafaf8; border-color: #e2e8f0; }
+
+/* Callout cards */
+.callouts { max-width: 900px; margin: 52px auto 0; display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; }
+.callout { background: #fff; border-radius: 16px; border: 1px solid #E8E6F0; padding: 18px 20px; }
+.callout-icon { font-size: 22px; margin-bottom: 8px; }
+.callout-title { font-size: 13px; font-weight: 700; color: #18181B; margin-bottom: 4px; }
+.callout-body { font-size: 12px; color: #A1A1AA; line-height: 1.55; }
+</style>
+</head>
+<body>
+
+<div class="page-title">Child Navigation — Bottom Nav Mockup</div>
+<div class="page-sub">Three tabs · Today · Calendar · Prizes · Ages 5–16 · Tiny Tots unchanged</div>
+
+<div class="screens">
+
+  <!-- ── Independents: Today tab ── -->
+  <div class="screen-col">
+    <div class="screen-label">Today (active)</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff" opacity=".6"/><rect x="9" y=".5" width="3" height="11.5" rx="1" fill="#fff" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#fff"/></svg>
+        </div>
+      </div>
+      <div class="cv-header">
+        <div class="cv-header-row">
+          <div class="cv-avatar-wrap">
+            <span class="cv-avatar">😊</span>
+            <div>
+              <div class="cv-name">Amy</div>
+              <div class="cv-greeting">Good morning!</div>
+            </div>
+          </div>
+          <button class="cv-signout">Sign out</button>
+        </div>
+        <div class="cv-nudge">You've earned ⭐ 15 points today — keep going!</div>
+      </div>
+
+      <div class="cv-content">
+        <div class="cv2-group">
+          <div class="cv2-group-heading">📋 My Routines</div>
+          <div class="cv2-card">
+            <div class="cv2-routine-header">
+              <div class="cv2-routine-title"><span>🌅</span><span class="cv2-routine-name">Morning</span></div>
+              <span class="cv2-routine-frac">3/5 · ⭐20</span>
+            </div>
+            <div class="cv2-progress"><div class="cv2-progress-fill" style="width:60%"></div></div>
+            <div class="cv2-steps">
+              <div class="cv2-step"><div class="cv2-step-check done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🛏️</span><span class="cv2-step-label done">Make bed</span><span class="cv2-step-pts">⭐ 5</span></div>
+              <div class="cv2-step"><div class="cv2-step-check done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🚿</span><span class="cv2-step-label done">Shower</span></div>
+              <div class="cv2-step"><div class="cv2-step-check done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji">🥣</span><span class="cv2-step-label done">Breakfast</span></div>
+              <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🎒</span><span class="cv2-step-label">Pack school bag</span><span class="cv2-step-pts">⭐ 5</span></div>
+              <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji">🦷</span><span class="cv2-step-label">Brush teeth</span><span class="cv2-step-pts">⭐ 5</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cv2-group">
+          <div class="cv2-group-heading">🧹 Chores</div>
+          <div class="cv2-card">
+            <div class="cv2-chore"><span style="font-size:21px">🧹</span><div class="cv2-chore-info"><div class="cv2-chore-name">Sweep kitchen</div><div class="cv2-chore-pts">⭐ 10 · daily</div></div><span style="background:#fef9c3;color:#854d0e;font-size:11px;font-weight:700;padding:5px 11px;border-radius:99px">Waiting ✓</span></div>
+            <div class="cv2-chore"><span style="font-size:21px">🐕</span><div class="cv2-chore-info"><div class="cv2-chore-name">Feed the dog</div><div class="cv2-chore-pts">⭐ 5 · daily</div></div><button class="cv2-chore-btn">Done ✓</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom nav -->
+      <div class="cv-bottom-nav">
+        <button class="cv-nav-item active">
+          <span class="cv-nav-icon">☀️</span>Today
+        </button>
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">📅</span>Calendar
+        </button>
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">🏆</span>Prizes
+          <span class="cv-nav-badge">2</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Independents: Calendar tab ── -->
+  <div class="screen-col">
+    <div class="screen-label">Calendar (active)</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff" opacity=".6"/><rect x="9" y=".5" width="3" height="11.5" rx="1" fill="#fff" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#fff"/></svg>
+        </div>
+      </div>
+      <div class="cv-header">
+        <div class="cv-header-row">
+          <div class="cv-avatar-wrap">
+            <span class="cv-avatar">😊</span>
+            <div>
+              <div class="cv-name">Amy</div>
+              <div class="cv-greeting">Good morning!</div>
+            </div>
+          </div>
+          <button class="cv-signout">Sign out</button>
+        </div>
+      </div>
+
+      <div class="cv-content">
+        <!-- View toggle -->
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button style="border-radius:99px;padding:6px 16px;font-size:12px;font-weight:600;background:#5B4CF5;color:#fff;border:none;cursor:pointer">Week</button>
+          <button style="border-radius:99px;padding:6px 16px;font-size:12px;font-weight:600;background:transparent;color:#94a3b8;border:1.5px solid #e2e8f0;cursor:pointer">Month</button>
+        </div>
+        <!-- Week strip -->
+        <div class="cv-week-strip">
+          <div class="cv-week-cell today"><div class="cv-week-dow">WED</div><div class="cv-week-date">30</div><div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:3px"><div class="cv-cal-dot" style="background:#7C3AED"></div><div class="cv-cal-dot" style="background:#ec4899"></div></div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">THU</div><div class="cv-week-date">1</div><div style="margin-top:3px"><div class="cv-cal-dot" style="background:#7C3AED"></div></div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">FRI</div><div class="cv-week-date">2</div><div style="margin-top:3px"><div class="cv-cal-dot" style="background:#10b981"></div></div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">SAT</div><div class="cv-week-date">3</div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">SUN</div><div class="cv-week-date">4</div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">MON</div><div class="cv-week-date">5</div><div style="margin-top:3px"><div class="cv-cal-dot" style="background:#7C3AED"></div></div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">TUE</div><div class="cv-week-date">6</div><div style="margin-top:3px"><div class="cv-cal-dot" style="background:#7C3AED"></div></div></div>
+        </div>
+        <!-- Schedule -->
+        <div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:8px">Wednesday, 30 April</div>
+        <div class="cv-sched-section-hdr">Schedule</div>
+        <!-- Routine card expanded -->
+        <div class="cv-sched-item">
+          <div class="cv-sched-row" style="cursor:pointer">
+            <span class="cv-sched-time">7:00 am</span>
+            <div class="cv-sched-bar" style="background:#7C3AED"></div>
+            <span class="cv-sched-emoji">🌅</span>
+            <div class="cv-sched-body">
+              <div class="cv-sched-title">Morning Routine</div>
+            </div>
+            <div class="cv-sched-progress">
+              <div class="cv-sched-prog-bar"><div class="cv-sched-prog-fill" style="width:60%"></div></div>
+              <span style="font-size:11px;color:#94a3b8;font-weight:600">3/5</span>
+            </div>
+            <button class="cv-sched-expand-btn">▲</button>
+          </div>
+          <div class="cv-sched-steps">
+            <div class="cv-sched-step"><div class="cv-sched-step-check done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style="font-size:16px">🛏️</span><span class="cv-sched-step-label done">Make bed</span></div>
+            <div class="cv-sched-step"><div class="cv-sched-step-check done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style="font-size:16px">🚿</span><span class="cv-sched-step-label done">Shower</span></div>
+            <div class="cv-sched-step"><div class="cv-sched-step-check done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span style="font-size:16px">🥣</span><span class="cv-sched-step-label done">Breakfast</span></div>
+            <div class="cv-sched-step"><div class="cv-sched-step-check"></div><span style="font-size:16px">🎒</span><span class="cv-sched-step-label">Pack school bag</span></div>
+            <div class="cv-sched-step"><div class="cv-sched-step-check"></div><span style="font-size:16px">🦷</span><span class="cv-sched-step-label">Brush teeth</span></div>
+          </div>
+        </div>
+        <!-- Event -->
+        <div class="cv-sched-item">
+          <div class="cv-sched-row">
+            <span class="cv-sched-time">3:30 pm</span>
+            <div class="cv-sched-bar" style="background:#10b981"></div>
+            <span class="cv-sched-emoji">⚽</span>
+            <div class="cv-sched-body">
+              <div class="cv-sched-title">Soccer training</div>
+              <div class="cv-sched-sub">Bring boots + water bottle</div>
+            </div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#10b98120;color:#10b981">Event</span>
+          </div>
+        </div>
+        <div class="cv-sched-section-hdr">Chores</div>
+        <div class="cv-sched-item">
+          <div class="cv-sched-row">
+            <span class="cv-sched-time"></span>
+            <div class="cv-sched-bar" style="background:#ec4899"></div>
+            <span class="cv-sched-emoji">🧹</span>
+            <div class="cv-sched-body"><div class="cv-sched-title">Sweep kitchen</div></div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:#ec489920;color:#ec4899">Chore</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-bottom-nav">
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">☀️</span>Today
+        </button>
+        <button class="cv-nav-item active">
+          <span class="cv-nav-icon">📅</span>Calendar
+        </button>
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">🏆</span>Prizes
+          <span class="cv-nav-badge">2</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Independents: Prizes tab ── -->
+  <div class="screen-col">
+    <div class="screen-label">Prizes (active)</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff" opacity=".6"/><rect x="9" y=".5" width="3" height="11.5" rx="1" fill="#fff" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#fff"/></svg>
+        </div>
+      </div>
+      <div class="cv-header">
+        <div class="cv-header-row">
+          <div class="cv-avatar-wrap">
+            <span class="cv-avatar">😊</span>
+            <div>
+              <div class="cv-name">Amy</div>
+              <div class="cv-greeting">Good morning!</div>
+            </div>
+          </div>
+          <button class="cv-signout">Sign out</button>
+        </div>
+      </div>
+
+      <div class="cv-content">
+        <!-- Notification -->
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;font-weight:600;color:#15803d">
+          🎁 <span><strong>Ice Cream</strong> approved! You can redeem it now.</span>
+          <button style="margin-left:auto;background:none;border:none;font-size:16px;opacity:.5;cursor:pointer">×</button>
+        </div>
+
+        <div class="cv2-card cv2-card--warm">
+          <div class="cv2-prize-header">
+            <span class="cv2-prize-header-title">🏆 Prize Store</span>
+            <span class="cv2-bal-badge">⭐ 65 pts</span>
+          </div>
+          <div class="cv2-prize">
+            <span class="cv2-prize-emoji">🍦</span>
+            <div class="cv2-prize-info"><div class="cv2-prize-name">Ice Cream</div><div class="cv2-prize-cost">⭐ 30 points</div></div>
+            <button class="cv2-prize-btn can">Redeem</button>
+          </div>
+          <div class="cv2-prize">
+            <span class="cv2-prize-emoji">🎬</span>
+            <div class="cv2-prize-info"><div class="cv2-prize-name">Movie night</div><div class="cv2-prize-cost">⭐ 50 points</div></div>
+            <button class="cv2-prize-btn can">Redeem</button>
+          </div>
+          <div class="cv2-prize">
+            <span class="cv2-prize-emoji">🎮</span>
+            <div class="cv2-prize-info"><div class="cv2-prize-name">Extra screen time</div><div class="cv2-prize-cost">⭐ 80 points</div></div>
+            <button class="cv2-prize-btn cant" disabled>⭐ 80</button>
+          </div>
+          <div class="cv2-prize">
+            <span class="cv2-prize-emoji">🏖</span>
+            <div class="cv2-prize-info"><div class="cv2-prize-name">Beach trip</div><div class="cv2-prize-cost">⭐ 200 points</div></div>
+            <button class="cv2-prize-btn cant" disabled>⭐ 200</button>
+          </div>
+        </div>
+
+        <!-- Redemption history -->
+        <div style="margin-top:18px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#94a3b8;margin-bottom:8px">Recent</div>
+          <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:11px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span style="font-size:20px">🍕</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1e293b">Pizza night</div><div style="font-size:11px;color:#94a3b8">Approved 28 Apr</div></div>
+            <span style="font-size:10px;font-weight:700;background:#f0fdf4;color:#15803d;padding:3px 8px;border-radius:99px">✓ Done</span>
+          </div>
+          <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:11px 14px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">🍦</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1e293b">Ice Cream</div><div style="font-size:11px;color:#94a3b8">Requested today</div></div>
+            <span style="font-size:10px;font-weight:700;background:#fffbeb;color:#854d0e;padding:3px 8px;border-radius:99px">⏳ Pending</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-bottom-nav">
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">☀️</span>Today
+        </button>
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">📅</span>Calendar
+        </button>
+        <button class="cv-nav-item active">
+          <span class="cv-nav-icon">🏆</span>Prizes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tweens (12-16) ── -->
+  <div class="screen-col">
+    <div class="screen-label">Tweens (12–16) — Today</div>
+    <div class="phone" style="background:#f8fafc">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff" opacity=".6"/><rect x="9" y=".5" width="3" height="11.5" rx="1" fill="#fff" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#fff"/></svg>
+        </div>
+      </div>
+      <div class="cv-header tween">
+        <div class="cv-header-row">
+          <div class="cv-avatar-wrap">
+            <span class="cv-avatar">🧑</span>
+            <div>
+              <div class="cv-name tween">Jordan</div>
+              <div class="cv-greeting tween">Good morning</div>
+            </div>
+          </div>
+          <button class="cv-signout">Sign out</button>
+        </div>
+      </div>
+
+      <div class="cv-content tween-content">
+        <div class="cv2-group">
+          <div class="cv2-group-heading">📋 My Routines</div>
+          <div class="cv2-card">
+            <div class="cv2-routine-header">
+              <div class="cv2-routine-title"><span>🌅</span><span class="cv2-routine-name">Morning</span></div>
+              <span class="cv2-routine-frac">2/4 · ⭐25</span>
+            </div>
+            <div class="cv2-progress"><div class="cv2-progress-fill" style="width:50%"></div></div>
+            <div class="cv2-steps">
+              <div class="cv2-step"><div class="cv2-step-check done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji" style="font-size:16px">🏃</span><span class="cv2-step-label done" style="font-size:14px">Morning run</span><span class="cv2-step-pts">⭐ 10</span></div>
+              <div class="cv2-step"><div class="cv2-step-check done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cv2-step-emoji" style="font-size:16px">🚿</span><span class="cv2-step-label done" style="font-size:14px">Shower</span></div>
+              <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji" style="font-size:16px">📚</span><span class="cv2-step-label" style="font-size:14px">Review timetable</span></div>
+              <div class="cv2-step"><div class="cv2-step-check"></div><span class="cv2-step-emoji" style="font-size:16px">🎒</span><span class="cv2-step-label" style="font-size:14px">Pack bag</span><span class="cv2-step-pts">⭐ 5</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cv2-group">
+          <div class="cv2-group-heading">🧹 Chores</div>
+          <div class="cv2-card">
+            <div class="cv2-chore"><span style="font-size:19px">🗑</span><div class="cv2-chore-info"><div class="cv2-chore-name" style="font-size:14px">Empty bins</div><div class="cv2-chore-pts">⭐ 10</div></div><button class="cv2-chore-btn">Done ✓</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-bottom-nav tween">
+        <button class="cv-nav-item active tween-tab">
+          <span class="cv-nav-icon">☀️</span>Today
+        </button>
+        <button class="cv-nav-item tween-tab">
+          <span class="cv-nav-icon">📅</span>Calendar
+        </button>
+        <button class="cv-nav-item tween-tab">
+          <span class="cv-nav-icon">🏆</span>Prizes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Early Readers: Calendar ── -->
+  <div class="screen-col">
+    <div class="screen-label">Early Readers (5–8) — Calendar</div>
+    <div class="phone">
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#fff" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#fff" opacity=".6"/><rect x="9" y=".5" width="3" height="11.5" rx="1" fill="#fff" opacity=".8"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#fff"/></svg>
+          <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="#fff" stroke-opacity=".4"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#fff"/></svg>
+        </div>
+      </div>
+      <div class="cv-header">
+        <div class="cv-header-row">
+          <div class="cv-avatar-wrap">
+            <span class="cv-avatar">🦁</span>
+            <div>
+              <div class="cv-name" style="font-size:22px">Jack</div>
+              <div class="cv-greeting">Good morning!</div>
+            </div>
+          </div>
+          <button class="cv-signout">Sign out</button>
+        </div>
+      </div>
+
+      <div class="cv-content">
+        <!-- No month toggle for Early Readers -->
+        <div class="cv-week-strip">
+          <div class="cv-week-cell today"><div class="cv-week-dow">WED</div><div class="cv-week-date" style="font-size:17px">30</div><div style="margin-top:4px"><div class="cv-cal-dot" style="background:#7C3AED"></div></div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">THU</div><div class="cv-week-date" style="font-size:17px">1</div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">FRI</div><div class="cv-week-date" style="font-size:17px">2</div><div style="margin-top:4px"><div class="cv-cal-dot" style="background:#10b981"></div></div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">SAT</div><div class="cv-week-date" style="font-size:17px">3</div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">SUN</div><div class="cv-week-date" style="font-size:17px">4</div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">MON</div><div class="cv-week-date" style="font-size:17px">5</div></div>
+          <div class="cv-week-cell"><div class="cv-week-dow">TUE</div><div class="cv-week-date" style="font-size:17px">6</div></div>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:10px">Wednesday, 30 April</div>
+        <div class="cv-sched-section-hdr">Schedule</div>
+        <div class="cv-sched-item">
+          <div class="cv-sched-row">
+            <span class="cv-sched-time">7:00 am</span>
+            <div class="cv-sched-bar" style="background:#7C3AED"></div>
+            <span class="cv-sched-emoji" style="font-size:22px">🌅</span>
+            <div class="cv-sched-body">
+              <div class="cv-sched-title" style="font-size:15px">Morning Routine</div>
+            </div>
+            <div class="cv-sched-progress">
+              <div class="cv-sched-prog-bar"><div class="cv-sched-prog-fill" style="width:33%"></div></div>
+              <span style="font-size:11px;color:#94a3b8;font-weight:600">1/3</span>
+            </div>
+            <button class="cv-sched-expand-btn">▼</button>
+          </div>
+        </div>
+        <div class="cv-sched-section-hdr">Chores</div>
+        <div class="cv-sched-item">
+          <div class="cv-sched-row">
+            <span class="cv-sched-time"></span>
+            <div class="cv-sched-bar" style="background:#ec4899"></div>
+            <span class="cv-sched-emoji" style="font-size:22px">🐕</span>
+            <div class="cv-sched-body"><div class="cv-sched-title" style="font-size:15px">Feed the dog</div></div>
+            <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#ec489920;color:#ec4899">Chore</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cv-bottom-nav">
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">☀️</span>Today
+        </button>
+        <button class="cv-nav-item active">
+          <span class="cv-nav-icon">📅</span>Calendar
+        </button>
+        <button class="cv-nav-item">
+          <span class="cv-nav-icon">🏆</span>Prizes
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Callouts -->
+<div class="callouts">
+  <div class="callout">
+    <div class="callout-icon">☀️</div>
+    <div class="callout-title">Today tab</div>
+    <div class="callout-body">Routines, chores and lunchbox — exactly as now. Prizes moved out to its own tab so Today stays focused on what needs doing right now.</div>
+  </div>
+  <div class="callout">
+    <div class="callout-icon">📅</div>
+    <div class="callout-title">Calendar tab</div>
+    <div class="callout-body">Week strip at top, day schedule below. Routines appear at their trigger time as expandable cards — tap to tick steps. Events and chores ordered below. Early Readers get 7-day only (no month toggle).</div>
+  </div>
+  <div class="callout">
+    <div class="callout-icon">🏆</div>
+    <div class="callout-title">Prizes tab</div>
+    <div class="callout-body">Full prize store with balance, prize list, and redemption history. Approval notifications appear here. Badge on the tab icon when there's a new approval or available prize.</div>
+  </div>
+  <div class="callout">
+    <div class="callout-icon">🔔</div>
+    <div class="callout-title">Badge on Prizes tab</div>
+    <div class="callout-body">Red badge on the Prizes tab icon when there are unread approval notifications or newly affordable prizes — draws the child's attention without interrupting the Today flow.</div>
+  </div>
+  <div class="callout">
+    <div class="callout-icon">🧒</div>
+    <div class="callout-title">Age consistency</div>
+    <div class="callout-body">Early Readers (5–8), Independents (8–12) and Tweens (12–16) all get the same three-tab nav. Only Tiny Tots (1–5) remain Today-only with no nav bar.</div>
+  </div>
+  <div class="callout">
+    <div class="callout-icon">🌙</div>
+    <div class="callout-title">Tweens palette</div>
+    <div class="callout-body">Dark nav bar (#0f172a) with muted icon colours and a purple active indicator — matches the mature dark header aesthetic, not cartoonish.</div>
+  </div>
+</div>
+
+</body>
+</html>

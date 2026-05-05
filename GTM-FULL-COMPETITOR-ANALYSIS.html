@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toto — Full GTM Competitor Analysis</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+
+    /* ── Nav ── */
+    nav { position: sticky; top: 0; background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 28px; display: flex; align-items: center; gap: 6px; height: 52px; z-index: 100; overflow-x: auto; white-space: nowrap; }
+    .nav-brand { font-weight: 800; font-size: 15px; color: #0d9488; margin-right: 12px; flex-shrink: 0; }
+    nav a { font-size: 12px; color: #64748b; text-decoration: none; padding: 4px 10px; border-radius: 6px; transition: all .15s; flex-shrink: 0; }
+    nav a:hover { background: #f0fdfa; color: #0d9488; }
+
+    /* ── Hero ── */
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #0d9488 100%); padding: 60px 32px 52px; text-align: center; color: #fff; }
+    .hero-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; opacity: .7; margin-bottom: 12px; }
+    .hero h1 { font-size: 38px; font-weight: 800; margin-bottom: 10px; }
+    .hero p { font-size: 16px; opacity: .8; max-width: 620px; margin: 0 auto 20px; }
+    .hero-stats { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+    .hero-stat { text-align: center; }
+    .hero-stat-num { font-size: 26px; font-weight: 800; }
+    .hero-stat-label { font-size: 12px; opacity: .65; margin-top: 2px; }
+    .hero-meta { margin-top: 24px; font-size: 12px; opacity: .5; }
+
+    /* ── Layout ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 52px 24px 80px; }
+    section { margin-bottom: 60px; }
+    h2 { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+    .section-sub { font-size: 14px; color: #64748b; margin-bottom: 28px; }
+
+    /* ── Category label ── */
+    .cat-label { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; padding: 4px 12px; border-radius: 99px; margin-bottom: 16px; }
+    .cat-family  { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .cat-finance { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+    .cat-kids    { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+    .cat-home    { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+    .cat-display { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .cat-couple  { background: #fdf4ff; color: #86198f; border: 1px solid #f0abfc; }
+    .cat-au      { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+
+    /* ── Summary Table ── */
+    .table-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow-x: auto; box-shadow: 0 4px 20px rgba(0,0,0,.05); margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 780px; }
+    thead tr { background: #f1f5f9; }
+    th { padding: 13px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #64748b; text-align: left; white-space: nowrap; }
+    td { padding: 12px 16px; border-top: 1px solid #f1f5f9; font-size: 13px; color: #374151; vertical-align: middle; }
+    tr:hover td { background: #fafafa; }
+    .badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+    .badge-au    { background: #fff7ed; color: #c2410c; }
+    .badge-us    { background: #eff6ff; color: #1d4ed8; }
+    .badge-global{ background: #f1f5f9; color: #475569; }
+    .tick  { color: #16a34a; font-size: 16px; }
+    .cross { color: #94a3b8; font-size: 16px; }
+    .part  { color: #f59e0b; font-size: 14px; }
+    .price-pill { display: inline-block; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 6px; padding: 2px 8px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .price-pill.red   { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+    .price-pill.yellow{ background: #fefce8; color: #854d0e; border-color: #fde68a; }
+    .price-pill.blue  { background: #f0f9ff; color: #075985; border-color: #bae6fd; }
+    .price-pill.grey  { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+
+    /* ── Deep-dive cards (expandable) ── */
+    .competitor-group { margin-bottom: 32px; }
+    .competitor-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+    .competitor-header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; cursor: pointer; user-select: none; transition: background .15s; }
+    .competitor-header:hover { background: #fafafa; }
+    .comp-emoji { font-size: 28px; flex-shrink: 0; width: 44px; text-align: center; }
+    .comp-title-wrap { flex: 1; min-width: 0; }
+    .comp-name { font-size: 16px; font-weight: 700; color: #0f172a; }
+    .comp-tagline { font-size: 13px; color: #64748b; margin-top: 1px; }
+    .comp-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 5px; }
+    .comp-chev { font-size: 12px; color: #94a3b8; transition: transform .25s; flex-shrink: 0; }
+    .competitor-card.open .comp-chev { transform: rotate(180deg); }
+    .competitor-body { display: none; border-top: 1px solid #f1f5f9; }
+    .competitor-card.open .competitor-body { display: block; }
+    .comp-body-inner { padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 640px) { .comp-body-inner { grid-template-columns: 1fr; } }
+    .comp-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; margin-bottom: 10px; }
+    .comp-section p, .comp-section li { font-size: 13px; color: #374151; line-height: 1.7; }
+    .comp-section ul { padding-left: 16px; }
+    .comp-section li { margin-bottom: 3px; }
+    .beat-now { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px 16px; }
+    .beat-build { background: #fef9c3; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 16px; }
+    .beat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .beat-label.green { color: #16a34a; }
+    .beat-label.yellow { color: #854d0e; }
+    .beat-now p, .beat-build p { font-size: 13px; color: #374151; line-height: 1.6; }
+    .comp-full-width { grid-column: 1 / -1; }
+    .threat-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .threat-label { font-size: 12px; color: #475569; width: 80px; flex-shrink: 0; }
+    .threat-track { flex: 1; height: 6px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .threat-fill { height: 100%; border-radius: 99px; }
+    .threat-fill.red    { background: #ef4444; }
+    .threat-fill.orange { background: #f97316; }
+    .threat-fill.yellow { background: #eab308; }
+    .threat-fill.green  { background: #22c55e; }
+    .threat-num { font-size: 12px; font-weight: 700; color: #64748b; width: 24px; }
+
+    /* ── Callouts ── */
+    .callout { display: flex; gap: 14px; padding: 16px 18px; border-radius: 12px; margin-bottom: 14px; }
+    .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .callout-body { font-size: 14px; color: #374151; line-height: 1.6; }
+    .callout-body strong { color: #1e293b; }
+    .callout.green  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .callout.yellow { background: #fefce8; border: 1px solid #fde68a; }
+    .callout.blue   { background: #f0f9ff; border: 1px solid #bae6fd; }
+    .callout.teal   { background: linear-gradient(135deg,#f0fdfa,#ecfeff); border: 1px solid #99f6e4; }
+
+    /* ── Pricing recommendation ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .price-card { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 16px; padding: 24px; position: relative; }
+    .price-card.featured { border-color: #0d9488; box-shadow: 0 8px 24px rgba(13,148,136,.15); }
+    .price-card .popular-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #0d9488; color: #fff; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 3px 12px; border-radius: 99px; white-space: nowrap; }
+    .price-tier { font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .price-amount { font-size: 36px; font-weight: 800; color: #0f172a; line-height: 1; margin-bottom: 4px; }
+    .price-amount span { font-size: 16px; font-weight: 500; color: #64748b; }
+    .price-period { font-size: 12px; color: #94a3b8; margin-bottom: 16px; }
+    .price-features { list-style: none; }
+    .price-features li { font-size: 13px; color: #374151; padding: 5px 0; border-bottom: 1px solid #f1f5f9; display: flex; gap: 8px; }
+    .price-features li:last-child { border: none; }
+    .price-features li::before { content: '✓'; color: #0d9488; font-weight: 700; flex-shrink: 0; }
+
+    /* ── Positioning ── */
+    .positioning-box { background: linear-gradient(135deg, #0f172a, #0d9488); border-radius: 16px; padding: 36px 32px; color: #fff; text-align: center; margin-bottom: 28px; }
+    .positioning-box .eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; opacity: .7; margin-bottom: 10px; }
+    .positioning-box blockquote { font-size: 20px; font-weight: 700; line-height: 1.5; max-width: 620px; margin: 0 auto; }
+
+    /* ── GTM Priorities ── */
+    .priority-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .priority-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px; }
+    .priority-num { width: 30px; height: 30px; border-radius: 50%; background: #0d9488; color: #fff; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .priority-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .priority-card p { font-size: 13px; color: #64748b; line-height: 1.6; }
+
+    hr { border: none; border-top: 1px solid #e2e8f0; margin: 48px 0; }
+    footer { text-align: center; padding: 28px; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Toto</span>
+  <a href="#overview">Overview</a>
+  <a href="#table">Comparison</a>
+  <a href="#family-org">Family Org</a>
+  <a href="#finance">Finance</a>
+  <a href="#kids">Kids</a>
+  <a href="#home">Home Mgmt</a>
+  <a href="#display">Displays</a>
+  <a href="#couple">Couples</a>
+  <a href="#au">AU-Specific</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#gtm">GTM</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-label">Competitive Intelligence — Confidential</div>
+  <h1>Toto Market Analysis</h1>
+  <p>A deep, honest analysis of 19 competitors across family organisation, personal finance, kids apps, home management, digital displays, and couples tools. Australia-first lens.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">19</div><div class="hero-stat-label">Competitors analysed</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Market categories</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">4</div><div class="hero-stat-label">AU-native competitors</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-label">Doing what Toto does</div></div>
+  </div>
+  <div class="hero-meta">Prepared April 2026 · For business partner review · Not for distribution</div>
+</div>
+
+<div class="container">
+
+  <!-- ── OVERVIEW ── -->
+  <section id="overview">
+    <h2>The Market Opportunity</h2>
+    <p class="section-sub">Where every competitor falls short — and where Toto sits.</p>
+
+    <div class="callout teal">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body"><strong>The gap nobody owns:</strong> Family organisation apps (FamilyWall, Cozi, Homsy) are great at scheduling and communication but have no real financial depth. Finance apps (Monarch, Goodbudget, Frollo) have deep money tools but no concept of children, chores, or household life. Kids apps (Spriggy, Greenlight) teach pocket money but don't connect to household finances. <strong>No single product does all three.</strong> Toto is the first app built at the intersection of family life, household finances, and kids.</div>
+    </div>
+
+    <div class="callout green">
+      <span class="callout-icon">🇦🇺</span>
+      <div class="callout-body"><strong>Australia is underserved:</strong> The only credible Australian-native competitors are Spriggy (kids pocket money only, 1.3M users), WeMoney (debt-focused, no kids), and Frollo (Open Banking, B2B focused). The global players (Cozi, Monarch, Greenlight, Simplifi) are US-optimised and either unavailable in Australia or poorly localised. This is a wide-open window.</div>
+    </div>
+  </section>
+
+  <!-- ── SUMMARY TABLE ── -->
+  <section id="table">
+    <h2>Full Comparison Table</h2>
+    <p class="section-sub">All 19 competitors at a glance. ✅ = strong · ⚠️ = basic/premium only · ❌ = absent.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Competitor</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>AU?</th>
+            <th>Finance</th>
+            <th>Kids</th>
+            <th>Planning</th>
+            <th>Kids Login</th>
+            <th>Net Worth</th>
+            <th>Threat Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>FamilyWall</strong></td><td><span class="cat-label cat-family" style="padding:2px 8px;margin:0;font-size:10px">Family Org</span></td><td><span class="price-pill grey">Free + premium</span></td><td><span class="badge badge-global">Global</span></td><td><span class="part">⚠️</span></td><td><span class="cross">❌</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>OurHome</strong></td><td><span class="cat-label cat-family" style="padding:2px 8px;margin:0;font-size:10px">Family Org</span></td><td><span class="price-pill grey">Free</span></td><td><span class="badge badge-global">Global</span></td><td><span class="cross">❌</span></td><td><span class="part">⚠️</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>Homsy</strong></td><td><span class="cat-label cat-family" style="padding:2px 8px;margin:0;font-size:10px">Family Org</span></td><td><span class="price-pill grey">Free</span></td><td><span class="badge badge-au">AU ✓</span></td><td><span class="part">⚠️</span></td><td><span class="cross">❌</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>Cozi</strong></td><td><span class="cat-label cat-family" style="padding:2px 8px;margin:0;font-size:10px">Family Org</span></td><td><span class="price-pill grey">Free / $39 USD/yr</span></td><td><span class="badge badge-global">Global</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>Any.do</strong></td><td><span class="cat-label cat-family" style="padding:2px 8px;margin:0;font-size:10px">Tasks / AI</span></td><td><span class="price-pill grey">Free / $8.33 USD/mo</span></td><td><span class="badge badge-global">Global</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟢 Low</td></tr>
+          <tr><td><strong>Monarch Money</strong></td><td><span class="cat-label cat-finance" style="padding:2px 8px;margin:0;font-size:10px">Finance</span></td><td><span class="price-pill blue">~$99 USD/yr</span></td><td><span class="badge badge-us">US/CA only</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="tick">✅</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>Goodbudget</strong></td><td><span class="cat-label cat-finance" style="padding:2px 8px;margin:0;font-size:10px">Finance</span></td><td><span class="price-pill grey">Free / ~$8 USD/mo</span></td><td><span class="badge badge-global">Global</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟢 Low</td></tr>
+          <tr><td><strong>Quicken Simplifi</strong></td><td><span class="cat-label cat-finance" style="padding:2px 8px;margin:0;font-size:10px">Finance</span></td><td><span class="price-pill blue">$2.99 USD/mo</span></td><td><span class="badge badge-us">US only</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="tick">✅</span></td><td>🟢 Low</td></tr>
+          <tr><td><strong>WeMoney</strong></td><td><span class="cat-label cat-au" style="padding:2px 8px;margin:0;font-size:10px">AU Finance</span></td><td><span class="price-pill grey">Free</span></td><td><span class="badge badge-au">AU ✓</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🔴 High</td></tr>
+          <tr><td><strong>Frollo</strong></td><td><span class="cat-label cat-au" style="padding:2px 8px;margin:0;font-size:10px">AU Finance</span></td><td><span class="price-pill grey">Free (consumer)</span></td><td><span class="badge badge-au">AU ✓</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>Honeydue</strong></td><td><span class="cat-label cat-couple" style="padding:2px 8px;margin:0;font-size:10px">Couples</span></td><td><span class="price-pill grey">Free</span></td><td><span class="badge badge-global">Global</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟢 Low</td></tr>
+          <tr><td><strong>Spriggy</strong></td><td><span class="cat-label cat-kids" style="padding:2px 8px;margin:0;font-size:10px">Kids Finance</span></td><td><span class="price-pill yellow">$60–$78 AUD/yr</span></td><td><span class="badge badge-au">AU ✓</span></td><td><span class="part">⚠️</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🔴 High</td></tr>
+          <tr><td><strong>Greenlight</strong></td><td><span class="cat-label cat-kids" style="padding:2px 8px;margin:0;font-size:10px">Kids Finance</span></td><td><span class="price-pill blue">$5.99 USD/mo</span></td><td><span class="badge badge-us">US only</span></td><td><span class="part">⚠️</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>HomeZada</strong></td><td><span class="cat-label cat-home" style="padding:2px 8px;margin:0;font-size:10px">Home Mgmt</span></td><td><span class="price-pill grey">Subscription</span></td><td><span class="badge badge-us">US-focused</span></td><td><span class="part">⚠️</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟢 Low</td></tr>
+          <tr><td><strong>Centriq</strong></td><td><span class="cat-label cat-home" style="padding:2px 8px;margin:0;font-size:10px">Home Mgmt</span></td><td><span class="price-pill grey">Unknown</span></td><td><span class="badge badge-global">Global</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟢 Low</td></tr>
+          <tr><td><strong>Skylight</strong></td><td><span class="cat-label cat-display" style="padding:2px 8px;margin:0;font-size:10px">Hardware</span></td><td><span class="price-pill red">$159–$349 USD device</span></td><td><span class="badge badge-au">AU ✓</span></td><td><span class="cross">❌</span></td><td><span class="part">⚠️</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>Hearth Display</strong></td><td><span class="cat-label cat-display" style="padding:2px 8px;margin:0;font-size:10px">Hardware</span></td><td><span class="price-pill red">$299+ USD device</span></td><td><span class="badge badge-global">Global</span></td><td><span class="cross">❌</span></td><td><span class="part">⚠️</span></td><td><span class="tick">✅</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟡 Medium</td></tr>
+          <tr><td><strong>DAKboard</strong></td><td><span class="cat-label cat-display" style="padding:2px 8px;margin:0;font-size:10px">Dashboard</span></td><td><span class="price-pill grey">Free / $6–$10 USD/mo</span></td><td><span class="badge badge-global">Global</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td><span class="part">⚠️</span></td><td><span class="cross">❌</span></td><td><span class="cross">❌</span></td><td>🟢 Low</td></tr>
+          <tr style="background:#f0fdfa"><td><strong>🏠 Toto</strong></td><td><span class="cat-label cat-family" style="padding:2px 8px;margin:0;font-size:10px">All-in-one</span></td><td><span class="price-pill" style="background:#0d9488;color:#fff;border-color:#0d9488">$7.99 AUD/mo*</span></td><td><span class="badge badge-au">AU First</span></td><td><span class="tick">✅</span></td><td><span class="tick">✅</span></td><td><span class="tick">✅</span></td><td><span class="tick">✅</span></td><td><span class="tick">✅</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;margin-top:6px">*Recommended pricing — see Pricing section below</p>
+  </section>
+
+  <hr>
+
+  <!-- ── FAMILY ORG ── -->
+  <section id="family-org">
+    <div class="cat-label cat-family">🏠 Family Organisation Apps</div>
+    <h2>Family Organisation</h2>
+    <p class="section-sub">Apps focused on scheduling, chores, communication, and shared lists. Strong on coordination, weak on finances.</p>
+
+    <!-- FamilyWall -->
+    <div class="competitor-card" id="card-familywall">
+      <div class="competitor-header" onclick="toggleCard('familywall')">
+        <div class="comp-emoji">🧱</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">FamilyWall</div>
+          <div class="comp-tagline">"Happy Family Organisation" — calendar, messaging, location, meal planning</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free + premium</span>
+            <span class="badge badge-global">Global</span>
+            <span class="cat-label cat-family" style="padding:2px 8px;margin:0;font-size:10px">Family Org</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Shared family calendar + Google Calendar sync</li>
+              <li>Family messaging (text, voice, photos, video)</li>
+              <li>Real-time location tracking with safe zone alerts</li>
+              <li>Private photo and video sharing</li>
+              <li>Meal planner and recipe import (premium)</li>
+              <li>Budget tracking (premium, basic)</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill green" style="width:20%"></div></div><span class="threat-num">2</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill yellow" style="width:20%"></div></div><span class="threat-num">2</span></div>
+            <div class="threat-bar"><span class="threat-label">Communication</span><div class="threat-track"><div class="threat-fill red" style="width:90%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill yellow" style="width:50%"></div></div><span class="threat-num">5</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:50%"></div></div><span class="threat-num">5</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Deep financial management (budget, net worth, bills, goals) vs FamilyWall's basic premium bolt-on. Kids chores, rewards, PIN login, and lunchbox planner — features FamilyWall has never built. Toto is purpose-built for Australian families; FamilyWall is globally generic with no AU localisation.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build to fully beat them</div>
+              <p>Family messaging layer (or deep WhatsApp integration). Google Calendar and Apple Calendar two-way sync. Real-time location sharing — even a basic "where is everyone" feature would close the gap significantly.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cozi -->
+    <div class="competitor-card" id="card-cozi">
+      <div class="competitor-header" onclick="toggleCard('cozi')">
+        <div class="comp-emoji">📅</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Cozi</div>
+          <div class="comp-tagline">"Family Life. Simplified." — the #1 family organiser app, est. 2007</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free / $39 USD/yr Gold</span>
+            <span class="badge badge-global">Global</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>#1 family organiser by brand recognition</li>
+              <li>Shared colour-coded family calendar</li>
+              <li>Shopping lists and to-do lists</li>
+              <li>Recipe manager and meal planner</li>
+              <li>Cross-device access (iOS, Android, web)</li>
+              <li>Featured on TODAY Show — strong US media presence</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:10%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">Brand strength</span><div class="threat-track"><div class="threat-fill orange" style="width:80%"></div></div><span class="threat-num">8</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill yellow" style="width:30%"></div></div><span class="threat-num">3</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:40%"></div></div><span class="threat-num">4</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Cozi's UI is dated and hasn't meaningfully evolved in years. Zero financial features. Zero kids-specific features. Toto offers everything Cozi does (calendar, lists, meal planning) plus an entire financial management layer and kids platform. We beat them on depth, modernity, and AU relevance.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build to fully beat them</div>
+              <p>Cozi's brand recognition is its real moat — not its features. We need Australian marketing presence and app store visibility to unseat them in family search results. Two-way calendar sync with Google/Apple would remove their last functional advantage.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Homsy -->
+    <div class="competitor-card" id="card-homsy">
+      <div class="competitor-header" onclick="toggleCard('homsy')">
+        <div class="comp-emoji">🏡</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Homsy</div>
+          <div class="comp-tagline">"A complete OS for your home" — offline-first, privacy-focused, AU app store</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free to download</span>
+            <span class="badge badge-au">AU App Store</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Beautiful, modern design — better UI than most competitors</li>
+              <li>Offline-first with encrypted data storage</li>
+              <li>Smart chore rotation and completion tracking</li>
+              <li>Utility tracking (electricity, water, gas)</li>
+              <li>Trash collection schedule reminders</li>
+              <li>Google and Apple Calendar integration</li>
+              <li>Available on Australian App Store</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill green" style="width:10%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Design quality</span><div class="threat-track"><div class="threat-fill orange" style="width:80%"></div></div><span class="threat-num">8</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill orange" style="width:60%"></div></div><span class="threat-num">6</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:50%"></div></div><span class="threat-num">5</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Homsy is a household coordination app with no financial layer and no kids features. Toto offers everything Homsy does (chores, calendar, shopping) plus full budgeting, net worth, kids rewards, lunchbox, and a dedicated child interface. The utility tracking is a gap Toto should close.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build to fully beat them</div>
+              <p>Homsy's design quality is a real threat — we need to match or exceed it. Utility tracking (electricity, water, gas bills) would be a natural addition to Toto's bills section. Their offline-first architecture is a differentiator we should consider matching for low-connectivity scenarios.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Any.do -->
+    <div class="competitor-card" id="card-anydo">
+      <div class="competitor-header" onclick="toggleCard('anydo')">
+        <div class="comp-emoji">✅</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Any.do</div>
+          <div class="comp-tagline">AI-powered task management with a family plan — 40 million users</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free / $8.33 USD/mo family</span>
+            <span class="badge badge-global">Global</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>40 million users — massive scale and brand recognition</li>
+              <li>AI assistant for task creation and automation</li>
+              <li>WhatsApp integration for task creation by chat</li>
+              <li>6,000+ app integrations</li>
+              <li>Cross-platform (iOS, Android, web, Mac, Windows, Apple Watch)</li>
+              <li>Family plan: shared grocery lists, shared projects, 4 members</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Scale / brand</span><div class="threat-track"><div class="threat-fill red" style="width:90%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill yellow" style="width:40%"></div></div><span class="threat-num">4</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill green" style="width:25%"></div></div><span class="threat-num">2</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Any.do is a task manager that added a "family plan" as a product extension — it's not purpose-built for families. No financial features, no kids features, no household awareness. Toto wins on depth and purpose. Any.do's 40M users are primarily individuals and teams, not families.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build to fully beat them</div>
+              <p>WhatsApp integration for creating tasks and reminders by chat is genuinely powerful and would resonate strongly with Australian families. AI-assisted task creation ("Add milk to the shopping list") is table stakes within 2 years.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <hr>
+
+  <!-- ── FINANCE ── -->
+  <section id="finance">
+    <div class="cat-label cat-finance">💰 Personal Finance Apps</div>
+    <h2>Personal Finance</h2>
+    <p class="section-sub">Deep money management tools. Strong on individual finances, zero family context, no kids.</p>
+
+    <!-- Monarch -->
+    <div class="competitor-card" id="card-monarch">
+      <div class="competitor-header" onclick="toggleCard('monarch')">
+        <div class="comp-emoji">👑</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Monarch Money</div>
+          <div class="comp-tagline">"The modern way to manage money" — 1M+ members, Wall Street Journal's #1 budgeting app</div>
+          <div class="comp-meta">
+            <span class="price-pill blue">~$99 USD/yr (~$150 AUD)</span>
+            <span class="badge badge-us">US / Canada</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Comprehensive account aggregation (14,000+ institutions)</li>
+              <li>Deep budgeting with transaction categorization</li>
+              <li>Investment and portfolio tracking</li>
+              <li>Partner/advisor collaboration access</li>
+              <li>Cash flow visualizations and custom reports</li>
+              <li>1M+ users, strong Reddit community (30k members)</li>
+              <li>Net worth tracking with snapshots</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill red" style="width:95%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Family context</span><div class="threat-track"><div class="threat-fill green" style="width:15%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:40%"></div></div><span class="threat-num">4</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Monarch is not available in Australia. At $150 AUD/yr it's expensive for features that don't include kids, chores, lunchbox, or family planning. Toto is purpose-built for families; Monarch is for financially sophisticated individuals. Our Toto Family plan at ~$96 AUD/yr offers more family value at a lower AU price.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build to fully beat them</div>
+              <p>Open Banking integration (CDR in Australia) for automatic transaction syncing would close the biggest gap. Investment portfolio tracking is a future growth feature. Monarch's reporting depth is a 3–5 year horizon for Toto — focus on family depth first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goodbudget -->
+    <div class="competitor-card" id="card-goodbudget">
+      <div class="competitor-header" onclick="toggleCard('goodbudget')">
+        <div class="comp-emoji">✉️</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Goodbudget</div>
+          <div class="comp-tagline">Digital envelope budgeting — simple, intentional, household sharing</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free (10 envelopes) / ~$8 USD/mo</span>
+            <span class="badge badge-global">Global</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Simple envelope budgeting — accessible to non-finance users</li>
+              <li>Household sharing across devices</li>
+              <li>Debt payoff tracking tools</li>
+              <li>Featured in Guardian, Forbes, ABC News</li>
+              <li>Works globally (manual entry, no bank sync required)</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill yellow" style="width:55%"></div></div><span class="threat-num">5</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill yellow" style="width:30%"></div></div><span class="threat-num">3</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill green" style="width:25%"></div></div><span class="threat-num">2</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Toto's budgeting is more sophisticated and family-aware. Goodbudget is intentionally simple (envelope-only) with no household planning, no kids features, and no Australian localisation. The target user who wants simple budgeting is actually a Toto free-tier user who will grow into our paid plan.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build to fully beat them</div>
+              <p>Goodbudget's simplicity is deliberate and works for a specific user type. We need to ensure Toto's budget UI doesn't feel overwhelming for first-time budgeters. A "simplified mode" or guided first-budget flow would capture this user segment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simplifi -->
+    <div class="competitor-card" id="card-simplifi">
+      <div class="competitor-header" onclick="toggleCard('simplifi')">
+        <div class="comp-emoji">📊</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Quicken Simplifi</div>
+          <div class="comp-tagline">Cash flow, investments, and forecasting in one — US and Canada only</div>
+          <div class="comp-meta">
+            <span class="price-pill blue">$2.99 USD/mo ($36/yr)</span>
+            <span class="badge badge-us">US / Canada only</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Very competitive price point ($36 USD/yr)</li>
+              <li>Investment portfolio tracking</li>
+              <li>Cash flow forecasting ("what-if" scenarios)</li>
+              <li>Retirement planning tools</li>
+              <li>14,000+ financial institution connections</li>
+              <li>Quicken brand heritage (30+ years)</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill orange" style="width:80%"></div></div><span class="threat-num">8</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill green" style="width:15%"></div></div><span class="threat-num">1</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Simplifi explicitly states it does not work outside the US and Canada. Zero AU presence, zero family features, zero kids features. Not a direct competitor for Australian families today.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to watch</div>
+              <p>If Quicken/Simplifi expand internationally (they have Quicken brand recognition globally), they become a price competitor. Their $36 USD/yr price point is aggressive. Toto needs to make family features central to its value proposition so pure finance apps can't win on price alone.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Honeydue -->
+    <div class="competitor-card" id="card-honeydue">
+      <div class="competitor-header" onclick="toggleCard('honeydue')">
+        <div class="comp-emoji">🍯</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Honeydue</div>
+          <div class="comp-tagline">"Outsmart Money, Together" — couples finance, account sharing, bill tracking</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free</span>
+            <span class="badge badge-global">Global</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Couples-first design — shared account balances without full access</li>
+              <li>In-app messaging about specific transactions</li>
+              <li>Bill tracking and split expenses</li>
+              <li>Endorsed by Apple, Google, Forbes, Wall Street Journal</li>
+              <li>Free — removes pricing friction entirely</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill yellow" style="width:50%"></div></div><span class="threat-num">5</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Couples UX</span><div class="threat-track"><div class="threat-fill orange" style="width:80%"></div></div><span class="threat-num">8</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill green" style="width:25%"></div></div><span class="threat-num">2</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Honeydue is for couples, not families. When kids arrive, Honeydue has nothing to offer. Toto's invite system and multi-user access already covers the couples use case, while extending to full family management. We capture pre-kids couples who then grow with us.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build</div>
+              <p>Honeydue's income privacy toggle (hide specific income from partner) is genuinely useful for many couples. Toto's spec includes this — prioritise it. In-app comments on transactions ("what was this for?") would match their couples messaging feature.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ── KIDS ── -->
+  <section id="kids">
+    <div class="cat-label cat-kids">🧒 Kids Finance Apps</div>
+    <h2>Kids Finance</h2>
+    <p class="section-sub">Pocket money, prepaid cards, chores, and allowance apps. Strong on kids, completely disconnected from household finances.</p>
+
+    <!-- Spriggy -->
+    <div class="competitor-card" id="card-spriggy">
+      <div class="competitor-header" onclick="toggleCard('spriggy')">
+        <div class="comp-emoji">🐿️</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Spriggy</div>
+          <div class="comp-tagline">Australia's #1 Pocket Money app — 1.3 million Australian members</div>
+          <div class="comp-meta">
+            <span class="price-pill yellow">$60 AUD/yr (1 child) / $78 AUD/yr (2–6 children)</span>
+            <span class="badge badge-au">AU Native ★</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li><strong>1.3 million Australian members</strong> — massive AU market penetration</li>
+              <li>Prepaid Visa card — works in-store, online, Apple Pay, Google Pay</li>
+              <li>Real chore-to-payment automation</li>
+              <li>Real-time spending notifications to parents</li>
+              <li>Card lock, merchant restrictions (alcohol, gambling)</li>
+              <li>Teen banking with BSB/account number (13+)</li>
+              <li>Savings goals for kids</li>
+              <li>Backed by Indue (Australian licensed deposit-taker)</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">AU market</span><div class="threat-track"><div class="threat-fill red" style="width:95%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill red" style="width:90%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill yellow" style="width:30%"></div></div><span class="threat-num">3</span></div>
+            <div class="threat-bar"><span class="threat-label">Family context</span><div class="threat-track"><div class="threat-fill green" style="width:10%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill red" style="width:80%"></div></div><span class="threat-num">8</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Spriggy is kids-only — parents have no view of household finances, budget, or goals. Toto connects kids' chores and rewards to the full family financial picture. At $78 AUD/yr for multiple kids (Spriggy) vs Toto Family covering the whole household, we win on value. Toto also includes lunchbox, meal planning, calendar, and net worth — Spriggy does none of this.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build to fully beat them</div>
+              <p><strong>A real prepaid card or banking integration is the big gap.</strong> Spriggy's real money transfers make chore completion tangible for kids. Toto's points system is valuable but virtual. A partnership with a neobank (Up, Ubank) or BNPL-adjacent player for a Toto Kids Card would be transformative. Also: CDR/Open Banking integration so parents can see actual account balances alongside the Toto budget.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Greenlight -->
+    <div class="competitor-card" id="card-greenlight">
+      <div class="competitor-header" onclick="toggleCard('greenlight')">
+        <div class="comp-emoji">🟢</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Greenlight</div>
+          <div class="comp-tagline">"The #1 family finance and safety app" — 6.5M families, US market leader</div>
+          <div class="comp-meta">
+            <span class="price-pill blue">$5.99 USD/mo (~$110 AUD/yr)</span>
+            <span class="badge badge-us">US only</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>6.5 million families — dominant US market position</li>
+              <li>Kids debit card with parental controls</li>
+              <li>Kids investing from $1 minimum</li>
+              <li>Financial literacy games (Level Up™)</li>
+              <li>Location sharing and crash detection</li>
+              <li>4.8 stars, 440k App Store reviews</li>
+              <li>$75M+ invested by families through the platform</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill red" style="width:95%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Future risk</span><div class="threat-track"><div class="threat-fill orange" style="width:70%"></div></div><span class="threat-num">7</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:40%"></div></div><span class="threat-num">4</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Greenlight is not available in Australia and has no near-term AU expansion plans. Even in the US, Greenlight is kids-only — no household budget, no adult finances, no lunchbox or meal planning. Toto's integrated family approach is fundamentally different and broader.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to watch</div>
+              <p>Greenlight is the playbook Toto should study. Their kids investing and financial literacy games (Level Up) create deep engagement. Greenlight is well-funded and could expand to Australia — we should build market presence and brand recognition in AU before they do. Their safety features (crash detection, location) are complementary not competitive.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ── HOME MANAGEMENT ── -->
+  <section id="home">
+    <div class="cat-label cat-home">🔧 Home Management Apps</div>
+    <h2>Home Management</h2>
+    <p class="section-sub">Apps focused on maintenance, inventory, and property management. Niche, low family adoption.</p>
+
+    <div class="competitor-card" id="card-homezada">
+      <div class="competitor-header" onclick="toggleCard('homezada')">
+        <div class="comp-emoji">🏠</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">HomeZada</div>
+          <div class="comp-tagline">"Save Money. Improve Value. Make Smarter Decisions" — home inventory and maintenance</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Subscription (pricing unclear)</span>
+            <span class="badge badge-us">US-focused</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Comprehensive home inventory with photos, receipts, videos</li>
+              <li>AI-generated maintenance reminders</li>
+              <li>Home improvement project budgeting</li>
+              <li>Home value and equity tracking</li>
+              <li>Multi-property support</li>
+              <li>Featured in Better Homes and Gardens</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Home features</span><div class="threat-track"><div class="threat-fill red" style="width:85%"></div></div><span class="threat-num">8</span></div>
+            <div class="threat-bar"><span class="threat-label">Family context</span><div class="threat-track"><div class="threat-fill green" style="width:10%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill green" style="width:10%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill green" style="width:20%"></div></div><span class="threat-num">2</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>HomeZada is property-management software masquerading as a family app. No kids features, no budgeting depth beyond home projects, no AU presence. Toto's vehicles and documents sections cover the most family-relevant parts of home management without the complexity.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build</div>
+              <p>Home inventory (appliances, furniture with warranty/receipt tracking) and maintenance scheduling (service reminders for HVAC, smoke alarms) would let Toto expand into the home management space naturally. This is a logical next chapter for the "Home" section in Toto.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ── DISPLAYS ── -->
+  <section id="display">
+    <div class="cat-label cat-display">🖥️ Digital Displays & Hardware</div>
+    <h2>Digital Family Displays</h2>
+    <p class="section-sub">Hardware and dashboard apps for shared family screens. Physical products with high switching cost — but no finance, no kids management.</p>
+
+    <!-- Skylight -->
+    <div class="competitor-card" id="card-skylight">
+      <div class="competitor-header" onclick="toggleCard('skylight')">
+        <div class="comp-emoji">🌤️</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Skylight</div>
+          <div class="comp-tagline">1M+ families, AU presence — touchscreen family calendar and photo display</div>
+          <div class="comp-meta">
+            <span class="price-pill red">$159–$349 USD device + optional subscription</span>
+            <span class="badge badge-au">AU ✓</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>1 million+ families — very strong market penetration</li>
+              <li>Dedicated Australian website (au.myskylight.com)</li>
+              <li>Touchscreen calendar with chore chart</li>
+              <li>Remote photo and video updates from family</li>
+              <li>Featured in New York Times Wirecutter</li>
+              <li>High hardware switching cost creates retention</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">AU market</span><div class="threat-track"><div class="threat-fill orange" style="width:70%"></div></div><span class="threat-num">7</span></div>
+            <div class="threat-bar"><span class="threat-label">Hardware moat</span><div class="threat-track"><div class="threat-fill orange" style="width:75%"></div></div><span class="threat-num">7</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:45%"></div></div><span class="threat-num">4</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Skylight is a physical screen — Toto runs on every device a family already owns. No $349 hardware purchase needed. Skylight has zero financial features, zero kids reward system, zero budgeting. Toto's dashboard view could serve the same "always-on family display" use case on an old iPad.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build</div>
+              <p>A dedicated "Toto Display Mode" — full-screen always-on dashboard optimised for a shared screen (iPad on the fridge, tablet in the kitchen) showing today's calendar, upcoming bills, kids' chore status, and meal plan. This directly competes with Skylight's hardware at zero cost.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hearth -->
+    <div class="competitor-card" id="card-hearth">
+      <div class="competitor-header" onclick="toggleCard('hearth')">
+        <div class="comp-emoji">🔥</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Hearth Display</div>
+          <div class="comp-tagline">"The system that takes the mental load off mom" — AI meal planning, routines, 40K families</div>
+          <div class="comp-meta">
+            <span class="price-pill red">~$299+ USD device (hardware)</span>
+            <span class="badge badge-global">Global</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>AI-powered meal planning ("Hearth Helper")</li>
+              <li>Visual routines with kids reward system</li>
+              <li>Emotional check-in tool ("Today's Feelings")</li>
+              <li>Featured in TechCrunch, New York Times, Inc.</li>
+              <li>4.7 stars, 786 reviews — strong user satisfaction</li>
+              <li>Smart family rhythm and dashboard summary</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Kids routines</span><div class="threat-track"><div class="threat-fill orange" style="width:75%"></div></div><span class="threat-num">7</span></div>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">AU presence</span><div class="threat-track"><div class="threat-fill green" style="width:10%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:35%"></div></div><span class="threat-num">3</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Hearth requires a $299+ hardware purchase. Toto delivers similar family scheduling and kids routines on phones families already own — zero upfront cost. Toto also adds full financial management which Hearth completely lacks. Their "mental load" positioning is strong but their solution is expensive and hardware-locked.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build</div>
+              <p>Hearth's "Today's Feelings" emotional check-in and AI meal helper are genuinely innovative. Adding an AI assistant to Toto's meal planning (already in progress) would close this gap. The emotional check-in is worth exploring as a differentiator for family wellbeing.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAKboard -->
+    <div class="competitor-card" id="card-dakboard">
+      <div class="competitor-header" onclick="toggleCard('dakboard')">
+        <div class="comp-emoji">🖥️</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">DAKboard</div>
+          <div class="comp-tagline">"Organize. Simplify. Enjoy!" — customisable wall dashboard, Raspberry Pi compatible</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free / $6–$10 USD/mo</span>
+            <span class="badge badge-global">Global</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Highly customisable drag-and-drop layout</li>
+              <li>Calendar sync (Google, iCloud, Office365, Facebook)</li>
+              <li>Photo frame with Flickr, Dropbox, iCloud integration</li>
+              <li>Weather, news, smart home device support</li>
+              <li>Works on Raspberry Pi — popular in tech communities</li>
+              <li>Free tier available</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Finance depth</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Family features</span><div class="threat-track"><div class="threat-fill green" style="width:15%"></div></div><span class="threat-num">1</span></div>
+            <div class="threat-bar"><span class="threat-label">Tech community</span><div class="threat-track"><div class="threat-fill orange" style="width:70%"></div></div><span class="threat-num">7</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill green" style="width:15%"></div></div><span class="threat-num">1</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>DAKboard is a tech enthusiast's tool — not a family app. It requires DIY setup, technical knowledge, and has no family-specific features. Toto's Display Mode (planned) would surpass DAKboard for family use with zero setup effort.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build</div>
+              <p>DAKboard's strength is flexibility and third-party integrations. Toto's display mode needs smart home widget support (weather, traffic) to match it. Long-term: smart TV app or Apple TV app to display the Toto family dashboard on the living room TV.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ── AU SPECIFIC ── -->
+  <section id="au">
+    <div class="cat-label cat-au">🇦🇺 Australian-Native Competitors</div>
+    <h2>Australian-Specific Apps</h2>
+    <p class="section-sub">The most relevant competitive threat for Toto's launch market.</p>
+
+    <!-- WeMoney -->
+    <div class="competitor-card" id="card-wemoney">
+      <div class="competitor-header" onclick="toggleCard('wemoney')">
+        <div class="comp-emoji">💚</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">WeMoney</div>
+          <div class="comp-tagline">Australia's social financial wellness app — 1.35M downloads, debt-focused</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free</span>
+            <span class="badge badge-au">AU Native ★</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li><strong>1.35 million Australian downloads</strong> — real AU scale</li>
+              <li>Account aggregation across Australian financial institutions</li>
+              <li>Debt consolidation matching and loan offers</li>
+              <li>Credit score monitoring</li>
+              <li>Community forum for peer financial advice</li>
+              <li>Budget tracking and subscription identification</li>
+              <li>92.3% of users report improved financial lives</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">AU market</span><div class="threat-track"><div class="threat-fill red" style="width:90%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">Kids features</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Family context</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill orange" style="width:75%"></div></div><span class="threat-num">7</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>WeMoney is debt and credit focused — a personal finance tool that happens to have AU bank connections. Zero family management, zero kids, zero household planning. Toto's target user (family with kids, managing a household) is not WeMoney's user. However, WeMoney's AU bank connections are a genuine data moat we don't have yet.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 What we need to build</div>
+              <p>CDR (Consumer Data Right) Open Banking integration is the key feature WeMoney has that Toto doesn't. Automatic transaction import from Australian banks would dramatically reduce manual data entry friction. This is a 12–18 month development priority — it requires ACCC accreditation or a partnership with an existing CDR accredited party.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frollo -->
+    <div class="competitor-card" id="card-frollo">
+      <div class="competitor-header" onclick="toggleCard('frollo')">
+        <div class="comp-emoji">🏦</div>
+        <div class="comp-title-wrap">
+          <div class="comp-name">Frollo</div>
+          <div class="comp-tagline">Australia's leading Open Banking provider — "Feel good about money"</div>
+          <div class="comp-meta">
+            <span class="price-pill grey">Free (consumer)</span>
+            <span class="badge badge-au">AU Native ★</span>
+          </div>
+        </div>
+        <span class="comp-chev">▼</span>
+      </div>
+      <div class="competitor-body">
+        <div class="comp-body-inner">
+          <div class="comp-section">
+            <h4>What they do well</h4>
+            <ul>
+              <li>Australia's leading Open Banking / CDR provider</li>
+              <li>Partners: P&N Bank, BOQ, UBank, AMP, Virgin Money</li>
+              <li>Real-time verified financial data aggregation</li>
+              <li>AI-powered transaction categorisation</li>
+              <li>Enterprise-grade bank statement collection</li>
+              <li>Primarily B2B — powers other fintechs' data</li>
+            </ul>
+          </div>
+          <div class="comp-section">
+            <h4>Threat assessment</h4>
+            <div class="threat-bar"><span class="threat-label">Open Banking</span><div class="threat-track"><div class="threat-fill red" style="width:95%"></div></div><span class="threat-num">9</span></div>
+            <div class="threat-bar"><span class="threat-label">Consumer app</span><div class="threat-track"><div class="threat-fill yellow" style="width:40%"></div></div><span class="threat-num">4</span></div>
+            <div class="threat-bar"><span class="threat-label">Family context</span><div class="threat-track"><div class="threat-fill green" style="width:5%"></div></div><span class="threat-num">0</span></div>
+            <div class="threat-bar"><span class="threat-label">Overall threat</span><div class="threat-track"><div class="threat-fill yellow" style="width:45%"></div></div><span class="threat-num">4</span></div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-now">
+              <div class="beat-label green">✅ How Toto beats them now</div>
+              <p>Frollo's consumer app is not family-focused — it's a personal finance tool that serves their B2B data business. No family features, no kids, no household management. Toto wins completely on family UX. Frollo is more a potential partner than a direct competitor.</p>
+            </div>
+          </div>
+          <div class="comp-section">
+            <div class="beat-build">
+              <div class="beat-label yellow">🔨 Strategic opportunity</div>
+              <p><strong>Partner with Frollo rather than compete.</strong> Frollo's CDR data infrastructure is exactly what Toto needs for automatic bank transaction import. A white-label or API partnership would give Toto AU Open Banking capabilities without requiring ACCC accreditation ourselves. This is worth exploring actively.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ── PRICING ── -->
+  <section id="pricing">
+    <h2>Recommended Toto Pricing Model</h2>
+    <p class="section-sub">Based on competitor analysis, Australian market conditions, and Toto's feature depth. Priced in AUD.</p>
+
+    <div class="callout blue">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body"><strong>Pricing rationale:</strong> Spriggy charges $60–78 AUD/yr for kids features only. Monarch charges ~$150 AUD/yr for finance only (US). WeMoney and Frollo are free but monetise through data partnerships. Toto should sit between these — priced as a complete family platform, cheaper than buying specialist apps for each need, clearly more valuable than any single competitor.</div>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">Free</div>
+        <div class="price-amount">$0</div>
+        <div class="price-period">Forever free · No credit card</div>
+        <ul class="price-features">
+          <li>Dashboard &amp; today view</li>
+          <li>Basic budget (3 months history)</li>
+          <li>Family calendar</li>
+          <li>Shopping &amp; to-do lists</li>
+          <li>Up to 2 household members</li>
+          <li>1 kid profile</li>
+        </ul>
+      </div>
+      <div class="price-card featured">
+        <div class="popular-badge">Most Popular</div>
+        <div class="price-tier">Toto Family</div>
+        <div class="price-amount">$7.99<span>/mo</span></div>
+        <div class="price-period">$69.99/yr · Save 27%</div>
+        <ul class="price-features">
+          <li>Everything in Free</li>
+          <li>Full budget + unlimited history</li>
+          <li>Net worth tracking</li>
+          <li>Bills &amp; subscriptions</li>
+          <li>Savings goals</li>
+          <li>Up to 6 kids profiles</li>
+          <li>Chores, rewards &amp; prize store</li>
+          <li>Lunchbox planner</li>
+          <li>Meal planner</li>
+          <li>Vehicles &amp; documents</li>
+          <li>Household invite system</li>
+          <li>Kids PIN login</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Toto Premium</div>
+        <div class="price-amount">$12.99<span>/mo</span></div>
+        <div class="price-period">$119.99/yr · Save 23%</div>
+        <ul class="price-features">
+          <li>Everything in Family</li>
+          <li>AI budget assistant (Toto AI)</li>
+          <li>Open Banking auto-import*</li>
+          <li>Advanced financial reports</li>
+          <li>Scenario planning</li>
+          <li>Priority support</li>
+          <li>Early access to new features</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="font-size:12px;color:#94a3b8;margin-top:4px">*Open Banking (CDR) integration subject to regulatory accreditation or partner arrangement</p>
+
+    <div class="callout green" style="margin-top:20px">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body"><strong>Why this works:</strong> At $69.99 AUD/yr, Toto Family is cheaper than Spriggy for multiple kids ($78/yr) — and includes the entire household. It's less than half the cost of Monarch ($150 AUD/yr) and offers more family value. The free tier is generous enough to demonstrate value before asking for payment, and the jump from free to Family is justified by the kids and financial features unlocked.</div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ── GTM POSITIONING ── -->
+  <section id="gtm">
+    <h2>GTM Positioning & Strategy</h2>
+    <p class="section-sub">How Toto wins the Australian family market.</p>
+
+    <div class="positioning-box">
+      <div class="eyebrow">Toto's positioning statement</div>
+      <blockquote>"The only app that brings your family's finances, household, and kids together in one place — built for Australian families, not American ones."</blockquote>
+    </div>
+
+    <div class="callout blue">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body"><strong>Target segment:</strong> Dual-income Australian families with children aged 5–15. Frustrated that their budgeting app (YNAB, Frollo, WeMoney) has no concept of family life, and their family app (FamilyWall, Cozi) has no real financial depth. Currently using 3–5 separate apps for things Toto handles in one. Combined annual spend on these apps: $150–300 AUD. Toto at $70 AUD/yr is an obvious consolidation.</div>
+    </div>
+
+    <h3 style="font-size:17px;font-weight:700;margin:28px 0 16px">5 GTM Priorities</h3>
+
+    <div class="priority-grid">
+      <div class="priority-card">
+        <div class="priority-num">1</div>
+        <h4>Finance-first acquisition</h4>
+        <p>Reach families through financial anxiety moments — mortgage stress, school fees, grocery price rises. Search intent around "family budget app Australia" is unowned. Content marketing here outranks FamilyWall's "family organiser" framing in purchase intent.</p>
+      </div>
+      <div class="priority-card">
+        <div class="priority-num">2</div>
+        <h4>Kids chores as the viral hook</h4>
+        <p>Parents share the chores and rewards system at school pickup, Facebook parent groups, and team chats. Organic word-of-mouth with very low CAC. The feature is genuinely unique — no competitor does kids chores + family finances together.</p>
+      </div>
+      <div class="priority-card">
+        <div class="priority-num">3</div>
+        <h4>Beat Spriggy on value</h4>
+        <p>Spriggy has 1.3M Australian users — the largest AU family app audience. Position Toto Family ($69.99/yr) vs Spriggy multi-child ($78/yr): same price, entire family covered. Run comparison ads targeting Spriggy search terms.</p>
+      </div>
+      <div class="priority-card">
+        <div class="priority-num">4</div>
+        <h4>AU-first identity</h4>
+        <p>Every global competitor is US-first. Toto should be loudly, explicitly Australian — fortnightly pay cycles, rego reminders, school term lunchbox planning, Aussie expense presets. This alone differentiates from every competitor on the list.</p>
+      </div>
+      <div class="priority-card">
+        <div class="priority-num">5</div>
+        <h4>Explore Frollo partnership</h4>
+        <p>Frollo's CDR Open Banking infrastructure is exactly what Toto needs for automatic bank sync. A partnership gives Toto AU bank connections without ACCC accreditation. This would be a 12-month competitive advantage no family app currently has.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:17px;font-weight:700;margin:36px 0 16px">What We Must Build to Dominate Long-Term</h3>
+
+    <div class="callout yellow">
+      <span class="callout-icon">🔨</span>
+      <div class="callout-body"><strong>Year 1 — Close the gaps:</strong> Google/Apple Calendar two-way sync. Toto Display Mode (full-screen always-on dashboard for shared screen/iPad). WhatsApp task creation. Income privacy toggle for couples. Basic location "where is everyone" feature.</div>
+    </div>
+    <div class="callout yellow">
+      <span class="callout-icon">🔨</span>
+      <div class="callout-body"><strong>Year 2 — Build the moat:</strong> CDR Open Banking integration (via Frollo partnership or direct accreditation) for automatic transaction import from AU banks. Toto Kids Card (prepaid card via neobank partnership — the Spriggy killer). Financial literacy features for kids. AI budget assistant.</div>
+    </div>
+    <div class="callout yellow">
+      <span class="callout-icon">🔨</span>
+      <div class="callout-body"><strong>Year 3 — Scale globally:</strong> Localise for UK and NZ (closest cultural match to AU). Home inventory and maintenance scheduling. Investment tracking. Smart TV / Apple TV display app. Consider acquiring a competitor (Homsy or similar) for their user base.</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Toto — Confidential &amp; Commercially Sensitive · April 2026 · Not for distribution</footer>
+
+<script>
+  function toggleCard(id) {
+    const card = document.getElementById('card-' + id);
+    if (!card) return;
+    card.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>

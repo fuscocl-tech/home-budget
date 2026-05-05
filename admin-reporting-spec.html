@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOTO Admin — Reporting Spec &amp; Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pearl:       #FAFAF7;
+      --paper:       #F4F3F0;
+      --bg:          #ECEAE4;
+      --ink:         #18181B;
+      --ink-soft:    #52525B;
+      --muted:       #A1A1AA;
+      --hairline:    rgba(24,24,27,.09);
+      --iris-1:      #5B4CF5;
+      --iris-2:      #7C6FF7;
+      --iris-3:      #A89FF9;
+      --purple-soft: #EEEAFF;
+      --ember:       #f97316;
+      --good:        #10b981;
+      --amber:       #f59e0b;
+      --red:         #ef4444;
+      --cyan:        #0891b2;
+      --admin-bg:    #0F1117;
+      --admin-surface: #1A1D27;
+      --admin-border:rgba(255,255,255,.08);
+      --admin-muted: rgba(255,255,255,.35);
+      --admin-text:  rgba(255,255,255,.9);
+      --sans:        'Inter', system-ui, sans-serif;
+      --mono:        'JetBrains Mono', ui-monospace, monospace;
+      --r:           12px;
+      --r-lg:        18px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+    /* ── Spec nav ────────────────────────────────────── */
+    .spec-nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(236,234,228,.95); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--hairline);
+      padding: 0 32px; display: flex; align-items: center;
+      overflow-x: auto; scrollbar-width: none; gap: 0;
+    }
+    .spec-nav::-webkit-scrollbar { display: none; }
+    .spec-brand {
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      letter-spacing: .06em; color: var(--iris-1);
+      padding: 15px 20px 15px 0; white-space: nowrap; flex-shrink: 0;
+      border-right: 1px solid var(--hairline); margin-right: 14px;
+    }
+    .spec-link {
+      font-size: 12px; font-weight: 600; color: var(--ink-soft);
+      padding: 15px 12px; white-space: nowrap; text-decoration: none;
+      border-bottom: 2px solid transparent; flex-shrink: 0;
+    }
+    .spec-link:hover { color: var(--iris-1); border-bottom-color: var(--iris-3); }
+
+    /* ── Page ────────────────────────────────────────── */
+    .page { max-width: 1040px; margin: 0 auto; padding: 52px 32px 120px; }
+
+    .page-header { margin-bottom: 60px; }
+    .eyebrow {
+      font-family: var(--mono); font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--iris-2); margin-bottom: 10px;
+    }
+    h1 { font-size: 40px; font-weight: 800; letter-spacing: -.03em; color: var(--ink); line-height: 1.08; margin-bottom: 14px; }
+    .lead { font-size: 15px; color: var(--ink-soft); max-width: 600px; line-height: 1.7; }
+
+    hr { border: none; border-top: 1px solid var(--hairline); margin: 68px 0 0; }
+
+    .section { margin-top: 68px; scroll-margin-top: 72px; }
+    h2 { font-size: 26px; font-weight: 800; letter-spacing: -.025em; color: var(--ink); margin-bottom: 8px; }
+    h3 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -.01em; }
+    .sub { font-size: 14px; color: var(--ink-soft); line-height: 1.65; max-width: 640px; margin-bottom: 28px; }
+
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .g2, .g3 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--paper); border: 1px solid var(--hairline);
+      border-radius: var(--r-lg); padding: 20px;
+    }
+    .card-label {
+      font-family: var(--mono); font-size: 10px; font-weight: 700;
+      letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+    }
+    .row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--hairline);
+    }
+    .row:last-child { border-bottom: none; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+    .txt { font-size: 13px; color: var(--ink-soft); line-height: 1.55; }
+    .txt strong { color: var(--ink); font-weight: 600; }
+
+    .chip {
+      display: inline-block; font-family: var(--mono); font-size: 11px;
+      background: #F0EEFF; color: var(--iris-1); border-radius: 6px; padding: 2px 6px;
+    }
+    .ch-good  { background: #ECFDF5; color: #047857; }
+    .ch-ember { background: #FFF4EE; color: #c2410c; }
+    .ch-ink   { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--hairline); }
+    .ch-red   { background: #FEF2F2; color: #991b1b; }
+    .ch-cyan  { background: #ECFEFF; color: #155e75; }
+
+    /* ══════════════════════════════════════════════════
+       ADMIN DASHBOARD MOCKUP
+    ═══════════════════════════════════════════════════ */
+    .admin-frame {
+      background: var(--admin-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,.5);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    /* Sidebar */
+    .admin-shell { display: flex; height: 680px; }
+
+    .admin-sidebar {
+      width: 220px;
+      background: var(--admin-surface);
+      border-right: 1px solid var(--admin-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .admin-logo {
+      height: 56px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--admin-border);
+      flex-shrink: 0;
+    }
+    .admin-logo-mark {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--iris-1), var(--iris-2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .admin-logo-text {
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      letter-spacing: .06em; color: var(--admin-text);
+    }
+    .admin-logo-badge {
+      font-family: var(--mono); font-size: 8px; font-weight: 700;
+      background: rgba(91,76,245,.3); color: var(--iris-3);
+      border-radius: 4px; padding: 2px 5px; margin-left: auto;
+    }
+
+    .admin-nav { flex: 1; padding: 8px 0; overflow-y: auto; scrollbar-width: none; }
+    .admin-nav::-webkit-scrollbar { display: none; }
+    .admin-nav-section {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: rgba(255,255,255,.2); padding: 12px 18px 4px;
+    }
+    .admin-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 18px; cursor: pointer;
+      color: var(--admin-muted); font-size: 13px; font-weight: 500;
+      border-radius: 8px; margin: 1px 8px;
+      transition: background .15s, color .15s;
+    }
+    .admin-nav-item:hover { background: rgba(255,255,255,.06); color: var(--admin-text); }
+    .admin-nav-item.active { background: rgba(91,76,245,.2); color: var(--iris-3); }
+    .admin-nav-item svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+
+    .admin-user {
+      padding: 12px;
+      border-top: 1px solid var(--admin-border);
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .admin-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--iris-2), var(--iris-3));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .admin-user-name { font-size: 12px; font-weight: 600; color: var(--admin-text); }
+    .admin-user-role { font-family: var(--mono); font-size: 9px; color: var(--admin-muted); }
+
+    /* Main area */
+    .admin-main {
+      flex: 1; overflow-y: auto; background: var(--admin-bg);
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.1) transparent;
+    }
+
+    .admin-topbar {
+      height: 56px; position: sticky; top: 0; z-index: 20;
+      background: rgba(15,17,23,.9); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--admin-border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; flex-shrink: 0;
+    }
+    .admin-topbar-title { font-size: 15px; font-weight: 700; color: var(--admin-text); }
+    .admin-topbar-actions { display: flex; gap: 8px; }
+    .admin-btn {
+      font-family: var(--sans); font-size: 12px; font-weight: 600;
+      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--admin-border);
+      background: rgba(255,255,255,.06); color: var(--admin-text); cursor: pointer;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .admin-btn-primary { background: var(--iris-1); border-color: var(--iris-1); }
+
+    .admin-content { padding: 24px; }
+
+    /* Date range selector */
+    .date-range {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .date-range-label { font-family: var(--mono); font-size: 11px; color: var(--admin-muted); }
+    .date-chip {
+      font-family: var(--mono); font-size: 11px; font-weight: 600;
+      padding: 5px 12px; border-radius: 99px; cursor: pointer;
+      border: 1px solid var(--admin-border);
+      color: var(--admin-muted); background: none;
+      font-family: var(--sans);
+    }
+    .date-chip.active {
+      background: rgba(91,76,245,.2); color: var(--iris-3); border-color: rgba(91,76,245,.4);
+    }
+
+    /* KPI cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+    .kpi-card {
+      background: var(--admin-surface); border: 1px solid var(--admin-border);
+      border-radius: var(--r-lg); padding: 16px;
+    }
+    .kpi-label { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--admin-muted); margin-bottom: 8px; }
+    .kpi-value { font-size: 28px; font-weight: 800; letter-spacing: -.04em; color: var(--admin-text); line-height: 1; }
+    .kpi-delta {
+      font-family: var(--mono); font-size: 10px; font-weight: 700; margin-top: 5px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .kpi-delta-up   { color: var(--good); }
+    .kpi-delta-down { color: var(--red); }
+    .kpi-delta-flat { color: var(--admin-muted); }
+
+    /* Chart area */
+    .chart-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .chart-card {
+      background: var(--admin-surface); border: 1px solid var(--admin-border);
+      border-radius: var(--r-lg); padding: 16px;
+    }
+    .chart-title { font-size: 13px; font-weight: 700; color: var(--admin-text); margin-bottom: 4px; }
+    .chart-sub   { font-family: var(--mono); font-size: 10px; color: var(--admin-muted); margin-bottom: 14px; }
+
+    /* Sparkline bar chart */
+    .bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+    .bar { flex: 1; border-radius: 4px 4px 0 0; min-width: 6px; transition: height .3s; }
+    .bar-label-row { display: flex; gap: 4px; margin-top: 6px; }
+    .bar-label { flex: 1; font-family: var(--mono); font-size: 7px; color: var(--admin-muted); text-align: center; }
+
+    /* Donut */
+    .donut-wrap { display: flex; align-items: center; gap: 14px; }
+    .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .donut-leg-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--admin-muted); }
+    .donut-leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .donut-leg-val { margin-left: auto; font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--admin-text); }
+
+    /* Table */
+    .admin-table { width: 100%; border-collapse: collapse; }
+    .admin-table th {
+      text-align: left; font-family: var(--mono); font-size: 9px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--admin-muted);
+      padding: 8px 12px; border-bottom: 1px solid var(--admin-border);
+    }
+    .admin-table td {
+      padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: 12px; color: var(--admin-muted); vertical-align: middle;
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table td.strong { color: var(--admin-text); font-weight: 600; }
+
+    /* Mini badge */
+    .mini-badge {
+      font-family: var(--mono); font-size: 9px; font-weight: 700;
+      border-radius: 99px; padding: 2px 7px; display: inline-block;
+    }
+
+    /* Heat row */
+    .heat-row { display: flex; gap: 3px; margin-bottom: 3px; }
+    .heat-cell {
+      width: 14px; height: 14px; border-radius: 3px;
+      background: rgba(91,76,245,.08);
+    }
+    .heat-cell.l1 { background: rgba(91,76,245,.2); }
+    .heat-cell.l2 { background: rgba(91,76,245,.4); }
+    .heat-cell.l3 { background: rgba(91,76,245,.65); }
+    .heat-cell.l4 { background: var(--iris-1); }
+
+    /* Feature usage bars */
+    .usage-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .usage-row:last-child { border-bottom: none; }
+    .usage-name { font-size: 11px; color: var(--admin-text); width: 110px; flex-shrink: 0; }
+    .usage-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,.08); border-radius: 99px; overflow: hidden; }
+    .usage-bar { height: 100%; border-radius: 99px; background: var(--iris-2); }
+    .usage-pct { font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--admin-muted); width: 36px; text-align: right; }
+
+    /* Funnel */
+    .funnel-step {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    }
+    .funnel-bar-wrap { flex: 1; height: 24px; background: rgba(255,255,255,.06); border-radius: 6px; overflow: hidden; position: relative; }
+    .funnel-bar { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--iris-1), var(--iris-2)); }
+    .funnel-bar-label {
+      position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+      font-size: 10px; font-weight: 700; color: #fff;
+    }
+    .funnel-pct { font-family: var(--mono); font-size: 10px; color: var(--admin-muted); width: 36px; text-align: right; }
+    .funnel-label { font-size: 11px; color: var(--admin-muted); width: 120px; }
+
+    /* Segment pills */
+    .segment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .segment-card {
+      background: rgba(255,255,255,.04); border: 1px solid var(--admin-border);
+      border-radius: 10px; padding: 12px; text-align: center;
+    }
+    .segment-pct { font-size: 22px; font-weight: 800; color: var(--admin-text); letter-spacing: -.04em; }
+    .segment-label { font-family: var(--mono); font-size: 9px; color: var(--admin-muted); margin-top: 3px; }
+
+    /* Page tabs */
+    .admin-page-tabs {
+      display: flex; gap: 0; margin-bottom: 20px;
+      border-bottom: 1px solid var(--admin-border);
+    }
+    .admin-page-tab {
+      font-size: 12px; font-weight: 600; color: var(--admin-muted);
+      padding: 10px 16px; cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: color .15s, border-color .15s;
+      background: none; border-top: none; border-left: none; border-right: none;
+      font-family: var(--sans);
+    }
+    .admin-page-tab.active { color: var(--iris-3); border-bottom-color: var(--iris-2); }
+
+    /* Scrollbar */
+    .admin-main::-webkit-scrollbar { width: 4px; }
+    .admin-main::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+
+    /* Prototype switcher */
+    .proto-bar {
+      background: var(--ink); padding: 14px 24px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .proto-label { font-family: var(--mono); font-size: 11px; color: rgba(255,255,255,.4); letter-spacing: .04em; }
+    .proto-tab-btn {
+      font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.5);
+      cursor: pointer; background: none; font-family: var(--sans);
+    }
+    .proto-tab-btn.on { background: var(--iris-1); border-color: var(--iris-1); color: #fff; }
+
+    .proto-view { display: none; }
+    .proto-view.on { display: block; }
+
+  </style>
+</head>
+<body>
+
+<!-- ── Spec nav ─────────────────────────────────────────── -->
+<nav class="spec-nav">
+  <div class="spec-brand">TOTO Admin · Reporting Spec</div>
+  <a class="spec-link" href="#overview">Overview</a>
+  <a class="spec-link" href="#access">Access control</a>
+  <a class="spec-link" href="#data">Data model</a>
+  <a class="spec-link" href="#reports">Usage reports</a>
+  <a class="spec-link" href="#data-reports">Data reports</a>
+  <a class="spec-link" href="#prototype">Prototypes</a>
+  <a class="spec-link" href="#implementation">Implementation</a>
+</nav>
+
+<div class="page">
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="eyebrow">Product Spec · Admin Reporting</div>
+    <h1>TOTO Admin<br>Reporting Dashboard</h1>
+    <p class="lead">
+      A private, owner-only web dashboard giving visibility into app usage, household demographics, feature adoption, retention, and product health — accessible only to authorised admin accounts via a separate URL with Firebase UID allowlist gating.
+    </p>
+  </div>
+
+  <!-- ── Overview ────────────────────────────────────────── -->
+  <div id="overview" class="section">
+    <h2>What it is</h2>
+    <p class="sub">A standalone admin web app (separate from the main TOTO PWA) that reads aggregated data from Firestore and presents it in a dark-mode reporting dashboard. Desktop-only. No end-user access — not linked from the app.</p>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-label">What it answers</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>How many households are using TOTO?</strong> Growth over time, actives, churn.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>Who are our users?</strong> Household size, kids vs no-kids, adult count, geo.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>What features do they use?</strong> Adoption per section, depth of engagement.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>Are they coming back?</strong> DAU/WAU/MAU, session frequency, streak data.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>Where do they drop off?</strong> Feature funnel, setup completion rates.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><strong>How is Type A Mode performing?</strong> Adoption rate, average life score, mission completion.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">What it is NOT</div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Not visible to end users — zero UI exposure in the main app.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Not real-time — aggregated snapshots updated on a schedule, not live streaming.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Not individual user surveillance — data is anonymised and aggregated at the household level.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Not a customer support tool — no ability to edit user data from this interface.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Not a separate mobile app — desktop web only, designed for 1200px+ screens.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Access control ──────────────────────────────────── -->
+  <hr />
+  <div id="access" class="section">
+    <h2>Access control</h2>
+    <p class="sub">The dashboard must be inaccessible to anyone who isn't an authorised application owner. Three layers of protection.</p>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-label">Layer 1 — Separate URL + no app link</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Hosted at a separate subdomain: <span class="chip">admin.toto.app</span> (or a path like <span class="chip">toto.app/admin</span>). Not linked from anywhere in the main app.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Security-by-obscurity is not the primary defence — it just means the URL isn't discoverable from the app itself.</div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Layer 2 — Firebase UID allowlist</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">A Firestore collection <span class="chip">admin_users/{uid}</span> contains the allowlisted UIDs of application owners.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">On load, the dashboard checks <span class="chip">fbStore.collection('admin_users').doc(currentUser.uid).get()</span>. If the document doesn't exist → redirect to a blank denial page.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">New admin accounts added manually by editing Firestore directly — no self-serve registration.</div></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-label">Layer 3 — Firestore security rules</div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">The <span class="chip">analytics_snapshots</span> and <span class="chip">admin_users</span> collections have Firestore rules that deny reads to any UID not in <span class="chip">admin_users</span>. Even if someone guesses the URL and is authenticated, they cannot read the data.</div></div>
+      <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Rule pattern: <span class="chip">allow read: if exists(/databases/$(database)/documents/admin_users/$(request.auth.uid));</span></div></div>
+      <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">The <span class="chip">families</span> collection (individual user data) is never read by the admin dashboard directly — only the pre-aggregated <span class="chip">analytics_snapshots</span> collection is read.</div></div>
+    </div>
+  </div>
+
+  <!-- ── Data model ───────────────────────────────────────── -->
+  <hr />
+  <div id="data" class="section">
+    <h2>Data model</h2>
+    <p class="sub">No new data is collected from users without consent. All metrics are derived from the existing <span class="chip">families/{uid}</span> documents that already exist in Firestore. A scheduled Cloud Function aggregates them nightly into a separate collection.</p>
+
+    <div class="g2">
+      <div class="card">
+        <div class="card-label">Source: families/{uid} — already exists</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.householdProfile</span> — member count, adult names, kids count</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.settings</span> — typeAMode, typeAStreak, language, setup dismissed</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.bills, state.budget, state.goals</span> — wallet feature usage</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.planner.events</span> — planner engagement (count, recency)</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.routines, state.routineAssignments</span> — routine adoption + streak</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.kids.profiles</span> — kids zone adoption</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.lists</span> — shopping list adoption</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt"><span class="chip">state.maintenance, state.vehicles, state.documents</span> — home section usage</div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Output: analytics_snapshots/{date}</div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt"><strong>Aggregated nightly</strong> by a Firebase Cloud Function that reads all family documents and writes a single daily snapshot document. No raw user data is exposed.</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt"><span class="chip ch-good">totalHouseholds</span> — count of all family docs</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt"><span class="chip ch-good">activeThisWeek</span> — families with a Firestore update timestamp in last 7 days</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt"><span class="chip ch-good">featureAdoption</span> — % of households using each section (bills, planner, kids, lists etc)</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt"><span class="chip ch-good">demographics</span> — household size distribution, kids/no-kids split, avg adult count</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt"><span class="chip ch-good">typeAStats</span> — adoption rate, avg life score, avg streak, mission completion rate</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt"><span class="chip ch-good">setupFunnel</span> — % completing each setup step</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="card-label">New: event tracking (requires small app change)</div>
+      <div class="row"><div class="dot" style="background:var(--amber)"></div><div class="txt">The current app has <strong>no event tracking</strong>. To get session frequency, DAU, and screen views we need to add lightweight event writes. Recommended: a simple <span class="chip">analytics_events</span> Firestore subcollection under each family doc, written on key actions (session start, tab activate, feature used). This adds ~2KB/month per active household.</div></div>
+      <div class="row"><div class="dot" style="background:var(--amber)"></div><div class="txt">Alternatively: integrate <strong>Firebase Analytics</strong> (free, already available in the Firebase SDK bundle). This gives session data, screen views, and custom events without writing to Firestore. Recommended approach — zero cost, no extra Firestore writes.</div></div>
+      <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Privacy: add a one-line disclosure to the app's sign-up flow: "We collect anonymous usage data to improve TOTO." No personal data (names, financial figures) is included in events.</div></div>
+    </div>
+  </div>
+
+  <!-- ── Report sections ─────────────────────────────────── -->
+  <hr />
+  <div id="reports" class="section">
+    <h2>Report sections</h2>
+    <p class="sub">Six core report sections in the admin dashboard, accessible via the sidebar.</p>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+
+      <div class="card">
+        <h3>1. Overview</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Top-line health metrics. First screen after login. Shows the state of the product at a glance.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Total households</span>
+          <span class="chip">Active this week (WAU)</span>
+          <span class="chip">New this month</span>
+          <span class="chip">7-day retention</span>
+          <span class="chip">Avg session / week</span>
+          <span class="chip">Type A adoption %</span>
+          <span class="chip">Growth chart (90 days)</span>
+          <span class="chip">Feature adoption bar chart</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>2. Demographics</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Who is using TOTO. Household composition breakdown.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Household size distribution (1, 2, 3, 4, 5+)</span>
+          <span class="chip">Kids vs no-kids split (donut)</span>
+          <span class="chip">Avg number of kids per family household</span>
+          <span class="chip">Adult-only households %</span>
+          <span class="chip">Setup completion funnel</span>
+          <span class="chip">Sign-in method (Google vs anonymous)</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3. Engagement</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">How often and how deeply users engage. Session activity and retention cohorts.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">DAU / WAU / MAU trend</span>
+          <span class="chip">Activity heatmap (day × hour)</span>
+          <span class="chip">Sessions per household per week</span>
+          <span class="chip">30-day retention cohort table</span>
+          <span class="chip">Avg screens per session</span>
+          <span class="chip">Most active time of day</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>4. Feature Adoption</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Which sections are being used and how deeply. Ranked by adoption rate.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">% households using each section</span>
+          <span class="chip">Avg items per section (e.g. avg bills, avg events)</span>
+          <span class="chip">Shopping list active households</span>
+          <span class="chip">Planner events created this month</span>
+          <span class="chip">Routine completion rate</span>
+          <span class="chip">Kids zone activation %</span>
+          <span class="chip">AI quick-add usage</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>5. Type A Mode</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Deep dive into the Type A feature — the most differentiating part of the product.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Type A enabled % (of all households)</span>
+          <span class="chip">Average Life Score (current)</span>
+          <span class="chip">Life Score distribution histogram</span>
+          <span class="chip">Per-dimension average scores</span>
+          <span class="chip">Weekly reset completion rate</span>
+          <span class="chip">Average streak length</span>
+          <span class="chip">Most common mission assigned</span>
+          <span class="chip">Mission completion vs skip rate</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>6. Raw households (table)</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Anonymised list of all households for debugging, support, and data auditing. No names or financial data.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Household ID (uid hash)</span>
+          <span class="chip">Created date</span>
+          <span class="chip">Last active</span>
+          <span class="chip">Member count</span>
+          <span class="chip">Features enabled (flags)</span>
+          <span class="chip">Type A on/off</span>
+          <span class="chip">Life Score</span>
+          <span class="chip">Setup %</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Prototypes ───────────────────────────────────────── -->
+  <hr />
+  <div id="prototype" class="section">
+    <h2>Dashboard prototypes</h2>
+    <p class="sub">Interactive mockups of each report section. All data is illustrative.</p>
+  </div>
+
+  <!-- Prototype switcher -->
+  <div class="proto-bar">
+    <span class="proto-label">USAGE:</span>
+    <button class="proto-tab-btn on" onclick="showProto('overview',this)">Overview</button>
+    <button class="proto-tab-btn" onclick="showProto('demographics',this)">Demographics</button>
+    <button class="proto-tab-btn" onclick="showProto('engagement',this)">Engagement</button>
+    <button class="proto-tab-btn" onclick="showProto('features',this)">Features</button>
+    <button class="proto-tab-btn" onclick="showProto('typea',this)">Type A</button>
+    <button class="proto-tab-btn" onclick="showProto('households',this)">Households</button>
+    <span class="proto-label" style="margin-left:12px;padding-left:12px;border-left:1px solid rgba(255,255,255,.15)">DATA:</span>
+    <button class="proto-tab-btn" onclick="showProto('completeness',this)">Completeness</button>
+    <button class="proto-tab-btn" onclick="showProto('financial',this)">Financial</button>
+    <button class="proto-tab-btn" onclick="showProto('cohorts',this)">Cohorts</button>
+    <button class="proto-tab-btn" onclick="showProto('lifecycle',this)">Lifecycle</button>
+    <button class="proto-tab-btn" onclick="showProto('privacy',this)">Privacy Audit</button>
+    <button class="proto-tab-btn" onclick="showProto('commercial',this)">Commercial</button>
+  </div>
+
+  <!-- ══ OVERVIEW ══ -->
+  <div class="proto-view on" id="proto-overview">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo">
+        <div class="admin-logo-mark">🐕</div>
+        <div class="admin-logo-text">TOTO</div>
+        <div class="admin-logo-badge">ADMIN</div>
+      </div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Reports</div>
+        <div class="admin-nav-item active">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Overview
+        </div>
+        <div class="admin-nav-item">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          Demographics
+        </div>
+        <div class="admin-nav-item">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Engagement
+        </div>
+        <div class="admin-nav-item">
+          <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Feature Adoption
+        </div>
+        <div class="admin-nav-item">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Type A Mode
+        </div>
+        <div class="admin-nav-section">Data</div>
+        <div class="admin-nav-item">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          Households
+        </div>
+        <div class="admin-nav-item">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Export
+        </div>
+      </div>
+      <div class="admin-user">
+        <div class="admin-avatar">RG</div>
+        <div>
+          <div class="admin-user-name">Robert G.</div>
+          <div class="admin-user-role">owner</div>
+        </div>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar-title">Overview</div>
+        <div class="admin-topbar-actions">
+          <button class="admin-btn">↓ Export CSV</button>
+          <button class="admin-btn admin-btn-primary">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="admin-content">
+        <div class="date-range">
+          <span class="date-range-label">PERIOD:</span>
+          <button class="date-chip">7d</button>
+          <button class="date-chip active">30d</button>
+          <button class="date-chip">90d</button>
+          <button class="date-chip">All time</button>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Total Households</div>
+            <div class="kpi-value">247</div>
+            <div class="kpi-delta kpi-delta-up">↑ 18 this month</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Active this week</div>
+            <div class="kpi-value">134</div>
+            <div class="kpi-delta kpi-delta-up">↑ 54% WAU rate</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">7-day retention</div>
+            <div class="kpi-value">61%</div>
+            <div class="kpi-delta kpi-delta-up">↑ 4pp vs last mo</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Type A enabled</div>
+            <div class="kpi-value">38%</div>
+            <div class="kpi-delta kpi-delta-up">↑ 94 households</div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="chart-grid">
+          <!-- Growth chart -->
+          <div class="chart-card">
+            <div class="chart-title">Household growth</div>
+            <div class="chart-sub">New households per week · last 12 weeks</div>
+            <div class="bar-chart">
+              <div class="bar" style="height:35%;background:var(--iris-2);opacity:.5"></div>
+              <div class="bar" style="height:42%;background:var(--iris-2);opacity:.55"></div>
+              <div class="bar" style="height:38%;background:var(--iris-2);opacity:.6"></div>
+              <div class="bar" style="height:50%;background:var(--iris-2);opacity:.65"></div>
+              <div class="bar" style="height:45%;background:var(--iris-2);opacity:.65"></div>
+              <div class="bar" style="height:60%;background:var(--iris-2);opacity:.7"></div>
+              <div class="bar" style="height:55%;background:var(--iris-2);opacity:.7"></div>
+              <div class="bar" style="height:70%;background:var(--iris-2);opacity:.75"></div>
+              <div class="bar" style="height:65%;background:var(--iris-2);opacity:.8"></div>
+              <div class="bar" style="height:80%;background:var(--iris-2);opacity:.85"></div>
+              <div class="bar" style="height:75%;background:var(--iris-2);opacity:.9"></div>
+              <div class="bar" style="height:100%;background:var(--iris-1)"></div>
+            </div>
+            <div class="bar-label-row">
+              <div class="bar-label">Feb</div>
+              <div class="bar-label"></div>
+              <div class="bar-label">Mar</div>
+              <div class="bar-label"></div>
+              <div class="bar-label">Apr</div>
+              <div class="bar-label"></div>
+              <div class="bar-label"></div>
+              <div class="bar-label"></div>
+              <div class="bar-label"></div>
+              <div class="bar-label"></div>
+              <div class="bar-label"></div>
+              <div class="bar-label">May</div>
+            </div>
+          </div>
+          <!-- Feature adoption donut -->
+          <div class="chart-card">
+            <div class="chart-title">Feature adoption</div>
+            <div class="chart-sub">% of households using each section</div>
+            <div class="usage-row"><div class="usage-name">Budget</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:82%"></div></div><div class="usage-pct">82%</div></div>
+            <div class="usage-row"><div class="usage-name">Planner</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:74%;background:var(--iris-3)"></div></div><div class="usage-pct">74%</div></div>
+            <div class="usage-row"><div class="usage-name">Lists</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:68%;background:var(--cyan)"></div></div><div class="usage-pct">68%</div></div>
+            <div class="usage-row"><div class="usage-name">Kids Zone</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:51%;background:var(--amber)"></div></div><div class="usage-pct">51%</div></div>
+            <div class="usage-row"><div class="usage-name">Routines</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:44%;background:var(--good)"></div></div><div class="usage-pct">44%</div></div>
+            <div class="usage-row"><div class="usage-name">Type A</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:38%;background:var(--ember)"></div></div><div class="usage-pct">38%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-overview -->
+
+  <!-- ══ DEMOGRAPHICS ══ -->
+  <div class="proto-view" id="proto-demographics">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>Demographics</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Engagement</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Feature Adoption</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Type A Mode</div>
+        <div class="admin-nav-section">Data</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Households</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Demographics</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Avg household size</div><div class="kpi-value">3.2</div><div class="kpi-delta kpi-delta-flat">members per household</div></div>
+          <div class="kpi-card"><div class="kpi-label">Households with kids</div><div class="kpi-value">58%</div><div class="kpi-delta kpi-delta-flat">143 of 247</div></div>
+          <div class="kpi-card"><div class="kpi-label">Solo users</div><div class="kpi-value">22%</div><div class="kpi-delta kpi-delta-flat">54 households</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg kids per family</div><div class="kpi-value">1.8</div><div class="kpi-delta kpi-delta-flat">in family households</div></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Household size distribution</div>
+            <div class="chart-sub">% of all households by member count</div>
+            <div class="bar-chart" style="height:100px">
+              <div class="bar" style="height:22%;background:var(--iris-3)"></div>
+              <div class="bar" style="height:35%;background:var(--iris-2)"></div>
+              <div class="bar" style="height:100%;background:var(--iris-1)"></div>
+              <div class="bar" style="height:80%;background:var(--iris-2)"></div>
+              <div class="bar" style="height:45%;background:var(--iris-3)"></div>
+              <div class="bar" style="height:20%;background:var(--iris-3);opacity:.6"></div>
+            </div>
+            <div class="bar-label-row">
+              <div class="bar-label">1</div>
+              <div class="bar-label">2</div>
+              <div class="bar-label">3</div>
+              <div class="bar-label">4</div>
+              <div class="bar-label">5</div>
+              <div class="bar-label">6+</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Household type</div>
+            <div class="chart-sub">Kids vs no kids</div>
+            <div class="donut-wrap" style="margin-top:10px">
+              <svg viewBox="0 0 80 80" width="80" height="80" style="flex-shrink:0">
+                <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="14"/>
+                <circle cx="40" cy="40" r="30" fill="none" stroke="var(--iris-1)" stroke-width="14"
+                  stroke-dasharray="109 190" stroke-linecap="butt" transform="rotate(-90 40 40)"/>
+                <circle cx="40" cy="40" r="30" fill="none" stroke="var(--amber)" stroke-width="14"
+                  stroke-dasharray="56 190" stroke-linecap="butt" stroke-dashoffset="-109" transform="rotate(-90 40 40)"/>
+                <circle cx="40" cy="40" r="30" fill="none" stroke="var(--cyan)" stroke-width="14"
+                  stroke-dasharray="25 190" stroke-linecap="butt" stroke-dashoffset="-165" transform="rotate(-90 40 40)"/>
+              </svg>
+              <div class="donut-legend">
+                <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--iris-1)"></div>Family with kids<span class="donut-leg-val">58%</span></div>
+                <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--amber)"></div>Couple, no kids<span class="donut-leg-val">29%</span></div>
+                <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--cyan)"></div>Solo user<span class="donut-leg-val">13%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card" style="margin-top:14px">
+          <div class="chart-title">Setup completion funnel</div>
+          <div class="chart-sub">% of all households completing each onboarding step</div>
+          <div style="margin-top:10px">
+            <div class="funnel-step"><div class="funnel-label">Created account</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%"><span class="funnel-bar-label">247</span></div></div><div class="funnel-pct">100%</div></div>
+            <div class="funnel-step"><div class="funnel-label">Added household</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:88%"><span class="funnel-bar-label">217</span></div></div><div class="funnel-pct">88%</div></div>
+            <div class="funnel-step"><div class="funnel-label">Added adult</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:84%"><span class="funnel-bar-label">207</span></div></div><div class="funnel-pct">84%</div></div>
+            <div class="funnel-step"><div class="funnel-label">Added first bill</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:72%"><span class="funnel-bar-label">178</span></div></div><div class="funnel-pct">72%</div></div>
+            <div class="funnel-step"><div class="funnel-label">Added budget</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:61%"><span class="funnel-bar-label">151</span></div></div><div class="funnel-pct">61%</div></div>
+            <div class="funnel-step"><div class="funnel-label">Added planner event</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:54%"><span class="funnel-bar-label">133</span></div></div><div class="funnel-pct">54%</div></div>
+            <div class="funnel-step"><div class="funnel-label">Setup dismissed</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:41%"><span class="funnel-bar-label">101</span></div></div><div class="funnel-pct">41%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-demographics -->
+
+  <!-- ══ ENGAGEMENT ══ -->
+  <div class="proto-view" id="proto-engagement">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Demographics</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Engagement</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Feature Adoption</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Type A Mode</div>
+        <div class="admin-nav-section">Data</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Households</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Engagement</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">DAU (today)</div><div class="kpi-value">42</div><div class="kpi-delta kpi-delta-up">↑ 17% vs yesterday</div></div>
+          <div class="kpi-card"><div class="kpi-label">WAU (7d)</div><div class="kpi-value">134</div><div class="kpi-delta kpi-delta-up">↑ 54% of all users</div></div>
+          <div class="kpi-card"><div class="kpi-label">MAU (30d)</div><div class="kpi-value">189</div><div class="kpi-delta kpi-delta-flat">76% of all users</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg sessions/week</div><div class="kpi-value">4.2</div><div class="kpi-delta kpi-delta-up">↑ 0.4 vs last mo</div></div>
+        </div>
+
+        <!-- Activity heatmap -->
+        <div class="chart-card" style="margin-bottom:14px">
+          <div class="chart-title">Activity heatmap</div>
+          <div class="chart-sub">Sessions by day of week × hour of day (darker = more activity)</div>
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:flex-start">
+            <div style="display:flex;flex-direction:column;gap:3px;padding-top:2px">
+              <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted);height:14px;line-height:14px">Mon</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted);height:14px;line-height:14px">Tue</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted);height:14px;line-height:14px">Wed</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted);height:14px;line-height:14px">Thu</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted);height:14px;line-height:14px">Fri</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted);height:14px;line-height:14px">Sat</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted);height:14px;line-height:14px">Sun</div>
+            </div>
+            <div style="flex:1">
+              <!-- Mon -->
+              <div class="heat-row"><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell"></div></div>
+              <!-- Tue -->
+              <div class="heat-row"><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell"></div><div class="heat-cell"></div></div>
+              <!-- Wed -->
+              <div class="heat-row"><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div></div>
+              <!-- Thu -->
+              <div class="heat-row"><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell"></div><div class="heat-cell"></div></div>
+              <!-- Fri -->
+              <div class="heat-row"><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l3"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div></div>
+              <!-- Sat -->
+              <div class="heat-row"><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell"></div><div class="heat-cell"></div></div>
+              <!-- Sun -->
+              <div class="heat-row"><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l4"></div><div class="heat-cell l4"></div><div class="heat-cell l3"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l3"></div><div class="heat-cell l3"></div><div class="heat-cell l2"></div><div class="heat-cell l1"></div><div class="heat-cell l1"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div><div class="heat-cell"></div></div>
+              <div style="display:flex;gap:3px;margin-top:4px">
+                <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted)">12am</div>
+                <div style="flex:1"></div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted)">6am</div>
+                <div style="flex:1"></div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted)">12pm</div>
+                <div style="flex:1"></div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted)">6pm</div>
+                <div style="flex:1"></div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--admin-muted)">11pm</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.3)">Peak: Tue–Thu 7–8am (school morning rush) · Sat–Sun 10am–12pm (weekend planning)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-engagement -->
+
+  <!-- ══ FEATURES ══ -->
+  <div class="proto-view" id="proto-features">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Demographics</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Engagement</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Feature Adoption</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Type A Mode</div>
+        <div class="admin-nav-section">Data</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Households</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Feature Adoption</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div class="chart-card" style="margin-bottom:14px">
+          <div class="chart-title">Feature adoption by section</div>
+          <div class="chart-sub">% of all 247 households that have used each feature · sorted by adoption</div>
+          <div style="margin-top:12px">
+            <div class="usage-row"><div class="usage-name" style="width:140px">Budget</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:82%"></div></div><div class="usage-pct">82%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">203</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Bills</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:79%;background:var(--iris-3)"></div></div><div class="usage-pct">79%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">195</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Planner</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:74%;background:var(--iris-3)"></div></div><div class="usage-pct">74%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">183</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Shopping Lists</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:68%;background:var(--cyan)"></div></div><div class="usage-pct">68%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">168</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Goals</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:61%;background:var(--good)"></div></div><div class="usage-pct">61%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">151</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Kids Zone</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:51%;background:var(--amber)"></div></div><div class="usage-pct">51%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">126</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Net Worth</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:48%;background:var(--amber);opacity:.8"></div></div><div class="usage-pct">48%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">119</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Routines</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:44%;background:var(--good);opacity:.8"></div></div><div class="usage-pct">44%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">109</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Home / Maintenance</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:41%;background:rgba(255,255,255,.3)"></div></div><div class="usage-pct">41%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">101</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Type A Mode</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:38%;background:var(--ember)"></div></div><div class="usage-pct">38%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">94</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">AI Quick Add</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:29%;background:var(--iris-3);opacity:.7"></div></div><div class="usage-pct">29%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">72</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:140px">Vehicles</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:24%;background:rgba(255,255,255,.2)"></div></div><div class="usage-pct">24%</div><div style="font-size:10px;color:var(--admin-muted);width:50px;text-align:right">59</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-features -->
+
+  <!-- ══ TYPE A ══ -->
+  <div class="proto-view" id="proto-typea">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Demographics</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Engagement</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Feature Adoption</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Type A Mode</div>
+        <div class="admin-nav-section">Data</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Households</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Type A Mode</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Type A enabled</div><div class="kpi-value" style="color:var(--iris-3)">38%</div><div class="kpi-delta kpi-delta-up">↑ 94 households</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg Life Score</div><div class="kpi-value" style="color:var(--iris-3)">64</div><div class="kpi-delta kpi-delta-up">↑ 3pts vs last mo</div></div>
+          <div class="kpi-card"><div class="kpi-label">Weekly reset rate</div><div class="kpi-value">47%</div><div class="kpi-delta kpi-delta-up">↑ 44 completions</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg streak (weeks)</div><div class="kpi-value">3.1</div><div class="kpi-delta kpi-delta-flat">of Type A users</div></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Life Score distribution</div>
+            <div class="chart-sub">% of Type A households by score band</div>
+            <div class="bar-chart" style="height:90px;align-items:flex-end">
+              <div class="bar" style="height:5%;background:var(--red);opacity:.8"></div>
+              <div class="bar" style="height:12%;background:var(--ember);opacity:.8"></div>
+              <div class="bar" style="height:28%;background:var(--amber);opacity:.8"></div>
+              <div class="bar" style="height:100%;background:var(--iris-1)"></div>
+              <div class="bar" style="height:75%;background:var(--iris-2)"></div>
+              <div class="bar" style="height:42%;background:var(--good);opacity:.9"></div>
+              <div class="bar" style="height:18%;background:var(--good)"></div>
+            </div>
+            <div class="bar-label-row">
+              <div class="bar-label">0–10</div>
+              <div class="bar-label">20</div>
+              <div class="bar-label">40</div>
+              <div class="bar-label">60</div>
+              <div class="bar-label">70</div>
+              <div class="bar-label">80</div>
+              <div class="bar-label">90+</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Avg score by dimension</div>
+            <div class="chart-sub">Across all Type A households</div>
+            <div style="margin-top:8px">
+              <div class="usage-row"><div class="usage-name">Budget</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:78%;background:var(--good)"></div></div><div class="usage-pct">78</div></div>
+              <div class="usage-row"><div class="usage-name">Home</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:71%"></div></div><div class="usage-pct">71</div></div>
+              <div class="usage-row"><div class="usage-name">Goals</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:65%"></div></div><div class="usage-pct">65</div></div>
+              <div class="usage-row"><div class="usage-name">Habits</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:58%;background:var(--iris-3)"></div></div><div class="usage-pct">58</div></div>
+              <div class="usage-row"><div class="usage-name">Plan</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:54%;background:var(--iris-3)"></div></div><div class="usage-pct">54</div></div>
+              <div class="usage-row"><div class="usage-name">Meals</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:48%;background:var(--amber)"></div></div><div class="usage-pct">48</div></div>
+              <div class="usage-row"><div class="usage-name">Family</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:41%;background:var(--amber)"></div></div><div class="usage-pct">41</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card" style="margin-top:14px">
+          <div class="chart-title">Mission assignment frequency</div>
+          <div class="chart-sub">Most common missions surfaced to users · last 30 days</div>
+          <div style="margin-top:10px">
+            <div class="usage-row"><div class="usage-name" style="width:200px">Log actual spending</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:71%"></div></div><div class="usage-pct">71%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:200px">Plan this week's dinners</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:58%;background:var(--amber)"></div></div><div class="usage-pct">58%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:200px">Complete a routine today</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:44%;background:var(--iris-3)"></div></div><div class="usage-pct">44%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:200px">Clear overdue maintenance</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:31%;background:var(--ember)"></div></div><div class="usage-pct">31%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:200px">Set first savings goal</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:18%;background:var(--good)"></div></div><div class="usage-pct">18%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-typea -->
+
+  <!-- ══ HOUSEHOLDS ══ -->
+  <div class="proto-view" id="proto-households">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Demographics</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Engagement</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Feature Adoption</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Type A Mode</div>
+        <div class="admin-nav-section">Data</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Households</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar">
+        <div class="admin-topbar-title">All Households</div>
+        <div class="admin-topbar-actions">
+          <button class="admin-btn">🔍 Search</button>
+          <button class="admin-btn">↓ Export CSV</button>
+        </div>
+      </div>
+      <div class="admin-content">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="date-chip active">All (247)</button>
+          <button class="date-chip">Active this week (134)</button>
+          <button class="date-chip">Type A on (94)</button>
+          <button class="date-chip">New this month (18)</button>
+          <button class="date-chip">Inactive 30d+ (41)</button>
+        </div>
+        <div class="chart-card" style="padding:0;overflow:hidden">
+          <table class="admin-table" style="width:100%">
+            <thead>
+              <tr>
+                <th>Household ID</th>
+                <th>Created</th>
+                <th>Last active</th>
+                <th>Members</th>
+                <th>Features</th>
+                <th>Type A</th>
+                <th>Life Score</th>
+                <th>Setup</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="strong" style="font-family:var(--mono);font-size:10px">a3f8…c291</td>
+                <td>12 Jan 2026</td>
+                <td style="color:var(--good)">Today</td>
+                <td>4 (2 kids)</td>
+                <td><span class="mini-badge" style="background:rgba(91,76,245,.2);color:var(--iris-3)">7 sections</span></td>
+                <td><span class="mini-badge" style="background:rgba(16,185,129,.15);color:var(--good)">ON</span></td>
+                <td class="strong" style="color:var(--iris-3)">78</td>
+                <td>100%</td>
+              </tr>
+              <tr>
+                <td class="strong" style="font-family:var(--mono);font-size:10px">b71d…e044</td>
+                <td>3 Feb 2026</td>
+                <td style="color:var(--good)">Yesterday</td>
+                <td>2 (0 kids)</td>
+                <td><span class="mini-badge" style="background:rgba(91,76,245,.2);color:var(--iris-3)">5 sections</span></td>
+                <td><span class="mini-badge" style="background:rgba(255,255,255,.08);color:var(--admin-muted)">OFF</span></td>
+                <td class="strong" style="color:var(--admin-muted)">—</td>
+                <td>84%</td>
+              </tr>
+              <tr>
+                <td class="strong" style="font-family:var(--mono);font-size:10px">c290…f155</td>
+                <td>18 Feb 2026</td>
+                <td>3 days ago</td>
+                <td>3 (1 kid)</td>
+                <td><span class="mini-badge" style="background:rgba(91,76,245,.2);color:var(--iris-3)">6 sections</span></td>
+                <td><span class="mini-badge" style="background:rgba(16,185,129,.15);color:var(--good)">ON</span></td>
+                <td class="strong" style="color:var(--amber)">52</td>
+                <td>92%</td>
+              </tr>
+              <tr>
+                <td class="strong" style="font-family:var(--mono);font-size:10px">d44a…8b32</td>
+                <td>1 Mar 2026</td>
+                <td style="color:var(--amber)">12 days ago</td>
+                <td>1 (solo)</td>
+                <td><span class="mini-badge" style="background:rgba(255,255,255,.08);color:var(--admin-muted)">3 sections</span></td>
+                <td><span class="mini-badge" style="background:rgba(255,255,255,.08);color:var(--admin-muted)">OFF</span></td>
+                <td class="strong" style="color:var(--admin-muted)">—</td>
+                <td>41%</td>
+              </tr>
+              <tr>
+                <td class="strong" style="font-family:var(--mono);font-size:10px">e81f…2c17</td>
+                <td>14 Mar 2026</td>
+                <td style="color:var(--ember)">38 days ago</td>
+                <td>5 (3 kids)</td>
+                <td><span class="mini-badge" style="background:rgba(255,255,255,.08);color:var(--admin-muted)">2 sections</span></td>
+                <td><span class="mini-badge" style="background:rgba(255,255,255,.08);color:var(--admin-muted)">OFF</span></td>
+                <td class="strong" style="color:var(--admin-muted)">—</td>
+                <td>28%</td>
+              </tr>
+              <tr>
+                <td class="strong" style="font-family:var(--mono);font-size:10px">f02c…9d88</td>
+                <td>2 Apr 2026</td>
+                <td style="color:var(--good)">Today</td>
+                <td>2 (0 kids)</td>
+                <td><span class="mini-badge" style="background:rgba(91,76,245,.2);color:var(--iris-3)">6 sections</span></td>
+                <td><span class="mini-badge" style="background:rgba(16,185,129,.15);color:var(--good)">ON</span></td>
+                <td class="strong" style="color:var(--good)">81</td>
+                <td>100%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--admin-muted)">Showing 6 of 247 households · UIDs truncated for privacy · No personal data stored here</div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-households -->
+
+  <!-- ── Data reports spec ───────────────────────────────── -->
+  <hr />
+  <div id="data-reports" class="section">
+    <h2>Data reporting — the data asset</h2>
+    <p class="sub">Six additional reports that treat the data TOTO holds as the subject, not the user behaviour. Inspired by how Meta, Google, and Stripe report internally — understanding the completeness, quality, and commercial value of the data asset itself.</p>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+
+      <div class="card">
+        <h3>7. Data Completeness</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">How rich is each household's data profile? A household with income + expenses + goals + kids + planner + maintenance is a high-value user. One with only bills is shallow. This drives product decisions about where to invest onboarding energy.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Data richness score per household (0–100)</span>
+          <span class="chip">Score distribution histogram</span>
+          <span class="chip">Average completeness by data category</span>
+          <span class="chip">% households with income set up</span>
+          <span class="chip">% with goals</span>
+          <span class="chip">% with 3+ months of actuals</span>
+          <span class="chip">Completeness vs retention correlation</span>
+          <span class="chip">Households with only 1 data category (at-risk)</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>8. Financial Health Aggregate</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Anonymised aggregate view of the financial patterns across all households. No individual data exposed — purely distribution and averages. Commercially valuable for partnerships, product direction, and understanding what financial stress looks like in the user base.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Average monthly surplus/deficit</span>
+          <span class="chip">Surplus vs deficit household split</span>
+          <span class="chip">Top 5 expense categories by frequency</span>
+          <span class="chip">Average household income band (bucketed, not exact)</span>
+          <span class="chip">Average savings goal target amount</span>
+          <span class="chip">Average net worth (households that set it up)</span>
+          <span class="chip">Most common bill types tracked</span>
+          <span class="chip">Average bills per household</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>9. Behavioural Cohorts</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Segment users by how they use the product, not who they are. Four cohorts: Power Users, Planners, Budgeters, and Drifters. Knowing which cohort is growing — and what triggers cohort upgrades — is the most actionable product signal available.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Cohort size + trend (Power / Planner / Budgeter / Drifter)</span>
+          <span class="chip">Cohort definition criteria</span>
+          <span class="chip">Cohort migration rate (Drifter → Budgeter etc)</span>
+          <span class="chip">Feature combinations by cohort</span>
+          <span class="chip">Type A adoption by cohort</span>
+          <span class="chip">Retention rate by cohort</span>
+          <span class="chip">Which features trigger cohort upgrades</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>10. Lifecycle &amp; Churn</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Where in the user journey do households go quiet? Day 1 → 7 → 30 → 90 cohort retention analysis. Which features are leading indicators of long-term retention? This is the most actionable report for reducing churn and improving onboarding.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Cohort retention table (D1/D7/D30/D90)</span>
+          <span class="chip">Median time to first return visit</span>
+          <span class="chip">Drop-off point analysis (where users go quiet)</span>
+          <span class="chip">Feature correlation with 30-day retention</span>
+          <span class="chip">Churned households — last feature used</span>
+          <span class="chip">Re-activation rate (returned after 30d+ gap)</span>
+          <span class="chip">Average household lifespan</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>11. Data &amp; Privacy Audit</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">What data does TOTO hold, how old is it, and what would a privacy data request look like? Required for GDPR / Australian Privacy Act compliance. Meta reports extensively on this — number of data categories, data age, deletion rates. Essential before any commercial partnership or app store review.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">Data categories held per household (count)</span>
+          <span class="chip">Average data age (days since last write)</span>
+          <span class="chip">Stale households (no write in 90d+)</span>
+          <span class="chip">Estimated data volume per household (KB)</span>
+          <span class="chip">Authentication method breakdown</span>
+          <span class="chip">Anonymous vs authenticated users</span>
+          <span class="chip">Data deletion request readiness</span>
+          <span class="chip">Oldest data in the system</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>12. Commercial Signal</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">Which users show the strongest signals of willingness to pay? Households with high data richness, Type A enabled, goals set, and consistent weekly engagement are the best monetisation candidates. This report is the bridge between product usage and revenue strategy.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <span class="chip">High-value user count (richness score &gt; 70)</span>
+          <span class="chip">Monetisation readiness score per household</span>
+          <span class="chip">Features most correlated with payment intent</span>
+          <span class="chip">Type A + high richness overlap (prime upsell cohort)</span>
+          <span class="chip">Weekly reset completers (highest engagement signal)</span>
+          <span class="chip">Estimated revenue potential at $X/mo price point</span>
+          <span class="chip">Feature gap analysis (what would premium unlock)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ DATA COMPLETENESS ══ -->
+  <div class="proto-view" id="proto-completeness">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Usage Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Demographics</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Engagement</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>Feature Adoption</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Type A Mode</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Households</div>
+        <div class="admin-nav-section">Data Reports</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Data Completeness</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financial Health</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>Cohorts</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Lifecycle</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Privacy Audit</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Commercial</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Data Completeness</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Avg richness score</div><div class="kpi-value" style="color:var(--iris-3)">58</div><div class="kpi-delta kpi-delta-up">↑ 4pts vs last mo</div></div>
+          <div class="kpi-card"><div class="kpi-label">High value (score 70+)</div><div class="kpi-value">31%</div><div class="kpi-delta kpi-delta-up">76 households</div></div>
+          <div class="kpi-card"><div class="kpi-label">At-risk (1 category)</div><div class="kpi-value" style="color:var(--ember)">18%</div><div class="kpi-delta kpi-delta-down">need re-engagement</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg data categories</div><div class="kpi-value">4.2</div><div class="kpi-delta kpi-delta-flat">of 8 possible</div></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Richness score distribution</div>
+            <div class="chart-sub">% of households by data richness band</div>
+            <div class="bar-chart" style="height:90px">
+              <div class="bar" style="height:18%;background:var(--red);opacity:.7"></div>
+              <div class="bar" style="height:22%;background:var(--ember);opacity:.8"></div>
+              <div class="bar" style="height:35%;background:var(--amber)"></div>
+              <div class="bar" style="height:80%;background:var(--iris-2)"></div>
+              <div class="bar" style="height:100%;background:var(--iris-1)"></div>
+              <div class="bar" style="height:65%;background:var(--iris-2)"></div>
+              <div class="bar" style="height:42%;background:var(--good)"></div>
+              <div class="bar" style="height:18%;background:var(--good);opacity:.8"></div>
+            </div>
+            <div class="bar-label-row">
+              <div class="bar-label">0–10</div><div class="bar-label">20</div><div class="bar-label">30</div><div class="bar-label">50</div><div class="bar-label">60</div><div class="bar-label">70</div><div class="bar-label">80</div><div class="bar-label">90+</div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Category completeness</div>
+            <div class="chart-sub">% of households with each data type set up</div>
+            <div class="usage-row"><div class="usage-name">Bills</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:79%"></div></div><div class="usage-pct">79%</div></div>
+            <div class="usage-row"><div class="usage-name">Budget income</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:72%"></div></div><div class="usage-pct">72%</div></div>
+            <div class="usage-row"><div class="usage-name">Budget expenses</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:68%"></div></div><div class="usage-pct">68%</div></div>
+            <div class="usage-row"><div class="usage-name">Actuals (3mo+)</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:41%;background:var(--amber)"></div></div><div class="usage-pct">41%</div></div>
+            <div class="usage-row"><div class="usage-name">Goals set</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:55%"></div></div><div class="usage-pct">55%</div></div>
+            <div class="usage-row"><div class="usage-name">Maintenance items</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:38%;background:var(--amber)"></div></div><div class="usage-pct">38%</div></div>
+            <div class="usage-row"><div class="usage-name">Documents added</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:31%;background:var(--ember)"></div></div><div class="usage-pct">31%</div></div>
+            <div class="usage-row"><div class="usage-name">Net worth set up</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:28%;background:var(--ember)"></div></div><div class="usage-pct">28%</div></div>
+          </div>
+        </div>
+        <div class="chart-card" style="margin-top:14px">
+          <div class="chart-title">Completeness vs retention correlation</div>
+          <div class="chart-sub">30-day retention rate by data richness band — richer data = dramatically higher retention</div>
+          <div style="margin-top:10px">
+            <div class="usage-row"><div class="usage-name" style="width:130px">Score 0–30</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:22%;background:var(--red)"></div></div><div class="usage-pct" style="color:var(--red)">22%</div><div style="font-size:10px;color:var(--admin-muted);margin-left:8px">retained at D30</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:130px">Score 30–60</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:48%;background:var(--amber)"></div></div><div class="usage-pct" style="color:var(--amber)">48%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:130px">Score 60–80</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:74%"></div></div><div class="usage-pct">74%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:130px">Score 80+ (rich)</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:91%;background:var(--good)"></div></div><div class="usage-pct" style="color:var(--good)">91%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-completeness -->
+
+  <!-- ══ FINANCIAL HEALTH ══ -->
+  <div class="proto-view" id="proto-financial">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Usage Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-section">Data Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Data Completeness</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financial Health</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/></svg>Cohorts</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg>Lifecycle</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Privacy Audit</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Commercial</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Financial Health Aggregate</div><div class="admin-topbar-actions"><button class="admin-btn" style="background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5">🔒 Anonymised only</button><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div style="background:rgba(91,76,245,.1);border:1px solid rgba(91,76,245,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--iris-3)">All figures are averages and distributions across anonymised households. No individual household financial data is displayed on this screen.</div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Avg monthly surplus</div><div class="kpi-value" style="color:var(--good)">$620</div><div class="kpi-delta kpi-delta-flat">of households w/ budget</div></div>
+          <div class="kpi-card"><div class="kpi-label">Deficit households</div><div class="kpi-value" style="color:var(--ember)">34%</div><div class="kpi-delta kpi-delta-down">spending over budget</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg savings goal</div><div class="kpi-value">$14.2k</div><div class="kpi-delta kpi-delta-flat">per active goal</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg bills tracked</div><div class="kpi-value">5.8</div><div class="kpi-delta kpi-delta-flat">per household</div></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Top expense categories by frequency</div>
+            <div class="chart-sub">Most common expense categories across all budget setups</div>
+            <div style="margin-top:8px">
+              <div class="usage-row"><div class="usage-name" style="width:150px">Mortgage / Rent</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:88%"></div></div><div class="usage-pct">88%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:150px">Groceries</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:84%"></div></div><div class="usage-pct">84%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:150px">Utilities</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:79%"></div></div><div class="usage-pct">79%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:150px">Subscriptions</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:71%;background:var(--iris-3)"></div></div><div class="usage-pct">71%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:150px">Dining out</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:64%;background:var(--amber)"></div></div><div class="usage-pct">64%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:150px">Insurance</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:58%;background:var(--amber)"></div></div><div class="usage-pct">58%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:150px">Childcare / School</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:44%;background:var(--good)"></div></div><div class="usage-pct">44%</div></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Surplus / deficit split</div>
+            <div class="chart-sub">Budget status across all households</div>
+            <div class="donut-wrap" style="margin-top:12px">
+              <svg viewBox="0 0 80 80" width="80" height="80" style="flex-shrink:0">
+                <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="14"/>
+                <circle cx="40" cy="40" r="30" fill="none" stroke="#10b981" stroke-width="14" stroke-dasharray="124 190" stroke-linecap="butt" transform="rotate(-90 40 40)"/>
+                <circle cx="40" cy="40" r="30" fill="none" stroke="#f97316" stroke-width="14" stroke-dasharray="66 190" stroke-linecap="butt" stroke-dashoffset="-124" transform="rotate(-90 40 40)"/>
+              </svg>
+              <div class="donut-legend">
+                <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--good)"></div>Surplus / on track<span class="donut-leg-val" style="color:var(--good)">66%</span></div>
+                <div class="donut-leg-item"><div class="donut-leg-dot" style="background:var(--ember)"></div>Over budget<span class="donut-leg-val" style="color:var(--ember)">34%</span></div>
+              </div>
+            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--admin-border)">
+              <div class="kpi-label" style="margin-bottom:8px">Income bands (bucketed)</div>
+              <div class="usage-row"><div class="usage-name">Under $60k</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:14%;background:rgba(255,255,255,.3)"></div></div><div class="usage-pct">14%</div></div>
+              <div class="usage-row"><div class="usage-name">$60k–$100k</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:28%"></div></div><div class="usage-pct">28%</div></div>
+              <div class="usage-row"><div class="usage-name">$100k–$160k</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:38%"></div></div><div class="usage-pct">38%</div></div>
+              <div class="usage-row"><div class="usage-name">$160k+</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:20%;background:var(--good)"></div></div><div class="usage-pct">20%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-financial -->
+
+  <!-- ══ COHORTS ══ -->
+  <div class="proto-view" id="proto-cohorts">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Usage Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-section">Data Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Data Completeness</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financial Health</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>Cohorts</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg>Lifecycle</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Privacy Audit</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Commercial</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Behavioural Cohorts</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+          <div class="kpi-card" style="border-color:rgba(91,76,245,.3)">
+            <div class="kpi-label" style="color:var(--iris-3)">⚡ Power Users</div>
+            <div class="kpi-value" style="color:var(--iris-3)">52</div>
+            <div class="kpi-delta" style="color:var(--iris-3)">21% · ↑ 8 this mo</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--admin-muted);margin-top:6px;line-height:1.5">7+ features · weekly reset · Type A · 90d+ active</div>
+          </div>
+          <div class="kpi-card" style="border-color:rgba(8,145,178,.3)">
+            <div class="kpi-label" style="color:#67e8f9">📅 Planners</div>
+            <div class="kpi-value" style="color:#67e8f9">74</div>
+            <div class="kpi-delta" style="color:#67e8f9">30% · ↑ 12 this mo</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--admin-muted);margin-top:6px;line-height:1.5">Planner + calendar heavy · 5+ events/mo</div>
+          </div>
+          <div class="kpi-card" style="border-color:rgba(245,158,11,.3)">
+            <div class="kpi-label" style="color:#fcd34d">💰 Budgeters</div>
+            <div class="kpi-value" style="color:#fcd34d">76</div>
+            <div class="kpi-delta" style="color:#fcd34d">31% · flat</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--admin-muted);margin-top:6px;line-height:1.5">Budget + bills only · low planner use</div>
+          </div>
+          <div class="kpi-card" style="border-color:rgba(239,68,68,.2)">
+            <div class="kpi-label" style="color:#fca5a5">🌀 Drifters</div>
+            <div class="kpi-value" style="color:#fca5a5">45</div>
+            <div class="kpi-delta" style="color:var(--red)">18% · ↓ 6 this mo</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--admin-muted);margin-top:6px;line-height:1.5">1–2 features · &lt;1 session/week</div>
+          </div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Cohort retention rates</div>
+            <div class="chart-sub">30-day retention by cohort</div>
+            <div style="margin-top:10px">
+              <div class="usage-row"><div class="usage-name">Power Users</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:94%;background:var(--iris-1)"></div></div><div class="usage-pct" style="color:var(--iris-3)">94%</div></div>
+              <div class="usage-row"><div class="usage-name">Planners</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:78%;background:#0891b2"></div></div><div class="usage-pct" style="color:#67e8f9">78%</div></div>
+              <div class="usage-row"><div class="usage-name">Budgeters</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:61%;background:var(--amber)"></div></div><div class="usage-pct" style="color:#fcd34d">61%</div></div>
+              <div class="usage-row"><div class="usage-name">Drifters</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:24%;background:var(--red)"></div></div><div class="usage-pct" style="color:#fca5a5">24%</div></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Features that trigger cohort upgrade</div>
+            <div class="chart-sub">Correlated with Drifter → Power User promotion</div>
+            <div style="margin-top:10px">
+              <div class="usage-row"><div class="usage-name" style="width:130px">Routines set up</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:82%;background:var(--iris-1)"></div></div><div class="usage-pct">82%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:130px">Goals added</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:74%"></div></div><div class="usage-pct">74%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:130px">Type A enabled</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:68%"></div></div><div class="usage-pct">68%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:130px">Kids zone used</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:55%;background:var(--amber)"></div></div><div class="usage-pct">55%</div></div>
+              <div class="usage-row"><div class="usage-name" style="width:130px">3mo actuals</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:48%;background:var(--amber)"></div></div><div class="usage-pct">48%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-cohorts -->
+
+  <!-- ══ LIFECYCLE ══ -->
+  <div class="proto-view" id="proto-lifecycle">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Usage Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-section">Data Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Data Completeness</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Financial Health</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/></svg>Cohorts</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Lifecycle</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Privacy Audit</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Commercial</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Lifecycle &amp; Churn</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export</button></div></div>
+      <div class="admin-content">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">D1 retention</div><div class="kpi-value" style="color:var(--good)">78%</div><div class="kpi-delta kpi-delta-flat">returned next day</div></div>
+          <div class="kpi-card"><div class="kpi-label">D7 retention</div><div class="kpi-value">61%</div><div class="kpi-delta kpi-delta-up">↑ 4pp vs last mo</div></div>
+          <div class="kpi-card"><div class="kpi-label">D30 retention</div><div class="kpi-value" style="color:var(--amber)">44%</div><div class="kpi-delta kpi-delta-flat">stable</div></div>
+          <div class="kpi-card"><div class="kpi-label">D90 retention</div><div class="kpi-value" style="color:var(--amber)">31%</div><div class="kpi-delta kpi-delta-up">↑ 3pp vs last mo</div></div>
+        </div>
+        <div class="chart-card" style="margin-bottom:14px">
+          <div class="chart-title">Monthly cohort retention table</div>
+          <div class="chart-sub">% of each signup cohort still active at D1 / D7 / D30 / D90</div>
+          <div style="margin-top:12px;overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Cohort</th><th>n</th><th>D1</th><th>D7</th><th>D30</th><th>D90</th><th>Active</th></tr></thead>
+              <tbody>
+                <tr><td class="strong">Jan 2026</td><td>31</td><td><span class="mini-badge" style="background:rgba(16,185,129,.2);color:var(--good)">81%</span></td><td><span class="mini-badge" style="background:rgba(16,185,129,.15);color:var(--good)">65%</span></td><td><span class="mini-badge" style="background:rgba(245,158,11,.15);color:var(--amber)">48%</span></td><td><span class="mini-badge" style="background:rgba(245,158,11,.15);color:var(--amber)">35%</span></td><td>11</td></tr>
+                <tr><td class="strong">Feb 2026</td><td>28</td><td><span class="mini-badge" style="background:rgba(16,185,129,.2);color:var(--good)">79%</span></td><td><span class="mini-badge" style="background:rgba(16,185,129,.15);color:var(--good)">62%</span></td><td><span class="mini-badge" style="background:rgba(245,158,11,.15);color:var(--amber)">45%</span></td><td>—</td><td>13</td></tr>
+                <tr><td class="strong">Mar 2026</td><td>44</td><td><span class="mini-badge" style="background:rgba(16,185,129,.2);color:var(--good)">84%</span></td><td><span class="mini-badge" style="background:rgba(16,185,129,.15);color:var(--good)">67%</span></td><td><span class="mini-badge" style="background:rgba(16,185,129,.15);color:var(--good)">51%</span></td><td>—</td><td>22</td></tr>
+                <tr><td class="strong">Apr 2026</td><td>38</td><td><span class="mini-badge" style="background:rgba(16,185,129,.2);color:var(--good)">76%</span></td><td><span class="mini-badge" style="background:rgba(245,158,11,.15);color:var(--amber)">58%</span></td><td>—</td><td>—</td><td>22</td></tr>
+                <tr><td class="strong">May 2026</td><td>18</td><td><span class="mini-badge" style="background:rgba(16,185,129,.2);color:var(--good)">78%</span></td><td>—</td><td>—</td><td>—</td><td>14</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Feature correlation with D30 retention</div>
+          <div class="chart-sub">Features used in first 7 days that predict 30-day retention — ranked by correlation</div>
+          <div style="margin-top:10px">
+            <div class="usage-row"><div class="usage-name" style="width:190px">Routine completed (day 1–7)</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:91%;background:var(--iris-1)"></div></div><div class="usage-pct" style="color:var(--iris-3)">91%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:190px">Type A enabled</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:87%;background:var(--iris-2)"></div></div><div class="usage-pct">87%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:190px">Goal set in first week</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:79%;background:var(--iris-3)"></div></div><div class="usage-pct">79%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:190px">Planner event added</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:74%;background:var(--cyan)"></div></div><div class="usage-pct">74%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:190px">Budget + actuals both set</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:68%;background:var(--good)"></div></div><div class="usage-pct">68%</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:190px">Bills only (no budget)</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:31%;background:var(--ember)"></div></div><div class="usage-pct" style="color:var(--ember)">31%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-lifecycle -->
+
+  <!-- ══ PRIVACY AUDIT ══ -->
+  <div class="proto-view" id="proto-privacy">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Usage Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-section">Data Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Data Completeness</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/></svg>Financial Health</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/></svg>Cohorts</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/></svg>Lifecycle</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Privacy Audit</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Commercial</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Data &amp; Privacy Audit</div><div class="admin-topbar-actions"><button class="admin-btn" style="background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:#6ee7b7">✓ Privacy Act ready</button><button class="admin-btn">↓ Export audit</button></div></div>
+      <div class="admin-content">
+        <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#6ee7b7">Australian Privacy Act (APP) · GDPR basis. This report supports subject access requests and data minimisation compliance.</div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Data categories held</div><div class="kpi-value">14</div><div class="kpi-delta kpi-delta-flat">across all households</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg data age</div><div class="kpi-value">38d</div><div class="kpi-delta kpi-delta-flat">since last write</div></div>
+          <div class="kpi-card"><div class="kpi-label">Stale (90d+)</div><div class="kpi-value" style="color:var(--amber)">41</div><div class="kpi-delta kpi-delta-flat">households inactive</div></div>
+          <div class="kpi-card"><div class="kpi-label">Anonymous users</div><div class="kpi-value">8%</div><div class="kpi-delta kpi-delta-flat">no Google sign-in</div></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Data categories by sensitivity</div>
+            <div class="chart-sub">All 14 data types TOTO may hold — classified by privacy sensitivity</div>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:rgba(239,68,68,.08);border-radius:6px;border:1px solid rgba(239,68,68,.15)"><span style="color:var(--admin-text)">Financial data (income, expenses, actuals)</span><span class="mini-badge" style="background:rgba(239,68,68,.2);color:#fca5a5">Sensitive</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:rgba(239,68,68,.08);border-radius:6px;border:1px solid rgba(239,68,68,.15)"><span style="color:var(--admin-text)">Net worth assets &amp; liabilities</span><span class="mini-badge" style="background:rgba(239,68,68,.2);color:#fca5a5">Sensitive</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:rgba(239,68,68,.08);border-radius:6px;border:1px solid rgba(239,68,68,.15)"><span style="color:var(--admin-text)">Children's names &amp; dates of birth</span><span class="mini-badge" style="background:rgba(239,68,68,.2);color:#fca5a5">Sensitive</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:rgba(245,158,11,.08);border-radius:6px;border:1px solid rgba(245,158,11,.15)"><span style="color:var(--admin-text)">Household member names &amp; ages</span><span class="mini-badge" style="background:rgba(245,158,11,.2);color:#fcd34d">Personal</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:rgba(245,158,11,.08);border-radius:6px;border:1px solid rgba(245,158,11,.15)"><span style="color:var(--admin-text)">Vehicle details (plate, make, model)</span><span class="mini-badge" style="background:rgba(245,158,11,.2);color:#fcd34d">Personal</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:6px;border:1px solid rgba(255,255,255,.06)"><span style="color:var(--admin-text)">Calendar events &amp; addresses</span><span class="mini-badge" style="background:rgba(255,255,255,.08);color:var(--admin-muted)">Standard</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:6px;border:1px solid rgba(255,255,255,.06)"><span style="color:var(--admin-text)">Shopping lists, meal plans, routines</span><span class="mini-badge" style="background:rgba(255,255,255,.08);color:var(--admin-muted)">Standard</span></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Data age distribution</div>
+            <div class="chart-sub">Households by days since last Firestore write</div>
+            <div class="bar-chart" style="height:80px;margin-top:8px">
+              <div class="bar" style="height:100%;background:var(--good)"></div>
+              <div class="bar" style="height:80%;background:var(--iris-2)"></div>
+              <div class="bar" style="height:55%;background:var(--iris-3)"></div>
+              <div class="bar" style="height:32%;background:var(--amber)"></div>
+              <div class="bar" style="height:22%;background:var(--ember)"></div>
+              <div class="bar" style="height:17%;background:var(--red);opacity:.8"></div>
+            </div>
+            <div class="bar-label-row"><div class="bar-label">0–7d</div><div class="bar-label">8–14d</div><div class="bar-label">15–30d</div><div class="bar-label">31–60d</div><div class="bar-label">61–90d</div><div class="bar-label">90d+</div></div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--admin-border)">
+              <div class="kpi-label" style="margin-bottom:8px">Auth method</div>
+              <div class="usage-row"><div class="usage-name">Google sign-in</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:92%;background:var(--iris-2)"></div></div><div class="usage-pct">92%</div></div>
+              <div class="usage-row"><div class="usage-name">Anonymous</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:8%;background:rgba(255,255,255,.25)"></div></div><div class="usage-pct">8%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-privacy -->
+
+  <!-- ══ COMMERCIAL SIGNAL ══ -->
+  <div class="proto-view" id="proto-commercial">
+  <div class="admin-frame">
+  <div class="admin-shell">
+    <div class="admin-sidebar">
+      <div class="admin-logo"><div class="admin-logo-mark">🐕</div><div class="admin-logo-text">TOTO</div><div class="admin-logo-badge">ADMIN</div></div>
+      <div class="admin-nav">
+        <div class="admin-nav-section">Usage Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</div>
+        <div class="admin-nav-section">Data Reports</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Data Completeness</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/></svg>Financial Health</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/></svg>Cohorts</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/></svg>Lifecycle</div>
+        <div class="admin-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/></svg>Privacy Audit</div>
+        <div class="admin-nav-item active"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Commercial Signal</div>
+      </div>
+      <div class="admin-user"><div class="admin-avatar">RG</div><div><div class="admin-user-name">Robert G.</div><div class="admin-user-role">owner</div></div></div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-topbar"><div class="admin-topbar-title">Commercial Signal</div><div class="admin-topbar-actions"><button class="admin-btn">↓ Export upsell list</button></div></div>
+      <div class="admin-content">
+        <div class="kpi-grid">
+          <div class="kpi-card" style="border-color:rgba(91,76,245,.3)"><div class="kpi-label" style="color:var(--iris-3)">Prime upsell cohort</div><div class="kpi-value" style="color:var(--iris-3)">52</div><div class="kpi-delta" style="color:var(--iris-3)">Type A + richness 70+</div></div>
+          <div class="kpi-card"><div class="kpi-label">Est. MRR at $9/mo</div><div class="kpi-value" style="color:var(--good)">$468</div><div class="kpi-delta kpi-delta-flat">prime cohort converts</div></div>
+          <div class="kpi-card"><div class="kpi-label">Est. MRR at $19/mo</div><div class="kpi-value" style="color:var(--good)">$988</div><div class="kpi-delta kpi-delta-flat">same cohort, higher price</div></div>
+          <div class="kpi-card"><div class="kpi-label">Weekly reset completers</div><div class="kpi-value">44</div><div class="kpi-delta kpi-delta-flat">highest engagement signal</div></div>
+        </div>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <div class="chart-title">Monetisation readiness funnel</div>
+            <div class="chart-sub">All households filtered down to prime upsell cohort</div>
+            <div style="margin-top:10px">
+              <div class="funnel-step"><div class="funnel-label">All households</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%"><span class="funnel-bar-label">247</span></div></div><div class="funnel-pct">100%</div></div>
+              <div class="funnel-step"><div class="funnel-label">Active (WAU)</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:54%"><span class="funnel-bar-label">134</span></div></div><div class="funnel-pct">54%</div></div>
+              <div class="funnel-step"><div class="funnel-label">High richness (70+)</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:31%"><span class="funnel-bar-label">76</span></div></div><div class="funnel-pct">31%</div></div>
+              <div class="funnel-step"><div class="funnel-label">Type A enabled</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:21%"><span class="funnel-bar-label">52</span></div></div><div class="funnel-pct">21%</div></div>
+              <div class="funnel-step"><div class="funnel-label">Weekly reset done</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:18%"><span class="funnel-bar-label">44</span></div></div><div class="funnel-pct">18%</div></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Revenue scenarios</div>
+            <div class="chart-sub">MRR at different price points and conversion assumptions</div>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+              <div style="background:rgba(91,76,245,.1);border:1px solid rgba(91,76,245,.2);border-radius:10px;padding:12px">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--iris-3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Conservative · 30% converts</div>
+                <div style="font-size:20px;font-weight:800;color:var(--iris-3)">$140 MRR</div>
+                <div style="font-size:10px;color:var(--admin-muted);margin-top:2px">16 households × $9/mo</div>
+              </div>
+              <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:12px">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--good);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Base case · 60% converts</div>
+                <div style="font-size:20px;font-weight:800;color:var(--good)">$561 MRR</div>
+                <div style="font-size:10px;color:var(--admin-muted);margin-top:2px">31 households × $18/mo avg</div>
+              </div>
+              <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:12px">
+                <div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Optimistic · full cohort</div>
+                <div style="font-size:20px;font-weight:800;color:var(--amber)">$988 MRR</div>
+                <div style="font-size:10px;color:var(--admin-muted);margin-top:2px">52 households × $19/mo</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card" style="margin-top:14px">
+          <div class="chart-title">Features most correlated with payment intent</div>
+          <div class="chart-sub">Engagement depth with each feature as a proxy for willingness to pay</div>
+          <div style="margin-top:10px">
+            <div class="usage-row"><div class="usage-name" style="width:180px">Type A weekly reset</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:91%;background:var(--iris-1)"></div></div><div class="usage-pct" style="color:var(--iris-3)">strongest</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:180px">Goals with targets</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:82%"></div></div><div class="usage-pct">high</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:180px">3+ months actuals</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:77%"></div></div><div class="usage-pct">high</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:180px">Net worth tracked</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:71%;background:var(--good)"></div></div><div class="usage-pct">high</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:180px">Kids chores + rewards</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:58%;background:var(--amber)"></div></div><div class="usage-pct">medium</div></div>
+            <div class="usage-row"><div class="usage-name" style="width:180px">Bills only, no budget</div><div class="usage-bar-wrap"><div class="usage-bar" style="width:18%;background:var(--ember)"></div></div><div class="usage-pct" style="color:var(--ember)">weak</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div><!-- /proto-commercial -->
+
+  <!-- ── Implementation ───────────────────────────────────── -->
+  <hr />
+  <div id="implementation" class="section">
+    <h2>Implementation path</h2>
+    <p class="sub">Three phases — data collection, aggregation, and the dashboard itself.</p>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <h3>Phase 1 — Add Firebase Analytics (1–2 hours)</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">The fastest way to get session data, screen views, and DAU/WAU/MAU without writing any Firestore data.</div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Add <span class="chip">firebase-analytics-compat.js</span> to the existing Firebase SDK imports in <span class="chip">index.html</span>. Already in the free Firebase plan.</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Call <span class="chip">firebase.analytics().logEvent('screen_view', &#123;screen_name: tab&#125;)</span> inside <span class="chip">activateTab()</span>. That's one line.</div></div>
+        <div class="row"><div class="dot" style="background:var(--good)"></div><div class="txt">Firebase console gives DAU/WAU/MAU, session length, and screen flows automatically with no further code.</div></div>
+        <div class="row"><div class="dot" style="background:var(--amber)"></div><div class="txt">Add a consent note to the sign-up screen: "We collect anonymous usage analytics to improve TOTO."</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Phase 2 — Nightly aggregation Cloud Function (1 day)</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">A Firebase Cloud Function that runs nightly, reads all <span class="chip">families/*</span> documents, and writes a single aggregated snapshot to <span class="chip">analytics_snapshots/{YYYY-MM-DD}</span>.</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Scheduled with <span class="chip">functions.pubsub.schedule('every 24 hours')</span>.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Reads all family docs, counts households by type (kids/no-kids/solo), calculates feature adoption flags, averages Life Scores for Type A households.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Writes one document per day — keeps history automatically. 365 documents per year at ~5KB each = negligible cost.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Firestore security rules on <span class="chip">analytics_snapshots</span> restrict reads to <span class="chip">admin_users</span> UIDs only.</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Phase 3 — Admin dashboard (2–3 days)</h3>
+        <div class="txt" style="margin-bottom:10px;color:var(--ink-soft)">A separate static HTML file (or lightweight React app) hosted at <span class="chip">admin.toto.app</span>. Reads from <span class="chip">analytics_snapshots</span>. Uses the same Firebase project and auth.</div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Single HTML file approach mirrors the main app — no build step, deploy to Firebase Hosting.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">On load: check <span class="chip">admin_users/{uid}</span> → deny or allow. If allowed, load last 90 days of snapshots and render charts.</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Charts rendered with SVG (no library needed for bar/line charts at this scale) or a lightweight library like <span class="chip">Chart.js</span> (~60KB).</div></div>
+        <div class="row"><div class="dot" style="background:var(--iris-2)"></div><div class="txt">Export buttons write CSV using <span class="chip">Blob</span> + <span class="chip">URL.createObjectURL</span> — no server needed.</div></div>
+        <div class="row"><div class="dot" style="background:var(--muted)"></div><div class="txt">Total Firebase cost: Cloud Function runs once/day (~$0.00 on Spark plan). Firestore reads for the dashboard: ~100 reads per session (~$0.003). Effectively free.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showProto(id, btn) {
+    document.querySelectorAll('.proto-view').forEach(v => v.classList.remove('on'));
+    document.querySelectorAll('.proto-tab-btn').forEach(b => b.classList.remove('on'));
+    document.getElementById('proto-' + id).classList.add('on');
+    btn.classList.add('on');
+  }
+</script>
+</body>
+</html>
