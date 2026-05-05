@@ -295,17 +295,17 @@ async function guestMode() {
   if (overlay) overlay.classList.add('hidden');
   await _prewarmReady;
   if (!state.onboarded) {
-    showOnboarding();
-  } else {
-    const _hashTab = location.hash.slice(1);
-    if (_hashTab && document.getElementById('tab-' + _hashTab)) {
-      history.replaceState({ tab: _hashTab }, '', '#' + _hashTab);
-      _activateTabInternal(_hashTab);
-    } else {
-      renderAll();
-    }
-    handleDeviceRouting();
+    state.onboarded = true;
+    saveData(state);
   }
+  const _hashTab = location.hash.slice(1);
+  if (_hashTab && document.getElementById('tab-' + _hashTab)) {
+    history.replaceState({ tab: _hashTab }, '', '#' + _hashTab);
+    _activateTabInternal(_hashTab);
+  } else {
+    renderAll();
+  }
+  handleDeviceRouting();
 }
 
 function signOutUser() {
@@ -407,22 +407,21 @@ function _startFirestoreSync() {
         renderAll();
       }
       if (!state.onboarded) {
-        showOnboarding();
+        state.onboarded = true;
+        saveData(state);
+      }
+      const pendingToken    = sessionStorage.getItem(_PENDING_INVITE_KEY);
+      const postInviteToken = sessionStorage.getItem('toto_post_invite_action');
+      if (pendingToken || postInviteToken) {
+        sessionStorage.removeItem('toto_post_invite_action');
+        _handlePendingInvite();
       } else {
-        const pendingToken    = sessionStorage.getItem(_PENDING_INVITE_KEY);
-        const postInviteToken = sessionStorage.getItem('toto_post_invite_action');
-        if (pendingToken || postInviteToken) {
-          sessionStorage.removeItem('toto_post_invite_action');
-          _handlePendingInvite();
-        } else {
-          handleDeviceRouting();
-        }
+        handleDeviceRouting();
       }
     });
   }, err => {
     console.error('Firestore sync error:', err);
     renderAll();
-    if (!state.onboarded) showOnboarding();
   });
 }
 
@@ -2030,7 +2029,9 @@ function safeRender(fn) {
   try {
     fn();
   } catch(e) {
-    console.error('Render error in ' + fn.name + ':', e);
+    const msg = e?.message || String(e);
+    const stack = e?.stack || '';
+    console.error('Render error in ' + (fn.name || '?') + ': ' + msg + '\n' + stack);
     if (typeof Sentry !== 'undefined') {
       Sentry.withScope(scope => {
         scope.setTag('renderer', fn.name || 'anonymous');
