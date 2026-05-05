@@ -281,10 +281,11 @@ function signInWithGoogle() {
   });
 }
 
-function guestMode() {
+async function guestMode() {
   _guestMode = true;
   const overlay = document.getElementById('login-overlay');
   if (overlay) overlay.classList.add('hidden');
+  await _prewarmReady;
   if (!state.onboarded) {
     showOnboarding();
   } else {
@@ -881,7 +882,7 @@ function setKidSession(kidId)    { _secureSet(KID_SESSION_KEY, String(kidId)); }
 function clearKidSession()       { _secureClear(KID_SESSION_KEY); }
 
 // Pre-warm cache immediately so synchronous getters work by the time auth resolves.
-_securePrewarm([
+const _prewarmReady = _securePrewarm([
   HOUSEHOLD_OWNER_KEY,
   DEVICE_KEY,
   KID_SESSION_KEY,
