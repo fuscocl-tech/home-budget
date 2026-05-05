@@ -1,5 +1,5 @@
 // Dev tools — fixture loading and state reset (not shipped in production)
-import { state } from '../store.js';
+import { state, _replaceState } from '../store.js';
 import { _plannerMembers } from './planner-utils.js';
 
 // DEV TOOLS
@@ -376,7 +376,7 @@ export function _devLoadAll() {
 
 export function _devReset() {
   if (!confirm('Reset all data to empty defaults?')) return;
-  const fresh = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  const fresh = JSON.parse(JSON.stringify(window.DEFAULT_DATA));
   fresh.onboarded = true;
   fresh.setupProgressDismissed = false;
   _replaceState(fresh);

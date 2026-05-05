@@ -3622,6 +3622,7 @@ window.toggleShopItem = toggleShopItem;
 window.toggleSidebar = toggleSidebar;
 window.toggleTotoAssistant = toggleTotoAssistant;
 window.uid = uid;
+window.DEFAULT_DATA = DEFAULT_DATA;
 window.unpushEventFromBudget = unpushEventFromBudget;
 window.updateCars = updateCars;
 window.updateCategoryGroup = updateCategoryGroup;
