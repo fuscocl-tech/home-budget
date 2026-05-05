@@ -3913,9 +3913,64 @@
     }
     /* ── End Section 10 CSS ─────────────────────────────────── */
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase config injected before the module script so it can read window.__FIREBASE_CONFIG__ -->
+  <script>
+    window.__FIREBASE_CONFIG__ = {
+      apiKey: "AIzaSyBiQq8lIf5yCKGDyinGjLaeAE100u7vF90",
+      authDomain: "home-budget-b0f28.firebaseapp.com",
+      projectId: "home-budget-b0f28",
+      storageBucket: "home-budget-b0f28.firebasestorage.app",
+      messagingSenderId: "777614158624",
+      appId: "1:777614158624:web:a8636d1b5894ae4d3e8545"
+    };
+  </script>
+  <!-- Firebase v10 modular SDK — loaded as ESM, globals exposed for the classic script below -->
+  <script type="module">
+    import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider }
+                                        from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+    import { getFirestore, enableIndexedDbPersistence,
+             collection, doc, onSnapshot, getDoc, setDoc, deleteDoc }
+                                        from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+    const _app   = initializeApp(window.__FIREBASE_CONFIG__);
+    const _auth  = getAuth(_app);
+    const _db    = getFirestore(_app);
+
+    // Enable offline persistence before any reads/writes
+    enableIndexedDbPersistence(_db, { forceOwnership: false }).catch(err => {
+      if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+        console.warn('Firestore persistence error:', err.code);
+      }
+    });
+
+    // Expose a thin compatibility shim so the classic script below needs minimal changes.
+    // fbAuth mirrors the compat auth API; fbStore mirrors the compat firestore API.
+    window.fbAuth = {
+      _auth,
+      onAuthStateChanged: (cb) => onAuthStateChanged(_auth, cb),
+      signInWithPopup: (provider) => signInWithPopup(_auth, provider),
+      signOut: () => signOut(_auth),
+      GoogleAuthProvider,
+      get currentUser() { return _auth.currentUser; },
+    };
+    window.fbStore = {
+      _db,
+      collection: (path) => ({
+        doc: (id) => ({
+          _ref: doc(_db, path, id),
+          get:        ()      => getDoc(doc(_db, path, id)),
+          set:        (data)  => setDoc(doc(_db, path, id), data),
+          delete:     ()      => deleteDoc(doc(_db, path, id)),
+          onSnapshot: (cb, err) => onSnapshot(doc(_db, path, id), cb, err),
+        }),
+      }),
+    };
+
+    // Signal that Firebase is ready — the classic script defers its init until this fires
+    window.__firebaseReady = true;
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
   <script
     src="https://browser.sentry-cdn.com/8.28.0/bundle.min.js"
     crossorigin="anonymous"
@@ -4395,31 +4450,12 @@ function openNavGroupFor(tab) {
 // ─────────────────────────────────────────────────
 // FIREBASE
 // ─────────────────────────────────────────────────
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBiQq8lIf5yCKGDyinGjLaeAE100u7vF90",
-  authDomain: "home-budget-b0f28.firebaseapp.com",
-  projectId: "home-budget-b0f28",
-  storageBucket: "home-budget-b0f28.firebasestorage.app",
-  messagingSenderId: "777614158624",
-  appId: "1:777614158624:web:a8636d1b5894ae4d3e8545"
-};
-
-firebase.initializeApp(firebaseConfig);
-const fbAuth  = firebase.auth();
-const fbStore = firebase.firestore();
-
-// Enable IndexedDB-backed offline persistence so the app works without connectivity.
-// Must be called before any other Firestore operations.
-fbStore.enablePersistence({ synchronizeTabs: true }).catch(err => {
-  if (err.code === 'failed-precondition') {
-    // Multiple tabs open — only the first tab gets persistence.
-    console.warn('Firestore persistence unavailable: multiple tabs open');
-  } else if (err.code === 'unimplemented') {
-    // Browser doesn't support offline persistence.
-    console.warn('Firestore persistence not supported in this browser');
-  }
-});
+// fbAuth and fbStore are set by the module script in <head>.
+// The module script fires 'firebase-ready' on window when done.
+// All Firebase-dependent code waits for that event before running.
+//
+// fbAuth shim API: onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, currentUser
+// fbStore shim API: .collection(path).doc(id).{get, set, delete, onSnapshot}
 
 // Global error capture — catches unhandled promise rejections and JS exceptions
 // that fall outside safeRender. Sentry also installs its own handlers, but we
@@ -4473,7 +4509,7 @@ function logActivity(action, detail) {
 }
 
 function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
+  const provider = new fbAuth.GoogleAuthProvider();
   fbAuth.signInWithPopup(provider).catch(err => {
     const el = document.getElementById('login-error');
     if (el) { el.textContent = err.message; el.style.display = ''; }
@@ -4487,7 +4523,13 @@ function guestMode() {
   if (!state.onboarded) {
     showOnboarding();
   } else {
-    renderAll();
+    const _hashTab = location.hash.slice(1);
+    if (_hashTab && document.getElementById('tab-' + _hashTab)) {
+      history.replaceState({ tab: _hashTab }, '', '#' + _hashTab);
+      _activateTabInternal(_hashTab);
+    } else {
+      renderAll();
+    }
     handleDeviceRouting();
   }
 }
@@ -4582,7 +4624,14 @@ function _startFirestoreSync() {
     }
     refreshReceiptCounts().then(() => {
       _autoCreateRecurringEvents();
-      renderAll();
+      // Apply URL hash route before renderAll so the correct tab renders first
+      const _hashTab = location.hash.slice(1);
+      if (_hashTab && document.getElementById('tab-' + _hashTab)) {
+        history.replaceState({ tab: _hashTab }, '', '#' + _hashTab);
+        _activateTabInternal(_hashTab);
+      } else {
+        renderAll();
+      }
       if (!state.onboarded) {
         showOnboarding();
       } else {
@@ -4603,12 +4652,14 @@ function _startFirestoreSync() {
   });
 }
 
-fbAuth.onAuthStateChanged(user => {
-  if (_guestMode && !user) return;
-  _currentUser = user;
-  const overlay       = document.getElementById('login-overlay');
-  const headerAvatar  = document.getElementById('header-avatar');
-  const headerSignOut = document.getElementById('header-sign-out');
+// Defer auth listener until the Firebase module script has set up fbAuth.
+function _initAuthListener() {
+  fbAuth.onAuthStateChanged(user => {
+    if (_guestMode && !user) return;
+    _currentUser = user;
+    const overlay       = document.getElementById('login-overlay');
+    const headerAvatar  = document.getElementById('header-avatar');
+    const headerSignOut = document.getElementById('header-sign-out');
 
   if (user) {
     if (overlay)       overlay.classList.add('hidden');
@@ -4628,7 +4679,15 @@ fbAuth.onAuthStateChanged(user => {
       if (tagline) tagline.style.display = 'none';
     }
   }
-});
+  });
+}
+
+// Start auth when Firebase module is ready (may already be ready if module ran first)
+if (window.__firebaseReady) {
+  _initAuthListener();
+} else {
+  window.addEventListener('firebase-ready', _initAuthListener, { once: true });
+}
 
 // ─────────────────────────────────────────────────
 // DATA
@@ -8395,11 +8454,20 @@ window.addEventListener('resize', () => {
   document.querySelectorAll('.section-pills-wrap').forEach(_updatePillsOverflow);
 });
 
-function activateTab(tab) {
+// ── URL-based routing ────────────────────────────────────────────────────────
+// Tab name lives in the URL hash: toto.app/#budget, toto.app/#planner, etc.
+// activateTab() pushes a history entry; popstate restores it so the back
+// button works. _activateTabInternal() does the DOM work without touching history.
+
+function _activateTabInternal(tab) {
+  // Normalise aliases
   if (tab === 'subscriptions') tab = 'bills';
-  if (tab === 'scenarios') tab = 'insights';
-  if (tab === 'money') tab = 'budget';
-  if (tab === 'dashboard') tab = 'budget';
+  if (tab === 'scenarios')     tab = 'insights';
+  if (tab === 'money')         tab = 'budget';
+  if (tab === 'dashboard')     tab = 'budget';
+
+  // Validate — fall back to today if the hash names an unknown panel
+  if (!document.getElementById('tab-' + tab)) tab = 'today';
 
   // Check unsaved settings before leaving
   if (_activeTab() === 'settings' && tab !== 'settings') _checkSettingsUnsaved(tab);
@@ -8430,18 +8498,42 @@ function activateTab(tab) {
     const hdr = document.getElementById(section + '-section-header');
     if (hdr) {
       hdr.classList.add('active');
-      // Update date in header
       const dateEl = document.getElementById(section + '-header-date');
       if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-AU', { weekday:'long', month:'long', day:'numeric' });
-      // Update active pill
       hdr.querySelectorAll('.section-pill').forEach(p => p.classList.toggle('active', p.dataset.pill === tab));
-      // Update overflow chevrons
       requestAnimationFrame(() => hdr.querySelectorAll('.section-pills-wrap').forEach(_updatePillsOverflow));
     }
   }
 
   renderAll();
 }
+
+function activateTab(tab) {
+  // Normalise before pushing to history so the hash is canonical
+  if (tab === 'subscriptions') tab = 'bills';
+  if (tab === 'scenarios')     tab = 'insights';
+  if (tab === 'money')         tab = 'budget';
+  if (tab === 'dashboard')     tab = 'budget';
+
+  const current = location.hash.slice(1) || 'today';
+  if (current !== tab) {
+    history.pushState({ tab }, '', '#' + tab);
+  }
+  _activateTabInternal(tab);
+}
+
+// Back/forward button support
+window.addEventListener('popstate', e => {
+  const tab = (e.state?.tab) || location.hash.slice(1) || 'today';
+  _activateTabInternal(tab);
+});
+
+// On first load: seed the history stack so the back button always has
+// somewhere to go within the app rather than leaving it immediately.
+(function _initRouteFromHash() {
+  const tab = location.hash.slice(1) || 'today';
+  history.replaceState({ tab }, '', tab === 'today' ? (location.pathname + location.search) : '#' + tab);
+})();
 
 document.querySelectorAll('.nav-item, .nav-text-item').forEach(el => {
   el.addEventListener('click', () => activateTab(el.dataset.tab));
