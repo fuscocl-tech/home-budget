@@ -4,7 +4,8 @@
   "description": "",
   "main": "sw.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "dev": "npx serve . -p 3000",
     "sim": "cp index.html www/index.html && npx cap sync ios"
   },
@@ -27,5 +28,8 @@
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.5"
   }
 }
