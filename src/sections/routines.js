@@ -376,13 +376,15 @@ export function _routineSetTab(tab) { _routineActiveTab = tab; renderRoutines();
 // ── Adult routines view ───────────────────────────────────────
 
 export function _renderAdultRoutines() {
-  // Lazy window.uid claim: adult routines saved as 'guest' before sign-in
+  // Lazy UID claim: migrate guest-owned routines once the user has a real UID
   const _uid = _routineCurrentUserId();
   let claimed = false;
-  (state.routines || []).forEach(r => {
-    if (r.ownerType === 'adult' && r.ownerId === 'guest') { r.ownerId = window.uid; claimed = true; }
-  });
-  if (claimed) _routineSaveValidated('lazy-window.uid-claim');
+  if (_uid !== 'guest') {
+    (state.routines || []).forEach(r => {
+      if (r.ownerType === 'adult' && r.ownerId === 'guest') { r.ownerId = _uid; claimed = true; }
+    });
+    if (claimed) _routineSaveValidated('lazy-uid-claim');
+  }
 
   const todayStr   = new Date().toISOString().slice(0, 10);
   const myRoutines = _routinesForCurrentUser().filter(r => _routineMatchesDate(r, todayStr));
