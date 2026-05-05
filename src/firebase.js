@@ -7,6 +7,15 @@ import {
   doc, getDoc, setDoc, deleteDoc, onSnapshot,
 } from 'firebase/firestore';
 
+const FIREBASE_CONFIG = {
+  apiKey:            'AIzaSyBiQq8lIf5yCKGDyinGjLaeAE100u7vF90',
+  authDomain:        'home-budget-b0f28.firebaseapp.com',
+  projectId:         'home-budget-b0f28',
+  storageBucket:     'home-budget-b0f28.firebasestorage.app',
+  messagingSenderId: '777614158624',
+  appId:             '1:777614158624:web:a8636d1b5894ae4d3e8545',
+};
+
 // E2E tests inject window.__FIREBASE_STUB__ = true via page.addInitScript
 // before this module runs. When stubbed, skip real Firebase init so tests
 // don't hang waiting for network or auth state.
@@ -31,7 +40,7 @@ if (window.__FIREBASE_STUB__) {
     }),
   };
 } else {
-  const _app  = initializeApp(window.__FIREBASE_CONFIG__);
+  const _app  = initializeApp(FIREBASE_CONFIG);
   const _auth = getAuth(_app);
   const _db   = getFirestore(_app);
 

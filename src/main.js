@@ -7,6 +7,12 @@ import {
   _updatePillsOverflow, _activateTabInternal, activateTab, setRenderCallback,
 } from './router.js';
 
+// Wire login buttons immediately — modules are deferred so DOMContentLoaded
+// has already fired. Using lambdas means guestMode/signInWithGoogle are
+// looked up at click time (after the full module has run), not at bind time.
+document.getElementById('btn-guest-mode')?.addEventListener('click', () => guestMode());
+document.getElementById('btn-google-signin')?.addEventListener('click', () => signInWithGoogle());
+
 // ─────────────────────────────────────────────────
 // SIDEBAR
 // ─────────────────────────────────────────────────
