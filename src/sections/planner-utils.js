@@ -1,6 +1,31 @@
 // Shared Planner utilities — constants, member helpers, event helpers
 import { state } from '../store.js';
 
+// Pure recurrence engine — no state, no side-effects.
+// Single canonical copy used by planner-utils, routines, child-view, and guide.
+export function _recurrenceMatchesDate(recurrence, dateStr) {
+  if (!recurrence) return true;
+  const { type, days, intervalDays, startDate, endDate } = recurrence;
+  if (startDate && dateStr < startDate) return false;
+  if (endDate   && dateStr > endDate)   return false;
+  const d = new Date(dateStr + 'T12:00:00');
+  const dow = d.getDay(); // 0=Sun..6=Sat
+  switch (type) {
+    case 'daily':         return true;
+    case 'weekdays':      return dow >= 1 && dow <= 5;
+    case 'weekends':      return dow === 0 || dow === 6;
+    case 'specific_days': return Array.isArray(days) && days.includes(String(dow));
+    case 'interval': {
+      if (!startDate || !intervalDays) return false;
+      const start = new Date(startDate + 'T12:00:00');
+      const diff  = Math.round((d - start) / 86400000);
+      return diff >= 0 && diff % intervalDays === 0;
+    }
+    case 'one_time': return dateStr === startDate;
+    default:         return true;
+  }
+}
+
 export const PLANNER_CATS = {
   work:    { label: 'Work',    emoji: '💼', color: '#dbeafe', text: '#1e40af', financial: false },
   study:   { label: 'Study',   emoji: '📚', color: '#fef3c7', text: '#92400e', financial: false },

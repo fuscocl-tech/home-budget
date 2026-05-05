@@ -203,27 +203,5 @@ export function exitChildView() {
   }
 }
 
-// ── Shared recurrence engine (used by routines + child calendar) ──
-// Pure function — reads no state, has no side effects.
-export function _recurrenceMatchesDate(recurrence, dateStr) {
-  if (!recurrence) return true;
-  const { type, days, intervalDays, startDate, endDate } = recurrence;
-  if (startDate && dateStr < startDate) return false;
-  if (endDate   && dateStr > endDate)   return false;
-  const d = new Date(dateStr + 'T12:00:00');
-  const dow = d.getDay(); // 0=Sun..6=Sat
-  switch (type) {
-    case 'daily':         return true;
-    case 'weekdays':      return dow >= 1 && dow <= 5;
-    case 'weekends':      return dow === 0 || dow === 6;
-    case 'specific_days': return Array.isArray(days) && days.includes(String(dow));
-    case 'interval': {
-      if (!startDate || !intervalDays) return false;
-      const start = new Date(startDate + 'T12:00:00');
-      const diff  = Math.round((d - start) / 86400000);
-      return diff >= 0 && diff % intervalDays === 0;
-    }
-    case 'one_time': return dateStr === startDate;
-    default:         return true;
-  }
-}
+// _recurrenceMatchesDate is the canonical copy in planner-utils.js
+export { _recurrenceMatchesDate } from './planner-utils.js';

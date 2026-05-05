@@ -49,6 +49,7 @@ import {
   _plannerEventsForDate, _plannerEvMemberIds, _plannerEvPrimaryMember, _plannerEvWhoLabel,
   _plannerMemberById, _plannerMembers, _plannerFmt12h, _plannerRecurrenceLabel,
   _forecastMonth, _prevForecastMonth, _nextForecastMonth,
+  _recurrenceMatchesDate,
 } from './sections/planner-utils.js';
 import { renderForecast, estimateAllEvents } from './sections/forecast.js';
 import {
@@ -184,12 +185,12 @@ import {
 } from './sections/dev-tools.js';
 import { renderLunchbox, LB_SLOTS, LB_ALLERGIES, _lbActiveKid, _lbWeekOffset,
   _saveLbSlot, aiPlanLunchbox, deleteLbProfile, lbToShoppingList, openLunchboxEdit,
-  openLunchboxProfile, saveLbProfile, _estimateLbCalories,
+  openLunchboxProfile, saveLbProfile, _estimateLbCalories, toggleHealthPopover,
 } from './sections/lunchbox.js';
 import {
   HEALTH_GUIDES, _cleanupGuide, _cvViewCalendar, _guideCleanup, _guideIdx, _guideSteps,
   _highlightStep, startGuide, startHealthGuide, nextGuideStep, endGuide, _showGuideStep,
-  _cvReadOnly,
+  _cvReadOnly, exitChildView, viewChildToday,
 } from './sections/guide.js';
 import {
   renderRoutines, _routineCheckDailyReset, _routineMatchesDate, _routinesForCurrentUser,
@@ -210,6 +211,7 @@ import {
   _routineResetTodayKid, _routineResetTodayAllKids, _renderAdultRoutines, _renderChildRoutines,
   _renderRoutinesTodayCard, _renderSuggestionsSection, _routineDragStart, _routineDragOver,
   _routineDragEnd, _routineDrop, ROUTINE_SUGGESTIONS, SUGG_PREVIEW,
+  _routineSuggCollapsed, _routineSuggExpanded, _routineActiveTab, _routineDragIdx,
 } from './sections/routines.js';
 import {
   renderKids, renderKidsParent, renderKidsOverview, renderChoreMgmt, renderPrizeMgmt,

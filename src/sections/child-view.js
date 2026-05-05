@@ -1,6 +1,7 @@
 // Child view — kid-mode overlay (routines, chores, prizes, calendar)
 import { state } from '../store.js';
 import { escHtml, fmtDate } from './format.js';
+import { _recurrenceMatchesDate } from './planner-utils.js';
 
 export function _applyChildNav() {
   const isKid = window._activeProfile?.role === 'child';
