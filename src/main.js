@@ -182,6 +182,55 @@ import {
   _devToolsOpen, _devToolsClose, _devLoadWallet, _devLoadKids, _devLoadRoutines,
   _devLoadPlanner, _devLoadHome, _devLoadMeals, _devLoadAll, _devReset,
 } from './sections/dev-tools.js';
+import { renderLunchbox, LB_SLOTS, LB_ALLERGIES, _lbActiveKid, _lbWeekOffset,
+  _saveLbSlot, aiPlanLunchbox, deleteLbProfile, lbToShoppingList, openLunchboxEdit,
+  openLunchboxProfile, saveLbProfile, _estimateLbCalories,
+} from './sections/lunchbox.js';
+import {
+  HEALTH_GUIDES, _cleanupGuide, _cvViewCalendar, _guideCleanup, _guideIdx, _guideSteps,
+  _highlightStep, startGuide, startHealthGuide, nextGuideStep, endGuide, _showGuideStep,
+  _cvReadOnly,
+} from './sections/guide.js';
+import {
+  renderRoutines, _routineCheckDailyReset, _routineMatchesDate, _routinesForCurrentUser,
+  _routinesForHousehold, _routineCurrentUserId, _routineKids, _routineOtherAdults,
+  _routineIsOwner, _routineTodayKey, _routineDateKey, _routineGetAssignment,
+  _routineCompletedToday, _routineStreak, _routineHistory, _assignmentCompletedToday,
+  _assignmentHistory, _assignmentStreak, _routineToggleStep, _routineToggleStepKid,
+  _routineToggleSugg, _routineExpandSugg, _routineSetTab, _routineCreate, _routineEdit,
+  _routineDelete, _routineDeleteChild, _routineJoin, _routineLeave, _routineUnassign,
+  _routineManageAssignments, _routineToggleAssignment, _routineAddStep, _routineDeleteStep,
+  _routineEditStep, _routinePropagateStepAdd, _routinePropagateStepDelete, _routineTypeSelect,
+  _routineRecurrenceFormHtml, _routineRecurrenceTypeChange, _routineRecurrenceCollect,
+  _routineRecurrenceSummaryUpdate, _routineSaveValidated, _routineAssertScope,
+  _routineShareMenu, _routineToggleShare, _routineDuplicateTo, _routineDuplicateFromJoined,
+  _routinePauseMenu, _routineRemovePause, _routineSkipDay, _routineShowHistory,
+  _routineIntelNudge, _routineAwardPoints, _routineAwardStepPoints, _routineAddSuggestion,
+  _routineEditSuggestion, _routineAvailableSuggestions, _routineNextId, _routineResetToday,
+  _routineResetTodayKid, _routineResetTodayAllKids, _renderAdultRoutines, _renderChildRoutines,
+  _renderRoutinesTodayCard, _renderSuggestionsSection, _routineDragStart, _routineDragOver,
+  _routineDragEnd, _routineDrop, ROUTINE_SUGGESTIONS, SUGG_PREVIEW,
+} from './sections/routines.js';
+import {
+  renderKids, renderKidsParent, renderKidsOverview, renderChoreMgmt, renderPrizeMgmt,
+  renderApprovals, renderKidView, _renderChildEventsMgmt, _deleteChildEvent,
+  _openChildEventModal, approveCompletion, rejectCompletion, approveRedemption,
+  rejectRedemption, deleteChore, deletePrize, deleteKid, openAddKidModal, openEditKidModal,
+  saveKid, openChoreModal, saveChore, openPrizeModal, savePrize, requestRedemption,
+  markChoreDone, addSavings, openSavingsModal, emojiPicker, pickEmoji, pickedEmoji,
+  kidBalance, CHILD_EVENT_EMOJIS, CHORE_EMOJIS, KID_EMOJIS, PRIZE_EMOJIS,
+  kidsView, kidsParentTab,
+} from './sections/kids.js';
+import {
+  getDB, refreshReceiptCounts, getReceipts, saveReceipt, deleteReceiptById, fundingBadge,
+  attachBtn, fileSizeStr, fileIcon, openReceiptsModal, renderReceiptsList, addLink,
+  uploadReceiptFiles, uploadFiles, viewReceipt, removeReceipt, installApp,
+} from './sections/receipts.js';
+import {
+  hideOnboarding, showOnboarding, obBack, obFinish, obNext, obPickEmoji, obSetAdults,
+  obSetKids, obSkip, obSkipExpenses, obStepPosition, obStepSequence, obToggleEmojiPicker,
+  obToggleExpenseSkip, renderObStep, OB_EXPENSE_PRESETS,
+} from './sections/onboarding.js';
 
 // Wire login buttons immediately — modules are deferred so DOMContentLoaded
 // has already fired. Using lambdas means guestMode/signInWithGoogle are
@@ -2054,16 +2103,16 @@ const _TAB_RENDERERS = {
   insights:    [() => renderInsights()],
   build:       [() => renderBuild()],
   settings:    [() => renderSettings()],
-  kids:        [() => typeof renderKids === 'function' && renderKids()],
+  kids:        [() => renderKids()],
   planner:     [() => renderPlanner()],
   forecast:    [() => renderForecast()],
   meals:       [() => renderMeals()],
-  lunchbox:    [() => typeof renderLunchbox === 'function' ? renderLunchbox() : renderMeals()],
+  lunchbox:    [() => renderLunchbox()],
   pantry:      [() => renderPantry()],
   vehicles:    [() => renderVehicles()],
   documents:   [() => renderDocuments()],
   maintenance: [() => renderMaintenance()],
-  routines:    [() => typeof renderRoutines === 'function' && renderRoutines()],
+  routines:    [() => renderRoutines()],
   lists:       [() => renderLists()],
 };
 
@@ -3475,7 +3524,7 @@ window.renderGoals = renderGoals;
 window.renderInsightCards = renderInsightCards;
 window.renderInsights = renderInsights;
 window.renderLists = renderLists;
-window.renderLunchbox = renderMeals;
+window.renderLunchbox = renderLunchbox;
 window.renderMaintenance = renderMaintenance;
 window.renderMeals = renderMeals;
 window.renderMoneyDashboard = renderMoneyDashboard;
@@ -3485,7 +3534,7 @@ window.renderNWTrend = renderNWTrend;
 window.renderNetWorth = renderNetWorth;
 window.renderPantry = renderPantry;
 window.renderPlanner = renderPlanner;
-window.renderRoutines = () => {};
+window.renderRoutines = renderRoutines;
 window.renderScenarios = renderScenarios;
 window.renderSettings = renderSettings;
 window.renderSetupProgress = renderSetupProgress;
@@ -3572,3 +3621,185 @@ window.updateSetting = updateSetting;
 window.upgradeSelects = upgradeSelects;
 window.variationForm = variationForm;
 window.variationFromForm = variationFromForm;
+
+// ── Lunchbox ──────────────────────────────────────────────────────────────
+window.LB_ALLERGIES = LB_ALLERGIES;
+window.LB_SLOTS = LB_SLOTS;
+window._estimateLbCalories = _estimateLbCalories;
+window._lbActiveKid = _lbActiveKid;
+window._lbWeekOffset = _lbWeekOffset;
+window._saveLbSlot = _saveLbSlot;
+window.aiPlanLunchbox = aiPlanLunchbox;
+window.deleteLbProfile = deleteLbProfile;
+window.lbToShoppingList = lbToShoppingList;
+window.openLunchboxEdit = openLunchboxEdit;
+window.openLunchboxProfile = openLunchboxProfile;
+window.saveLbProfile = saveLbProfile;
+// ── Guide ─────────────────────────────────────────────────────────────────
+window.HEALTH_GUIDES = HEALTH_GUIDES;
+window._cleanupGuide = _cleanupGuide;
+window._cvReadOnly = _cvReadOnly;
+window._cvViewCalendar = _cvViewCalendar;
+window._guideCleanup = _guideCleanup;
+window._guideIdx = _guideIdx;
+window._guideSteps = _guideSteps;
+window._highlightStep = _highlightStep;
+window._recurrenceMatchesDate = _recurrenceMatchesDate;
+window._showGuideStep = _showGuideStep;
+window.endGuide = endGuide;
+window.exitChildView = exitChildView;
+window.nextGuideStep = nextGuideStep;
+window.startGuide = startGuide;
+window.startHealthGuide = startHealthGuide;
+window.toggleHealthPopover = toggleHealthPopover;
+window.viewChildToday = viewChildToday;
+// ── Routines ──────────────────────────────────────────────────────────────
+window.ROUTINE_SUGGESTIONS = ROUTINE_SUGGESTIONS;
+window.SUGG_PREVIEW = SUGG_PREVIEW;
+window._assignmentCompletedToday = _assignmentCompletedToday;
+window._assignmentHistory = _assignmentHistory;
+window._assignmentStreak = _assignmentStreak;
+window._renderAdultRoutines = _renderAdultRoutines;
+window._renderChildRoutines = _renderChildRoutines;
+window._renderRoutinesTodayCard = _renderRoutinesTodayCard;
+window._renderSuggestionsSection = _renderSuggestionsSection;
+window._routineActiveTab = _routineActiveTab;
+window._routineAddStep = _routineAddStep;
+window._routineAddSuggestion = _routineAddSuggestion;
+window._routineAssertScope = _routineAssertScope;
+window._routineAvailableSuggestions = _routineAvailableSuggestions;
+window._routineAwardPoints = _routineAwardPoints;
+window._routineAwardStepPoints = _routineAwardStepPoints;
+window._routineCheckDailyReset = _routineCheckDailyReset;
+window._routineCompletedToday = _routineCompletedToday;
+window._routineCreate = _routineCreate;
+window._routineCurrentUserId = _routineCurrentUserId;
+window._routineDateKey = _routineDateKey;
+window._routineDelete = _routineDelete;
+window._routineDeleteChild = _routineDeleteChild;
+window._routineDeleteStep = _routineDeleteStep;
+window._routineDragEnd = _routineDragEnd;
+window._routineDragIdx = _routineDragIdx;
+window._routineDragOver = _routineDragOver;
+window._routineDragStart = _routineDragStart;
+window._routineDrop = _routineDrop;
+window._routineDuplicateFromJoined = _routineDuplicateFromJoined;
+window._routineDuplicateTo = _routineDuplicateTo;
+window._routineEdit = _routineEdit;
+window._routineEditStep = _routineEditStep;
+window._routineEditSuggestion = _routineEditSuggestion;
+window._routineExpandSugg = _routineExpandSugg;
+window._routineGetAssignment = _routineGetAssignment;
+window._routineHistory = _routineHistory;
+window._routineIntelNudge = _routineIntelNudge;
+window._routineIsOwner = _routineIsOwner;
+window._routineJoin = _routineJoin;
+window._routineKids = _routineKids;
+window._routineLeave = _routineLeave;
+window._routineManageAssignments = _routineManageAssignments;
+window._routineMatchesDate = _routineMatchesDate;
+window._routineNextId = _routineNextId;
+window._routineOtherAdults = _routineOtherAdults;
+window._routinePauseMenu = _routinePauseMenu;
+window._routinePropagateStepAdd = _routinePropagateStepAdd;
+window._routinePropagateStepDelete = _routinePropagateStepDelete;
+window._routineRecurrenceCollect = _routineRecurrenceCollect;
+window._routineRecurrenceFormHtml = _routineRecurrenceFormHtml;
+window._routineRecurrenceSummaryUpdate = _routineRecurrenceSummaryUpdate;
+window._routineRecurrenceTypeChange = _routineRecurrenceTypeChange;
+window._routineRemovePause = _routineRemovePause;
+window._routineResetToday = _routineResetToday;
+window._routineResetTodayAllKids = _routineResetTodayAllKids;
+window._routineResetTodayKid = _routineResetTodayKid;
+window._routineSaveValidated = _routineSaveValidated;
+window._routineSetTab = _routineSetTab;
+window._routineShareMenu = _routineShareMenu;
+window._routineShowHistory = _routineShowHistory;
+window._routineSkipDay = _routineSkipDay;
+window._routineStreak = _routineStreak;
+window._routineSuggCollapsed = _routineSuggCollapsed;
+window._routineSuggExpanded = _routineSuggExpanded;
+window._routineTodayKey = _routineTodayKey;
+window._routineToggleAssignment = _routineToggleAssignment;
+window._routineToggleShare = _routineToggleShare;
+window._routineToggleStep = _routineToggleStep;
+window._routineToggleStepKid = _routineToggleStepKid;
+window._routineToggleSugg = _routineToggleSugg;
+window._routineTypeSelect = _routineTypeSelect;
+window._routineUnassign = _routineUnassign;
+window._routinesForCurrentUser = _routinesForCurrentUser;
+window._routinesForHousehold = _routinesForHousehold;
+// ── Kids ──────────────────────────────────────────────────────────────────
+window.CHILD_EVENT_EMOJIS = CHILD_EVENT_EMOJIS;
+window.CHORE_EMOJIS = CHORE_EMOJIS;
+window.KID_EMOJIS = KID_EMOJIS;
+window.PRIZE_EMOJIS = PRIZE_EMOJIS;
+window._deleteChildEvent = _deleteChildEvent;
+window._openChildEventModal = _openChildEventModal;
+window._renderChildEventsMgmt = _renderChildEventsMgmt;
+window.addSavings = addSavings;
+window.approveCompletion = approveCompletion;
+window.approveRedemption = approveRedemption;
+window.deleteChore = deleteChore;
+window.deleteKid = deleteKid;
+window.deletePrize = deletePrize;
+window.emojiPicker = emojiPicker;
+window.kidBalance = kidBalance;
+window.kidsParentTab = kidsParentTab;
+window.kidsView = kidsView;
+window.markChoreDone = markChoreDone;
+window.openAddKidModal = openAddKidModal;
+window.openChoreModal = openChoreModal;
+window.openEditKidModal = openEditKidModal;
+window.openPrizeModal = openPrizeModal;
+window.openSavingsModal = openSavingsModal;
+window.pickEmoji = pickEmoji;
+window.pickedEmoji = pickedEmoji;
+window.rejectCompletion = rejectCompletion;
+window.rejectRedemption = rejectRedemption;
+window.renderApprovals = renderApprovals;
+window.renderChoreMgmt = renderChoreMgmt;
+window.renderKidView = renderKidView;
+window.renderKids = renderKids;
+window.renderKidsOverview = renderKidsOverview;
+window.renderKidsParent = renderKidsParent;
+window.renderPrizeMgmt = renderPrizeMgmt;
+window.requestRedemption = requestRedemption;
+window.saveChore = saveChore;
+window.saveKid = saveKid;
+window.savePrize = savePrize;
+// ── Receipts ──────────────────────────────────────────────────────────────
+window.addLink = addLink;
+window.attachBtn = attachBtn;
+window.deleteReceiptById = deleteReceiptById;
+window.fileIcon = fileIcon;
+window.fileSizeStr = fileSizeStr;
+window.fundingBadge = fundingBadge;
+window.getDB = getDB;
+window.getReceipts = getReceipts;
+window.installApp = installApp;
+window.openReceiptsModal = openReceiptsModal;
+window.refreshReceiptCounts = refreshReceiptCounts;
+window.removeReceipt = removeReceipt;
+window.renderReceiptsList = renderReceiptsList;
+window.saveReceipt = saveReceipt;
+window.uploadFiles = uploadFiles;
+window.uploadReceiptFiles = uploadReceiptFiles;
+window.viewReceipt = viewReceipt;
+// ── Onboarding ────────────────────────────────────────────────────────────
+window.OB_EXPENSE_PRESETS = OB_EXPENSE_PRESETS;
+window.hideOnboarding = hideOnboarding;
+window.obBack = obBack;
+window.obFinish = obFinish;
+window.obNext = obNext;
+window.obPickEmoji = obPickEmoji;
+window.obSetAdults = obSetAdults;
+window.obSetKids = obSetKids;
+window.obSkip = obSkip;
+window.obSkipExpenses = obSkipExpenses;
+window.obStepPosition = obStepPosition;
+window.obStepSequence = obStepSequence;
+window.obToggleEmojiPicker = obToggleEmojiPicker;
+window.obToggleExpenseSkip = obToggleExpenseSkip;
+window.renderObStep = renderObStep;
+window.showOnboarding = showOnboarding;
