@@ -205,7 +205,7 @@ export function openMaintForm(editId) {
 
   document.getElementById('modal-footer').innerHTML = `
     ${isEdit ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="deleteMaint(${editId})">Delete</button>` : ''}
-    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn" onclick="window.closeModal()">Cancel</button>
     <button class="btn btn-primary" onclick="saveMaint(${editId || 'null'})">Save</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -233,17 +233,17 @@ export function saveMaint(editId) {
     state.maintenance.push(data);
   }
 
-  saveData(state);
-  closeModal();
-  renderAll();
+  window.saveData(state);
+  window.closeModal();
+  window.renderAll();
 }
 
 export function deleteMaint(id) {
   if (!confirm('Delete this maintenance item?')) return;
   state.maintenance = state.maintenance.filter(m => m.id !== id);
-  saveData(state);
-  closeModal();
-  renderAll();
+  window.saveData(state);
+  window.closeModal();
+  window.renderAll();
 }
 
 export function markMaintDone(id) {
@@ -255,26 +255,26 @@ export function markMaintDone(id) {
   // Log cost to budget if there's a cost
   if (m.lastCost > 0) {
     const mo = today.slice(0, 7);
-    const md = getMonthData(mo);
+    const md = window.getMonthData(mo);
     let maintExp = md.expenses.find(e => (e.category || '').toLowerCase() === 'other' && (e.name || '').toLowerCase().includes('maintenance'))
                 || md.expenses.find(e => (e.name || '').toLowerCase().includes('maintenance'));
     if (!maintExp) {
       maintExp = { id: nextId(state.budget.expenses), name: 'Home Maintenance', amount: 0, frequency: 'monthly', category: 'Other', dueDate: '', vendor: null };
       state.budget.expenses.push(maintExp);
-      if (isMonthCustomized(mo)) {
+      if (window.isMonthCustomized(mo)) {
         const mb = state.budget.months[mo];
         maintExp = { ...maintExp, id: nextId(mb.expenses) };
         mb.expenses.push(maintExp);
       }
     }
     if (!state.budget.actuals[mo]) state.budget.actuals[mo] = {};
-    const entries = getActualEntries(maintExp.id, mo);
+    const entries = window.getActualEntries(maintExp.id, mo);
     entries.push({ id: entries.length ? Math.max(...entries.map(e => e.id)) + 1 : 1, amount: m.lastCost, date: today, note: `${m.name}${m.provider ? ' - ' + m.provider : ''}` });
     state.budget.actuals[mo][maintExp.id] = entries;
   }
 
-  saveData(state);
-  renderAll();
+  window.saveData(state);
+  window.renderAll();
 }
 
 export function quickAddMaint(starterIdx) {
@@ -292,7 +292,7 @@ export function quickAddMaint(starterIdx) {
     notes: ''
   };
   state.maintenance.push(data);
-  saveData(state);
-  renderAll();
+  window.saveData(state);
+  window.renderAll();
 }
 

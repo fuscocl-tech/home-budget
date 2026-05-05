@@ -14,7 +14,7 @@ export function renderForecast() {
   if (!el) return;
 
   const events = (state.planner?.events || []).filter(ev => ev.date && ev.date.startsWith(_forecastMonth));
-  const curData = getMonthData(_forecastMonth);
+  const curData = window.getMonthData(_forecastMonth);
   const surplus = monthlyTotal(curData.income) - monthlyTotal(curData.expenses);
 
   // Group events by week
@@ -230,7 +230,7 @@ Rules:
       }
     });
 
-    saveData(state);
+    window.saveData(state);
     renderForecast();
   } catch(err) {
     if (btn) { btn.textContent = `Estimate all (${events.length} events)`; btn.disabled = false; }

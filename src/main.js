@@ -69,6 +69,7 @@ import {
   estimatePlannerEvent, togglePlannerCard, togglePlannerEstimate,
   _autoCreateRecurringEvents, _addRecurrenceToDate, _getNthDayOfMonth, getSeasonalNudges,
   goToPlannerDay, _renderNudgeSection, approveSuggestion, dismissSuggestion,
+  _plannerCloseDaySheet,
 } from './sections/planner.js';
 import {
   openTotoAssistant, closeTotoAssistant, toggleTotoAssistant, sendTotoMessage,
@@ -172,6 +173,10 @@ import {
   _cvScheduleHtml, _cvRoutineSchedCard, _cvRenderCalendar, _cvCalViewToggle,
   _cvRender7Day, _cvWeekDayTap, _cvRenderMonth, _cvMonthDayTap, _cvShowDayDetail,
   _cvDismissNotif, _cvShowPrizeConfirm, markChoreChildView, redeemPrizeChildView, switchToKidMode,
+  _adultPinKey, _adultPinSubmit, _adultPinStep, _adultPinFirst, _adultPinTarget, _adultPinBuf,
+  _cvActiveKidId, _cvSelectedDate, _cvExpandedRoutines, _cvActiveTab,
+  _renderAdultPinModal, setKidPin, clearAdultPin, setAdultPin, showChildView, switchProfile,
+  clearKidPin, _cvCalView,
 } from './sections/child-view.js';
 import {
   _devToolsOpen, _devToolsClose, _devLoadWallet, _devLoadKids, _devLoadRoutines,
@@ -261,7 +266,10 @@ function _setHouseholdOwner(uid) {
 let _currentUser    = null;
 let _guestMode      = false;
 let _fsUnsubscribe  = null;
+Object.defineProperty(window, '_fsUnsubscribe', { get() { return _fsUnsubscribe; }, set(v) { _fsUnsubscribe = v; }, configurable: true });
 let _pendingLogEntry = null;
+Object.defineProperty(window, '_pendingLogEntry', { get() { return _pendingLogEntry; }, set(v) { _pendingLogEntry = v; }, configurable: true });
+Object.defineProperty(window, '_currentUser', { get() { return _currentUser; }, set(v) { _currentUser = v; }, configurable: true });
 
 function logActivity(action, detail) {
   _pendingLogEntry = {
@@ -833,6 +841,12 @@ let _pinAttempts        = 0;
 let _pinLockUntil       = 0;
 let _pinBuffer          = '';
 let _pinTargetId        = null;
+// Expose mutable state that child-view.js (a separate ES module) needs to read/write.
+Object.defineProperty(window, '_activeProfile',     { get() { return _activeProfile; },     set(v) { _activeProfile = v; },     configurable: true });
+Object.defineProperty(window, '_deviceRoutingDone', { get() { return _deviceRoutingDone; }, set(v) { _deviceRoutingDone = v; }, configurable: true });
+Object.defineProperty(window, '_pinAttempts',       { get() { return _pinAttempts; },       set(v) { _pinAttempts = v; },       configurable: true });
+Object.defineProperty(window, '_pinBuffer',         { get() { return _pinBuffer; },         set(v) { _pinBuffer = v; },         configurable: true });
+Object.defineProperty(window, '_pinTargetId',       { get() { return _pinTargetId; },       set(v) { _pinTargetId = v; },       configurable: true });
 
 // ── Secure storage abstraction ───────────────────────────────────────────────
 // On iOS (Capacitor native) we write to the Keychain via @capacitor/preferences.
@@ -1980,6 +1994,7 @@ function copyMonthFromPrevious(toMonth) {
 
 // ─── Scope confirmation modal ──────────────────────
 let _scopePending = null;
+Object.defineProperty(window, '_scopePending', { get() { return _scopePending; }, set(v) { _scopePending = v; }, configurable: true });
 
 function confirmScope(onThisMonth, onAllMonths) {
   _scopePending = { onThisMonth, onAllMonths };
@@ -2011,6 +2026,64 @@ function doScopeAll() {
   closeModal();
 }
 
+function safeRender(fn) {
+  try {
+    fn();
+  } catch(e) {
+    console.error('Render error in ' + fn.name + ':', e);
+    if (typeof Sentry !== 'undefined') {
+      Sentry.withScope(scope => {
+        scope.setTag('renderer', fn.name || 'anonymous');
+        Sentry.captureException(e);
+      });
+    }
+  }
+}
+
+// Use arrow wrappers so undefined renderers don't crash module init.
+const _TAB_RENDERERS = {
+  today:       [() => renderToday()],
+  money:       [() => renderMoneyDashboard()],
+  dashboard:   [() => renderDashboard()],
+  budget:      [() => renderBudget()],
+  bills:       [() => renderBills()],
+  networth:    [() => renderNetWorth()],
+  goals:       [() => renderGoals()],
+  scenarios:   [() => renderScenarios()],
+  insights:    [() => renderInsights()],
+  build:       [() => renderBuild()],
+  settings:    [() => renderSettings()],
+  kids:        [() => typeof renderKids === 'function' && renderKids()],
+  planner:     [() => renderPlanner()],
+  forecast:    [() => renderForecast()],
+  meals:       [() => renderMeals()],
+  lunchbox:    [() => typeof renderLunchbox === 'function' ? renderLunchbox() : renderMeals()],
+  pantry:      [() => renderPantry()],
+  vehicles:    [() => renderVehicles()],
+  documents:   [() => renderDocuments()],
+  maintenance: [() => renderMaintenance()],
+  routines:    [() => typeof renderRoutines === 'function' && renderRoutines()],
+  lists:       [() => renderLists()],
+};
+
+let _splashHidden = false;
+function renderAll() {
+  _applyChildNav();
+  safeRender(renderToday);
+  const active = _activeTab();
+  const fns = _TAB_RENDERERS[active];
+  if (fns) fns.forEach(fn => safeRender(fn));
+  if (!_splashHidden) {
+    _splashHidden = true;
+    window.Capacitor?.Plugins?.SplashScreen?.hide().catch(() => {});
+  }
+}
+subscribe(renderAll);
+setRenderCallback(renderAll);
+registerSectionRenderers(_TAB_RENDERERS, renderAll);
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
 _initState(loadData());
 // `state` is the Proxy from store.js — all existing `state.x` reads/writes work unchanged.
 _checkInviteOnLoad(); // run immediately on script parse — strips ?invite= from URL
@@ -2018,12 +2091,17 @@ _checkInviteOnLoad(); // run immediately on script parse — strips ?invite= fro
 setTimeout(() => { try { _routineCheckDailyReset(); } catch(e) {} }, 0);
 let selectedBudgetMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
 let budgetViewMode = 'grouped'; // 'grouped' | 'table'
+Object.defineProperty(window, 'budgetViewMode', { get() { return budgetViewMode; }, set(v) { budgetViewMode = v; }, configurable: true });
+Object.defineProperty(window, 'selectedBudgetMonth', { get() { return selectedBudgetMonth; }, set(v) { selectedBudgetMonth = v; }, configurable: true });
 let _settingsOpen = new Set(['ai', 'household']); // accordion open sections
 let _billsSubsFilter = 'all'; // 'all' | 'bills' | 'subs'
+Object.defineProperty(window, '_billsSubsFilter', { get() { return _billsSubsFilter; }, set(v) { _billsSubsFilter = v; }, configurable: true });
 
 // ─── Mini date picker ─────────────────────────────
 let dpViewYear = new Date().getFullYear();
+Object.defineProperty(window, 'dpViewYear', { get() { return dpViewYear; }, set(v) { dpViewYear = v; }, configurable: true });
 let dpViewMonth = new Date().getMonth() + 1;
+Object.defineProperty(window, 'dpViewMonth', { get() { return dpViewMonth; }, set(v) { dpViewMonth = v; }, configurable: true });
 
 // → src/sections/date-picker.js
 function prevMonth() {
@@ -2154,7 +2232,6 @@ function openActualEditor(expenseId) {
     document.getElementById('actual-editor-body').innerHTML = entriesHtml();
   }
 
-  window._actualEditorRefresh = refreshModal;
 
   document.getElementById('modal-title').textContent = `Actuals — ${expense.name}`;
   document.getElementById('modal-body').innerHTML = `<div id="actual-editor-body">${entriesHtml()}</div>`;
@@ -2827,7 +2904,9 @@ function setupProgressTasks() {
 }
 
 let _spExpanded    = false;
+Object.defineProperty(window, '_spExpanded', { get() { return _spExpanded; }, set(v) { _spExpanded = v; }, configurable: true });
 let _spDoneExpanded = false;
+Object.defineProperty(window, '_spDoneExpanded', { get() { return _spDoneExpanded; }, set(v) { _spDoneExpanded = v; }, configurable: true });
 
 function _refreshSetupProgress() {
   const el = document.getElementById('setup-progress-card');
@@ -2853,8 +2932,11 @@ function _refreshSetupProgress() {
 // ─────────────────────────────────────────────────
 
 let expenseSortCol = null;
+Object.defineProperty(window, 'expenseSortCol', { get() { return expenseSortCol; }, set(v) { expenseSortCol = v; }, configurable: true });
 let expenseSortDir = 'asc';
+Object.defineProperty(window, 'expenseSortDir', { get() { return expenseSortDir; }, set(v) { expenseSortDir = v; }, configurable: true });
 let expenseFilterCat = 'all';
+Object.defineProperty(window, 'expenseFilterCat', { get() { return expenseFilterCat; }, set(v) { expenseFilterCat = v; }, configurable: true });
 
 function setExpenseFilter(val) {
   expenseFilterCat = val;
@@ -2885,6 +2967,7 @@ function ordinal(n) {
 // MEAL PLANNER
 // ─────────────────────────────────────────────────
 let _mealView       = 'plan'; // 'plan' | 'shopping'
+Object.defineProperty(window, '_mealView', { get() { return _mealView; }, set(v) { _mealView = v; }, configurable: true });
 // → src/sections/meals.js
 // ─────────────────────────────────────────────────
 
@@ -2941,9 +3024,6 @@ window._adultPinSubmit = _adultPinSubmit;
 window._applyActiveProfile = _applyActiveProfile;
 window._applyChildNav = _applyChildNav;
 window._applyMigrations = _applyMigrations;
-window._assignmentCompletedToday = _assignmentCompletedToday;
-window._assignmentHistory = _assignmentHistory;
-window._assignmentStreak = _assignmentStreak;
 window._autoCreateRecurringEvents = _autoCreateRecurringEvents;
 window._briefIcon = _briefIcon;
 window._briefRow = _briefRow;
@@ -2956,7 +3036,6 @@ window._checkMissionEscalation = _checkMissionEscalation;
 window._checkSettingsUnsaved = _checkSettingsUnsaved;
 window._chipClassFor = _chipClassFor;
 window._chipLabelFor = _chipLabelFor;
-window._cleanupGuide = _cleanupGuide;
 window._copyInviteLinkForMember = _copyInviteLinkForMember;
 window._csOpen = _csOpen;
 window._csvSetExpense = _csvSetExpense;
@@ -2986,9 +3065,7 @@ window._cvTimeGreeting = _cvTimeGreeting;
 window._cvToggleRoutineExpand = _cvToggleRoutineExpand;
 window._cvToggleStepFromCal = _cvToggleStepFromCal;
 window._cvUpdatePrizesBadge = _cvUpdatePrizesBadge;
-window._cvViewCalendar = _cvViewCalendar;
 window._cvWeekDayTap = _cvWeekDayTap;
-window._deleteChildEvent = _deleteChildEvent;
 window._devLoadAll = _devLoadAll;
 window._devLoadHome = _devLoadHome;
 window._devLoadKids = _devLoadKids;
@@ -3003,7 +3080,6 @@ window._dismissInviteFlow = _dismissInviteFlow;
 window._docCatMeta = _docCatMeta;
 window._ensureKidProfileAndPin = _ensureKidProfileAndPin;
 window._ensureNWModals = _ensureNWModals;
-window._estimateLbCalories = _estimateLbCalories;
 window._estimateMealCalories = _estimateMealCalories;
 window._fetchAIBriefing = _fetchAIBriefing;
 window._finishInviteJourney = _finishInviteJourney;
@@ -3014,7 +3090,6 @@ window._getNthDayOfMonth = _getNthDayOfMonth;
 window._getPinTotalAttempts = _getPinTotalAttempts;
 window._handlePendingInvite = _handlePendingInvite;
 window._hashPin = _hashPin;
-window._highlightStep = _highlightStep;
 window._incPinTotalAttempts = _incPinTotalAttempts;
 window._inferAisle = _inferAisle;
 window._initAuthListener = _initAuthListener;
@@ -3041,7 +3116,6 @@ window._mealWeekDates = _mealWeekDates;
 window._mealWeekKey = _mealWeekKey;
 window._missionDaysIgnored = _missionDaysIgnored;
 window._nextForecastMonth = _nextForecastMonth;
-window._openChildEventModal = _openChildEventModal;
 window._pantryToAisle = _pantryToAisle;
 window._parseShopInput = _parseShopInput;
 window._pickAdult = _pickAdult;
@@ -3109,13 +3183,9 @@ window._qahAction = _qahAction;
 window._qahApplyParsed = _qahApplyParsed;
 window._qahSendText = _qahSendText;
 window._recordInviteAcceptance = _recordInviteAcceptance;
-window._recurrenceMatchesDate = _recurrenceMatchesDate;
 window._refreshSetupProgress = _refreshSetupProgress;
 window._renderAdultPinModal = _renderAdultPinModal;
-window._renderAdultRoutines = _renderAdultRoutines;
 window._renderApiKeySummary = _renderApiKeySummary;
-window._renderChildEventsMgmt = _renderChildEventsMgmt;
-window._renderChildRoutines = _renderChildRoutines;
 window._renderContextBanners = _renderContextBanners;
 window._renderCsvPreview = _renderCsvPreview;
 window._renderCsvReview = _renderCsvReview;
@@ -3136,76 +3206,11 @@ window._renderPlannerMonthGrid = _renderPlannerMonthGrid;
 window._renderPlannerWeekStrip = _renderPlannerWeekStrip;
 window._renderQAHub = _renderQAHub;
 window._renderQASheet = _renderQASheet;
-window._renderRoutinesTodayCard = _renderRoutinesTodayCard;
 window._renderShoppingList = _renderShoppingList;
-window._renderSuggestionsSection = _renderSuggestionsSection;
 window._renderTourSlide = _renderTourSlide;
 window._renderWeekStrip = _renderWeekStrip;
 window._resetPinAttempts = _resetPinAttempts;
-window._routineAddStep = _routineAddStep;
-window._routineAddSuggestion = _routineAddSuggestion;
-window._routineAssertScope = _routineAssertScope;
-window._routineAvailableSuggestions = _routineAvailableSuggestions;
-window._routineAwardPoints = _routineAwardPoints;
-window._routineAwardStepPoints = _routineAwardStepPoints;
-window._routineCheckDailyReset = _routineCheckDailyReset;
-window._routineCompletedToday = _routineCompletedToday;
-window._routineCreate = _routineCreate;
-window._routineCurrentUserId = _routineCurrentUserId;
-window._routineDateKey = _routineDateKey;
-window._routineDelete = _routineDelete;
-window._routineDeleteChild = _routineDeleteChild;
-window._routineDeleteStep = _routineDeleteStep;
-window._routineDragEnd = _routineDragEnd;
-window._routineDragOver = _routineDragOver;
-window._routineDragStart = _routineDragStart;
-window._routineDrop = _routineDrop;
-window._routineDuplicateFromJoined = _routineDuplicateFromJoined;
-window._routineDuplicateTo = _routineDuplicateTo;
-window._routineEdit = _routineEdit;
-window._routineEditStep = _routineEditStep;
-window._routineEditSuggestion = _routineEditSuggestion;
-window._routineExpandSugg = _routineExpandSugg;
-window._routineGetAssignment = _routineGetAssignment;
-window._routineHistory = _routineHistory;
-window._routineIntelNudge = _routineIntelNudge;
-window._routineIsOwner = _routineIsOwner;
-window._routineJoin = _routineJoin;
-window._routineKids = _routineKids;
-window._routineLeave = _routineLeave;
-window._routineManageAssignments = _routineManageAssignments;
-window._routineMatchesDate = _routineMatchesDate;
-window._routineNextId = _routineNextId;
-window._routineOtherAdults = _routineOtherAdults;
-window._routinePauseMenu = _routinePauseMenu;
-window._routinePropagateStepAdd = _routinePropagateStepAdd;
-window._routinePropagateStepDelete = _routinePropagateStepDelete;
-window._routineRecurrenceCollect = _routineRecurrenceCollect;
-window._routineRecurrenceFormHtml = _routineRecurrenceFormHtml;
-window._routineRecurrenceSummaryUpdate = _routineRecurrenceSummaryUpdate;
-window._routineRecurrenceTypeChange = _routineRecurrenceTypeChange;
-window._routineRemovePause = _routineRemovePause;
-window._routineResetToday = _routineResetToday;
-window._routineResetTodayAllKids = _routineResetTodayAllKids;
-window._routineResetTodayKid = _routineResetTodayKid;
-window._routineSaveValidated = _routineSaveValidated;
-window._routineSetTab = _routineSetTab;
-window._routineShareMenu = _routineShareMenu;
-window._routineShowHistory = _routineShowHistory;
-window._routineSkipDay = _routineSkipDay;
-window._routineStreak = _routineStreak;
-window._routineTodayKey = _routineTodayKey;
-window._routineToggleAssignment = _routineToggleAssignment;
-window._routineToggleShare = _routineToggleShare;
-window._routineToggleStep = _routineToggleStep;
-window._routineToggleStepKid = _routineToggleStepKid;
-window._routineToggleSugg = _routineToggleSugg;
-window._routineTypeSelect = _routineTypeSelect;
-window._routineUnassign = _routineUnassign;
-window._routinesForCurrentUser = _routinesForCurrentUser;
-window._routinesForHousehold = _routinesForHousehold;
 window._saveInviteIncome = _saveInviteIncome;
-window._saveLbSlot = _saveLbSlot;
 window._sectionTag = _sectionTag;
 window._secureClear = _secureClear;
 window._secureGet = _secureGet;
@@ -3218,7 +3223,6 @@ window.prefsClear = _secureClear;
 window._setHouseholdOwner = _setHouseholdOwner;
 window._setInviteRole = _setInviteRole;
 window._setPinHardLock = _setPinHardLock;
-window._showGuideStep = _showGuideStep;
 window._showInviteA1 = _showInviteA1;
 window._showInviteA3 = _showInviteA3;
 window._showInviteA4 = _showInviteA4;
@@ -3244,27 +3248,23 @@ window._totoRemoveTyping = _totoRemoveTyping;
 window._totoSend = _totoSend;
 window._totoSendSuggestion = _totoSendSuggestion;
 window._totoShowTyping = _totoShowTyping;
+window._updatePillsOverflow = _updatePillsOverflow;
 window._updateSwitchBtn = _updateSwitchBtn;
 window._verifyPin = _verifyPin;
+window.activateTab = activateTab;
 window.addActualEntry = addActualEntry;
 window.addCatToGroup = addCatToGroup;
 window.addCategory = addCategory;
 window.addHouseholdMember = addHouseholdMember;
-window.addLink = addLink;
 window.addPet = addPet;
-window.addSavings = addSavings;
 window.addShopItem = addShopItem;
 window.addSubFromImport = addSubFromImport;
 window.adjForm = adjForm;
-window.aiPlanLunchbox = aiPlanLunchbox;
 window.applianceForm = applianceForm;
 window.applianceFromForm = applianceFromForm;
 window.applyCsvImport = applyCsvImport;
-window.approveCompletion = approveCompletion;
-window.approveRedemption = approveRedemption;
 window.approveSuggestion = approveSuggestion;
 window.assignDevice = assignDevice;
-window.attachBtn = attachBtn;
 window.aud = aud;
 window.audD = audD;
 window.billCatIcon = billCatIcon;
@@ -3300,21 +3300,16 @@ window.deleteAdjustment = deleteAdjustment;
 window.deleteAppliance = deleteAppliance;
 window.deleteBill = deleteBill;
 window.deleteCategoryGroup = deleteCategoryGroup;
-window.deleteChore = deleteChore;
 window.deleteDoc = deleteDoc;
 window.deleteExpense = deleteExpense;
 window.deleteExtra = deleteExtra;
 window.deleteFurniture = deleteFurniture;
 window.deleteGoal = deleteGoal;
 window.deleteIncome = deleteIncome;
-window.deleteKid = deleteKid;
-window.deleteLbProfile = deleteLbProfile;
 window.deleteMaint = deleteMaint;
 window.deleteNWItem = deleteNWItem;
 window.deletePantryItem = deletePantryItem;
 window.deletePlannerEvent = deletePlannerEvent;
-window.deletePrize = deletePrize;
-window.deleteReceiptById = deleteReceiptById;
 window.deleteScenario = deleteScenario;
 window.deleteService = deleteService;
 window.deleteStage = deleteStage;
@@ -3333,29 +3328,23 @@ window.dpNextMonth = dpNextMonth;
 window.dpPrevMonth = dpPrevMonth;
 window.dpSelectDate = dpSelectDate;
 window.editActual = editActual;
-window.emojiPicker = emojiPicker;
-window.endGuide = endGuide;
 window.ensureMonthOverride = ensureMonthOverride;
 window.escAttr = escAttr;
 window.escHtml = escHtml;
 window.estimateAllEvents = estimateAllEvents;
 window.estimatePlannerEvent = estimatePlannerEvent;
-window.exitChildView = exitChildView;
 window.expenseCategories = expenseCategories;
 window.expenseForm = expenseForm;
 window.expenseFromForm = expenseFromForm;
 window.exportData = exportData;
 window.extraForm = extraForm;
 window.extraFromForm = extraFromForm;
-window.fileIcon = fileIcon;
-window.fileSizeStr = fileSizeStr;
 window.fmtDate = fmtDate;
 window.fmtNW = fmtNW;
 window.freqDisplay = freqDisplay;
 window.freqDisplayItem = freqDisplayItem;
 window.freqLabel = freqLabel;
 window.freqLabelItem = freqLabelItem;
-window.fundingBadge = fundingBadge;
 window.furnitureForm = furnitureForm;
 window.furnitureFromForm = furnitureFromForm;
 window.generateInvite = generateInvite;
@@ -3369,12 +3358,10 @@ window.getActualEntries = getActualEntries;
 window.getBenchmarkStatus = getBenchmarkStatus;
 window.getBenchmarks = getBenchmarks;
 window.getCategoryHistoryData = getCategoryHistoryData;
-window.getDB = getDB;
 window.getDeviceProfile = getDeviceProfile;
 window.getKidSession = getKidSession;
 window.getLast6Months = getLast6Months;
 window.getMonthData = getMonthData;
-window.getReceipts = getReceipts;
 window.getSeasonalNudges = getSeasonalNudges;
 window.goToPlannerDay = goToPlannerDay;
 window.goalForm = goalForm;
@@ -3384,47 +3371,29 @@ window.guestMode = guestMode;
 window.handleCsvFile = handleCsvFile;
 window.handleDeviceRouting = handleDeviceRouting;
 window.handleSubCSV = handleSubCSV;
-window.hideOnboarding = hideOnboarding;
 window.importData = importData;
 window.incomeCategories = incomeCategories;
 window.incomeForm = incomeForm;
 window.incomeFromForm = incomeFromForm;
-window.installApp = installApp;
 window.inviteMember = inviteMember;
 window.isMonthCustomized = isMonthCustomized;
 window.isOverdue = isOverdue;
 window.itemMonthly = itemMonthly;
-window.kidBalance = kidBalance;
-window.lbToShoppingList = lbToShoppingList;
 window.loadColors = loadColors;
 window.loadData = loadData;
 window.logActivity = logActivity;
 window.markBillPaid = markBillPaid;
 window.markChoreChildView = markChoreChildView;
-window.markChoreDone = markChoreDone;
 window.markGoalAchieved = markGoalAchieved;
 window.markMaintDone = markMaintDone;
 window.monthLabel = monthLabel;
 window.monthShortLabel = monthShortLabel;
 window.monthlyTotal = monthlyTotal;
-window.nextGuideStep = nextGuideStep;
 window.nextId = nextId;
 window.nextInsightsMonth = nextInsightsMonth;
 window.nextMoneyMonth = nextMoneyMonth;
 window.nextMonth = nextMonth;
 window.nwItemRow = nwItemRow;
-window.obBack = obBack;
-window.obFinish = obFinish;
-window.obNext = obNext;
-window.obPickEmoji = obPickEmoji;
-window.obSetAdults = obSetAdults;
-window.obSetKids = obSetKids;
-window.obSkip = obSkip;
-window.obSkipExpenses = obSkipExpenses;
-window.obStepPosition = obStepPosition;
-window.obStepSequence = obStepSequence;
-window.obToggleEmojiPicker = obToggleEmojiPicker;
-window.obToggleExpenseSkip = obToggleExpenseSkip;
 window.openActualEditor = openActualEditor;
 window.openAddAdjustment = openAddAdjustment;
 window.openAddAppliance = openAddAppliance;
@@ -3435,12 +3404,10 @@ window.openAddExtra = openAddExtra;
 window.openAddFurniture = openAddFurniture;
 window.openAddGoal = openAddGoal;
 window.openAddIncome = openAddIncome;
-window.openAddKidModal = openAddKidModal;
 window.openAddScenario = openAddScenario;
 window.openAddStage = openAddStage;
 window.openAddVariation = openAddVariation;
 window.openBillModal = openBillModal;
-window.openChoreModal = openChoreModal;
 window.openCsvImport = openCsvImport;
 window.openDatePicker = openDatePicker;
 window.openDocForm = openDocForm;
@@ -3451,14 +3418,11 @@ window.openEditExtra = openEditExtra;
 window.openEditFurniture = openEditFurniture;
 window.openEditGoal = openEditGoal;
 window.openEditIncome = openEditIncome;
-window.openEditKidModal = openEditKidModal;
 window.openEditScenario = openEditScenario;
 window.openEditStage = openEditStage;
 window.openEditVariation = openEditVariation;
 window.openEmojiPickerModal = openEmojiPickerModal;
 window.openIconPickerForGroup = openIconPickerForGroup;
-window.openLunchboxEdit = openLunchboxEdit;
-window.openLunchboxProfile = openLunchboxProfile;
 window.openMaintForm = openMaintForm;
 window.openMealEdit = openMealEdit;
 window.openModal = openModal;
@@ -3468,10 +3432,7 @@ window.openNavGroupFor = openNavGroupFor;
 window.openPantryForm = openPantryForm;
 window.openPinSetup = openPinSetup;
 window.openPlannerModal = openPlannerModal;
-window.openPrizeModal = openPrizeModal;
 window.openQuickAdd = openQuickAdd;
-window.openReceiptsModal = openReceiptsModal;
-window.openSavingsModal = openSavingsModal;
 window.openServiceForm = openServiceForm;
 window.openSubModal = openSubModal;
 window.openTotoAssistant = openTotoAssistant;
@@ -3480,8 +3441,6 @@ window.openWeeklyReset = openWeeklyReset;
 window.ordinal = ordinal;
 window.pantryToShoppingList = pantryToShoppingList;
 window.parseBankCSV = parseBankCSV;
-window.pickEmoji = pickEmoji;
-window.pickedEmoji = pickedEmoji;
 window.prevInsightsMonth = prevInsightsMonth;
 window.prevMoneyMonth = prevMoneyMonth;
 window.prevMonth = prevMonth;
@@ -3491,19 +3450,14 @@ window.profileChildren = profileChildren;
 window.quickAddMaint = quickAddMaint;
 window.quickAddPantry = quickAddPantry;
 window.redeemPrizeChildView = redeemPrizeChildView;
-window.refreshReceiptCounts = refreshReceiptCounts;
-window.rejectCompletion = rejectCompletion;
-window.rejectRedemption = rejectRedemption;
 window.removeActualEntry = removeActualEntry;
 window.removeApiKey = removeApiKey;
 window.removeCatFromGroup = removeCatFromGroup;
 window.removeCategory = removeCategory;
 window.removeHouseholdMember = removeHouseholdMember;
 window.removePet = removePet;
-window.removeReceipt = removeReceipt;
 window.removeShopItem = removeShopItem;
 window.renderAll = renderAll;
-window.renderApprovals = renderApprovals;
 window.renderBenchmarksSection = renderBenchmarksSection;
 window.renderBills = renderBills;
 window.renderBudget = renderBudget;
@@ -3511,7 +3465,6 @@ window.renderBudgetForecast = renderBudgetForecast;
 window.renderBudgetSuggestions = renderBudgetSuggestions;
 window.renderBuild = renderBuild;
 window.renderCategoryBreakdown = renderCategoryBreakdown;
-window.renderChoreMgmt = renderChoreMgmt;
 window.renderDashboard = renderDashboard;
 window.renderDocuments = renderDocuments;
 window.renderDpCalendar = renderDpCalendar;
@@ -3520,12 +3473,8 @@ window.renderForecast = renderForecast;
 window.renderGoals = renderGoals;
 window.renderInsightCards = renderInsightCards;
 window.renderInsights = renderInsights;
-window.renderKidView = renderKidView;
-window.renderKids = renderKids;
-window.renderKidsOverview = renderKidsOverview;
-window.renderKidsParent = renderKidsParent;
 window.renderLists = renderLists;
-window.renderLunchbox = renderLunchbox;
+window.renderLunchbox = renderMeals;
 window.renderMaintenance = renderMaintenance;
 window.renderMeals = renderMeals;
 window.renderMoneyDashboard = renderMoneyDashboard;
@@ -3533,12 +3482,9 @@ window.renderNWDebtCard = renderNWDebtCard;
 window.renderNWTargetCard = renderNWTargetCard;
 window.renderNWTrend = renderNWTrend;
 window.renderNetWorth = renderNetWorth;
-window.renderObStep = renderObStep;
 window.renderPantry = renderPantry;
 window.renderPlanner = renderPlanner;
-window.renderPrizeMgmt = renderPrizeMgmt;
-window.renderReceiptsList = renderReceiptsList;
-window.renderRoutines = renderRoutines;
+window.renderRoutines = () => {};
 window.renderScenarios = renderScenarios;
 window.renderSettings = renderSettings;
 window.renderSetupProgress = renderSetupProgress;
@@ -3547,7 +3493,6 @@ window.renderSubImportResults = renderSubImportResults;
 window.renderSubscriptions = renderSubscriptions;
 window.renderToday = renderToday;
 window.renderVehicles = renderVehicles;
-window.requestRedemption = requestRedemption;
 window.resetAllData = resetAllData;
 window.resetKidPinLock = resetKidPinLock;
 window.revokeInvite = revokeInvite;
@@ -3558,12 +3503,9 @@ window.sanitiseState = sanitiseState;
 window.saveAIKey = saveAIKey;
 window.saveApiKey = saveApiKey;
 window.saveBill = saveBill;
-window.saveChore = saveChore;
 window.saveColors = saveColors;
 window.saveData = saveData;
 window.saveDoc = saveDoc;
-window.saveKid = saveKid;
-window.saveLbProfile = saveLbProfile;
 window.saveMaint = saveMaint;
 window.saveMealSlot = saveMealSlot;
 window.saveNWItem = saveNWItem;
@@ -3571,9 +3513,7 @@ window.saveNWSnapshot = saveNWSnapshot;
 window.saveNWTarget = saveNWTarget;
 window.savePantryItem = savePantryItem;
 window.savePlannerEvent = savePlannerEvent;
-window.savePrize = savePrize;
 window.saveQuickAdd = saveQuickAdd;
-window.saveReceipt = saveReceipt;
 window.saveService = saveService;
 window.saveSettingsChanges = saveSettingsChanges;
 window.saveSub = saveSub;
@@ -3593,15 +3533,12 @@ window.setKidSession = setKidSession;
 window.setupProgressTasks = setupProgressTasks;
 window.showChildView = showChildView;
 window.showDeviceSetup = showDeviceSetup;
-window.showOnboarding = showOnboarding;
 window.showProfileSelector = showProfileSelector;
 window.signInWithGoogle = signInWithGoogle;
 window.signOutUser = signOutUser;
 window.sortExpenses = sortExpenses;
 window.stageForm = stageForm;
 window.stageFromForm = stageFromForm;
-window.startGuide = startGuide;
-window.startHealthGuide = startHealthGuide;
 window.subCatIcon = subCatIcon;
 window.subMonthlyAmount = subMonthlyAmount;
 window.suggestEventToBudget = suggestEventToBudget;
@@ -3614,7 +3551,6 @@ window.toggleBudgetDetail = toggleBudgetDetail;
 window.toggleCustomFreq = toggleCustomFreq;
 window.toggleGoalFields = toggleGoalFields;
 window.toggleGroupExpand = toggleGroupExpand;
-window.toggleHealthPopover = toggleHealthPopover;
 window.toggleInsightSheet = toggleInsightSheet;
 window.toggleNavGroup = toggleNavGroup;
 window.togglePlannerCard = togglePlannerCard;
@@ -3633,9 +3569,5 @@ window.updateMember = updateMember;
 window.updatePet = updatePet;
 window.updateSetting = updateSetting;
 window.upgradeSelects = upgradeSelects;
-window.uploadFiles = uploadFiles;
-window.uploadReceiptFiles = uploadReceiptFiles;
 window.variationForm = variationForm;
 window.variationFromForm = variationFromForm;
-window.viewChildToday = viewChildToday;
-window.viewReceipt = viewReceipt;

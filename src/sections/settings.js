@@ -127,7 +127,7 @@ export function renderSettings() {
             const sel   = (state.settings?.routineResetHour ?? 0) === h;
             return `<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:${sel?'700':'500'};color:${sel?'var(--primary)':'var(--text)'}">
               <input type="radio" name="reset-hour" value="${h}" ${sel?'checked':''} style="accent-color:var(--primary)"
-                onchange="state.settings.routineResetHour=${h};_markSettingsDirty();saveData(state);renderSettings()">
+                onchange="state.settings.routineResetHour=${h};_markSettingsDirty();window.saveData(state);renderSettings()">
               ${label}
             </label>`;
           }).join('')}
@@ -161,7 +161,7 @@ export function renderSettings() {
         ${state.settings?.typeAMode ? `
         <div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:10px">
           <div style="font-size:13px;font-weight:700;margin-bottom:8px">Current Life Score</div>
-          <div style="font-size:28px;font-weight:900;color:#0891b2">${calcLifeScore().total}%</div>
+          <div style="font-size:28px;font-weight:900;color:#0891b2">${window.calcLifeScore().total}%</div>
           ${state.settings?.typeAStreak > 0 ? `<div class="streak-badge" style="margin-top:8px">🔥 ${state.settings.typeAStreak} week streak</div>` : ''}
         </div>` : ''}
       </div>`) +
@@ -281,8 +281,8 @@ export function renderSettings() {
                   </div>
                 </div>
                 <div style="display:flex;gap:6px">
-                  <button onclick="event.stopPropagation();_copyInviteLinkForMember('${pending.id}')" style="flex:1;padding:6px;border:1px solid #fde68a;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#854d0e;cursor:pointer">📋 Copy link</button>
-                  <button onclick="event.stopPropagation();revokeInvite('${pending.id}')" style="padding:6px 10px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#ef4444;cursor:pointer">Revoke</button>
+                  <button onclick="event.stopPropagation();window._copyInviteLinkForMember('${pending.id}')" style="flex:1;padding:6px;border:1px solid #fde68a;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#854d0e;cursor:pointer">📋 Copy link</button>
+                  <button onclick="event.stopPropagation();window.revokeInvite('${pending.id}')" style="padding:6px 10px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:11px;font-weight:600;color:#ef4444;cursor:pointer">Revoke</button>
                 </div>
               </div>` + adultPinHtml;
             } else {
@@ -294,7 +294,7 @@ export function renderSettings() {
                     <div style="font-size:11px;color:var(--text-muted)">Send an invite link so ${escHtml(m.name || 'this person')} can join</div>
                   </div>
                 </div>
-                <button onclick="event.stopPropagation();inviteMember(${i})" class="btn btn-primary btn-sm" style="width:100%">Invite to join →</button>
+                <button onclick="event.stopPropagation();window.inviteMember(${i})" class="btn btn-primary btn-sm" style="width:100%">Invite to join →</button>
               </div>` + adultPinHtml;
             }
           }
@@ -304,7 +304,7 @@ export function renderSettings() {
           const hasPin  = !!(kidProfile?.pinHash);
           const hasName = !!(m.name && m.name.trim());
 
-          const isHardLocked = kidProfile && _isPinHardLocked ? _isPinHardLocked(kidProfile.id) : false;
+          const isHardLocked = kidProfile && window._isPinHardLocked ? window._isPinHardLocked(kidProfile.id) : false;
 
           if (isHardLocked) {
             accessHtml = `<div style="padding:10px 12px;background:#fef2f2;border-radius:8px;border:1px solid #fecaca">
@@ -315,7 +315,7 @@ export function renderSettings() {
                   <div style="font-size:11px;color:#64748b">Too many failed attempts</div>
                 </div>
               </div>
-              <button onclick="event.stopPropagation();resetKidPinLock(${kidProfile.id})" style="width:100%;padding:7px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer">Reset PIN lock</button>
+              <button onclick="event.stopPropagation();window.resetKidPinLock(${kidProfile.id})" style="width:100%;padding:7px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer">Reset PIN lock</button>
             </div>`;
           } else if (!hasName) {
             accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
@@ -329,7 +329,7 @@ export function renderSettings() {
                 <div style="font-size:12px;font-weight:600;color:var(--text)">PIN login · Not set up</div>
                 <div style="font-size:11px;color:var(--text-muted)">Save changes first, then set a PIN for ${escHtml(m.name)}</div>
               </div>
-              <button onclick="event.stopPropagation();_ensureKidProfileAndPin('${escAttr(m.name)}')" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">Set PIN</button>
+              <button onclick="event.stopPropagation();window._ensureKidProfileAndPin('${escAttr(m.name)}')" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">Set PIN</button>
             </div>`;
           } else {
             accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${hasPin?'#f0fdf4':'var(--surface2)'};border-radius:8px;border:1px solid ${hasPin?'#bbf7d0':'var(--border)'}">
@@ -338,7 +338,7 @@ export function renderSettings() {
                 <div style="font-size:12px;font-weight:600;color:${hasPin?'#16a34a':'var(--text)'}">PIN login · ${hasPin ? 'Set up ✓' : 'Not set up'}</div>
                 <div style="font-size:11px;color:var(--text-muted)">${hasPin ? 'PIN is active — tap to change it' : 'Set a PIN so ' + escHtml(m.name) + ' can log in'}</div>
               </div>
-              <button onclick="event.stopPropagation();openPinSetup(${kidProfile.id})" style="padding:6px 10px;border:1px solid ${hasPin?'#bbf7d0':'var(--border)'};border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">${hasPin ? 'Change' : 'Set PIN'}</button>
+              <button onclick="event.stopPropagation();window.openPinSetup(${kidProfile.id})" style="padding:6px 10px;border:1px solid ${hasPin?'#bbf7d0':'var(--border)'};border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">${hasPin ? 'Change' : 'Set PIN'}</button>
             </div>`;
           }
         }
@@ -503,14 +503,14 @@ export function renderSettings() {
           <div style="font-size:14px;font-weight:600;color:var(--text)">Show on dashboard</div>
           <div style="font-size:13px;color:var(--text-muted);margin-top:2px">${state.setupProgressDismissed ? 'Currently hidden' : 'Currently visible'}</div>
         </div>
-        <button onclick="event.stopPropagation();state.setupProgressDismissed=${!state.setupProgressDismissed};saveData(state);_refreshSetupProgress();renderSettings()" class="btn btn-secondary btn-sm">
+        <button onclick="event.stopPropagation();state.setupProgressDismissed=${!state.setupProgressDismissed};window.saveData(state);window._refreshSetupProgress();renderSettings()" class="btn btn-secondary btn-sm">
           ${state.setupProgressDismissed ? 'Show again' : 'Hide'}
         </button>
       </div>
     </div>`);
 
   // Device profile section
-  const device = getDeviceProfile();
+  const device = window.getDeviceProfile();
   const deviceKids = state.kids?.profiles || [];
   const deviceLabel = !device ? 'Not configured'
     : device === 'adult' ? 'Adult — opens straight to the full app'
@@ -524,7 +524,7 @@ export function renderSettings() {
           <div style="font-size:14px;font-weight:600;color:var(--text)">Assigned to</div>
           <div style="font-size:13px;color:var(--text-muted);margin-top:2px">${escHtml(deviceLabel)}</div>
         </div>
-        <button onclick="event.stopPropagation();showDeviceSetup()" class="btn btn-secondary btn-sm">Change</button>
+        <button onclick="event.stopPropagation();window.showDeviceSetup()" class="btn btn-secondary btn-sm">Change</button>
       </div>
     </div>`);
 
@@ -532,7 +532,7 @@ export function renderSettings() {
   /* ── DEV TOOLS — remove before release ── */
   html += `<div style="margin-top:24px;padding:16px;border:2px dashed #f59e0b;border-radius:12px;background:#fffbeb">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#92400e;margin-bottom:12px">⚠️ Dev Tools — Remove before release</div>
-    <button onclick="showProfileSelector()" class="btn btn-secondary" style="width:100%">🔄 Open profile switcher (shared device)</button>
+    <button onclick="window.showProfileSelector()" class="btn btn-secondary" style="width:100%">🔄 Open profile switcher (shared device)</button>
   </div>`;
 
   html += `<div class="settings-save-bar" id="settings-save-bar" style="display:${_settingsDirty ? 'flex' : 'none'}">
@@ -549,15 +549,15 @@ export function resetAllData() {
   if (!confirm('This will permanently delete ALL household data — budget, kids, goals, everything — from this device and the cloud.\n\nThis cannot be undone. Are you sure?')) return;
   if (!confirm('Last chance. All data will be gone. Continue?')) return;
   // Clear Firestore document
-  if (_currentUser && fbStore) {
-    const _resetDocRef = _getHouseholdDocRef();
+  if (window._currentUser && fbStore) {
+    const _resetDocRef = window._getHouseholdDocRef();
     if (_resetDocRef) _resetDocRef.delete().catch(() => {});
   }
   // Clear local storage (both data and household pointer)
   prefsClear(STORAGE_KEY);
-  _secureClear(HOUSEHOLD_OWNER_KEY);
+  window._secureClear(HOUSEHOLD_OWNER_KEY);
   // Sign out and reload — will trigger fresh onboarding
-  if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
+  if (window._fsUnsubscribe) { window._fsUnsubscribe(); window._fsUnsubscribe = null; }
   fbAuth.signOut().then(() => { window.location.reload(); });
 }
 
@@ -598,7 +598,7 @@ export function toggleGroupExpand(id) {
 }
 
 export function setBudgetView(mode) {
-  budgetViewMode = mode;
+  window.budgetViewMode = mode;
   renderBudget();
 }
 

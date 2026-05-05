@@ -117,7 +117,7 @@ export function _mealWeekDates(weekKey) {
 }
 
 export function renderMeals() {
-  if (_mealView === 'shopping') _renderShoppingList();
+  if (window._mealView === 'shopping') _renderShoppingList();
   else _renderMealPlan();
 }
 
@@ -336,8 +336,8 @@ export function saveMealSlot(weekKey, dayIdx, slot, value) {
   state.meals.plan[weekKey][dayIdx][slot] = value;
   // Clear old calorie estimate
   delete state.meals.plan[weekKey][dayIdx]['cal_' + slot];
-  saveData(state);
-  closeModal();
+  window.saveData(state);
+  window.closeModal();
   _renderMealPlan();
   // Estimate calories async if enabled
   if (value && state.settings?.showCalories) _estimateMealCalories(weekKey, dayIdx, slot, value);
@@ -359,7 +359,7 @@ export async function _estimateMealCalories(weekKey, dayIdx, slot, mealName) {
     const cal = parseInt(data.content[0].text.trim().replace(/[^0-9]/g, ''));
     if (cal > 0 && cal < 5000 && state.meals.plan[weekKey]?.[dayIdx]) {
       state.meals.plan[weekKey][dayIdx]['cal_' + slot] = cal;
-      saveData(state);
+      window.saveData(state);
       _renderMealPlan();
     }
   } catch(e) { /* silent */ }
@@ -398,7 +398,7 @@ export function _renderShoppingList() {
 
   document.getElementById('meals-content').innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-      <button class="btn btn-sm" onclick="_mealView='plan';renderMeals()">← Meal Plan</button>
+      <button class="btn btn-sm" onclick="window._mealView='plan';renderMeals()">← Meal Plan</button>
       <div style="display:flex;gap:8px">
         ${nDone > 0 ? `<button class="btn btn-sm" onclick="clearCheckedShopItems()">Remove ticked (${nDone})</button>` : ''}
       </div>
@@ -442,24 +442,24 @@ export function addShopItem() {
   const cat = document.getElementById('shop-cat')?.value || 'Other';
   const items = state.meals.shopping;
   items.push({ id: items.length ? Math.max(...items.map(i=>i.id))+1 : 1, name, qty, cat, checked:false });
-  saveData(state);
+  window.saveData(state);
   _renderShoppingList();
 }
 
 export function toggleShopItem(id, checked) {
   const item = state.meals.shopping.find(i => i.id === id);
-  if (item) { item.checked = checked; saveData(state); }
+  if (item) { item.checked = checked; window.saveData(state); }
 }
 
 export function removeShopItem(id) {
   state.meals.shopping = state.meals.shopping.filter(i => i.id !== id);
-  saveData(state);
+  window.saveData(state);
   _renderShoppingList();
 }
 
 export function clearCheckedShopItems() {
   state.meals.shopping = state.meals.shopping.filter(i => !i.checked);
-  saveData(state);
+  window.saveData(state);
   _renderShoppingList();
 }
 
@@ -486,7 +486,7 @@ export function _showToast(msg) {
 // ── Section 10: Lists CRUD ───────────────────────────────────────
 
 export function _listsAddItem(type, name, qty, unit, aisle, notes, mealTag) {
-  if (!state.lists) _applyMigrations(state);
+  if (!state.lists) window._applyMigrations(state);
   var list = state.lists[type];
   if (!list) return;
   // duplicate check
@@ -509,7 +509,7 @@ export function _listsAddItem(type, name, qty, unit, aisle, notes, mealTag) {
   };
   list.items.push(item);
   _listsAddFavourite(type, name);
-  saveData(state);
+  window.saveData(state);
   return true;
 }
 
@@ -519,14 +519,14 @@ export function _listsSetState(type, id, newState) {
   if (!item) return;
   item.state = newState;
   item.stateChangedAt = new Date().toISOString();
-  saveData(state);
+  window.saveData(state);
   renderLists();
 }
 
 export function _listsDeleteItem(type, id) {
   if (!state.lists || !state.lists[type]) return;
   state.lists[type].items = state.lists[type].items.filter(function(i) { return i.id !== id; });
-  saveData(state);
+  window.saveData(state);
   renderLists();
 }
 
@@ -598,8 +598,8 @@ export function _listsOpenAddForm(type, editId) {
     </div>`;
 
   document.getElementById('modal-footer').innerHTML = `
-    ${item ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="_listsDeleteItem('${type}','${editId}');closeModal()">Delete</button>` : ''}
-    <button class="btn" onclick="closeModal()">Cancel</button>
+    ${item ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="_listsDeleteItem('${type}','${editId}');window.closeModal()">Delete</button>` : ''}
+    <button class="btn" onclick="window.closeModal()">Cancel</button>
     <button class="btn btn-primary" onclick="_listsSaveForm('${type}','${editId||''}')">Save</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -630,11 +630,11 @@ export function _listsSaveForm(type, editId) {
     // Duplicate check
     const dup = items.find(i => i.name.toLowerCase() === name.toLowerCase() && i.state === 'active');
     if (dup) { if (!confirm(`"${name}" is already on your list. Add another?`)) return; }
-    items.push({ id: 'si-' + Date.now(), name, quantity: qty, unit, notes, aisle, state: state_, addedBy: _currentUser?.uid || 'guest', addedAt: new Date().toISOString(), mealTag: null, manualPrice: null, barcodeId: null });
+    items.push({ id: 'si-' + Date.now(), name, quantity: qty, unit, notes, aisle, state: state_, addedBy: window._currentUser?.uid || 'guest', addedAt: new Date().toISOString(), mealTag: null, manualPrice: null, barcodeId: null });
     _listsAddFavourite(type, name);
   }
-  saveData(state);
-  closeModal();
+  window.saveData(state);
+  window.closeModal();
   renderLists();
 }
 
@@ -644,7 +644,7 @@ export function _listsClearTrolley(type) {
   if (!gotIt.length) return;
   if (confirm('Remove ' + gotIt.length + ' trolley item' + (gotIt.length !== 1 ? 's' : '') + '?')) {
     state.lists[type].items = state.lists[type].items.filter(function(i) { return i.state !== 'got_it'; });
-    saveData(state);
+    window.saveData(state);
     renderLists();
   }
 }
@@ -655,7 +655,7 @@ export function _listsArchive(type) {
   if (!list.history) list.history = [];
   list.history.push({ archivedAt: new Date().toISOString(), items: JSON.parse(JSON.stringify(list.items)) });
   list.items = [];
-  saveData(state);
+  window.saveData(state);
   _showToast('Shop archived!');
   renderLists();
 }
@@ -700,7 +700,7 @@ export function _listsUpdateParsePreview() {
 export function renderLists() {
   var el = document.getElementById('lists-content');
   if (!el) return;
-  if (!state.lists) _applyMigrations(state);
+  if (!state.lists) window._applyMigrations(state);
 
   if (_listsView === 'selector') {
     _renderListsSelector(el);
@@ -909,7 +909,7 @@ Combine quantities where sensible. No duplicates. No other text.`;
         existing.push({ id: 'si-meal-' + Date.now() + '-' + idx++, name: item.name, quantity: 1, unit: 'units', notes: item.qty || '', aisle: catToAisle[item.cat] || (_inferAisle ? _inferAisle(item.name) : 'other'), state: 'active', addedBy: 'meals', addedAt: new Date().toISOString(), mealTag: 'Meal plan', manualPrice: null, barcodeId: null });
       }
     });
-    saveData(state);
+    window.saveData(state);
     _listsActiveType = 'food';
     _listsView = 'list';
     activateTab('lists');

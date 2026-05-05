@@ -23,7 +23,7 @@ export default defineConfig({
   // Serve the Vite-built www/ output.
   // Uses npx so the vite binary is always found regardless of PATH in CI.
   webServer: {
-    command: 'npx vite preview --port 3000',
+    command: 'node scripts/serve-www.mjs',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,  // 2 minutes — CI runners can be slow to start

@@ -50,6 +50,7 @@ export function loadColors() {
 export function saveColors(c) { prefsSet(COLORS_KEY, JSON.stringify(c)); }
 
 let colors = loadColors();
+Object.defineProperty(window, 'colors', { get() { return colors; }, set(v) { colors = v; }, configurable: true });
 
 export function updateColor(type, key, value) {
   if (type === 'expense') colors.expense[key] = value;
@@ -83,11 +84,11 @@ export function removeHouseholdMember(idx) {
       state.kids.redemptions = state.kids.redemptions.filter(r => r.kidId !== kid.id);
       if (state.meals?.lunchbox?.profiles)
         state.meals.lunchbox.profiles = state.meals.lunchbox.profiles.filter(p => p.id !== kid.id);
-      if (String(getDeviceProfile()) === String(kid.id)) setDeviceProfile('adult');
+      if (String(window.getDeviceProfile()) === String(kid.id)) window.setDeviceProfile('adult');
     }
   }
   state.householdProfile.members.splice(idx, 1);
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 export function updateMember(idx, field, value) {
   const m = state.householdProfile.members[idx];
@@ -236,15 +237,15 @@ export function saveAIKey(k) { prefsSet(INSIGHTS_KEY, k); }
 // ─── Spending pattern engine ──────────────────────
 
 export function getCategoryHistoryData() {
-  const months = getLast6Months();
+  const months = window.getLast6Months();
   const catData = {};
   months.forEach(mo => {
-    const md = getMonthData(mo);
+    const md = window.getMonthData(mo);
     const budByCat = {}, actByCat = {};
     md.expenses.forEach(e => {
       const cat = e.category || 'Other';
       budByCat[cat] = (budByCat[cat] || 0) + itemMonthly(e);
-      const actual = getActual(e.id, mo);
+      const actual = window.getActual(e.id, mo);
       if (actual > 0) actByCat[cat] = (actByCat[cat] || 0) + actual;
     });
     const allCats = new Set([...Object.keys(budByCat), ...Object.keys(actByCat)]);
@@ -298,14 +299,14 @@ export function detectSpendingPatterns(catData) {
 }
 
 export function renderCategoryBreakdown() {
-  const md = getMonthData(selectedBudgetMonth);
+  const md = window.getMonthData(window.selectedBudgetMonth);
   if (md.expenses.length === 0) return '';
   const byCat = {};
   md.expenses.forEach(e => {
     const cat = e.category || 'Other';
     if (!byCat[cat]) byCat[cat] = { budget:0, actual:0 };
     byCat[cat].budget += itemMonthly(e);
-    byCat[cat].actual += getActual(e.id, selectedBudgetMonth);
+    byCat[cat].actual += window.getActual(e.id, window.selectedBudgetMonth);
   });
   const entries = Object.entries(byCat)
     .filter(([,v]) => v.budget > 0 || v.actual > 0)
@@ -335,7 +336,7 @@ export function renderCategoryBreakdown() {
 
   return `<div class="spi-breakdown">
     <div class="spi-breakdown-header">
-      <span style="font-size:13px;font-weight:700">Budget vs Actual — ${monthLabel(selectedBudgetMonth)}</span>
+      <span style="font-size:13px;font-weight:700">Budget vs Actual — ${window.monthLabel(window.selectedBudgetMonth)}</span>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--text-muted)">
         <span><span class="spi-legend spi-legend-budget"></span>Budget</span>
         <span><span class="spi-legend spi-legend-actual"></span>Actual</span>
@@ -385,7 +386,7 @@ export function renderSpendingPatterns() {
 }
 
 export function generateSmartInsights() {
-  const md           = getMonthData(selectedBudgetMonth);
+  const md           = window.getMonthData(window.selectedBudgetMonth);
   const totalIncome  = monthlyTotal(md.income);
   const totalExpenses= monthlyTotal(md.expenses);
   const surplus      = totalIncome - totalExpenses;
@@ -398,9 +399,9 @@ export function generateSmartInsights() {
   });
   const sortedCats = Object.entries(byCategory).sort((a,b) => b[1]-a[1]);
 
-  const last6    = getLast6Months();
-  const avg6Exp  = last6.reduce((s, mo) => s + monthlyTotal(getMonthData(mo).expenses), 0) / 6;
-  const avg6Inc  = last6.reduce((s, mo) => s + monthlyTotal(getMonthData(mo).income),   0) / 6;
+  const last6    = window.getLast6Months();
+  const avg6Exp  = last6.reduce((s, mo) => s + monthlyTotal(window.getMonthData(mo).expenses), 0) / 6;
+  const avg6Inc  = last6.reduce((s, mo) => s + monthlyTotal(window.getMonthData(mo).income),   0) / 6;
 
   const insights = [];
 
@@ -487,7 +488,7 @@ export async function runAIInsights() {
   btn.disabled = true;
   btn.textContent = 'Analysing…';
 
-  const md           = getMonthData(selectedBudgetMonth);
+  const md           = window.getMonthData(window.selectedBudgetMonth);
   const totalIncome  = monthlyTotal(md.income);
   const totalExpenses= monthlyTotal(md.expenses);
   const surplus      = totalIncome - totalExpenses;
@@ -498,8 +499,8 @@ export async function runAIInsights() {
     byCategory[e.category || 'Other'] = (byCategory[e.category || 'Other'] || 0) + itemMonthly(e);
   });
 
-  const last6 = getLast6Months().map(mo => {
-    const m = getMonthData(mo);
+  const last6 = window.getLast6Months().map(mo => {
+    const m = window.getMonthData(mo);
     return { month: mo, income: monthlyTotal(m.income), expenses: monthlyTotal(m.expenses) };
   });
 
@@ -515,7 +516,7 @@ export async function runAIInsights() {
     }));
 
   const budgetSummary = {
-    month: monthLabel(selectedBudgetMonth),
+    month: window.monthLabel(window.selectedBudgetMonth),
     household: (function() {
       const hp = state.householdProfile || {};
       const members = (hp.members||[]);
@@ -624,7 +625,7 @@ export function renderInsightCards(insights, isAI) {
 
   document.getElementById('ai-output').innerHTML = `
     <div style="display:flex;flex-direction:column;gap:12px">
-      ${isAI ? `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-bottom:4px"><span>✨</span> Generated by Claude AI · ${monthLabel(selectedBudgetMonth)}</div>` : ''}
+      ${isAI ? `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-bottom:4px"><span>✨</span> Generated by Claude AI · ${window.monthLabel(window.selectedBudgetMonth)}</div>` : ''}
       ${html}
     </div>`;
 }
@@ -737,7 +738,7 @@ export function renderBenchmarksSection(income, adults, children, byCategory) {
 export function renderInsights() {
   const aiKey   = getAIKey();
   const smart   = generateSmartInsights();
-  const md      = getMonthData(selectedBudgetMonth);
+  const md      = window.getMonthData(window.selectedBudgetMonth);
   const income  = monthlyTotal(md.income);
   const exp     = monthlyTotal(md.expenses);
   const surplus = income - exp;
@@ -765,7 +766,7 @@ export function renderInsights() {
   document.getElementById('insights-content').innerHTML = `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
       <button class="btn btn-sm" onclick="prevInsightsMonth()" style="font-size:16px;padding:2px 10px">‹</button>
-      <span style="font-size:16px;font-weight:600;min-width:140px;text-align:center">${monthLabel(selectedBudgetMonth)}</span>
+      <span style="font-size:16px;font-weight:600;min-width:140px;text-align:center">${window.monthLabel(window.selectedBudgetMonth)}</span>
       <button class="btn btn-sm" onclick="nextInsightsMonth()" style="font-size:16px;padding:2px 10px">›</button>
     </div>
 
@@ -845,21 +846,21 @@ export function generateSmartInsightsHTML(insights) {
 }
 
 export function prevInsightsMonth() {
-  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const [y, m] = window.selectedBudgetMonth.split('-').map(Number);
   const d = new Date(y, m - 2, 1);
-  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  safeRender(renderInsights);
-  safeRender(renderMoneyDashboard);
-  safeRender(renderBudget);
+  window.selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  window.safeRender(renderInsights);
+  window.safeRender(renderMoneyDashboard);
+  window.safeRender(renderBudget);
 }
 
 export function nextInsightsMonth() {
-  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const [y, m] = window.selectedBudgetMonth.split('-').map(Number);
   const d = new Date(y, m, 1);
-  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  safeRender(renderInsights);
-  safeRender(renderMoneyDashboard);
-  safeRender(renderBudget);
+  window.selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  window.safeRender(renderInsights);
+  window.safeRender(renderMoneyDashboard);
+  window.safeRender(renderBudget);
 }
 
 // ─── Category Group management ────────────────────
@@ -903,7 +904,7 @@ export function openEmojiPickerModal(currentIcon, onSelect) {
 }
 
 export function openAddCategoryGroup() {
-  openModal('Add Category Group', `
+  window.openModal('Add Category Group', `
     <div class="form-row">
       <div class="form-group" style="flex:0 0 auto">
         <label class="form-label">Icon</label>
@@ -921,8 +922,8 @@ export function openAddCategoryGroup() {
     if (!name) return;
     const id = nextId(state.categoryGroups);
     state.categoryGroups.push({ id, name, icon, categories: [] });
-    logActivity('Added category group', name);
-    saveData(state); closeModal(); renderSettings();
+    window.logActivity('Added category group', name);
+    window.saveData(state); window.closeModal(); renderSettings();
   });
   // Wire up icon picker after modal renders
   document.getElementById('f-grp-icon-btn').addEventListener('click', () => {
@@ -948,15 +949,15 @@ export function deleteCategoryGroup(id) {
   const g = state.categoryGroups.find(x => x.id === id);
   if (!confirm(`Delete group "${g ? g.name : ''}"? Categories will become unassigned.`)) return;
   state.categoryGroups = state.categoryGroups.filter(x => x.id !== id);
-  logActivity('Deleted category group', g ? g.name : '');
-  saveData(state); renderSettings();
+  window.logActivity('Deleted category group', g ? g.name : '');
+  window.saveData(state); renderSettings();
 }
 
 export function updateCategoryGroup(id, field, value) {
   const g = state.categoryGroups.find(x => x.id === id);
   if (!g) return;
   g[field] = value;
-  saveData(state);
+  window.saveData(state);
 }
 
 export function addCatToGroup(groupId, cat) {
@@ -970,7 +971,7 @@ export function addCatToGroup(groupId, cat) {
   state.categoryGroups.forEach(g => { g.categories = g.categories.filter(c => c !== cat); });
   const g = state.categoryGroups.find(x => x.id === groupId);
   if (g) g.categories.push(cat);
-  saveData(state); renderSettings();
+  window.saveData(state); renderSettings();
 }
 
 export function openAddCatToGroup(groupId) {
@@ -980,7 +981,7 @@ export function openAddCatToGroup(groupId) {
   const alreadyIn = new Set(grp ? grp.categories : []);
   const available = allCats.filter(c => !alreadyIn.has(c) && !assignedElsewhere.has(c));
 
-  openModal('Add Category to Group', `
+  window.openModal('Add Category to Group', `
     ${available.length > 0 ? `
     <div class="form-group" style="margin-bottom:16px">
       <label class="form-label">Pick an existing category</label>
@@ -1017,7 +1018,7 @@ export function openAddCatToGroup(groupId) {
     const cat = newName || selected;
     if (!cat) return;
     addCatToGroup(groupId, cat);
-    closeModal();
+    window.closeModal();
   });
 }
 
@@ -1025,7 +1026,7 @@ export function removeCatFromGroup(groupId, cat) {
   const g = state.categoryGroups.find(x => x.id === groupId);
   if (!g) return;
   g.categories = g.categories.filter(c => c !== cat);
-  saveData(state); renderSettings();
+  window.saveData(state); renderSettings();
 }
 
 // ─────────────────────────────────────────────────
@@ -1046,13 +1047,13 @@ export function _markSettingsDirty() {
 export function saveSettingsChanges() {
   _settingsDirty = false;
   _settingsSnapshot = null;
-  saveData(state);
+  window.saveData(state);
   const bar = document.getElementById('settings-save-bar');
   if (bar) bar.style.display = 'none';
   // Brief confirmation
   const btn = document.getElementById('settings-save-btn');
   if (btn) { const orig = btn.textContent; btn.textContent = 'Saved'; btn.style.background = '#10b981'; setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500); }
-  renderAll();
+  window.renderAll();
 }
 
 export function cancelSettingsChanges() {
@@ -1133,7 +1134,7 @@ export function toggleSettingsSection(key) {
 export function clearActivityLog() {
   if (!confirm('Clear the entire activity log? This cannot be undone.')) return;
   state.activityLog = [];
-  saveData(state);
+  window.saveData(state);
   renderSettings();
 }
 
@@ -1144,7 +1145,7 @@ export function addCategory(type) {
   const list = type === 'expense' ? state.expenseCategories : state.incomeCategories;
   if (list.includes(name)) { alert('That category already exists.'); return; }
   list.push(name);
-  logActivity(`Added ${type} category`, name);
+  window.logActivity(`Added ${type} category`, name);
   _markSettingsDirty();
   input.value = '';
   renderSettings();
@@ -1161,7 +1162,7 @@ export function removeCategory(type, name) {
   }
   const idx = list.indexOf(name);
   if (idx !== -1) list.splice(idx, 1);
-  logActivity(`Removed ${type} category`, name);
+  window.logActivity(`Removed ${type} category`, name);
   _markSettingsDirty();
   renderSettings();
 }

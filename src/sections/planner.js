@@ -705,7 +705,7 @@ export function togglePlannerEstimate(eventId, estId) {
   const est = (ev.estimates || []).find(e => e.id === estId);
   if (!est) return;
   est.accepted = !est.accepted;
-  saveData(state);
+  window.saveData(state);
   renderPlanner();
 }
 
@@ -732,25 +732,25 @@ export function suggestEventToBudget(eventId) {
     });
   });
   ev.pushed = 'suggested';
-  saveData(state);
+  window.saveData(state);
   _plannerExpanded.add(eventId);
   renderPlanner();
   const monthFmt = new Date(monthStr+'-15').toLocaleDateString('en-AU',{month:'long',year:'numeric'});
   // If on a different month, offer to navigate
-  if (monthStr !== selectedBudgetMonth) {
+  if (monthStr !== window.selectedBudgetMonth) {
     if (confirm(`${accepted.length} suggestion${accepted.length>1?'s':''} sent to ${monthFmt} budget.\n\nGo to Monthly Budget to approve them?`)) {
-      selectedBudgetMonth = monthStr;
+      window.selectedBudgetMonth = monthStr;
       activateTab('budget');
     }
   } else {
-    safeRender(renderBudget);
+    window.safeRender(renderBudget);
   }
 }
 
 export function approveSuggestion(sugId) {
   const sug = (state.budget.suggestions||[]).find(s => s.id === sugId);
   if (!sug) return;
-  const mb = ensureMonthOverride(sug.month);
+  const mb = window.ensureMonthOverride(sug.month);
   mb.expenses.push({
     id: nextId(mb.expenses),
     name: `${sug.name} (${sug.eventTitle})`,
@@ -767,9 +767,9 @@ export function approveSuggestion(sugId) {
     const pending = (state.budget.suggestions||[]).filter(s => s.eventId === ev.id && s.status === 'pending');
     if (pending.length === 0) ev.pushed = true;
   }
-  saveData(state);
-  safeRender(renderBudget);
-  safeRender(renderPlanner);
+  window.saveData(state);
+  window.safeRender(renderBudget);
+  window.safeRender(renderPlanner);
 }
 
 export function dismissSuggestion(sugId) {
@@ -781,8 +781,8 @@ export function dismissSuggestion(sugId) {
     const pending = (state.budget.suggestions||[]).filter(s => s.eventId === ev.id && s.status === 'pending');
     if (pending.length === 0) ev.pushed = ev.pushed === 'suggested' ? false : ev.pushed;
   }
-  saveData(state);
-  safeRender(renderBudget);
+  window.saveData(state);
+  window.safeRender(renderBudget);
 }
 
 export function renderBudgetSuggestions(monthStr) {
@@ -822,9 +822,9 @@ export function unpushEventFromBudget(eventId) {
   // Remove suggestions
   state.budget.suggestions = (state.budget.suggestions||[]).filter(s => s.eventId !== eventId);
   ev.pushed = false;
-  saveData(state);
+  window.saveData(state);
   renderPlanner();
-  safeRender(renderBudget);
+  window.safeRender(renderBudget);
 }
 
 export function deletePlannerEvent(id) {
@@ -832,8 +832,8 @@ export function deletePlannerEvent(id) {
   unpushEventFromBudget(id);
   state.planner.events = state.planner.events.filter(e => e.id !== id);
   _plannerExpanded.delete(id);
-  saveData(state);
-  closeModal();
+  window.saveData(state);
+  window.closeModal();
   renderPlanner();
 }
 
@@ -898,7 +898,7 @@ Rules:
       accepted: true
     }));
     _plannerExpanded.add(eventId);
-    saveData(state);
+    window.saveData(state);
     renderPlanner();
   } catch (err) {
     console.error('Planner estimate error:', err);
@@ -997,7 +997,7 @@ export function openPlannerModal(id, presetDate) {
   document.getElementById('modal-footer').innerHTML = `
     ${ev ? `<button class="btn btn-danger" onclick="deletePlannerEvent('${ev.id}')">Delete</button>` : '<span></span>'}
     <div style="display:flex;gap:8px">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-secondary" onclick="window.closeModal()">Cancel</button>
       <button class="btn btn-primary" id="pm-save-btn" onclick="savePlannerEvent(${ev?`'${ev.id}'`:'null'})">Save</button>
     </div>`;
   document.getElementById('modal-footer').style.justifyContent = 'space-between';
@@ -1103,7 +1103,7 @@ export function _pmDpRender(pop) {
   const startOff = firstDow === 0 ? 6 : firstDow - 1;
   const daysInM  = new Date(y, m, 0).getDate();
   const daysInPrev = new Date(y, m-1, 0).getDate();
-  const monthLabel = new Date(y, m-1, 15).toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+  const _monthLabelStr = new Date(y, m-1, 15).toLocaleDateString('en-AU',{month:'long',year:'numeric'});
   let cells = [];
   for (let i = startOff-1; i >= 0; i--) cells.push({day:daysInPrev-i,muted:true,dateStr:null});
   for (let d=1;d<=daysInM;d++) { const ds=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; cells.push({day:d,muted:false,dateStr:ds}); }
@@ -1118,7 +1118,7 @@ export function _pmDpRender(pop) {
   pop.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <button type="button" onclick="_pmDpPrev()" style="width:28px;height:28px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;font-size:16px;color:#64748b">‹</button>
-      <div style="font-size:14px;font-weight:700;color:#1e293b">${monthLabel}</div>
+      <div style="font-size:14px;font-weight:700;color:#1e293b">${_monthLabelStr}</div>
       <button type="button" onclick="_pmDpNext()" style="width:28px;height:28px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;font-size:16px;color:#64748b">›</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:4px">
@@ -1188,8 +1188,8 @@ export function savePlannerEvent(id) {
     _plannerSelectedDay = date;
     _plannerMonth = date.slice(0,7);
   }
-  saveData(state);
-  closeModal();
+  window.saveData(state);
+  window.closeModal();
   renderPlanner();
 }
 
@@ -1364,5 +1364,5 @@ export function _autoCreateRecurringEvents() {
     }
   });
 
-  if (changed) saveData(state);
+  if (changed) window.saveData(state);
 }

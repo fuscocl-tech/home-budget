@@ -203,7 +203,7 @@ export function openVehicleForm(editId) {
     </div>`;
 
   document.getElementById('modal-footer').innerHTML = `
-    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn" onclick="window.closeModal()">Cancel</button>
     <button class="btn btn-primary" onclick="saveVehicle(${editId || 'null'})">Save</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -246,9 +246,9 @@ export function saveVehicle(editId) {
     _syncVehicleBill(data, 'insurance', `Insurance - ${data.name}`, data.insurance.renewalDate, 0, 'Insurance');
   }
 
-  saveData(state);
-  closeModal();
-  renderAll();
+  window.saveData(state);
+  window.closeModal();
+  window.renderAll();
 }
 
 export function _syncVehicleBill(vehicle, type, name, dueDate, amount, category) {
@@ -279,8 +279,8 @@ export function deleteVehicle(id) {
   const tag = `vehicle_${id}_`;
   state.bills = (state.bills || []).filter(b => !(b._vehicleRef && b._vehicleRef.startsWith(tag)));
   state.vehicles = state.vehicles.filter(v => v.id !== id);
-  saveData(state);
-  renderAll();
+  window.saveData(state);
+  window.renderAll();
 }
 
 export function openServiceForm(vehicleId) {
@@ -325,7 +325,7 @@ export function openServiceForm(vehicleId) {
     </div>`;
 
   document.getElementById('modal-footer').innerHTML = `
-    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn" onclick="window.closeModal()">Cancel</button>
     <button class="btn btn-primary" onclick="saveService(${vehicleId})">Save</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -355,7 +355,7 @@ export function saveService(vehicleId) {
   // Log cost as budget actual under a Transport/Car expense
   if (svc.cost > 0 && svc.date) {
     const mo = svc.date.slice(0, 7); // YYYY-MM
-    const md = getMonthData(mo);
+    const md = window.getMonthData(mo);
     // Find a car/transport expense, or create one
     let carExp = md.expenses.find(e => e.name && e.name.toLowerCase().includes(v.name.toLowerCase()))
               || md.expenses.find(e => (e.category || '').toLowerCase() === 'transport')
@@ -363,28 +363,28 @@ export function saveService(vehicleId) {
     if (!carExp) {
       carExp = { id: nextId(state.budget.expenses), name: `Car - ${v.name}`, amount: 0, frequency: 'monthly', category: 'Transport', dueDate: '', vendor: null };
       state.budget.expenses.push(carExp);
-      if (isMonthCustomized(mo)) {
+      if (window.isMonthCustomized(mo)) {
         const mb = state.budget.months[mo];
         carExp = { ...carExp, id: nextId(mb.expenses) };
         mb.expenses.push(carExp);
       }
     }
     if (!state.budget.actuals[mo]) state.budget.actuals[mo] = {};
-    const entries = getActualEntries(carExp.id, mo);
+    const entries = window.getActualEntries(carExp.id, mo);
     entries.push({ id: entries.length ? Math.max(...entries.map(e => e.id)) + 1 : 1, amount: svc.cost, date: svc.date, note: `${v.name}: ${svc.type}${svc.provider ? ' @ ' + svc.provider : ''}` });
     state.budget.actuals[mo][carExp.id] = entries;
   }
 
-  saveData(state);
-  closeModal();
-  renderAll();
+  window.saveData(state);
+  window.closeModal();
+  window.renderAll();
 }
 
 export function deleteService(vehicleId, serviceId) {
   const v = state.vehicles.find(v => v.id === vehicleId);
   if (!v) return;
   v.services = (v.services || []).filter(s => s.id !== serviceId);
-  saveData(state);
-  renderAll();
+  window.saveData(state);
+  window.renderAll();
 }
 

@@ -45,7 +45,7 @@ export function renderGoals() {
   </div>`;
 
   if (grouped.length === 0) {
-    const curData = getMonthData(selectedBudgetMonth);
+    const curData = window.getMonthData(window.selectedBudgetMonth);
     const surplus = monthlyTotal(curData.income) - monthlyTotal(curData.expenses);
     const surplusHtml = surplus > 0
       ? `<div style="font-size:14px;color:#64748b;margin-bottom:4px">You have <strong style="color:#16a34a">${aud(surplus)}</strong> surplus each month.</div>
@@ -232,31 +232,31 @@ export function goalFromForm(id) {
 }
 
 export function openAddGoal() {
-  openModal('New Goal', goalForm(), () => {
+  window.openModal('New Goal', goalForm(), () => {
     const g = goalFromForm(nextId(state.goals));
     if (!g.name) return;
     state.goals.push(g);
-    saveData(state); closeModal(); renderGoals();
+    window.saveData(state); window.closeModal(); renderGoals();
   });
 }
 
 export function openEditGoal(id) {
   const g = state.goals.find(x => x.id === id);
-  openModal('Edit Goal', goalForm(g), () => {
+  window.openModal('Edit Goal', goalForm(g), () => {
     Object.assign(g, goalFromForm(id));
-    saveData(state); closeModal(); renderGoals();
+    window.saveData(state); window.closeModal(); renderGoals();
   });
 }
 
 export function deleteGoal(id) {
   if (!confirm('Delete this goal?')) return;
   state.goals = state.goals.filter(g => g.id !== id);
-  saveData(state); renderGoals();
+  window.saveData(state); renderGoals();
 }
 
 export function markGoalAchieved(id) {
   const g = state.goals.find(x => x.id === id);
-  if (g) { g.status = 'achieved'; saveData(state); renderGoals(); }
+  if (g) { g.status = 'achieved'; window.saveData(state); renderGoals(); }
 }
 
 // ─────────────────────────────────────────────────
@@ -275,7 +275,7 @@ export const ADJ_TYPES = [
 ];
 
 export function calcScenario(scenario) {
-  const base = getMonthData(selectedBudgetMonth);
+  const base = window.getMonthData(window.selectedBudgetMonth);
   let income   = JSON.parse(JSON.stringify(base.income));
   let expenses = JSON.parse(JSON.stringify(base.expenses));
 
@@ -311,7 +311,7 @@ export function calcScenario(scenario) {
 
 export function renderScenarios() {
   const scenarios = state.scenarios;
-  const base = getMonthData(selectedBudgetMonth);
+  const base = window.getMonthData(window.selectedBudgetMonth);
   const baseTotalIncome   = monthlyTotal(base.income);
   const baseTotalExpenses = monthlyTotal(base.expenses);
   const baseSurplus       = baseTotalIncome - baseTotalExpenses;
@@ -449,20 +449,20 @@ export function scenarioFromForm(id, existing = {}) {
 }
 
 export function openAddScenario() {
-  openModal('New Scenario', scenarioForm(), () => {
+  window.openModal('New Scenario', scenarioForm(), () => {
     const sc = scenarioFromForm(nextId(state.scenarios));
     if (!sc.name) return;
     state.scenarios.push(sc);
-    saveData(state); closeModal(); renderScenarios();
+    window.saveData(state); window.closeModal(); renderScenarios();
   });
 }
 
 export function openEditScenario(id) {
   const sc = state.scenarios.find(x => x.id === id);
-  openModal('Edit Scenario', scenarioForm(sc), () => {
+  window.openModal('Edit Scenario', scenarioForm(sc), () => {
     const updated = scenarioFromForm(id, sc);
     Object.assign(sc, updated);
-    saveData(state); closeModal(); renderScenarios();
+    window.saveData(state); window.closeModal(); renderScenarios();
   });
 }
 
@@ -470,11 +470,11 @@ export function deleteScenario(id) {
   if (!confirm('Delete this scenario?')) return;
   state.scenarios = state.scenarios.filter(s => s.id !== id);
   if (openScenarioId === id) openScenarioId = null;
-  saveData(state); renderScenarios();
+  window.saveData(state); renderScenarios();
 }
 
 export function adjForm(sc) {
-  const base = getMonthData(selectedBudgetMonth);
+  const base = window.getMonthData(window.selectedBudgetMonth);
   const incomeOpts = base.income.map(i => `<option value="${i.id}">${escHtml(i.name)} (${aud(itemMonthly(i))}/mo)</option>`).join('');
   const expenseOpts = base.expenses.map(e => `<option value="${e.id}">${escHtml(e.name)} (${aud(itemMonthly(e))}/mo)</option>`).join('');
   return `
@@ -580,9 +580,9 @@ export function toggleAdjFields() {
 export function openAddAdjustment(scenarioId) {
   const sc = state.scenarios.find(x => x.id === scenarioId);
   if (!sc) return;
-  openModal('Add Adjustment', adjForm(sc), () => {
+  window.openModal('Add Adjustment', adjForm(sc), () => {
     const type = document.getElementById('f-adj-type').value;
-    const base = getMonthData(selectedBudgetMonth);
+    const base = window.getMonthData(window.selectedBudgetMonth);
     const adj = { id: nextId(sc.adjustments || []), type };
     if (type === 'add-income') {
       adj.name = document.getElementById('f-adj-name').value.trim();
@@ -618,7 +618,7 @@ export function openAddAdjustment(scenarioId) {
     }
     if (!sc.adjustments) sc.adjustments = [];
     sc.adjustments.push(adj);
-    saveData(state); closeModal(); renderScenarios();
+    window.saveData(state); window.closeModal(); renderScenarios();
   });
 }
 
@@ -626,7 +626,7 @@ export function deleteAdjustment(scenarioId, adjId) {
   const sc = state.scenarios.find(x => x.id === scenarioId);
   if (!sc) return;
   sc.adjustments = (sc.adjustments || []).filter(a => a.id !== adjId);
-  saveData(state); renderScenarios();
+  window.saveData(state); renderScenarios();
 }
 
 // ─────────────────────────────────────────────────

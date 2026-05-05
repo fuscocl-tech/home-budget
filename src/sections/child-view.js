@@ -3,15 +3,15 @@ import { state } from '../store.js';
 import { escHtml, fmtDate } from './format.js';
 
 export function _applyChildNav() {
-  const isKid = _activeProfile?.role === 'child';
+  const isKid = window._activeProfile?.role === 'child';
   document.body.classList.toggle('kid-mode', isKid);
 
   const label = document.getElementById('kid-banner-label');
   if (label && isKid) {
-    label.textContent = `${_activeProfile.emoji || '😊'} ${_activeProfile.name}'s view`;
+    label.textContent = `${window._activeProfile.emoji || '😊'} ${window._activeProfile.name}'s view`;
   }
 
-  const device = getDeviceProfile();
+  const device = window.getDeviceProfile();
   const switchBtn = document.getElementById('header-switch-profile');
   if (switchBtn) {
     const show = device && device !== 'adult';
@@ -29,30 +29,30 @@ export function _applyChildNav() {
 
 // "Switch" — two-way toggle depending on current state
 export function switchProfile() {
-  const device = getDeviceProfile();
+  const device = window.getDeviceProfile();
 
-  if (_activeProfile?.role === 'child') {
+  if (window._activeProfile?.role === 'child') {
     // Currently in kid mode → give parent temporary access
-    clearKidSession();
-    _activeProfile = null;
+    window.clearKidSession();
+    window._activeProfile = null;
     _applyChildNav();
-    renderAll();
+    window.renderAll();
   } else {
     // Currently in adult mode → hand back to the assigned profile
     if (device === 'shared') {
-      showProfileSelector();
+      window.showProfileSelector();
     } else if (device && device !== 'adult') {
       const kid = (state.kids?.profiles || []).find(k => k.id === device);
       if (kid) {
         if (kid.pinHash) {
-          _pinTargetId = kid.id;
-          _pinBuffer = '';
-          _pinAttempts = 0;
-          _showPinScreen(kid);
+          window._pinTargetId = kid.id;
+          window._pinBuffer = '';
+          window._pinAttempts = 0;
+          window._showPinScreen(kid);
         } else {
-          _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
-          setKidSession(kid.id);
-          _applyActiveProfile();
+          window._activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+          window.setKidSession(kid.id);
+          window._applyActiveProfile();
         }
       }
     }
@@ -62,15 +62,15 @@ export function switchProfile() {
 export async function setKidPin(kidId, pin) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
   if (!kid || pin.length !== 4) return;
-  kid.pinHash = await _hashPin(pin, _getHouseholdOwnerUID());
-  saveData(state);
+  kid.pinHash = await window._hashPin(pin, window._getHouseholdOwnerUID());
+  window.saveData(state);
 }
 
 export function clearKidPin(kidId) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
   if (!kid) return;
   delete kid.pinHash;
-  saveData(state);
+  window.saveData(state);
 }
 
 // ── Adult PIN ─────────────────────────────────────────
@@ -90,7 +90,7 @@ export function clearAdultPin(adultIndex) {
   const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
   if (!adults[adultIndex]) return;
   delete adults[adultIndex].pinHash;
-  saveData(state);
+  window.saveData(state);
   renderSettings();
 }
 
@@ -148,8 +148,8 @@ export async function _adultPinSubmit() {
       return;
     }
     const adults = (state.householdProfile?.members || []).filter(m => m.role === 'adult' && m.name);
-    adults[_adultPinTarget].pinHash = await _hashPin(_adultPinBuf, _getHouseholdOwnerUID());
-    saveData(state);
+    adults[_adultPinTarget].pinHash = await window._hashPin(_adultPinBuf, window._getHouseholdOwnerUID());
+    window.saveData(state);
     document.getElementById('adult-pin-modal').classList.add('hidden');
     renderSettings();
   }
@@ -548,7 +548,7 @@ export function _cvRenderPrizesTab(kid) {
   (k.notifications || []).filter(n => n.kidId === kid.id && !n.read).forEach(n => {
     n.read = true; notifsDirty = true;
   });
-  if (notifsDirty) saveData(state);
+  if (notifsDirty) window.saveData(state);
   _cvUpdatePrizesBadge(kid);
 
   const balDisplay = isTiny
@@ -736,7 +736,7 @@ export function _cvToggleStepFromCal(routineId, stepId, dateStr) {
     }
   }
 
-  saveData(state);
+  window.saveData(state);
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(_cvActiveKidId));
   if (kid) _cvRefreshSchedulePanel(kid, dateStr);
 }
@@ -985,7 +985,7 @@ export function _cvShowDayDetail(dateStr, kidId) {
 export function _cvDismissNotif(notifId, kidId) {
   const n = (state.kids?.notifications || []).find(x => x.id === notifId);
   if (n) n.read = true;
-  saveData(state);
+  window.saveData(state);
   showChildView(kidId);
 }
 
@@ -1008,21 +1008,21 @@ export function markChoreChildView(kidId, choreId) {
   const existing = state.kids.completions.find(c => c.kidId === kidId && c.choreId === choreId && c.status === 'pending');
   if (existing) return;
   state.kids.completions.push({ id: uid(), kidId, choreId, status: 'pending', ts: new Date().toISOString() });
-  saveData(state);
+  window.saveData(state);
   showChildView(kidId);
 }
 
 export function redeemPrizeChildView(kidId, prizeId) {
   state.kids.redemptions.push({ id: uid(), kidId, prizeId, status: 'pending', ts: new Date().toISOString() });
-  saveData(state);
+  window.saveData(state);
   _cvSwitchTab('prizes', kidId);
 }
 
 export function switchToKidMode(kidId) {
   const kid = (state.kids?.profiles || []).find(k => String(k.id) === String(kidId));
   if (!kid) return;
-  _activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
-  setKidSession(kid.id);
+  window._activeProfile = { id: kid.id, name: kid.name, emoji: kid.emoji, role: 'child' };
+  window.setKidSession(kid.id);
   showChildView(kidId);
 }
 

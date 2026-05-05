@@ -3,23 +3,23 @@ import { state } from '../store.js';
 import { aud, audD, escHtml, monthlyTotal, itemMonthly } from './format.js';
 
 export function prevMoneyMonth() {
-  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const [y, m] = window.selectedBudgetMonth.split('-').map(Number);
   const d = new Date(y, m - 2, 1);
-  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  safeRender(renderMoneyDashboard);
-  safeRender(renderBudget);
+  window.selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  window.safeRender(renderMoneyDashboard);
+  window.safeRender(renderBudget);
 }
 
 export function nextMoneyMonth() {
-  const [y, m] = selectedBudgetMonth.split('-').map(Number);
+  const [y, m] = window.selectedBudgetMonth.split('-').map(Number);
   const d = new Date(y, m, 1);
-  selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  safeRender(renderMoneyDashboard);
-  safeRender(renderBudget);
+  window.selectedBudgetMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  window.safeRender(renderMoneyDashboard);
+  window.safeRender(renderBudget);
 }
 
 export function renderMoneyDashboard() {
-  const md = getMonthData(selectedBudgetMonth);
+  const md = window.getMonthData(window.selectedBudgetMonth);
   const income   = md.income;
   const expenses = md.expenses;
 
@@ -36,17 +36,17 @@ export function renderMoneyDashboard() {
   });
   const sortedCats = Object.entries(byCategory).sort((a, b) => b[1] - a[1]);
 
-  const actuals     = state.budget.actuals[selectedBudgetMonth] || {};
-  const totalActual = expenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const actuals     = state.budget.actuals[window.selectedBudgetMonth] || {};
+  const totalActual = expenses.reduce((s, e) => s + window.getActual(e.id, window.selectedBudgetMonth), 0);
   const hasActuals  = totalActual > 0;
 
   // ── Month nav + KPI cards ──────────────────────
   let html = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
       <button class="btn btn-sm" onclick="prevMoneyMonth()" style="font-size:16px;padding:2px 10px">‹</button>
-      <span style="font-size:16px;font-weight:600;min-width:140px;text-align:center">${monthLabel(selectedBudgetMonth)}</span>
+      <span style="font-size:16px;font-weight:600;min-width:140px;text-align:center">${window.monthLabel(window.selectedBudgetMonth)}</span>
       <button class="btn btn-sm" onclick="nextMoneyMonth()" style="font-size:16px;padding:2px 10px">›</button>
-      ${isMonthCustomized(selectedBudgetMonth) ? '<span style="margin-left:8px;font-size:12px;padding:2px 10px;background:#dbeafe;color:#1d4ed8;border-radius:99px">Custom month</span>' : ''}
+      ${window.isMonthCustomized(window.selectedBudgetMonth) ? '<span style="margin-left:8px;font-size:12px;padding:2px 10px;background:#dbeafe;color:#1d4ed8;border-radius:99px">Custom month</span>' : ''}
     </div>
 
     <div class="cards">
@@ -152,7 +152,7 @@ export function renderMoneyDashboard() {
       <div class="section" style="margin-bottom:20px">
         <div class="section-header">
           <div>
-            <div class="section-title">Actuals — ${monthLabel(selectedBudgetMonth)}</div>
+            <div class="section-title">Actuals — ${window.monthLabel(window.selectedBudgetMonth)}</div>
             <div class="section-subtitle">Recorded spending vs budget</div>
           </div>
           <div style="display:flex;gap:16px;align-items:center;font-size:13px;flex-wrap:wrap">
@@ -190,11 +190,11 @@ export function renderMoneyDashboard() {
   }
 
   // ── 6-month trend chart ────────────────────────
-  const last6     = getLast6Months();
+  const last6     = window.getLast6Months();
   const trendData = last6.map(mo => {
-    const md2 = getMonthData(mo);
+    const md2 = window.getMonthData(mo);
     return {
-      label:    monthShortLabel(mo),
+      label:    window.monthShortLabel(mo),
       income:   monthlyTotal(md2.income),
       expenses: monthlyTotal(md2.expenses),
       actual:   Object.values(state.budget.actuals[mo] || {}).reduce((s, v) => s + v, 0)

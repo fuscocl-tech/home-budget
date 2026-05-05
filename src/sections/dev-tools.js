@@ -150,7 +150,7 @@ export function _devLoadWallet() {
     target: { amount: 1500000, byYear: 2040 }
   };
   state.settings = { ...state.settings, adultName: 'Robert Gentilcore', householdName: 'Gentilcore Family' };
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 export function _devLoadKids() {
@@ -189,7 +189,7 @@ export function _devLoadKids() {
     { id: uid(), title: 'Piano lesson', emoji: '🎹', date: new Date(Date.now()+86400000).toISOString().slice(0,10), time: '15:30', assignedTo: [kid1id], isHouseholdWide: false, createdBy: 'dev' },
     { id: uid(), title: 'Family dinner', emoji: '🍽️', date: new Date(Date.now()+2*86400000).toISOString().slice(0,10), time: '19:00', assignedTo: [], isHouseholdWide: true, createdBy: 'dev' },
   ];
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 export function _devLoadRoutines() {
@@ -244,7 +244,7 @@ export function _devLoadRoutines() {
   // Partial adult morning completion
   const morningRoutine = routines[0];
   morningRoutine.completions[todayKey] = [adultMorning[0].id, adultMorning[1].id];
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 export function _devLoadPlanner() {
@@ -267,7 +267,7 @@ export function _devLoadPlanner() {
     { id: uid(), title: 'Car service', category: 'home', date: in5, time: '09:00', memberIds: [m1], allDay: false },
     { id: uid(), title: "Amy's birthday", category: 'family', date: in7, allDay: true, memberIds: ['everyone'] },
   ]};
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 export function _devLoadHome() {
@@ -301,7 +301,7 @@ export function _devLoadHome() {
       { role: 'adult', name: 'Sarah', age: 36, emoji: '👩' },
     ]
   };
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 export function _devLoadMeals() {
@@ -332,7 +332,7 @@ export function _devLoadMeals() {
     state.meals.lunchbox.plans[lbWeek][kid1.id][dow] = { main: '🥪 Vegemite sandwich', snack: '🍫 Muesli bar', fruit: '🍎 Apple', drink: '💧 Water' };
   }
   // Dev data for lists
-  if (!state.lists) _applyMigrations(state);
+  if (!state.lists) window._applyMigrations(state);
   const now8601 = new Date().toISOString();
   state.lists.food.items = [
     { id:'dev-f1', name:'Milk', quantity:2, unit:'L', notes:'', aisle:'dairy', state:'active', addedBy:'dev', addedAt:now8601, stateChangedAt:null, mealTag:null, manualPrice:null, barcodeId:null },
@@ -361,7 +361,7 @@ export function _devLoadMeals() {
     { id:'dev-w3', name:'Kindle Paperwhite', quantity:1, unit:'units', notes:'', aisle:'other', state:'active', addedBy:'dev', addedAt:now8601, stateChangedAt:null, mealTag:null, manualPrice:null, barcodeId:null },
   ];
 
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 export function _devLoadAll() {
@@ -379,7 +379,7 @@ export function _devReset() {
   fresh.onboarded = true;
   fresh.setupProgressDismissed = false;
   _replaceState(fresh);
-  saveData(fresh);
-  renderAll();
+  window.saveData(fresh);
+  window.renderAll();
 }
 

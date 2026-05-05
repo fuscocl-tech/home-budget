@@ -80,31 +80,31 @@ export function furnitureFromForm(id) {
 }
 
 export function openAddFurniture() {
-  openModal('Add Furniture Item', furnitureForm(), () => {
+  window.openModal('Add Furniture Item', furnitureForm(), () => {
     const f = furnitureFromForm(nextId(state.furniture));
     if (!f.name) return;
-    logActivity('Added furniture', f.name);
+    window.logActivity('Added furniture', f.name);
     state.furniture.push(f);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); window.closeModal(); window.renderAll();
   });
 }
 
 export function openEditFurniture(id) {
   const f = state.furniture.find(x => x.id === id);
-  openModal('Edit Furniture Item', furnitureForm(f), () => {
+  window.openModal('Edit Furniture Item', furnitureForm(f), () => {
     const updated = furnitureFromForm(id);
-    logActivity('Edited furniture', updated.name || f.name);
+    window.logActivity('Edited furniture', updated.name || f.name);
     Object.assign(f, updated);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); window.closeModal(); window.renderAll();
   });
 }
 
 export function deleteFurniture(id) {
   if (!confirm('Delete this item?')) return;
   const f = state.furniture.find(x => x.id === id);
-  logActivity('Deleted furniture', f ? f.name : '');
+  window.logActivity('Deleted furniture', f ? f.name : '');
   state.furniture = state.furniture.filter(f => f.id !== id);
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 // ─────────────────────────────────────────────────
@@ -187,31 +187,31 @@ export function applianceFromForm(id) {
 }
 
 export function openAddAppliance() {
-  openModal('Add Appliance', applianceForm(), () => {
+  window.openModal('Add Appliance', applianceForm(), () => {
     const a = applianceFromForm(nextId(state.appliances));
     if (!a.name) return;
-    logActivity('Added appliance', a.name);
+    window.logActivity('Added appliance', a.name);
     state.appliances.push(a);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); window.closeModal(); window.renderAll();
   });
 }
 
 export function openEditAppliance(id) {
   const a = state.appliances.find(x => x.id === id);
-  openModal('Edit Appliance', applianceForm(a), () => {
+  window.openModal('Edit Appliance', applianceForm(a), () => {
     const updated = applianceFromForm(id);
-    logActivity('Edited appliance', updated.name || a.name);
+    window.logActivity('Edited appliance', updated.name || a.name);
     Object.assign(a, updated);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); window.closeModal(); window.renderAll();
   });
 }
 
 export function deleteAppliance(id) {
   if (!confirm('Delete this item?')) return;
   const a = state.appliances.find(x => x.id === id);
-  logActivity('Deleted appliance', a ? a.name : '');
+  window.logActivity('Deleted appliance', a ? a.name : '');
   state.appliances = state.appliances.filter(a => a.id !== id);
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 // ─────────────────────────────────────────────────

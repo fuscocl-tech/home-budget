@@ -7,7 +7,7 @@ import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 export function renderSetupProgress() {
   if (state.setupProgressDismissed) return '';
 
-  const tasks   = setupProgressTasks();
+  const tasks   = window.setupProgressTasks();
   const doneTasks  = tasks.filter(t => t.done);
   const todoTasks  = tasks.filter(t => !t.done);
   const done    = doneTasks.length;
@@ -21,7 +21,7 @@ export function renderSetupProgress() {
         <div style="font-size:14px;font-weight:700;color:var(--good)">Setup complete!</div>
         <div style="font-size:12px;color:var(--muted);margin-top:2px">Your household is fully configured.</div>
       </div>
-      <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Dismiss</button>
+      <button onclick="state.setupProgressDismissed=true;window.saveData(state);renderToday()" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Dismiss</button>
     </div>`;
   }
 
@@ -35,9 +35,9 @@ export function renderSetupProgress() {
     </svg>
     <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--purple)">${pct}%</div>`;
 
-  const chevron = _spExpanded ? '▲' : '▼';
+  const chevron = window._spExpanded ? '▲' : '▼';
   const header = `
-    <div onclick="_spExpanded=!_spExpanded;_refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
+    <div onclick="window._spExpanded=!window._spExpanded;window._refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
       <div>
         <div style="font-size:15px;font-weight:700;color:var(--ink)">Finish setting up Toto</div>
         <div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px">${done} of ${total} complete</div>
@@ -51,7 +51,7 @@ export function renderSetupProgress() {
       <div style="width:${pct}%;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--iris-2),var(--iris-3))"></div>
     </div>`;
 
-  if (!_spExpanded) {
+  if (!window._spExpanded) {
     return `<div class="td-card" style="margin-bottom:10px">${header}</div>`;
   }
 
@@ -77,11 +77,11 @@ export function renderSetupProgress() {
 
   const doneSection = done > 0 ? `
     <div style="margin-top:10px;border-top:1px solid var(--hairline-soft);padding-top:10px">
-      <div onclick="_spDoneExpanded=!_spDoneExpanded;_refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0;margin-bottom:${_spDoneExpanded?'8px':'0'}">
+      <div onclick="window._spDoneExpanded=!window._spDoneExpanded;window._refreshSetupProgress()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0;margin-bottom:${window._spDoneExpanded?'8px':'0'}">
         <span style="font-size:12px;font-weight:600;color:var(--good)">${done} done</span>
-        <span style="font-size:10px;color:var(--muted-soft)">${_spDoneExpanded?'▲':'▼'}</span>
+        <span style="font-size:10px;color:var(--muted-soft)">${window._spDoneExpanded?'▲':'▼'}</span>
       </div>
-      ${_spDoneExpanded ? `<div style="display:flex;flex-direction:column;gap:5px">${doneHtml}</div>` : ''}
+      ${window._spDoneExpanded ? `<div style="display:flex;flex-direction:column;gap:5px">${doneHtml}</div>` : ''}
     </div>` : '';
 
   return `
@@ -90,7 +90,7 @@ export function renderSetupProgress() {
       <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px">${todoHtml}</div>
       ${doneSection}
       <div style="text-align:center;margin-top:12px">
-        <button onclick="state.setupProgressDismissed=true;saveData(state);renderToday()" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer">Dismiss · I'll do this later</button>
+        <button onclick="state.setupProgressDismissed=true;window.saveData(state);renderToday()" style="font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer">Dismiss · I'll do this later</button>
       </div>
     </div>`;
 }
@@ -244,7 +244,7 @@ export function renderToday() {
     overnight: 'Still up,',
   };
   const greetWord = greetWords[dayPart] || 'Hello,';
-  const name = (_currentUser?.displayName?.split(' ')[0])
+  const name = (window._currentUser?.displayName?.split(' ')[0])
     || (state.settings?.adultName?.split(' ')[0])
     || (state.settings?.adults?.[0]?.name?.split(' ')[0])
     || (state.householdProfile?.members?.find(m => m.role === 'adult')?.name?.split(' ')[0])
@@ -256,12 +256,12 @@ export function renderToday() {
 
   // PRIORITY + SLIPPING — paired square tiles
   const billsDue = (state.bills || []).map(b => ({ ...b, days: billDaysUntil(b) })).filter(b => b.days !== null && b.days <= 2).sort((a,b) => a.days - b.days);
-  const maintOverdue = (state.maintenance || []).filter(m => { const d = _maintDaysUntil(m); return d !== null && d < 0; });
+  const maintOverdue = (state.maintenance || []).filter(m => { const d = window._maintDaysUntil(m); return d !== null && d < 0; });
   const docsExpired = (state.documents || []).filter(d => d.expiryDate && new Date(d.expiryDate) < now);
   const regoExpired = (state.vehicles || []).filter(v => v.regoExpiry && new Date(v.regoExpiry) < now);
   const slipping = [];
   (state.documents||[]).forEach(d => { if (d.expiryDate && new Date(d.expiryDate) < now) slipping.push({ label: escHtml(d.name), sub: 'Document expired', cls: 'alert', tab: 'documents' }); });
-  (state.maintenance||[]).forEach(m => { const d = _maintDaysUntil(m); if (d !== null && d < 0) slipping.push({ label: escHtml(m.name), sub: `${Math.abs(d)}d overdue`, cls: 'watch', tab: 'maintenance' }); });
+  (state.maintenance||[]).forEach(m => { const d = window._maintDaysUntil(m); if (d !== null && d < 0) slipping.push({ label: escHtml(m.name), sub: `${Math.abs(d)}d overdue`, cls: 'watch', tab: 'maintenance' }); });
   (state.vehicles||[]).forEach(v => { if (v.regoExpiry && new Date(v.regoExpiry) < now) slipping.push({ label: escHtml(v.name)+' rego', sub: 'Expired', cls: 'alert', tab: 'vehicles' }); });
 
   const hasHeadsUp = billsDue.length > 0;
@@ -361,11 +361,11 @@ export function renderToday() {
   }
 
   // MONEY CARD
-  const curData = getMonthData(selectedBudgetMonth);
+  const curData = window.getMonthData(window.selectedBudgetMonth);
   const totalIncome = monthlyTotal(curData.income);
   const totalExpenses = monthlyTotal(curData.expenses);
   const surplus = totalIncome - totalExpenses;
-  const totalActual = (curData.expenses||[]).reduce((s,e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const totalActual = (curData.expenses||[]).reduce((s,e) => s + window.getActual(e.id, window.selectedBudgetMonth), 0);
   const daysLeft = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate() - now.getDate();
   const spentPct = totalExpenses > 0 ? Math.min(100, Math.round(totalActual / totalExpenses * 100)) : 0;
   if (totalIncome > 0 || totalExpenses > 0) {
@@ -601,19 +601,19 @@ export function renderToday() {
 
     ${setupHtml}
     ${state.settings?.typeAMode ? `
-      ${_renderLifeScore()}
-      ${_renderMissionCard()}
+      ${window._renderLifeScore()}
+      ${window._renderMissionCard()}
     ` : ''}
     ${cardsHtml}
     ${calmState}
   `;
 
   // Type A mission escalation check
-  if (state.settings?.typeAMode) _checkMissionEscalation();
+  if (state.settings?.typeAMode) window._checkMissionEscalation();
 
   // Async AI briefing
   if (typeof _fetchAIBriefing === 'function') {
-    const health = typeof calcFinancialHealth === 'function' ? calcFinancialHealth() : null;
+    const health = typeof window.calcFinancialHealth === 'function' ? window.calcFinancialHealth() : null;
     const mealWeekKey = typeof _mealWeekKey === 'function' ? _mealWeekKey(0) : null;
     const todayMeals = mealWeekKey ? (state.meals?.plan?.[mealWeekKey]?.[now.getDay()===0?6:now.getDay()-1]) || {} : {};
     _fetchAIBriefing(cards.map(c=>({title:c.type})), surplus, daysLeft, todayMeals, health);
@@ -656,7 +656,7 @@ export function _tdOpenSlippingSheet() {
   const now = new Date();
   const slipping = [];
   (state.documents||[]).forEach(d => { if (d.expiryDate && new Date(d.expiryDate) < now) slipping.push({ label: d.name, sub: 'Documents', badge: 'Expired', cls: 'alert', tab: 'documents' }); });
-  (state.maintenance||[]).forEach(m => { const d = _maintDaysUntil(m); if (d !== null && d < 0) slipping.push({ label: m.name, sub: 'Maintenance', badge: `${Math.abs(d)}d overdue`, cls: 'watch', tab: 'maintenance' }); });
+  (state.maintenance||[]).forEach(m => { const d = window._maintDaysUntil(m); if (d !== null && d < 0) slipping.push({ label: m.name, sub: 'Maintenance', badge: `${Math.abs(d)}d overdue`, cls: 'watch', tab: 'maintenance' }); });
   (state.vehicles||[]).forEach(v => { if (v.regoExpiry && new Date(v.regoExpiry) < now) slipping.push({ label: v.name+' rego', sub: 'Vehicles', badge: 'Expired', cls: 'alert', tab: 'vehicles' }); });
   if (!slipping.length) return;
   const rows = slipping.map(s => {
@@ -716,14 +716,14 @@ export function _tdToggleStep(routineId, stepId) {
   const idx = routine.completions[key].indexOf(sid);
   if (idx === -1) routine.completions[key].push(sid);
   else routine.completions[key].splice(idx, 1);
-  saveData(state);
+  window.saveData(state);
   renderToday();
 }
 
 export function toggleInsightSheet() {
   const insights = [];
   const now = new Date();
-  const curData = getMonthData(selectedBudgetMonth);
+  const curData = window.getMonthData(window.selectedBudgetMonth);
   const totalIncome = monthlyTotal(curData.income);
   const totalExpenses = monthlyTotal(curData.expenses);
   const surplus = totalIncome - totalExpenses;
@@ -738,8 +738,8 @@ export function toggleInsightSheet() {
     <div style="font-size:13px;color:var(--muted)">${escHtml(i.detail)}</div>
     ${i.action?`<button onclick="activateTab('${i.action}');closeQuickAdd&&closeQuickAdd()" style="margin-top:10px;padding:7px 14px;border-radius:99px;background:var(--ink);color:var(--pearl);font-size:12px;font-weight:500;border:none;cursor:pointer">View →</button>`:''}
   </div>`).join('');
-  if (typeof openModal === 'function') {
-    openModal('💡 Insights', `<div style="padding:0 4px">${html}</div>`, null);
+  if (typeof window.openModal === 'function') {
+    window.openModal('💡 Insights', `<div style="padding:0 4px">${html}</div>`, null);
   }
 }
 export let _lastBriefingDate = '';
@@ -814,8 +814,8 @@ export function renderDashboard() {
   }
 
   // ── Budget ──
-  const curMonth     = selectedBudgetMonth;
-  const curData      = getMonthData(curMonth);
+  const curMonth     = window.selectedBudgetMonth;
+  const curData      = window.getMonthData(curMonth);
   const monthlyIncome    = monthlyTotal(curData.income);
   const monthlyExpenses  = monthlyTotal(curData.expenses);
   const surplus          = monthlyIncome - monthlyExpenses;
@@ -844,16 +844,16 @@ export function renderDashboard() {
                     + ((d.kids||{}).redemptions||[]).filter(r=>r.status==='pending').length;
 
   // ── 6-month budget chart ──
-  const last6        = getLast6Months();
+  const last6        = window.getLast6Months();
   const totalBudgetMo = monthlyTotal(curData.expenses);
   const chartData    = last6.map(mo => {
     const actual = Object.values(state.budget.actuals[mo]||{}).reduce((s,v)=>s+v,0);
-    return { label: monthShortLabel(mo), budget: totalBudgetMo, actual };
+    return { label: window.monthShortLabel(mo), budget: totalBudgetMo, actual };
   });
   const hasChart = totalBudgetMo > 0 || chartData.some(d=>d.actual>0);
 
   // ── Financial health score ──
-  const health = calcFinancialHealth();
+  const health = window.calcFinancialHealth();
   const circ = 251.3;
   const arc  = ((health.total / 100) * circ).toFixed(1);
   const dimBars = health.dimensions.map(dim => {
@@ -1016,7 +1016,7 @@ export function renderDashboard() {
         <!-- Budget this month -->
         <div class="db-widget">
           <div class="db-widget-header">
-            <span class="db-widget-title">Budget · ${monthLabel(curMonth)}</span>
+            <span class="db-widget-title">Budget · ${window.monthLabel(curMonth)}</span>
             <button class="db-widget-link" onclick="activateTab('budget')">Edit →</button>
           </div>
           <div class="db-budget-row">

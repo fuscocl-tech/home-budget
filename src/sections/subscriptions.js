@@ -30,6 +30,8 @@ export function subMonthlyAmount(sub) {
 
 let _subImportResults = [];
 let _subImportDismissed = new Set();
+Object.defineProperty(window, '_subImportResults',   { get() { return _subImportResults; },   set(v) { _subImportResults = v; },   configurable: true });
+Object.defineProperty(window, '_subImportDismissed', { get() { return _subImportDismissed; }, set(v) { _subImportDismissed = v; }, configurable: true });
 
 
 export function renderSubImportResults(results) {
@@ -85,11 +87,11 @@ export function saveSub() {
   } else {
     state.subscriptions.push({ id: uid(), ...entry });
   }
-  saveData(state); closeSubModal(); renderSubscriptions();
+  window.saveData(state); closeSubModal(); renderSubscriptions();
 }
 export function deleteSub(id) {
   state.subscriptions = (state.subscriptions||[]).filter(s => s.id !== id);
-  saveData(state); renderSubscriptions();
+  window.saveData(state); renderSubscriptions();
 }
 
 export async function handleSubCSV(event) {
@@ -172,12 +174,12 @@ export function addSubFromImport(key, dest) {
   if (dest === 'subscription') {
     if (!state.subscriptions) state.subscriptions = [];
     state.subscriptions.push({ id: uid(), name: item.name, amount: item.amount, category: item.category, frequency: item.frequency });
-    saveData(state);
+    window.saveData(state);
   } else {
     // Add to current month's budget as an expense
-    const mb = ensureMonthOverride(selectedBudgetMonth);
+    const mb = window.ensureMonthOverride(window.selectedBudgetMonth);
     mb.expenses.push({ id: nextId(mb.expenses), name: item.name, amount: item.amount, frequency: 'monthly', category: 'Subscriptions', recurring: true });
-    saveData(state);
+    window.saveData(state);
   }
   _subImportDismissed.add(key);
   renderSubscriptions();

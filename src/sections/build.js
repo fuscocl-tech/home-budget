@@ -400,7 +400,7 @@ export function goalProgress(g) {
     const months = Object.keys(state.budget.actuals).sort().reverse();
     let actual = null;
     for (const m of months) {
-      const catTotal = (getMonthData(m).expenses || [])
+      const catTotal = (window.getMonthData(m).expenses || [])
         .filter(e => (e.category || 'Other') === g.category)
         .reduce((s, e) => s + (state.budget.actuals[m]?.[e.id] || 0), 0);
       if (catTotal > 0) { actual = catTotal; break; }
@@ -418,7 +418,7 @@ export function goalProgress(g) {
     return { pct, label: `${aud(cur)} of ${aud(tgt)} saved`, ok: cur >= tgt };
   }
   if (g.type === 'income') {
-    const cur = monthlyTotal(getMonthData(selectedBudgetMonth).income);
+    const cur = monthlyTotal(window.getMonthData(window.selectedBudgetMonth).income);
     const tgt = g.targetMonthly || 1;
     const pct = Math.min(100, (cur / tgt) * 100);
     return { pct, label: `${aud(cur)}/mo of ${aud(tgt)}/mo target`, ok: cur >= tgt };

@@ -285,7 +285,7 @@ export function saveNWTarget() {
   if (!state.netWorth.target) state.netWorth.target = {};
   state.netWorth.target.amount = amount;
   state.netWorth.target.byYear = byYear;
-  saveData(state); renderNetWorth();
+  window.saveData(state); renderNetWorth();
   closeNWTargetModal();
 }
 
@@ -392,7 +392,7 @@ export function openNWModal(type, id) {
   document.getElementById('nw-payment').value = (item && item.monthlyPayment) ? item.monthlyPayment : '';
   const selectedCat = (item?.category) || cats[0];
   const catWrap = document.getElementById('nw-cat-wrap');
-  if (catWrap) catWrap.innerHTML = customSelect('nw-cat', cats, selectedCat, val => { _csStore['nw-cat'].value = val; });
+  if (catWrap) catWrap.innerHTML = window.customSelect('nw-cat', cats, selectedCat, val => { _csStore['nw-cat'].value = val; });
   const debtFields = document.getElementById('nw-debt-fields');
   if (debtFields) debtFields.style.display = type === 'liability' ? 'flex' : 'none';
   modal.style.display = 'flex';
@@ -419,12 +419,12 @@ export function saveNWItem() {
   } else {
     list.push({ id: uid(), ...entry });
   }
-  saveData(state); closeNWModal(); renderNetWorth();
+  window.saveData(state); closeNWModal(); renderNetWorth();
 }
 export function deleteNWItem(type, id) {
   const list = type === 'asset' ? state.netWorth.assets : state.netWorth.liabilities;
   const idx  = list.findIndex(x => x.id === id);
-  if (idx !== -1) { list.splice(idx, 1); saveData(state); renderNetWorth(); }
+  if (idx !== -1) { list.splice(idx, 1); window.saveData(state); renderNetWorth(); }
 }
 export function saveNWSnapshot() {
   const nw    = state.netWorth;
@@ -436,6 +436,6 @@ export function saveNWSnapshot() {
   const entry    = { date: today, netWorth: total, assets: (nw.assets||[]).reduce((s,a)=>s+(parseFloat(a.value)||0),0), liabilities: (nw.liabilities||[]).reduce((s,l)=>s+(parseFloat(l.value)||0),0) };
   if (existing !== -1) nw.snapshots[existing] = entry;
   else nw.snapshots.push(entry);
-  saveData(state); renderNetWorth();
+  window.saveData(state); renderNetWorth();
 }
 

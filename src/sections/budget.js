@@ -6,7 +6,7 @@ import { freqToMonthly } from '../utils.js';
 
 export function renderExpenseGroups(expenses) {
   const groups   = state.categoryGroups || DEFAULT_DATA.categoryGroups;
-  const actuals  = state.budget.actuals[selectedBudgetMonth] || {};
+  const actuals  = state.budget.actuals[window.selectedBudgetMonth] || {};
   const colors_e = (state.colors || {}).expense || {};
 
   // Categories assigned to any group
@@ -24,14 +24,14 @@ export function renderExpenseGroups(expenses) {
     if (items.length === 0) continue;
 
     const budgeted = items.reduce((s, e) => s + itemMonthly(e), 0);
-    const actual   = items.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+    const actual   = items.reduce((s, e) => s + window.getActual(e.id, window.selectedBudgetMonth), 0);
     const pct      = budgeted > 0 ? Math.round(actual / budgeted * 100) : 0;
     const barPct   = Math.min(100, pct);
     const barColor = pct >= 100 ? 'var(--danger)' : pct >= 80 ? 'var(--warning)' : 'var(--success)';
     const hasActual = actual > 0;
     const over = actual > budgeted && hasActual;
     const firstCat    = items[0] ? (items[0].category || 'Other') : 'Other';
-    const headerColor = colors_e[firstCat] || colors.expense[firstCat] || '#94a3b8';
+    const headerColor = colors_e[firstCat] || window.colors.expense[firstCat] || '#94a3b8';
 
     html += `
     <div style="background:var(--surface);border:1px solid ${over ? 'var(--danger)' : 'var(--border)'};border-radius:10px;overflow:hidden">
@@ -64,9 +64,9 @@ export function renderExpenseGroups(expenses) {
         <div style="max-height:248px;overflow-y:auto">
         ${items.map(e => {
           const eMo    = itemMonthly(e);
-          const eAct   = getActual(e.id, selectedBudgetMonth);
+          const eAct   = window.getActual(e.id, window.selectedBudgetMonth);
           const ePct   = eMo > 0 ? Math.min(100, Math.round(eAct / eMo * 100)) : 0;
-          const eColor = colors_e[e.category || 'Other'] || colors.expense[e.category || 'Other'] || '#94a3b8';
+          const eColor = colors_e[e.category || 'Other'] || window.colors.expense[e.category || 'Other'] || '#94a3b8';
           const eOver  = eAct > eMo && eAct > 0;
           const ringColor = eOver ? 'var(--danger)' : ePct >= 80 ? 'var(--warning)' : eAct > 0 ? eColor : 'var(--border)';
           const tipLabel = eAct > 0
@@ -83,10 +83,10 @@ export function renderExpenseGroups(expenses) {
               <div style="font-size:13px;font-weight:600">${aud(eMo)}/mo</div>
               ${eAct > 0
                 ? `<div style="font-size:11px;font-weight:600;color:${eOver ? 'var(--danger)' : ePct >= 80 ? 'var(--warning)' : 'var(--success)'}">${aud(eAct)} actual${eOver ? ' ▲' : ''}</div>`
-                : `<div style="font-size:11px;color:var(--text-muted);cursor:pointer" onclick="event.stopPropagation();editActual(${e.id})">+ add actual</div>`}
+                : `<div style="font-size:11px;color:var(--text-muted);cursor:pointer" onclick="event.stopPropagation();window.editActual(${e.id})">+ add actual</div>`}
             </div>
             <div style="position:relative;flex-shrink:0;width:32px;height:32px;cursor:pointer"
-                 onclick="event.stopPropagation();editActual(${e.id})"
+                 onclick="event.stopPropagation();window.editActual(${e.id})"
                  onmouseenter="this.querySelector('svg').style.opacity='.25';this.querySelector('.ring-overlay').style.opacity='1'"
                  onmouseleave="this.querySelector('svg').style.opacity='1';this.querySelector('.ring-overlay').style.opacity='0'">
               <svg width="32" height="32" viewBox="0 0 36 36" style="transform:rotate(-90deg);transition:opacity .15s">
@@ -178,13 +178,13 @@ export function _categoryIcon(name) {
 export function renderBudget() {
   try {
   const b = state.budget;
-  const { income: mi, expenses: me } = getMonthData(selectedBudgetMonth);
+  const { income: mi, expenses: me } = window.getMonthData(window.selectedBudgetMonth);
   const totalIncome = monthlyTotal(mi);
   const totalBudgetExpenses = monthlyTotal(me);
   const surplus = totalIncome - totalBudgetExpenses;
 
   // Actuals for selected month
-  const totalActual = me.reduce((sum, e) => sum + getActual(e.id, selectedBudgetMonth), 0);
+  const totalActual = me.reduce((sum, e) => sum + window.getActual(e.id, window.selectedBudgetMonth), 0);
   const totalVariance = totalBudgetExpenses - totalActual;
 
   const surplusClass = surplus >= 0 ? 'positive' : 'negative';
@@ -194,16 +194,16 @@ export function renderBudget() {
   const dayOfMonth = new Date().getDate();
   const pctMonth = Math.round(dayOfMonth / daysInMonth * 100);
   const spentPct = totalBudgetExpenses > 0 ? Math.round(totalActual / totalBudgetExpenses * 100) : 0;
-  const prevMo = prevMonthStr(selectedBudgetMonth);
+  const prevMo = window.prevMonthStr(window.selectedBudgetMonth);
 
   let html = '';
 
   // ── Month picker — top of screen, drives all figures ──
   html += `
     <div class="wallet-month-bar">
-      <button class="wallet-month-btn" onclick="prevMonth()">&#8249;</button>
-      <div class="wallet-month-label">${monthLabel(selectedBudgetMonth)}</div>
-      <button class="wallet-month-btn" onclick="nextMonth()">&#8250;</button>
+      <button class="wallet-month-btn" onclick="window.prevMonth()">&#8249;</button>
+      <div class="wallet-month-label">${window.monthLabel(window.selectedBudgetMonth)}</div>
+      <button class="wallet-month-btn" onclick="window.nextMonth()">&#8250;</button>
     </div>`;
 
   // ── Summary hero card ──
@@ -275,23 +275,23 @@ export function renderBudget() {
     </div>
     <div class="detail-panel ${_budgetDetailOpen ? 'expanded' : 'collapsed'}" id="budget-detail" style="margin:0 -4px">`;
 
-  const showCopyBanner = !isMonthCustomized(selectedBudgetMonth);
+  const showCopyBanner = !window.isMonthCustomized(window.selectedBudgetMonth);
   if (showCopyBanner) {
     html += `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--primary-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;gap:12px;flex-wrap:wrap">
       <div>
         <span style="font-size:13px;font-weight:600;color:var(--primary)">Using default budget</span>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="copyMonthFromPrevious('${selectedBudgetMonth}')">
-        Copy from ${monthLabel(prevMo)}
+      <button class="btn btn-primary btn-sm" onclick="window.copyMonthFromPrevious('${window.selectedBudgetMonth}')">
+        Copy from ${window.monthLabel(prevMo)}
       </button>
     </div>`;
   }
 
   // Planned events forecast widget
-  html += renderBudgetForecast(selectedBudgetMonth, surplus);
+  html += renderBudgetForecast(window.selectedBudgetMonth, surplus);
 
   // Suggestion inbox (planner → budget approvals)
-  html += renderBudgetSuggestions(selectedBudgetMonth);
+  html += renderBudgetSuggestions(window.selectedBudgetMonth);
 
   // Income — full width
   html += `
@@ -311,7 +311,7 @@ export function renderBudget() {
               const dueLabel = i.dueDate ? (() => { const [y,m,d] = i.dueDate.split('-'); return `${d}/${m}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
               const incOneTimeBadge = i.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
               return `<tr>
-              <td style="font-weight:500;border-left:4px solid ${colors.income}">${escHtml(i.name)}${incOneTimeBadge}</td>
+              <td style="font-weight:500;border-left:4px solid ${window.colors.income}">${escHtml(i.name)}${incOneTimeBadge}</td>
               <td class="amount">${audD(i.amount)}</td>
               <td>${dueLabel}</td>
               <td style="color:var(--text-muted)">${freqDisplayItem(i)}</td>
@@ -332,11 +332,11 @@ export function renderBudget() {
 
   // Category filter (table view only)
   const allCats = ['all', ...Array.from(new Set(me.map(e => e.category || 'Other'))).sort()];
-  const filteredExpenses = expenseFilterCat === 'all' ? me : me.filter(e => (e.category || 'Other') === expenseFilterCat);
+  const filteredExpenses = window.expenseFilterCat === 'all' ? me : me.filter(e => (e.category || 'Other') === window.expenseFilterCat);
   const catBudget   = filteredExpenses.reduce((s, e) => s + itemMonthly(e), 0);
-  const catActual   = filteredExpenses.reduce((s, e) => s + getActual(e.id, selectedBudgetMonth), 0);
+  const catActual   = filteredExpenses.reduce((s, e) => s + window.getActual(e.id, window.selectedBudgetMonth), 0);
   const catVariance = catBudget - catActual;
-  const isFiltered  = expenseFilterCat !== 'all';
+  const isFiltered  = window.expenseFilterCat !== 'all';
 
   html += `
     <div class="section">
@@ -350,29 +350,29 @@ export function renderBudget() {
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden">
-            <button onclick="setBudgetView('grouped')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:${budgetViewMode==='grouped'?'var(--primary)':'var(--surface)'};color:${budgetViewMode==='grouped'?'#fff':'var(--text-muted)'}">⊞ Groups</button>
-            <button onclick="setBudgetView('table')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;border-left:1px solid var(--border);cursor:pointer;background:${budgetViewMode==='table'?'var(--primary)':'var(--surface)'};color:${budgetViewMode==='table'?'#fff':'var(--text-muted)'}">≡ Table</button>
+            <button onclick="setBudgetView('grouped')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:${window.budgetViewMode==='grouped'?'var(--primary)':'var(--surface)'};color:${window.budgetViewMode==='grouped'?'#fff':'var(--text-muted)'}">⊞ Groups</button>
+            <button onclick="setBudgetView('table')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;border-left:1px solid var(--border);cursor:pointer;background:${window.budgetViewMode==='table'?'var(--primary)':'var(--surface)'};color:${window.budgetViewMode==='table'?'#fff':'var(--text-muted)'}">≡ Table</button>
           </div>
-          ${budgetViewMode === 'table' ? `<select class="form-select" style="width:auto;padding:6px 10px;font-size:12px" onchange="setExpenseFilter(this.value)">
-            ${allCats.map(c => `<option value="${c}" ${expenseFilterCat===c?'selected':''}>${c === 'all' ? 'All categories' : c}</option>`).join('')}
+          ${window.budgetViewMode === 'table' ? `<select class="form-select" style="width:auto;padding:6px 10px;font-size:12px" onchange="window.setExpenseFilter(this.value)">
+            ${allCats.map(c => `<option value="${c}" ${window.expenseFilterCat===c?'selected':''}>${c === 'all' ? 'All categories' : c}</option>`).join('')}
           </select>` : ''}
           <button class="btn btn-primary btn-sm" onclick="openAddExpense()">+ Expense</button>
         </div>
       </div>
 
       <div style="padding:16px 20px">
-      ${budgetViewMode === 'grouped' ? renderExpenseGroups(me) : `
+      ${window.budgetViewMode === 'grouped' ? renderExpenseGroups(me) : `
         <div class="table-wrap" style="margin:0 -20px">
           <table>
             <thead>
               <tr>
-                ${thSort('name', 'Item')}
-                ${thSort('category', 'Category')}
-                ${thSort('frequency', 'Frequency')}
-                ${thSort('due', 'Due')}
-                ${thSort('budget', 'Budget/mo')}
+                ${window.thSort('name', 'Item')}
+                ${window.thSort('category', 'Category')}
+                ${window.thSort('frequency', 'Frequency')}
+                ${window.thSort('due', 'Due')}
+                ${window.thSort('budget', 'Budget/mo')}
                 <th>Actual <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-muted)">(click to edit)</span></th>
-                ${thSort('variance', 'Variance')}
+                ${window.thSort('variance', 'Variance')}
                 <th></th>
               </tr>
             </thead>
@@ -381,21 +381,21 @@ export function renderBudget() {
                 ? `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>${me.length === 0 ? 'Add your household expenses' : 'No expenses in this category'}</div></td></tr>`
                 : (() => {
                     const sorted = [...filteredExpenses].sort((a, b) => {
-                      if (!expenseSortCol) return 0;
+                      if (!window.expenseSortCol) return 0;
                       let av, bv;
-                      if (expenseSortCol === 'name')           { av = a.name.toLowerCase();                                    bv = b.name.toLowerCase(); }
-                      else if (expenseSortCol === 'category')  { av = (a.category||'Other').toLowerCase();                     bv = (b.category||'Other').toLowerCase(); }
-                      else if (expenseSortCol === 'frequency') { av = freqDisplayItem(a);                                      bv = freqDisplayItem(b); }
-                      else if (expenseSortCol === 'due')       { av = a.dueDate || '\uffff';                                   bv = b.dueDate || '\uffff'; }
-                      else if (expenseSortCol === 'budget')    { av = itemMonthly(a);                                          bv = itemMonthly(b); }
-                      else if (expenseSortCol === 'actual')    { av = getActual(a.id, selectedBudgetMonth);                    bv = getActual(b.id, selectedBudgetMonth); }
-                      else if (expenseSortCol === 'variance')  { av = itemMonthly(a)-getActual(a.id,selectedBudgetMonth);      bv = itemMonthly(b)-getActual(b.id,selectedBudgetMonth); }
+                      if (window.expenseSortCol === 'name')           { av = a.name.toLowerCase();                                    bv = b.name.toLowerCase(); }
+                      else if (window.expenseSortCol === 'category')  { av = (a.category||'Other').toLowerCase();                     bv = (b.category||'Other').toLowerCase(); }
+                      else if (window.expenseSortCol === 'frequency') { av = freqDisplayItem(a);                                      bv = freqDisplayItem(b); }
+                      else if (window.expenseSortCol === 'due')       { av = a.dueDate || '\uffff';                                   bv = b.dueDate || '\uffff'; }
+                      else if (window.expenseSortCol === 'budget')    { av = itemMonthly(a);                                          bv = itemMonthly(b); }
+                      else if (window.expenseSortCol === 'actual')    { av = window.getActual(a.id, window.selectedBudgetMonth);                    bv = window.getActual(b.id, window.selectedBudgetMonth); }
+                      else if (window.expenseSortCol === 'variance')  { av = itemMonthly(a)-window.getActual(a.id,window.selectedBudgetMonth);      bv = itemMonthly(b)-window.getActual(b.id,window.selectedBudgetMonth); }
                       else return 0;
-                      return av < bv ? (expenseSortDir==='asc'?-1:1) : av > bv ? (expenseSortDir==='asc'?1:-1) : 0;
+                      return av < bv ? (window.expenseSortDir==='asc'?-1:1) : av > bv ? (window.expenseSortDir==='asc'?1:-1) : 0;
                     });
                     return sorted.map(e => {
                       const budgetMo = itemMonthly(e);
-                      const actual   = getActual(e.id, selectedBudgetMonth);
+                      const actual   = window.getActual(e.id, window.selectedBudgetMonth);
                       const variance = budgetMo - actual;
                       const hasAct   = actual > 0;
                       let varianceHtml;
@@ -403,7 +403,7 @@ export function renderBudget() {
                       else if (variance >= 0) varianceHtml = `<span class="var-under">▼ ${aud(variance)}</span>`;
                       else varianceHtml = `<span class="var-over">▲ ${aud(Math.abs(variance))}</span>`;
                       const dueLabel = e.dueDate ? (() => { const [y,mo,d] = e.dueDate.split('-'); return `${d}/${mo}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
-                      const rowColor = colors.expense[e.category || 'Other'] || '#94a3b8';
+                      const rowColor = window.colors.expense[e.category || 'Other'] || '#94a3b8';
                       const oneTimeBadge = e.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
                       return `<tr>
                         <td style="font-weight:500;border-left:4px solid ${rowColor}">${escHtml(e.name)}${oneTimeBadge}${e.vendor ? `<br><span style="font-size:11px;font-weight:400;color:var(--text-muted)">${escHtml(e.vendor)}</span>` : ''}</td>
@@ -411,7 +411,7 @@ export function renderBudget() {
                         <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
                         <td>${dueLabel}</td>
                         <td class="amount">${aud(budgetMo)}</td>
-                        <td class="actual-cell amount" id="actual-${e.id}" onclick="editActual(${e.id})">${hasAct ? aud(actual) : '<span style="color:var(--text-muted);font-size:12px">+ add</span>'}</td>
+                        <td class="actual-cell amount" id="actual-${e.id}" onclick="window.editActual(${e.id})">${hasAct ? aud(actual) : '<span style="color:var(--text-muted);font-size:12px">+ add</span>'}</td>
                         <td>${varianceHtml}</td>
                         <td class="actions">
                           <button class="btn btn-ghost btn-sm" onclick="openEditExpense(${e.id})">✏️</button>
@@ -425,7 +425,7 @@ export function renderBudget() {
             ${filteredExpenses.length > 0 ? `
             <tfoot>
               <tr style="background:var(--surface2);border-top:2px solid var(--border)">
-                <td colspan="4" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">Total ${isFiltered ? expenseFilterCat : 'all categories'}</td>
+                <td colspan="4" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">Total ${isFiltered ? window.expenseFilterCat : 'all categories'}</td>
                 <td class="amount" style="padding:11px 16px;font-weight:700">${aud(catBudget)}/mo</td>
                 <td class="amount" style="padding:11px 16px;font-weight:700">${catActual > 0 ? aud(catActual) : '—'}</td>
                 <td style="padding:11px 16px;font-weight:700">${catActual > 0 ? `<span class="${catVariance>=0?'var-under':'var-over'}">${catVariance>=0?'▼':'▲'} ${aud(Math.abs(catVariance))}</span>` : '—'}</td>
@@ -484,7 +484,7 @@ export function openModal(title, bodyHtml, onSave) {
 }
 
 export function closeModal() {
-  _pendingLogEntry = null;
+  window._pendingLogEntry = null;
   window._actualEditorRefresh = null;
   window._csvSuggestions = null;
   window._csvSuggestNames = null;
@@ -508,11 +508,11 @@ export function openEditContractTotal() {
   `, () => {
     const v = parseFloat(document.getElementById('f-contract-total').value);
     if (!isNaN(v) && v > 0) {
-      logActivity('Updated contract total', aud(v));
+      window.logActivity('Updated contract total', aud(v));
       state.buildContract.total = v;
-      saveData(state);
+      window.saveData(state);
       closeModal();
-      renderAll();
+      window.renderAll();
     }
   });
 }
@@ -585,9 +585,9 @@ export function openAddStage() {
   openModal('Add Contract Stage', stageForm(), () => {
     const s = stageFromForm(nextId(state.buildContract.stages));
     if (!s.name) return;
-    logActivity('Added build stage', s.name);
+    window.logActivity('Added build stage', s.name);
     state.buildContract.stages.push(s);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); closeModal(); window.renderAll();
   });
 }
 
@@ -595,18 +595,18 @@ export function openEditStage(id) {
   const s = state.buildContract.stages.find(x => x.id === id);
   openModal('Edit Stage', stageForm(s), () => {
     const updated = stageFromForm(id);
-    logActivity('Edited build stage', updated.name || s.name);
+    window.logActivity('Edited build stage', updated.name || s.name);
     Object.assign(s, updated);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); closeModal(); window.renderAll();
   });
 }
 
 export function deleteStage(id) {
   if (!confirm('Delete this stage?')) return;
   const s = state.buildContract.stages.find(x => x.id === id);
-  logActivity('Deleted build stage', s ? s.name : '');
+  window.logActivity('Deleted build stage', s ? s.name : '');
   state.buildContract.stages = state.buildContract.stages.filter(s => s.id !== id);
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 // ─── Variations ───────────────────────────────────
@@ -679,9 +679,9 @@ export function openAddVariation() {
   openModal('Add Variation', variationForm(), () => {
     const v = variationFromForm(nextId(state.buildContract.variations));
     if (!v.name) return;
-    logActivity('Added variation', `${v.ref ? v.ref+' · ' : ''}${v.name}`);
+    window.logActivity('Added variation', `${v.ref ? v.ref+' · ' : ''}${v.name}`);
     state.buildContract.variations.push(v);
-    saveData(state); renderBuild();
+    window.saveData(state); renderBuild();
   });
 }
 
@@ -690,19 +690,19 @@ export function openEditVariation(id) {
   openModal('Edit Variation', variationForm(v), () => {
     const updated = variationFromForm(id);
     if (!updated.name) return;
-    logActivity('Edited variation', `${updated.ref ? updated.ref+' · ' : ''}${updated.name}`);
+    window.logActivity('Edited variation', `${updated.ref ? updated.ref+' · ' : ''}${updated.name}`);
     const idx = state.buildContract.variations.findIndex(x => x.id === id);
     if (idx !== -1) state.buildContract.variations[idx] = updated;
-    saveData(state); renderBuild();
+    window.saveData(state); renderBuild();
   });
 }
 
 export function deleteVariation(id) {
   if (!confirm('Delete this variation?')) return;
   const v = state.buildContract.variations.find(x => x.id === id);
-  logActivity('Deleted variation', v ? v.name : '');
+  window.logActivity('Deleted variation', v ? v.name : '');
   state.buildContract.variations = state.buildContract.variations.filter(x => x.id !== id);
-  saveData(state); renderBuild();
+  window.saveData(state); renderBuild();
 }
 
 // ─── Extras ───────────────────────────────────────
@@ -784,9 +784,9 @@ export function openAddExtra() {
   openModal('Add Outside Contract Item', extraForm(), () => {
     const e = extraFromForm(nextId(state.extras));
     if (!e.name) return;
-    logActivity('Added extra item', e.name);
+    window.logActivity('Added extra item', e.name);
     state.extras.push(e);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); closeModal(); window.renderAll();
   });
 }
 
@@ -794,18 +794,18 @@ export function openEditExtra(id) {
   const e = state.extras.find(x => x.id === id);
   openModal('Edit Item', extraForm(e), () => {
     const updated = extraFromForm(id);
-    logActivity('Edited extra item', updated.name || e.name);
+    window.logActivity('Edited extra item', updated.name || e.name);
     Object.assign(e, updated);
-    saveData(state); closeModal(); renderAll();
+    window.saveData(state); closeModal(); window.renderAll();
   });
 }
 
 export function deleteExtra(id) {
   if (!confirm('Delete this item?')) return;
   const e = state.extras.find(x => x.id === id);
-  logActivity('Deleted extra item', e ? e.name : '');
+  window.logActivity('Deleted extra item', e ? e.name : '');
   state.extras = state.extras.filter(e => e.id !== id);
-  saveData(state); renderAll();
+  window.saveData(state); window.renderAll();
 }
 
 // ─── Income ───────────────────────────────────────
@@ -878,74 +878,74 @@ export function incomeFromForm(id) {
 
 export function openAddIncome() {
   openModal('Add Income', incomeForm(), () => {
-    const item = incomeFromForm(nextId(getMonthData(selectedBudgetMonth).income));
+    const item = incomeFromForm(nextId(window.getMonthData(window.selectedBudgetMonth).income));
     if (!item.name) return;
-    logActivity('Added income', item.name);
-    confirmScope(
+    window.logActivity('Added income', item.name);
+    window.confirmScope(
       () => {
-        const mb = ensureMonthOverride(selectedBudgetMonth);
+        const mb = window.ensureMonthOverride(window.selectedBudgetMonth);
         item.id = nextId(mb.income);
         mb.income.push(item);
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       },
       () => {
         item.id = nextId(state.budget.income);
         state.budget.income.push(item);
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       }
     );
   });
 }
 
 export function openEditIncome(id) {
-  const src = getMonthData(selectedBudgetMonth).income.find(x => x.id === id);
+  const src = window.getMonthData(window.selectedBudgetMonth).income.find(x => x.id === id);
   openModal('Edit Income', incomeForm(src), () => {
     const updated = incomeFromForm(id);
-    logActivity('Edited income', updated.name || (src && src.name) || '');
-    confirmScope(
+    window.logActivity('Edited income', updated.name || (src && src.name) || '');
+    window.confirmScope(
       () => {
-        const mb = ensureMonthOverride(selectedBudgetMonth);
+        const mb = window.ensureMonthOverride(window.selectedBudgetMonth);
         const item = mb.income.find(x => x.id === id);
         if (item) Object.assign(item, updated); else mb.income.push(updated);
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       },
       () => {
         const item = state.budget.income.find(x => x.id === id);
         if (item) Object.assign(item, updated);
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       }
     );
   });
 }
 
 export function deleteIncome(id) {
-  const src = getMonthData(selectedBudgetMonth).income.find(x => x.id === id);
+  const src = window.getMonthData(window.selectedBudgetMonth).income.find(x => x.id === id);
   const name = src ? src.name : 'this income';
-  logActivity('Deleted income', name);
-  _scopePending = null;
+  window.logActivity('Deleted income', name);
+  window._scopePending = null;
   document.getElementById('modal-title').textContent = 'Delete income';
   document.getElementById('modal-body').innerHTML = `
     <p style="font-size:14px;line-height:1.6;margin:0;color:var(--text-muted)">
       Delete <strong style="color:var(--text)">${name}</strong>? Apply to
-      <strong style="color:var(--text)">${monthLabel(selectedBudgetMonth)}</strong> only,
+      <strong style="color:var(--text)">${window.monthLabel(window.selectedBudgetMonth)}</strong> only,
       or remove from all months?
     </p>`;
-  _scopePending = {
+  window._scopePending = {
     onThisMonth: () => {
-      const mb = ensureMonthOverride(selectedBudgetMonth);
+      const mb = window.ensureMonthOverride(window.selectedBudgetMonth);
       mb.income = mb.income.filter(i => i.id !== id);
-      saveData(state); renderAll();
+      window.saveData(state); window.renderAll();
     },
     onAllMonths: () => {
       state.budget.income = state.budget.income.filter(i => i.id !== id);
       if (state.budget.months) Object.values(state.budget.months).forEach(m => { m.income = m.income.filter(i => i.id !== id); });
-      saveData(state); renderAll();
+      window.saveData(state); window.renderAll();
     }
   };
   document.getElementById('modal-footer').innerHTML = `
     <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-secondary" onclick="doScopeAll()">Remove from all months</button>
-    <button class="btn btn-danger" onclick="doScopeMonth()">Delete from ${monthLabel(selectedBudgetMonth)}</button>
+    <button class="btn btn-secondary" onclick="window.doScopeAll()">Remove from all months</button>
+    <button class="btn btn-danger" onclick="window.doScopeMonth()">Delete from ${window.monthLabel(window.selectedBudgetMonth)}</button>
   `;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -1040,52 +1040,52 @@ export function toggleCustomFreq(prefix) {
 
 export function openAddExpense() {
   openModal('Add Expense', expenseForm(), () => {
-    const item = expenseFromForm(nextId(getMonthData(selectedBudgetMonth).expenses));
+    const item = expenseFromForm(nextId(window.getMonthData(window.selectedBudgetMonth).expenses));
     if (!item.name) return;
-    logActivity('Added expense', `${item.name} (${item.category || 'Other'})`);
-    confirmScope(
+    window.logActivity('Added expense', `${item.name} (${item.category || 'Other'})`);
+    window.confirmScope(
       () => {
-        const mb = ensureMonthOverride(selectedBudgetMonth);
+        const mb = window.ensureMonthOverride(window.selectedBudgetMonth);
         item.id = nextId(mb.expenses);
         mb.expenses.push(item);
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       },
       () => {
         item.id = nextId(state.budget.expenses);
         state.budget.expenses.push(item);
         // Also add to current month's override so it appears immediately
-        if (isMonthCustomized(selectedBudgetMonth)) {
-          const mb = state.budget.months[selectedBudgetMonth];
+        if (window.isMonthCustomized(window.selectedBudgetMonth)) {
+          const mb = state.budget.months[window.selectedBudgetMonth];
           mb.expenses.push({ ...item, id: nextId(mb.expenses) });
         }
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       }
     );
   });
 }
 
 export function openEditExpense(id) {
-  const src = getMonthData(selectedBudgetMonth).expenses.find(x => x.id === id);
+  const src = window.getMonthData(window.selectedBudgetMonth).expenses.find(x => x.id === id);
   openModal('Edit Expense', expenseForm(src), () => {
     const updated = expenseFromForm(id);
-    logActivity('Edited expense', `${updated.name || (src && src.name) || ''} (${updated.category || 'Other'})`);
-    confirmScope(
+    window.logActivity('Edited expense', `${updated.name || (src && src.name) || ''} (${updated.category || 'Other'})`);
+    window.confirmScope(
       () => {
-        const mb = ensureMonthOverride(selectedBudgetMonth);
+        const mb = window.ensureMonthOverride(window.selectedBudgetMonth);
         const item = mb.expenses.find(x => x.id === id);
         if (item) Object.assign(item, updated); else mb.expenses.push(updated);
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       },
       () => {
         const item = state.budget.expenses.find(x => x.id === id);
         if (item) Object.assign(item, updated);
         // Also update current month's override if it exists
-        if (isMonthCustomized(selectedBudgetMonth)) {
-          const mb = state.budget.months[selectedBudgetMonth];
+        if (window.isMonthCustomized(window.selectedBudgetMonth)) {
+          const mb = state.budget.months[window.selectedBudgetMonth];
           const mItem = mb.expenses.find(x => x.id === id);
           if (mItem) Object.assign(mItem, updated);
         }
-        saveData(state); renderAll();
+        window.saveData(state); window.renderAll();
       }
     );
   });
@@ -1100,32 +1100,32 @@ export function openEditExpense(id) {
 }
 
 export function deleteExpense(id) {
-  const src = getMonthData(selectedBudgetMonth).expenses.find(x => x.id === id);
+  const src = window.getMonthData(window.selectedBudgetMonth).expenses.find(x => x.id === id);
   const name = src ? src.name : 'this expense';
-  logActivity('Deleted expense', name);
-  _scopePending = {
+  window.logActivity('Deleted expense', name);
+  window._scopePending = {
     onThisMonth: () => {
-      const mb = ensureMonthOverride(selectedBudgetMonth);
+      const mb = window.ensureMonthOverride(window.selectedBudgetMonth);
       mb.expenses = mb.expenses.filter(e => e.id !== id);
-      saveData(state); renderAll();
+      window.saveData(state); window.renderAll();
     },
     onAllMonths: () => {
       state.budget.expenses = state.budget.expenses.filter(e => e.id !== id);
       if (state.budget.months) Object.values(state.budget.months).forEach(m => { m.expenses = m.expenses.filter(e => e.id !== id); });
-      saveData(state); renderAll();
+      window.saveData(state); window.renderAll();
     }
   };
   document.getElementById('modal-title').textContent = 'Delete expense';
   document.getElementById('modal-body').innerHTML = `
     <p style="font-size:14px;line-height:1.6;margin:0;color:var(--text-muted)">
       Delete <strong style="color:var(--text)">${name}</strong>? Apply to
-      <strong style="color:var(--text)">${monthLabel(selectedBudgetMonth)}</strong> only,
+      <strong style="color:var(--text)">${window.monthLabel(window.selectedBudgetMonth)}</strong> only,
       or remove from all months?
     </p>`;
   document.getElementById('modal-footer').innerHTML = `
     <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-secondary" onclick="doScopeAll()">Remove from all months</button>
-    <button class="btn btn-danger" onclick="doScopeMonth()">Delete from ${monthLabel(selectedBudgetMonth)}</button>
+    <button class="btn btn-secondary" onclick="window.doScopeAll()">Remove from all months</button>
+    <button class="btn btn-danger" onclick="window.doScopeMonth()">Delete from ${window.monthLabel(window.selectedBudgetMonth)}</button>
   `;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }

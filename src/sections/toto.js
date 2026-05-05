@@ -145,7 +145,7 @@ export function _buildTotoContext() {
       return `- ${d}: ${e.title} (${cat.label})${est>0?' — $'+est.toLocaleString('en-AU')+' budgeted':''}${e.notes?' — Notes: '+e.notes:''}`;
     }).join('\n') || 'None';
 
-  const curData = getMonthData(selectedBudgetMonth);
+  const curData = window.getMonthData(window.selectedBudgetMonth);
   const income  = monthlyTotal(curData.income);
   const expenses = monthlyTotal(curData.expenses);
   const surplus = income - expenses;

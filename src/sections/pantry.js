@@ -102,7 +102,7 @@ export function cyclePantryStatus(id) {
   if (!item) return;
   const cycle = { stocked: 'low', low: 'need', need: 'stocked' };
   item.status = cycle[item.status] || 'stocked';
-  saveData(state);
+  window.saveData(state);
   renderPantry();
 }
 
@@ -142,8 +142,8 @@ export function openPantryForm(editId) {
     </div>`;
 
   document.getElementById('modal-footer').innerHTML = `
-    ${item ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="deletePantryItem(${editId});closeModal()">Delete</button>` : ''}
-    <button class="btn" onclick="closeModal()">Cancel</button>
+    ${item ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="deletePantryItem(${editId});window.closeModal()">Delete</button>` : ''}
+    <button class="btn" onclick="window.closeModal()">Cancel</button>
     <button class="btn btn-primary" onclick="savePantryItem(${editId || 'null'})">Save</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -166,14 +166,14 @@ export function savePantryItem(editId) {
     data.id = pantry.length ? Math.max(...pantry.map(i => i.id)) + 1 : 1;
     pantry.push(data);
   }
-  saveData(state);
-  closeModal();
+  window.saveData(state);
+  window.closeModal();
   renderPantry();
 }
 
 export function deletePantryItem(id) {
   state.meals.pantry = (state.meals.pantry || []).filter(i => i.id !== id);
-  saveData(state);
+  window.saveData(state);
   renderPantry();
 }
 
@@ -183,7 +183,7 @@ export function quickAddPantry(name, cat) {
     id: pantry.length ? Math.max(...pantry.map(i => i.id)) + 1 : 1,
     name, cat, qty: '', status: 'stocked'
   });
-  saveData(state);
+  window.saveData(state);
   renderPantry();
 }
 
@@ -202,7 +202,7 @@ export function pantryToShoppingList() {
     }
   });
   if (added > 0) {
-    saveData(state);
+    window.saveData(state);
     _listsActiveType = 'food';
     _listsView = 'list';
     activateTab('lists');

@@ -11,9 +11,9 @@ export function openDatePicker(evt) {
   if (!popup) return;
   const val = (dpDateInput() || {}).value || '';
   if (val) {
-    [dpViewYear, dpViewMonth] = val.split('-').map(Number);
+    [window.dpViewYear, window.dpViewMonth] = val.split('-').map(Number);
   } else {
-    const n = new Date(); dpViewYear = n.getFullYear(); dpViewMonth = n.getMonth() + 1;
+    const n = new Date(); window.dpViewYear = n.getFullYear(); window.dpViewMonth = n.getMonth() + 1;
   }
   popup.classList.remove('hidden');
   renderDpCalendar();
@@ -28,7 +28,7 @@ export function openDatePicker(evt) {
 export function renderDpCalendar() {
   const popup = document.getElementById('dp-popup');
   if (!popup) return;
-  const year = dpViewYear, month = dpViewMonth;
+  const year = window.dpViewYear, month = window.dpViewMonth;
   const firstDow = new Date(year, month - 1, 1).getDay();
   const daysInMonth = new Date(year, month, 0).getDate();
   const today = new Date();
@@ -58,13 +58,13 @@ export function renderDpCalendar() {
 
 export function dpPrevMonth(evt) {
   evt.stopPropagation();
-  if (dpViewMonth === 1) { dpViewMonth = 12; dpViewYear--; } else dpViewMonth--;
+  if (window.dpViewMonth === 1) { window.dpViewMonth = 12; window.dpViewYear--; } else window.dpViewMonth--;
   renderDpCalendar();
 }
 
 export function dpNextMonth(evt) {
   evt.stopPropagation();
-  if (dpViewMonth === 12) { dpViewMonth = 1; dpViewYear++; } else dpViewMonth++;
+  if (window.dpViewMonth === 12) { window.dpViewMonth = 1; window.dpViewYear++; } else window.dpViewMonth++;
   renderDpCalendar();
 }
 

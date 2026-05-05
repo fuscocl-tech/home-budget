@@ -191,7 +191,7 @@ export function openDocForm(editId) {
 
   document.getElementById('modal-footer').innerHTML = `
     ${isEdit ? `<button class="btn" style="color:var(--danger);margin-right:auto" onclick="deleteDoc(${editId})">Delete</button>` : ''}
-    <button class="btn" onclick="closeModal()">Cancel</button>
+    <button class="btn" onclick="window.closeModal()">Cancel</button>
     <button class="btn btn-primary" onclick="saveDoc(${editId || 'null'})">Save</button>`;
   document.getElementById('modal-overlay').classList.remove('hidden');
 }
@@ -237,9 +237,9 @@ export function saveDoc(editId) {
     else { billEntry.id = uid(); state.bills.push(billEntry); }
   }
 
-  saveData(state);
-  closeModal();
-  renderAll();
+  window.saveData(state);
+  window.closeModal();
+  window.renderAll();
 }
 
 export function deleteDoc(id) {
@@ -248,8 +248,8 @@ export function deleteDoc(id) {
   const tag = `doc_${id}`;
   state.bills = (state.bills || []).filter(b => b._docRef !== tag);
   state.documents = state.documents.filter(d => d.id !== id);
-  saveData(state);
-  closeModal();
-  renderAll();
+  window.saveData(state);
+  window.closeModal();
+  window.renderAll();
 }
 

@@ -81,8 +81,8 @@ export function _qahAction(type) {
       activateTab('planner');
       setTimeout(() => openPlannerModal(null, new Date().toISOString().slice(0,10)), 300);
     } else if (type === 'expense') {
-      const expenses = getMonthData(selectedBudgetMonth).expenses;
-      const lastId = parseInt(_secureGet('toto_qa_last') || '0');
+      const expenses = window.getMonthData(window.selectedBudgetMonth).expenses;
+      const lastId = parseInt(window._secureGet('toto_qa_last') || '0');
       _qaExpenseId = expenses.find(e => e.id === lastId)?.id ?? (expenses[0]?.id ?? null);
       _qaAmount = '';
       _renderQASheet(expenses);
@@ -182,8 +182,8 @@ export async function _qahApplyParsed(parsed, originalText) {
       if (dispEl && typeof _pmFmtDateShort === 'function') dispEl.textContent = _pmFmtDateShort(parsed.date);
     }
   } else if (parsed.type === 'expense') {
-    const expenses = getMonthData(selectedBudgetMonth).expenses;
-    const lastId = parseInt(_secureGet('toto_qa_last') || '0');
+    const expenses = window.getMonthData(window.selectedBudgetMonth).expenses;
+    const lastId = parseInt(window._secureGet('toto_qa_last') || '0');
     _qaExpenseId = expenses.find(e => e.id === lastId)?.id ?? (expenses[0]?.id ?? null);
     _qaAmount = parsed.amount ? String(parsed.amount) : '';
     _renderQASheet(expenses);
@@ -235,7 +235,7 @@ export async function _qahApplyParsed(parsed, originalText) {
 }
 
 export function _renderQASheet(expensesArg) {
-  const expenses = expensesArg || getMonthData(selectedBudgetMonth).expenses;
+  const expenses = expensesArg || window.getMonthData(window.selectedBudgetMonth).expenses;
   const display  = _qaAmount ? `$${_qaAmount}` : '$0';
   const isZero   = !_qaAmount;
 
@@ -313,16 +313,16 @@ export function saveQuickAdd() {
   const note  = document.getElementById('qa-note')?.value.trim() || '';
   const today = new Date().toISOString().slice(0, 10);
 
-  if (!state.budget.actuals[selectedBudgetMonth]) state.budget.actuals[selectedBudgetMonth] = {};
-  const entries = getActualEntries(_qaExpenseId, selectedBudgetMonth);
+  if (!state.budget.actuals[window.selectedBudgetMonth]) state.budget.actuals[window.selectedBudgetMonth] = {};
+  const entries = window.getActualEntries(_qaExpenseId, window.selectedBudgetMonth);
   const newId   = entries.length ? Math.max(...entries.map(e => e.id)) + 1 : 1;
   entries.push({ id: newId, amount, date: today, note });
-  state.budget.actuals[selectedBudgetMonth][_qaExpenseId] = entries;
+  state.budget.actuals[window.selectedBudgetMonth][_qaExpenseId] = entries;
 
-  _secureSet('toto_qa_last', String(_qaExpenseId));
-  saveData(state);
+  window._secureSet('toto_qa_last', String(_qaExpenseId));
+  window.saveData(state);
   closeQuickAdd();
-  renderAll();
+  window.renderAll();
 
   // FAB flash confirmation
   const fab = document.getElementById('qa-fab');

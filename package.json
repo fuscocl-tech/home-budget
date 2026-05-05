@@ -11,7 +11,7 @@
     "dev": "npx serve . -p 3000",
     "dev:vite": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 3000",
+    "preview": "node scripts/serve-www.mjs",
     "sim": "vite build && npx cap sync ios"
   },
   "repository": {
