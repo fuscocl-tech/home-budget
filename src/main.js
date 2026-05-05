@@ -6,6 +6,12 @@ import {
   SECTIONS, _tabSection, _activeTab, _sectionPillsHtml,
   _updatePillsOverflow, _activateTabInternal, activateTab, setRenderCallback,
 } from './router.js';
+import {
+  escHtml, escAttr, sanitiseState,
+  aud, audD, fmtNW, fmtDate, isOverdue,
+  freqLabel, freqDisplay, freqDisplayItem, freqLabelItem, itemMonthly, monthlyTotal,
+  nextId,
+} from './sections/format.js';
 
 // Wire login buttons immediately — modules are deferred so DOMContentLoaded
 // has already fired. Using lambdas means guestMode/signInWithGoogle are
@@ -375,36 +381,7 @@ function upgradeSelects(container) {
 })();
 // ───────────────────────────────────────────────────
 
-function escHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-// Escape for use inside onclick="..." attributes (single-quote safe)
-function escAttr(str) {
-  return escHtml(str).replace(/\\/g, '\\\\');
-}
-function sanitiseState(data) {
-  const MAX_STR = 500;
-  function walk(obj) {
-    if (!obj || typeof obj !== 'object') return;
-    for (const key of Object.keys(obj)) {
-      if (typeof obj[key] === 'string' && obj[key].length > MAX_STR) {
-        obj[key] = obj[key].slice(0, MAX_STR);
-      } else if (Array.isArray(obj[key])) {
-        obj[key].forEach(item => walk(item));
-      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-        walk(obj[key]);
-      }
-    }
-  }
-  walk(data);
-}
+// escHtml, escAttr, sanitiseState imported from ./sections/format.js
 const CLAUDE_API  = 'https://wandering-mouse-3925.fuscocl.workers.dev';
 
 const DEFAULT_DATA = {
@@ -3951,30 +3928,7 @@ function saveQuickAdd() {
   }
 }
 
-function nextId(arr) {
-  return arr.length ? Math.max(...arr.map(x => x.id)) + 1 : 1;
-}
-
-// ─────────────────────────────────────────────────
-// FORMATTING
-// ─────────────────────────────────────────────────
-
-const fmt = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
-const fmtD = new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-function aud(n) { return fmt.format(n || 0); }
-function audD(n) { return fmtD.format(n || 0); }
-
-function fmtDate(d) {
-  if (!d) return '—';
-  const [y,m,day] = d.split('-');
-  return `${day}/${m}/${y}`;
-}
-
-function isOverdue(dueDate) {
-  if (!dueDate) return false;
-  return new Date(dueDate) < new Date() ;
-}
+// nextId, aud, audD, fmtDate, isOverdue imported from ./sections/format.js
 
 // ─────────────────────────────────────────────────
 // NAVIGATION
@@ -6329,45 +6283,8 @@ function renderBuild() {
 
 // freqToMonthly imported from ./utils.js
 
-function monthlyTotal(items) {
-  return items.reduce((sum, i) => sum + itemMonthly(i), 0);
-}
-
-function freqLabel(f) {
-  return { daily:'/day', weekly:'/wk', fortnightly:'/fn', monthly:'/mo', quarterly:'/qtr', annually:'/yr', annual:'/yr' }[f] || '/mo';
-}
-
-function freqDisplay(f) {
-  return { daily:'Daily', weekly:'Weekly', fortnightly:'Fortnightly', monthly:'Monthly', quarterly:'Quarterly', annually:'Annually', annual:'Annually', custom:'Custom' }[f] || 'Monthly';
-}
-
-function freqDisplayItem(item) {
-  if ((item.frequency || 'monthly') === 'custom') {
-    return `Every ${item.customEvery || 1} ${item.customUnit || 'weeks'}`;
-  }
-  return freqDisplay(item.frequency || 'monthly');
-}
-
-function freqLabelItem(item) {
-  if ((item.frequency || 'monthly') === 'custom') {
-    const n = item.customEvery || 1;
-    const u = item.customUnit === 'months' ? 'mo' : 'wk';
-    return `/${n}${u}`;
-  }
-  return freqLabel(item.frequency || 'monthly');
-}
-
-function itemMonthly(item) {
-  const freq = item.frequency || 'monthly';
-  if (freq === 'custom') {
-    const n = item.customEvery || 1;
-    return item.customUnit === 'months'
-      ? (item.amount || 0) / n
-      : (item.amount || 0) * 52 / (n * 12);
-  }
-  return freqToMonthly(item.amount || 0, freq);
-}
-
+// freqLabel, freqDisplay, freqDisplayItem, freqLabelItem, itemMonthly, monthlyTotal
+// imported from ./sections/format.js
 
 function expenseCategories() { return state.expenseCategories || DEFAULT_DATA.expenseCategories; }
 function incomeCategories()  { return state.incomeCategories  || DEFAULT_DATA.incomeCategories; }
@@ -14362,12 +14279,18 @@ const _TAB_RENDERERS = {
   lists:       [renderLists],
 };
 
+let _splashHidden = false;
 function renderAll() {
   _applyChildNav();
   safeRender(renderToday);
   const active = _activeTab();
   const fns = _TAB_RENDERERS[active];
   if (fns) fns.forEach(fn => safeRender(fn));
+  // Hide the native splash screen after the first successful render
+  if (!_splashHidden) {
+    _splashHidden = true;
+    window.Capacitor?.Plugins?.SplashScreen?.hide().catch(() => {});
+  }
 }
 // Wire renderAll as a store subscriber so setState() triggers re-renders.
 // Also register with the router so _activateTabInternal() calls it.
@@ -15185,11 +15108,7 @@ function installApp() {
 const NW_ASSET_CATS = ['Cash & Savings','Investments','Property','Superannuation','Vehicle','Other'];
 const NW_LIAB_CATS  = ['Mortgage','Car Loan','Credit Card','Personal Loan','HECS/HELP','Other'];
 
-function fmtNW(n) {
-  const abs = Math.abs(n);
-  const s = abs >= 1e6 ? (abs/1e6).toFixed(2)+'M' : abs >= 1e3 ? (abs/1e3).toFixed(1)+'k' : abs.toFixed(0);
-  return (n < 0 ? '-$' : '$') + s;
-}
+// fmtNW imported from ./sections/format.js
 
 function renderNetWorth() {
   const el = document.getElementById('networth-content');
