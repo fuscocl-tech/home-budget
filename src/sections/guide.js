@@ -1,5 +1,6 @@
 // Guided walkthrough engine
 import { state } from '../store.js';
+import { _recurrenceMatchesDate } from './planner-utils.js';
 import { escHtml } from './format.js';
 
 // GUIDED WALKTHROUGH ENGINE

@@ -1,5 +1,6 @@
 // Dev tools — fixture loading and state reset (not shipped in production)
 import { state } from '../store.js';
+import { _plannerMembers } from './planner-utils.js';
 
 // DEV TOOLS
 // ─────────────────────────────────────────────────────────────────────────

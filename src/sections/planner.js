@@ -31,8 +31,8 @@ export function renderPlanner() {
   });
   const legendHtml = allMembers.map((m, i) => {
     const isEv = m.id === 'everyone';
-    const isActive = isEv ? _plannerFilterMembers.size === 0 : _plannerFilterMembers.has(m.id);
-    const isDimmed = !isActive && _plannerFilterMembers.size > 0 && !isEv;
+    const isActive = isEv ? window._plannerFilterMembers.size === 0 : window._plannerFilterMembers.has(m.id);
+    const isDimmed = !isActive && window._plannerFilterMembers.size > 0 && !isEv;
     const avatarContent = isEv
       ? `<span style="font-size:14px">👨‍👩‍👧</span>`
       : `<span>${initials[i]}</span>`;
@@ -487,9 +487,9 @@ export function _plannerToggleSection(key) {
   renderPlanner();
 }
 export function _plannerToggleFilter(id) {
-  if (id === 'everyone') { _plannerFilterMembers.clear(); }
-  else if (_plannerFilterMembers.has(id)) { _plannerFilterMembers.delete(id); }
-  else { _plannerFilterMembers.add(id); }
+  if (id === 'everyone') { window._plannerFilterMembers.clear(); }
+  else if (window._plannerFilterMembers.has(id)) { window._plannerFilterMembers.delete(id); }
+  else { window._plannerFilterMembers.add(id); }
   renderPlanner();
 }
 
@@ -923,8 +923,8 @@ export function openPlannerModal(id, presetDate) {
   // Pre-select members
   if (ev) {
     _plannerEvMemberIds(ev).forEach(id => _pmSelectedMembers.add(id));
-  } else if (_plannerFilterMembers.size > 0) {
-    _plannerFilterMembers.forEach(id => _pmSelectedMembers.add(id));
+  } else if (window._plannerFilterMembers.size > 0) {
+    window._plannerFilterMembers.forEach(id => _pmSelectedMembers.add(id));
   }
 
   document.getElementById('modal-title').textContent = ev ? 'Edit Event' : 'Add Event';

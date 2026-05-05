@@ -7,6 +7,7 @@ import {
   _plannerMembers, _plannerMemberById, _plannerEvMemberIds, _plannerEvPrimaryMember,
   _plannerEvWhoLabel, _plannerRecurrenceLabel, _plannerVisibleEvents, _plannerEventsForDate,
   _plannerFmt12h, _prevForecastMonth, _nextForecastMonth,
+  _forecastMonth
 } from './planner-utils.js';
 
 export function renderForecast() {

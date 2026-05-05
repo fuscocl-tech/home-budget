@@ -47,6 +47,16 @@ export let _plannerFilterMembers = new Set();
 export let _plannerCollapseState = { 'life-areas': false, 'nudge': false };
 export let _typeADimsExpanded = false;
 export let _plannerDetailEvId = null;
+// Expose mutable state on window so planner.js (separate module) can read/write via onclick strings
+Object.defineProperty(window, '_plannerMonth',        { get() { return _plannerMonth; },        set(v) { _plannerMonth = v; },        configurable: true });
+Object.defineProperty(window, '_plannerSelectedDay',  { get() { return _plannerSelectedDay; },  set(v) { _plannerSelectedDay = v; },  configurable: true });
+Object.defineProperty(window, '_plannerView',         { get() { return _plannerView; },         set(v) { _plannerView = v; },         configurable: true });
+Object.defineProperty(window, '_plannerDetailEvId',   { get() { return _plannerDetailEvId; },   set(v) { _plannerDetailEvId = v; },   configurable: true });
+Object.defineProperty(window, '_typeADimsExpanded',   { get() { return _typeADimsExpanded; },   set(v) { _typeADimsExpanded = v; },   configurable: true });
+// Object references (Sets/objects) — expose directly so mutations are visible everywhere
+window._plannerExpanded       = _plannerExpanded;
+window._plannerFilterMembers  = _plannerFilterMembers;
+window._plannerCollapseState  = _plannerCollapseState;
 
 export const PLANNER_MEMBER_PALETTE = [
   { dot:'#2563eb', bg:'#dbeafe', text:'#1e40af' },

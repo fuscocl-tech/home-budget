@@ -17,7 +17,7 @@ export function renderSettings() {
       </div>`;
   }
 
-  const rawData = prefsGet(STORAGE_KEY);
+  const rawData = prefsGet(window.STORAGE_KEY);
   const dataSize = rawData ? (rawData.length / 1024).toFixed(1) : 0;
   const dataStatus = rawData
     ? `<span style="color:var(--success);font-weight:600">✓ Data found in device storage (${dataSize} KB)</span>`
@@ -52,7 +52,7 @@ export function renderSettings() {
   }
 
   function acc(key, title, subtitle, bodyHtml, headerExtra) {
-    const isOpen = _settingsOpen.has(key);
+    const isOpen = window._settingsOpen.has(key);
     return `
       <div class="sacc-item">
         <div class="sacc-hdr" onclick="toggleSettingsSection('${key}')">
@@ -535,7 +535,7 @@ export function renderSettings() {
     <button onclick="window.showProfileSelector()" class="btn btn-secondary" style="width:100%">🔄 Open profile switcher (shared device)</button>
   </div>`;
 
-  html += `<div class="settings-save-bar" id="settings-save-bar" style="display:${_settingsDirty ? 'flex' : 'none'}">
+  html += `<div class="settings-save-bar" id="settings-save-bar" style="display:${window._settingsDirty ? 'flex' : 'none'}">
     <div class="unsaved-dot"></div>
     <div class="unsaved-text">Unsaved changes</div>
     <button class="btn" onclick="cancelSettingsChanges()">Cancel</button>
@@ -554,7 +554,7 @@ export function resetAllData() {
     if (_resetDocRef) _resetDocRef.delete().catch(() => {});
   }
   // Clear local storage (both data and household pointer)
-  prefsClear(STORAGE_KEY);
+  prefsClear(window.STORAGE_KEY);
   window._secureClear(HOUSEHOLD_OWNER_KEY);
   // Sign out and reload — will trigger fresh onboarding
   if (window._fsUnsubscribe) { window._fsUnsubscribe(); window._fsUnsubscribe = null; }
@@ -579,7 +579,7 @@ export function importData(evt) {
       const imported = JSON.parse(e.target.result);
       if (!imported.budget) { alert('Invalid backup file — missing budget data.'); return; }
       if (!confirm('This will replace ALL current data with the backup. Continue?')) return;
-      prefsSet(STORAGE_KEY, JSON.stringify(imported));
+      prefsSet(window.STORAGE_KEY, JSON.stringify(imported));
       location.reload();
     } catch(err) { alert('Failed to read backup file: ' + err.message); }
   };

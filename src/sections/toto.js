@@ -1,5 +1,6 @@
 // Toto AI Assistant section
 import { state } from '../store.js';
+import { PLANNER_CATS } from './planner-utils.js';
 import { escHtml } from './format.js';
 import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 

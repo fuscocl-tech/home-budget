@@ -514,6 +514,7 @@ _initAuthListener();
 // ─────────────────────────────────────────────────
 
 const STORAGE_KEY = 'home_finance_v1';
+window.STORAGE_KEY = STORAGE_KEY;
 
 // ── Security: HTML escaping for user-generated content ──
 // ─── Custom Select Component ───────────────────────
@@ -2146,6 +2147,7 @@ let budgetViewMode = 'grouped'; // 'grouped' | 'table'
 Object.defineProperty(window, 'budgetViewMode', { get() { return budgetViewMode; }, set(v) { budgetViewMode = v; }, configurable: true });
 Object.defineProperty(window, 'selectedBudgetMonth', { get() { return selectedBudgetMonth; }, set(v) { selectedBudgetMonth = v; }, configurable: true });
 let _settingsOpen = new Set(['ai', 'household']); // accordion open sections
+window._settingsOpen = _settingsOpen; // Set reference — mutations visible everywhere
 let _billsSubsFilter = 'all'; // 'all' | 'bills' | 'subs'
 Object.defineProperty(window, '_billsSubsFilter', { get() { return _billsSubsFilter; }, set(v) { _billsSubsFilter = v; }, configurable: true });
 
