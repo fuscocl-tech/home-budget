@@ -1,6 +1,7 @@
 // Settings section
 import { state } from '../store.js';
 import { escHtml, escAttr, aud } from './format.js';
+import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 
 export function renderSettings() {
   function safeId(s) { return s.replace(/[^a-z0-9]/gi, '_'); }
@@ -16,11 +17,11 @@ export function renderSettings() {
       </div>`;
   }
 
-  const rawData = localStorage.getItem(STORAGE_KEY);
+  const rawData = prefsGet(STORAGE_KEY);
   const dataSize = rawData ? (rawData.length / 1024).toFixed(1) : 0;
   const dataStatus = rawData
-    ? `<span style="color:var(--success);font-weight:600">✓ Data found in localStorage (${dataSize} KB)</span>`
-    : `<span style="color:var(--danger);font-weight:600">⚠ No data in localStorage</span>`;
+    ? `<span style="color:var(--success);font-weight:600">✓ Data found in device storage (${dataSize} KB)</span>`
+    : `<span style="color:var(--danger);font-weight:600">⚠ No data in device storage</span>`;
 
   const log = state.activityLog || [];
 
@@ -96,7 +97,7 @@ export function renderSettings() {
         <div style="display:flex;gap:8px;align-items:center;max-width:480px">
           <input type="password" class="form-input" id="settings-api-key" style="flex:1"
             placeholder="sk-ant-api03-..."
-            value="${localStorage.getItem('toto_ai_key')||''}">
+            value="${prefsGet('toto_ai_key')||''}">
           <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
         </div>
         <p id="api-key-status" style="font-size:12px;color:var(--text-muted);margin-top:6px"></p>
@@ -208,7 +209,7 @@ export function renderSettings() {
           <button class="btn btn-secondary btn-sm" onclick="document.getElementById('import-file').click()">Import JSON backup</button>
           <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
         </div>
-        ${rawData ? `<button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">Show raw localStorage data</button>
+        ${rawData ? `<button class="btn btn-ghost btn-sm" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display?'':'none'">Show raw device storage data</button>
           <pre style="display:none;margin-top:8px;background:var(--surface2);padding:12px;border-radius:8px;font-size:11px;overflow:auto;max-height:200px;white-space:pre-wrap;word-break:break-all">${rawData.replace(/</g,'&lt;')}</pre>` : ''}
         <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
           <div style="font-size:13px;font-weight:600;color:var(--danger);margin-bottom:4px">Danger zone</div>
@@ -553,7 +554,7 @@ export function resetAllData() {
     if (_resetDocRef) _resetDocRef.delete().catch(() => {});
   }
   // Clear local storage (both data and household pointer)
-  localStorage.removeItem(STORAGE_KEY);
+  prefsClear(STORAGE_KEY);
   _secureClear(HOUSEHOLD_OWNER_KEY);
   // Sign out and reload — will trigger fresh onboarding
   if (_fsUnsubscribe) { _fsUnsubscribe(); _fsUnsubscribe = null; }
@@ -578,7 +579,7 @@ export function importData(evt) {
       const imported = JSON.parse(e.target.result);
       if (!imported.budget) { alert('Invalid backup file — missing budget data.'); return; }
       if (!confirm('This will replace ALL current data with the backup. Continue?')) return;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(imported));
+      prefsSet(STORAGE_KEY, JSON.stringify(imported));
       location.reload();
     } catch(err) { alert('Failed to read backup file: ' + err.message); }
   };

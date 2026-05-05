@@ -1,6 +1,7 @@
 // Subscriptions section
 import { state } from '../store.js';
 import { aud, escHtml, escAttr, nextId } from './format.js';
+import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 
 
 export const SUB_CATS = [
@@ -94,7 +95,7 @@ export function deleteSub(id) {
 export async function handleSubCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const key = localStorage.getItem('toto_ai_key');
+  const key = prefsGet('toto_ai_key');
   const status = document.getElementById('sub-import-status');
   if (!key) {
     if (status) { status.textContent = '⚠ Please enter your Anthropic API key above first.'; status.style.display = ''; }

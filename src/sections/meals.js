@@ -1,6 +1,7 @@
 // Meal Planner and Shopping Lists sections
 import { state } from '../store.js';
 import { aud, escHtml, escAttr, nextId } from './format.js';
+import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 
 export let _mealWeekOffset = 0;      // 0 = current week
 
@@ -192,7 +193,7 @@ export function openMealEdit(weekKey, dayIdx, slot) {
   const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   const SLOTS_LBL = { b:'Breakfast', l:'Lunch', d:'Dinner' };
   const current = ((state.meals.plan[weekKey] || {})[dayIdx] || {})[slot] || '';
-  const hasKey  = !!localStorage.getItem('toto_ai_key');
+  const hasKey  = !!prefsGet('toto_ai_key');
 
   const seen = new Set();
   Object.values(state.meals.plan).forEach(week =>
@@ -291,7 +292,7 @@ export function _mealPriceSlide(val) {
 }
 
 export async function _mealGetSuggestions(slot) {
-  const key = localStorage.getItem('toto_ai_key');
+  const key = prefsGet('toto_ai_key');
   if (!key) return;
   const btn = document.getElementById('meal-suggest-btn');
   const out = document.getElementById('meal-suggest-out');
@@ -343,7 +344,7 @@ export function saveMealSlot(weekKey, dayIdx, slot, value) {
 }
 
 export async function _estimateMealCalories(weekKey, dayIdx, slot, mealName) {
-  const key = localStorage.getItem('toto_ai_key');
+  const key = prefsGet('toto_ai_key');
   if (!key || !mealName) return;
   try {
     const res = await fetch(CLAUDE_API, {
@@ -873,7 +874,7 @@ export async function generateShoppingList(weekKey) {
   }
   if (!meals.length) return;
 
-  const key = localStorage.getItem('toto_ai_key');
+  const key = prefsGet('toto_ai_key');
   if (!key) { _listsActiveType = 'food'; _listsView = 'list'; activateTab('lists'); return; }
 
   const btn = document.getElementById('gen-shop-btn');

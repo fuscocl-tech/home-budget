@@ -2,6 +2,7 @@
 import { state } from '../store.js';
 import { aud, escHtml, escAttr, nextId } from './format.js';
 import { billNextDue, billDaysUntil } from '../utils.js';
+import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 
 
 export const BILL_CATS = [
@@ -194,8 +195,8 @@ export function renderBills() {
         <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px">Upload a bank statement CSV and AI will find subscriptions and bills you haven't tracked yet.</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <input type="text" maxlength="200" class="sub-api-input" id="sub-api-key" placeholder="Anthropic API key"
-            value="${localStorage.getItem('toto_ai_key')||''}"
-            oninput="localStorage.setItem('toto_ai_key', this.value)" style="flex:1;min-width:200px">
+            value="${prefsGet('toto_ai_key')||''}"
+            oninput="prefsSet('toto_ai_key', this.value)" style="flex:1;min-width:200px">
           <label class="sub-upload-btn" for="sub-csv-input">📎 Upload CSV</label>
           <input type="file" id="sub-csv-input" accept=".csv,.txt" style="display:none" onchange="handleSubCSV(event)">
         </div>

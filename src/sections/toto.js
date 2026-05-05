@@ -1,6 +1,7 @@
 // Toto AI Assistant section
 import { state } from '../store.js';
 import { escHtml } from './format.js';
+import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 
 export let _totoOpen = false;
 export let _totoHistory = []; // { role, content }
@@ -82,7 +83,7 @@ export async function sendTotoMessage() {
 }
 
 export async function _totoSend(text) {
-  const key = localStorage.getItem('toto_ai_key');
+  const key = prefsGet('toto_ai_key');
   if (!key) {
     _totoAppendMessage('toto', "To chat with me, you'll need to add your AI API key in Settings. It only takes a second! ⚙️");
     return;

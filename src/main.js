@@ -48,6 +48,10 @@ import {
   _plannerFilterMembers, _plannerDetailEvId, _plannerVisibleEvents,
   _plannerEventsForDate, _plannerEvMemberIds, _plannerEvPrimaryMember, _plannerEvWhoLabel,
   _plannerMemberById, _plannerMembers, _plannerFmt12h, _plannerRecurrenceLabel,
+  _forecastMonth, _prevForecastMonth, _nextForecastMonth,
+} from './sections/planner-utils.js';
+import { renderForecast, estimateAllEvents } from './sections/forecast.js';
+import {
   _plannerNudges, _plannerRenderDaySheetList, _renderPlannerAgenda,
   _renderPlannerEventRow, _renderPlannerMonthGrid, _renderPlannerWeekStrip,
   _plannerOpenDaySheet, _plannerHandleDaySheetClick, _plannerOpenDetail,
@@ -60,10 +64,9 @@ import {
   _pmDpSelect, _pmDpClear, _pmDpRender, _pmDpTarget, _pmFmtDate, _pmFmtDateShort,
   _pmHandleCatChange, _pmRenderMemberPicker, _pmSelectedMembers, _pmToggleMember, _pmToggleAllDay,
   _plannerOpenModalFromSheet, openPlannerModal, savePlannerEvent, deletePlannerEvent,
-  renderPlanner, renderForecast, renderBudgetSuggestions, renderBudgetForecast,
-  _forecastMonth, _prevForecastMonth, _nextForecastMonth,
+  renderPlanner, renderBudgetSuggestions, renderBudgetForecast,
   _pushAllEventsToBudget, suggestEventToBudget, unpushEventFromBudget,
-  estimatePlannerEvent, estimateAllEvents, togglePlannerCard, togglePlannerEstimate,
+  estimatePlannerEvent, togglePlannerCard, togglePlannerEstimate,
   _autoCreateRecurringEvents, _addRecurrenceToDate, _getNthDayOfMonth, getSeasonalNudges,
   goToPlannerDay, _renderNudgeSection, approveSuggestion, dismissSuggestion,
 } from './sections/planner.js';
@@ -109,26 +112,32 @@ import {
   GOAL_TYPES, expenseCategories, goalProgress, incomeCategories, renderBuild,
 } from './sections/build.js';
 import {
-  ADJ_TYPES, COLORS_KEY, DEFAULT_COLORS, GROUP_ICONS, INSIGHTS_KEY, PROXY_URL,
+  ADJ_TYPES,
+  adjForm, calcScenario, deleteAdjustment, deleteGoal, deleteScenario,
+  goalForm, goalFromForm, markGoalAchieved,
+  openAddAdjustment, openAddGoal, openAddScenario, openEditGoal, openEditScenario,
+  renderGoals, renderScenarios, scenarioForm, scenarioFromForm,
+  toggleAdjFields, toggleGoalFields, toggleScenario,
+} from './sections/goals-scenarios.js';
+import {
+  COLORS_KEY, DEFAULT_COLORS, GROUP_ICONS, INSIGHTS_KEY, PROXY_URL,
   _checkSettingsUnsaved, _markSettingsDirty, _renderApiKeySummary,
   _settingsDirty, _settingsSnapshot,
   addCatToGroup, addCategory, addHouseholdMember, addPet,
-  adjForm, calcScenario, cancelSettingsChanges, clearActivityLog,
-  deleteAdjustment, deleteCategoryGroup, deleteGoal, deleteScenario,
+  cancelSettingsChanges, clearActivityLog,
+  deleteCategoryGroup,
   detectSpendingPatterns, generateSmartInsights, generateSmartInsightsHTML,
   getAIKey, getBenchmarkStatus, getBenchmarks, getCategoryHistoryData,
-  goalForm, goalFromForm, loadColors, markGoalAchieved,
+  loadColors,
   nextInsightsMonth, prevInsightsMonth,
-  openAddAdjustment, openAddCatToGroup, openAddCategoryGroup,
-  openAddGoal, openAddScenario, openEditGoal, openEditScenario,
+  openAddCatToGroup, openAddCategoryGroup,
   openEmojiPickerModal, openIconPickerForGroup,
   profileAdults, profileChildren, removeApiKey, removeCatFromGroup,
   removeCategory, removeHouseholdMember, removePet,
-  renderBenchmarksSection, renderCategoryBreakdown, renderGoals,
-  renderInsightCards, renderInsights, renderScenarios, renderSpendingPatterns,
+  renderBenchmarksSection, renderCategoryBreakdown,
+  renderInsightCards, renderInsights, renderSpendingPatterns,
   runAIInsights, saveAIKey, saveApiKey, saveColors, saveSettingsChanges,
-  scenarioForm, scenarioFromForm,
-  toggleAdjFields, toggleGoalFields, toggleScenario, toggleSettingsSection,
+  toggleSettingsSection,
   updateCars, updateCategoryGroup, updateColor, updateMember, updatePet, updateSetting,
 } from './sections/insights.js';
 import {
@@ -340,7 +349,7 @@ function _startFirestoreSync() {
     if (snap.exists) {
       const d = _applyMigrations(snap.data());
       Object.assign(state, d);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      _secureSet(STORAGE_KEY, JSON.stringify(state));
     } else {
       // New household — check if there's legacy data to migrate from family/shared
       const legacy = await fbStore.collection('family').doc('shared').get().catch(() => null);
@@ -348,7 +357,7 @@ function _startFirestoreSync() {
         const d = _applyMigrations(legacy.data());
         Object.assign(state, d);
         docRef.set(state).catch(() => {});
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        _secureSet(STORAGE_KEY, JSON.stringify(state));
       } else {
         // Genuinely new user: push local state up
         docRef.set(state).catch(() => {});
@@ -585,7 +594,7 @@ const DEFAULT_DATA = {
 
 function loadData() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = _secureGet(STORAGE_KEY);
     if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DATA));
     const d = JSON.parse(raw);
     if (!d.budget.actuals) d.budget.actuals = {};
@@ -777,7 +786,7 @@ function saveData(data) {
     if (data.activityLog.length > 200) data.activityLog.length = 200;
     _pendingLogEntry = null;
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  _secureSet(STORAGE_KEY, JSON.stringify(data));
   if (_currentUser) {
     const _docRef = _getHouseholdDocRef();
     if (_docRef) _docRef.set(data).catch(err => {
@@ -848,7 +857,16 @@ function setKidSession(kidId)    { _secureSet(KID_SESSION_KEY, String(kidId)); }
 function clearKidSession()       { _secureClear(KID_SESSION_KEY); }
 
 // Pre-warm cache immediately so synchronous getters work by the time auth resolves.
-_securePrewarm([HOUSEHOLD_OWNER_KEY, DEVICE_KEY, KID_SESSION_KEY]);
+_securePrewarm([
+  HOUSEHOLD_OWNER_KEY,
+  DEVICE_KEY,
+  KID_SESSION_KEY,
+  STORAGE_KEY,
+  'toto_ai_key',
+  'toto_ai_key_meta',
+  'toto_qa_last',
+  'home_finance_colors_v1',
+]);
 
 async function _hashPin(pin, salt) {
   // Salt should be the household owner UID so the same PIN hashes differently per household.
@@ -3367,7 +3385,7 @@ async function handleCsvFile(event) {
 }
 
 function _renderCsvPreview() {
-  const hasKey = !!localStorage.getItem('toto_ai_key');
+  const hasKey = !!_secureGet('toto_ai_key');
   const preview = _csvRows.slice(0, 5);
   document.getElementById('modal-body').innerHTML = `
     <div>
@@ -3399,7 +3417,7 @@ function _renderCsvPreview() {
 }
 
 async function runCsvCategorise() {
-  const key = localStorage.getItem('toto_ai_key');
+  const key = _secureGet('toto_ai_key');
   if (!key) { _renderCsvReview(null); return; }
 
   document.getElementById('modal-body').innerHTML = `
@@ -3809,7 +3827,7 @@ function _qahAction(type) {
       setTimeout(() => openPlannerModal(null, new Date().toISOString().slice(0,10)), 300);
     } else if (type === 'expense') {
       const expenses = getMonthData(selectedBudgetMonth).expenses;
-      const lastId = parseInt(localStorage.getItem('toto_qa_last') || '0');
+      const lastId = parseInt(_secureGet('toto_qa_last') || '0');
       _qaExpenseId = expenses.find(e => e.id === lastId)?.id ?? (expenses[0]?.id ?? null);
       _qaAmount = '';
       _renderQASheet(expenses);
@@ -3910,7 +3928,7 @@ async function _qahApplyParsed(parsed, originalText) {
     }
   } else if (parsed.type === 'expense') {
     const expenses = getMonthData(selectedBudgetMonth).expenses;
-    const lastId = parseInt(localStorage.getItem('toto_qa_last') || '0');
+    const lastId = parseInt(_secureGet('toto_qa_last') || '0');
     _qaExpenseId = expenses.find(e => e.id === lastId)?.id ?? (expenses[0]?.id ?? null);
     _qaAmount = parsed.amount ? String(parsed.amount) : '';
     _renderQASheet(expenses);
@@ -4046,7 +4064,7 @@ function saveQuickAdd() {
   entries.push({ id: newId, amount, date: today, note });
   state.budget.actuals[selectedBudgetMonth][_qaExpenseId] = entries;
 
-  localStorage.setItem('toto_qa_last', String(_qaExpenseId));
+  _secureSet('toto_qa_last', String(_qaExpenseId));
   saveData(state);
   closeQuickAdd();
   renderAll();
@@ -5481,6 +5499,10 @@ window._secureClear = _secureClear;
 window._secureGet = _secureGet;
 window._securePrewarm = _securePrewarm;
 window._secureSet = _secureSet;
+// Aliases used by inline onclick/oninput strings in section templates
+window.prefsGet = _secureGet;
+window.prefsSet = _secureSet;
+window.prefsClear = _secureClear;
 window._setHouseholdOwner = _setHouseholdOwner;
 window._setInviteRole = _setInviteRole;
 window._setPinHardLock = _setPinHardLock;

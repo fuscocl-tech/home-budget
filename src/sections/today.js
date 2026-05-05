@@ -2,6 +2,7 @@
 import { state } from '../store.js';
 import { aud, audD, escHtml, fmtDate, isOverdue, monthlyTotal, itemMonthly, nextId } from './format.js';
 import { billNextDue, billDaysUntil } from '../utils.js';
+import { prefsGet, prefsSet, prefsClear } from '../prefs.js';
 
 export function renderSetupProgress() {
   if (state.setupProgressDismissed) return '';
@@ -745,7 +746,7 @@ export let _lastBriefingDate = '';
 export let _cachedBriefing = '';
 
 export async function _fetchAIBriefing(cards, surplus, daysLeft, todayMeals, health) {
-  const key = localStorage.getItem('toto_ai_key');
+  const key = prefsGet('toto_ai_key');
   if (!key) return;
 
   // Cache: only call AI once per day

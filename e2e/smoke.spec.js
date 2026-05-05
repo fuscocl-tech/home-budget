@@ -165,3 +165,71 @@ test('can open add bill form', async ({ page }) => {
 
   await expect(page.locator('#bill-modal')).toBeVisible({ timeout: 5000 });
 });
+
+// ── Mutations: saving data ───────────────────────────────────────────────────
+
+test('saving a bill adds it to the bills list', async ({ page }) => {
+  await seedAndLoad(page);
+
+  await page.locator('[data-tab="budget"]').first().click();
+  await page.locator('.section-pill[data-pill="bills"]').first().click();
+  await expect(page.locator('#tab-bills')).toHaveClass(/active/);
+
+  const addBtn = page.getByRole('button', { name: /^\+ Bill$/i }).first();
+  await addBtn.click();
+  await expect(page.locator('#bill-modal')).toBeVisible({ timeout: 5000 });
+
+  await page.fill('#bill-name', 'AGL Electricity');
+  await page.fill('#bill-amount', '180');
+  await page.fill('#bill-day', '15');
+
+  await page.getByRole('button', { name: /^Save$/i }).click();
+
+  await expect(page.locator('#bill-modal')).toBeHidden({ timeout: 5000 });
+  await expect(page.locator('#tab-bills')).toContainText('AGL Electricity');
+});
+
+test('saving a budget income item adds it to the budget', async ({ page }) => {
+  await seedAndLoad(page);
+
+  await page.locator('[data-tab="budget"]').first().click();
+  await expect(page.locator('#tab-budget')).toHaveClass(/active/);
+
+  // Call openAddIncome() directly — button may be below fold
+  await page.evaluate(() => window.openAddIncome());
+  await expect(page.locator('#modal-overlay')).not.toHaveClass(/hidden/, { timeout: 5000 });
+
+  await page.fill('#f-inc-name', 'Test Salary');
+  await page.fill('#f-inc-amount', '5000');
+
+  await page.locator('#modal-save-btn').click();
+
+  // "Apply changes" scope dialog — apply to all months
+  const scopeDialog = page.getByText('Apply changes');
+  if (await scopeDialog.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await page.getByRole('button', { name: /apply to all months/i }).click();
+  }
+
+  await expect(page.locator('#modal-overlay')).toHaveClass(/hidden/, { timeout: 5000 });
+  await expect(page.locator('#tab-budget')).toContainText('Test Salary');
+});
+
+test('data persists in state after save', async ({ page }) => {
+  await seedAndLoad(page);
+
+  await page.locator('[data-tab="budget"]').first().click();
+  await page.locator('.section-pill[data-pill="bills"]').first().click();
+
+  const addBtn = page.getByRole('button', { name: /^\+ Bill$/i }).first();
+  await addBtn.click();
+  await page.fill('#bill-name', 'Persistent Bill');
+  await page.fill('#bill-amount', '99');
+  await page.fill('#bill-day', '1');
+  await page.getByRole('button', { name: /^Save$/i }).click();
+  await expect(page.locator('#bill-modal')).toBeHidden({ timeout: 5000 });
+
+  // Verify the bill was written to state
+  const bills = await page.evaluate(() => JSON.parse(localStorage.getItem('home_finance_v1') || '{}').bills || []);
+  expect(bills.length).toBe(1);
+  expect(bills[0].name).toBe('Persistent Bill');
+});
