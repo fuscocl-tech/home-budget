@@ -20,11 +20,11 @@ export default defineConfig({
     },
   ],
 
-  // Start the dev server before running tests
+  // Serve the Vite-built www/ output
   webServer: {
-    command: 'npx serve . -p 3000 -s',
+    command: 'npm run preview',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 10000,
+    timeout: 30000,
   },
 });

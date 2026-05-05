@@ -33,6 +33,52 @@
     };
   </script>
   <!-- Firebase v10 modular SDK — loaded as ESM, globals exposed for the classic script below -->
+  <script type="module">
+    import { initializeApp }            from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider }
+                                        from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+    import { getFirestore, enableIndexedDbPersistence,
+             collection, doc, onSnapshot, getDoc, setDoc, deleteDoc }
+                                        from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+    const _app   = initializeApp(window.__FIREBASE_CONFIG__);
+    const _auth  = getAuth(_app);
+    const _db    = getFirestore(_app);
+
+    // Enable offline persistence before any reads/writes
+    enableIndexedDbPersistence(_db, { forceOwnership: false }).catch(err => {
+      if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+        console.warn('Firestore persistence error:', err.code);
+      }
+    });
+
+    // Expose a thin compatibility shim so the classic script below needs minimal changes.
+    // fbAuth mirrors the compat auth API; fbStore mirrors the compat firestore API.
+    window.fbAuth = {
+      _auth,
+      onAuthStateChanged: (cb) => onAuthStateChanged(_auth, cb),
+      signInWithPopup: (provider) => signInWithPopup(_auth, provider),
+      signOut: () => signOut(_auth),
+      GoogleAuthProvider,
+      get currentUser() { return _auth.currentUser; },
+    };
+    window.fbStore = {
+      _db,
+      collection: (path) => ({
+        doc: (id) => ({
+          _ref: doc(_db, path, id),
+          get:        ()      => getDoc(doc(_db, path, id)),
+          set:        (data)  => setDoc(doc(_db, path, id), data),
+          delete:     ()      => deleteDoc(doc(_db, path, id)),
+          onSnapshot: (cb, err) => onSnapshot(doc(_db, path, id), cb, err),
+        }),
+      }),
+    };
+
+    // Signal that Firebase is ready — the classic script defers its init until this fires
+    window.__firebaseReady = true;
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
   <script
     src="https://browser.sentry-cdn.com/8.28.0/bundle.min.js"
     crossorigin="anonymous"
@@ -55,8 +101,6 @@
       });
     }
   </script>
-  <script type="module" crossorigin src="/assets/index-DXSVfDBH.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/style-CR1KVgQc.css">
 </head>
 <body data-section="today">
 
@@ -480,6 +524,7 @@
 </div>
 
 
+<script type="module" src="./main.js"></script>
 
 <!-- ─── Toto Assistant Panel ─────────────────── -->
 <div class="toto-panel" id="toto-panel">
