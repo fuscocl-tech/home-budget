@@ -774,6 +774,8 @@ function loadData() {
     // ── ROUTINES START ── migration
     if (!d.routines) d.routines = [];
     if (!d.routineAssignments) d.routineAssignments = [];
+    // Remove routines with missing/null IDs — they can never be correctly targeted
+    d.routines = d.routines.filter(r => r.id != null && r.id !== 'null' && r.id !== '');
     const _assignedRoutineIds = new Set((d.routineAssignments || []).map(a => a.routineId));
     d.routines.forEach(r => {
       if (!r.completions)       r.completions       = {};

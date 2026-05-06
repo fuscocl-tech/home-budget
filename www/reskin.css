@@ -217,13 +217,25 @@ body[data-section] {
 
 /* ── BUDGET / WALLET screen ──────────────────────────────── */
 .summary-hero {
-  background: var(--primary) !important;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1f1f1f 100%) !important;
   border-radius: 24px !important;
   border: none !important;
-  box-shadow: 0 8px 24px rgba(91,76,245,0.20) !important;
+  box-shadow: 0 8px 32px -8px rgba(22,20,15,0.35), 0 0 40px -10px rgba(16,185,129,0.15) !important;
+}
+.summary-hero::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  right: -30px !important;
+  top: -30px !important;
+  width: 180px !important;
+  height: 180px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, rgba(16,185,129,0.18), transparent 70%) !important;
+  pointer-events: none !important;
 }
 
-.summary-hero::before { display: none !important; }
+/* summary-hero::before handled above */
 
 .summary-mini-grid {
   gap: 10px !important;
