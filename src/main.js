@@ -114,6 +114,13 @@ import {
   GOAL_TYPES, expenseCategories, goalProgress, incomeCategories, renderBuild,
 } from './sections/build.js';
 import {
+  renderProjects, PROJECT_TEMPLATES,
+  _projectsOpenNew, _projectsBackToList, _projectsOpenDetail, _projectsPickTemplate,
+  _projectsSaveNew, _projectsDelete, _projectsSetStatus,
+  _projectsToggleFamilyGoal, _projectsSetGoalTarget,
+  _projectsToggleTask, _projectsAddTask, _projectsDeleteTask,
+} from './sections/projects.js';
+import {
   ADJ_TYPES,
   adjForm, calcScenario, deleteAdjustment, deleteGoal, deleteScenario,
   goalForm, goalFromForm, markGoalAchieved,
@@ -378,6 +385,10 @@ function _applyMigrations(d) {
   if (!d.furniture) d.furniture = [];
   if (!d.appliances) d.appliances = [];
   if (!d.planner) d.planner = { events: [] };
+
+  // Projects feature
+  if (!d.projects) d.projects = [];
+  if (d.activeFamilyGoalProjectId === undefined) d.activeFamilyGoalProjectId = null;
 
   // Section 10: Lists migration
   if (!d.lists) {
@@ -680,7 +691,9 @@ const DEFAULT_DATA = {
   routines: [],
   routineAssignments: [],
   // ── ROUTINES END ── default state
-  childEvents: []
+  childEvents: [],
+  projects: [],
+  activeFamilyGoalProjectId: null
 };
 
 function loadData() {
@@ -2126,6 +2139,7 @@ const _TAB_RENDERERS = {
   maintenance: [() => renderMaintenance()],
   routines:    [() => renderRoutines()],
   lists:       [() => renderLists()],
+  projects:    [() => renderProjects()],
 };
 
 let _splashHidden = false;
