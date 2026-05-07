@@ -13,6 +13,7 @@ export const SECTIONS = {
   ]},
   plan: { navTab: 'planner', label: 'Plan', tabs: [
     { tab: 'planner',  label: 'Planner' },
+    { tab: 'projects', label: 'Projects' },
     { tab: 'forecast', label: 'Forecast' },
     { tab: 'meals',    label: 'Meals' },
     { tab: 'lunchbox', label: 'Lunchbox' },
