@@ -57,6 +57,13 @@
       --danger-light: var(--alert-soft);
       --sidebar-w: 230px;
       --radius: var(--r);
+      /* UI consistency additions */
+      --r-pill: 99px;
+      --teal: #0891b2;
+      --teal-soft: #ECFEFF;
+      --good-light: #F0FDF4;
+      --watch-light: #FFFBEB;
+      --alert-light: #FEF2F2;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }

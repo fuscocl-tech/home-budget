@@ -219,7 +219,7 @@ export function renderBudget() {
   html += `
     <div class="summary-mini-grid">
       <div class="summary-mini">
-        <div class="summary-mini-num" style="color:#10b981">${aud(totalIncome)}</div>
+        <div class="summary-mini-num" style="color:var(--good)">${aud(totalIncome)}</div>
         <div class="summary-mini-label">Income</div>
       </div>
       <div class="summary-mini">
@@ -227,7 +227,7 @@ export function renderBudget() {
         <div class="summary-mini-label">Budgeted</div>
       </div>
       <div class="summary-mini">
-        <div class="summary-mini-num" style="color:${totalActual > totalBudgetExpenses ? '#ef4444' : '#18181b'}">${aud(totalActual)}</div>
+        <div class="summary-mini-num" style="color:${totalActual > totalBudgetExpenses ? 'var(--alert)' : 'var(--text)'}">${aud(totalActual)}</div>
         <div class="summary-mini-label">Actual spent</div>
       </div>
       <div class="summary-mini">
@@ -277,7 +277,7 @@ export function renderBudget() {
 
   const showCopyBanner = !window.isMonthCustomized(window.selectedBudgetMonth);
   if (showCopyBanner) {
-    html += `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--primary-light);border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+    html += `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--primary-light);border:1px solid #bfdbfe;border-radius:var(--r-sm);padding:10px 16px;margin-bottom:16px;gap:12px;flex-wrap:wrap">
       <div>
         <span style="font-size:13px;font-weight:600;color:var(--primary)">Using default budget</span>
       </div>

@@ -76,28 +76,28 @@ export function renderKidsOverview(k) {
     const pending = k.completions.filter(c => c.kidId === kid.id && c.status === 'pending').length;
     html += `
       <div class="kid-card" style="cursor:default">
-        <button onclick="openEditKidModal('${kid.id}')" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:14px;padding:2px 5px;border-radius:4px" title="Edit">✏️</button>
+        <button onclick="openEditKidModal('${kid.id}')" style="position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:#cbd5e1;font-size:14px;padding:2px 5px;border-radius:var(--r-sm)" title="Edit">✏️</button>
         <div onclick="kidsView='${kid.id}';renderKids()" style="cursor:pointer">
           <div class="kid-avatar">${kid.emoji}</div>
           <div class="kid-name">${escHtml(kid.name)}</div>
           <div class="kid-points">${bal}</div>
           <div class="kid-points-label">⭐ points</div>
-          <div style="display:flex;gap:10px;font-size:12px;color:#64748b;margin-top:4px">
+          <div style="display:flex;gap:10px;font-size:12px;color:var(--text-muted);margin-top:4px">
             <span>📋 ${myChores}</span>
-            ${pending ? `<span style="color:#f59e0b;font-weight:600">⏳ ${pending}</span>` : ''}
+            ${pending ? `<span style="color:var(--watch);font-weight:600">⏳ ${pending}</span>` : ''}
             ${kid.savings ? `<span style="color:#0891b2">💰 $${kid.savings.toFixed(0)}</span>` : ''}
           </div>
         </div>
-        <button onclick="window.switchToKidMode('${kid.id}')" style="width:100%;margin-top:10px;padding:8px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:8px;font-size:12px;color:#0891b2;font-weight:600;cursor:pointer">
+        <button onclick="window.switchToKidMode('${kid.id}')" style="width:100%;margin-top:10px;padding:8px;background:#ecfeff;border:1.5px solid #0891b2;border-radius:var(--r-sm);font-size:12px;color:#0891b2;font-weight:600;cursor:pointer">
           Switch to ${escHtml(kid.name)}'s view →
         </button>
-        <button onclick="viewChildToday('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;font-size:12px;color:#5B4CF5;font-weight:600;cursor:pointer">
+        <button onclick="viewChildToday('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:var(--r-sm);font-size:12px;color:#5B4CF5;font-weight:600;cursor:pointer">
           👁 View ${escHtml(kid.name)}'s Today
         </button>
-        <button onclick="_cvViewCalendar('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:12px;color:#15803d;font-weight:600;cursor:pointer">
+        <button onclick="_cvViewCalendar('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--r-sm);font-size:12px;color:#15803d;font-weight:600;cursor:pointer">
           📅 View ${escHtml(kid.name)}'s Calendar
         </button>
-        <button onclick="window.openPinSetup('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:${kid.pinHash?'#f0fdf4':'#fffbeb'};border:1px solid ${kid.pinHash?'#bbf7d0':'#fde68a'};border-radius:8px;font-size:12px;color:${kid.pinHash?'#15803d':'#854d0e'};font-weight:600;cursor:pointer">
+        <button onclick="window.openPinSetup('${kid.id}')" style="width:100%;margin-top:6px;padding:7px;background:${kid.pinHash?'var(--good-light)':'var(--watch-light)'};border:1px solid ${kid.pinHash?'var(--good-soft)':'var(--watch-soft)'};border-radius:var(--r-sm);font-size:12px;color:${kid.pinHash?'var(--good)':'var(--watch)'};font-weight:600;cursor:pointer">
           ${kid.pinHash ? '🔒 PIN set — change' : '🔓 Set PIN for login'}
         </button>
       </div>`;
@@ -248,7 +248,7 @@ export function renderKidView(el, k, kid) {
   }
 
   html += `</div><div>
-    <div style="background:linear-gradient(135deg,#ecfeff,#ccfbf1);border:1px solid #99f6e4;border-radius:12px;padding:16px 18px;margin-bottom:16px">
+    <div style="background:linear-gradient(135deg,#ecfeff,#ccfbf1);border:1px solid #99f6e4;border-radius:var(--r);padding:16px 18px;margin-bottom:16px">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#0891b2">💰 Savings Jar</div>
       <div style="font-size:28px;font-weight:800;color:#0e7490;margin:4px 0">$${(kid.savings||0).toFixed(2)}</div>
       <button onclick="openSavingsModal('${kid.id}')" style="background:none;border:1px solid #0891b2;color:#0891b2;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-weight:600">+ Add</button>
@@ -298,7 +298,7 @@ export function _renderChildEventsMgmt() {
       ? 'All kids'
       : ids.map(id => kids.find(k=>k.id===id)?.name || '?').join(', ');
     const recLabel = ev.recurrence ? ` · 🔁 ${({daily:'Daily',weekdays:'Weekdays',weekends:'Weekends',specific_days:'Selected days',interval:`Every ${ev.recurrence.intervalDays}d`,one_time:'Once'})[ev.recurrence.type]||''}` : '';
-    html += `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:8px">
+    html += `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:#fff;border:1px solid var(--hairline);border-radius:var(--r);margin-bottom:8px">
       <span style="font-size:22px">${ev.emoji||'📅'}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:600;color:#18181B">${escHtml(ev.title)}</div>
