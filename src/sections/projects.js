@@ -405,7 +405,7 @@ function _renderCreateForm(templateKey) {
 
       <div style="display:flex;gap:8px;margin-top:4px">
         <button type="button" onclick="_projectsPickTemplate(null)" style="flex:1;padding:12px;border-radius:14px;border:1px solid var(--hairline);background:var(--paper);color:var(--ink);font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">Cancel</button>
-        <button type="submit" style="flex:1;padding:12px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--iris-2),var(--purple));color:#fff;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;box-shadow:0 6px 16px -4px rgba(91,76,245,0.30)">Create project →</button>
+        <button type="button" onclick="event.preventDefault();_projectsSaveNew('${templateKey}')" style="flex:1;padding:12px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--iris-2),var(--purple));color:#fff;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;box-shadow:0 6px 16px -4px rgba(91,76,245,0.30)">Create project →</button>
       </div>
     </form>
     <div style="height:24px"></div>`;
@@ -571,7 +571,7 @@ export function _projectsSaveNew(templateKey) {
 
   _ensureProjectsState();
   const project = {
-    id: 'proj-' + nextId(),
+    id: 'proj-' + nextId(state.projects || []),
     name,
     emoji: tpl.emoji,
     template: templateKey,
@@ -586,7 +586,7 @@ export function _projectsSaveNew(templateKey) {
     notes,
     spentManual: 0,
     tasks: tpl.defaultTasks.map(t => ({
-      id: 't-' + nextId(),
+      id: 't-' + Date.now().toString(36) + Math.random().toString(36).slice(2),
       name: t.name,
       done: false,
       dueDate: '',
@@ -653,7 +653,7 @@ export function _projectsAddTask(projId) {
   const name = (window.prompt('Task name:', '') || '').trim();
   if (!name) return;
   if (!p.tasks) p.tasks = [];
-  p.tasks.push({ id: 't-' + nextId(), name, done: false, dueDate: '' });
+  p.tasks.push({ id: 't-' + Date.now().toString(36) + Math.random().toString(36).slice(2), name, done: false, dueDate: '' });
   window.saveData(state);
   renderProjects();
 }
@@ -839,7 +839,7 @@ export function _projectsAiConfirm() {
   _ensureProjectsState();
   const tpl = PROJECT_TEMPLATES[d.template] || PROJECT_TEMPLATES.custom;
   const project = {
-    id: 'proj-' + nextId(),
+    id: 'proj-' + nextId(state.projects || []),
     name: d.name,
     emoji: tpl.emoji,
     template: d.template,
@@ -853,7 +853,7 @@ export function _projectsAiConfirm() {
     location: d.location || '',
     notes: d.notes || '',
     spentManual: 0,
-    tasks: d.tasks.map(name => ({ id: 't-' + nextId(), name, done: false, dueDate: '' })),
+    tasks: d.tasks.map(name => ({ id: 't-' + Date.now().toString(36) + Math.random().toString(36).slice(2), name, done: false, dueDate: '' })),
     bookings: [],
     quotes: [],
     stages: [],

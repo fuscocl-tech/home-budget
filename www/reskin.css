@@ -3,6 +3,12 @@
   Injected via ?reskin=1 query param (see mockup-reskin.html).
 */
 
+/* iOS WKWebView: ensure all inputs and textareas are focusable and editable */
+input, textarea, select {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
 /* ── Design tokens ─────────────────────────────────────── */
 :root {
   --bg:              #FAFAF8;
