@@ -126,8 +126,8 @@ export function renderMaintenance() {
             <div class="maint-sub">${[statusText, interval, item.provider ? escHtml(item.provider) : ''].filter(Boolean).join(' · ')}</div>
           </div>
           <div class="maint-actions">
-            <button class="maint-done-btn" onclick="event.stopPropagation();markMaintDone(${item.id})">✓ Done</button>
-            <button class="btn btn-sm" onclick="openMaintForm(${item.id})">Edit</button>
+            <button class="maint-done-btn" onclick="event.stopPropagation();markMaintDone('${item.id}')">✓ Done</button>
+            <button class="btn btn-sm" onclick="openMaintForm('${item.id}')">Edit</button>
           </div>
         </div>
         ${item.lastCost ? `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;padding-left:48px">Last cost: ${aud(item.lastCost)}</div>` : ''}

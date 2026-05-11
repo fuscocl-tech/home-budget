@@ -150,7 +150,7 @@ import {
   updateCars, updateCategoryGroup, updateColor, updateMember, updatePet, updateSetting,
 } from './sections/insights.js';
 import {
-  EXTRA_STATUSES, _allocExpanded, _budgetAllocByCategory, _budgetDetailOpen, _categoryIcon,
+  EXTRA_STATUSES, _allocExpanded, _toggleAllocExpanded, _budgetShowAddMenu, _budgetScrollTo, _budgetExpenseMenu, _budgetRenderReport, _budgetAllocByCategory, _budgetDetailOpen, _categoryIcon,
   _ticker, closeModal, openModal,
   deleteExpense, deleteExtra, deleteIncome, deleteStage, deleteVariation,
   expenseForm, expenseFromForm, extraForm, extraFromForm,
@@ -2279,7 +2279,7 @@ function openActualEditor(expenseId) {
               ${en.date ? `<span style="font-size:12px;color:var(--text-muted);margin-left:8px">${fmtDate(en.date)}</span>` : ''}
               ${en.note ? `<span style="font-size:12px;color:var(--text-muted);margin-left:8px">— ${escHtml(en.note)}</span>` : ''}
             </div>
-            <button onclick="removeActualEntry(${expenseId},${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;line-height:1;padding:0 2px">&times;</button>
+            <button onclick="removeActualEntry('${expenseId}',${i})" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:16px;line-height:1;padding:0 2px">&times;</button>
           </div>`).join('')}
         </div>
         <div style="display:flex;justify-content:space-between;padding:8px 12px 0;font-size:13px;font-weight:700;border-top:1px solid var(--border);margin-top:8px">
@@ -2300,7 +2300,7 @@ function openActualEditor(expenseId) {
           <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:3px">Note (optional)</label>
           <input type="text" maxlength="200" id="ae-note" class="form-input" placeholder="e.g. Week 1 fill-up" style="width:100%">
         </div>
-        <button class="btn btn-primary btn-sm" onclick="addActualEntry(${expenseId})" style="flex-shrink:0;height:38px">Add</button>
+        <button class="btn btn-primary btn-sm" onclick="addActualEntry('${expenseId}')" style="flex-shrink:0;height:38px">Add</button>
       </div>
     `;
   }
@@ -3105,6 +3105,11 @@ window._autoCreateRecurringEvents = _autoCreateRecurringEvents;
 window._briefIcon = _briefIcon;
 window._briefRow = _briefRow;
 window._budgetAllocByCategory = _budgetAllocByCategory;
+window._toggleAllocExpanded = _toggleAllocExpanded;
+window._budgetShowAddMenu = _budgetShowAddMenu;
+window._budgetScrollTo = _budgetScrollTo;
+window._budgetExpenseMenu = _budgetExpenseMenu;
+window._budgetRenderReport = _budgetRenderReport;
 window._buildTotoContext = _buildTotoContext;
 window._capacitorPrefs = _capacitorPrefs;
 window._categoryIcon = _categoryIcon;

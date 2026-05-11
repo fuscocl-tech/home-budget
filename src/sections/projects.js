@@ -404,8 +404,8 @@ function _renderCreateForm(templateKey) {
       </div>
 
       <div style="display:flex;gap:8px;margin-top:4px">
-        <button type="button" onclick="_projectsPickTemplate(null)" style="flex:1;padding:12px;border-radius:14px;border:1px solid var(--hairline);background:var(--paper);color:var(--ink);font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">Cancel</button>
-        <button type="button" onclick="event.preventDefault();_projectsSaveNew('${templateKey}')" style="flex:1;padding:12px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--iris-2),var(--purple));color:#fff;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer;box-shadow:0 6px 16px -4px rgba(91,76,245,0.30)">Create project →</button>
+        <button type="button" class="btn btn-secondary" onclick="_projectsPickTemplate(null)" style="flex:1;padding:12px;justify-content:center">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="event.preventDefault();_projectsSaveNew('${templateKey}')" style="flex:1;padding:12px;justify-content:center">Create project →</button>
       </div>
     </form>
     <div style="height:24px"></div>`;

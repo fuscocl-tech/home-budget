@@ -17,7 +17,7 @@ export function renderExpenseGroups(expenses) {
     ? [...groups, { id: 'ug', name: 'Ungrouped', icon: '📋', categories: ungroupedCats }]
     : groups;
 
-  let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:4px;align-items:start">';
+  let html = '<div style="display:flex;flex-direction:column;gap:16px;margin-top:4px">';
 
   for (const group of displayGroups) {
     const items = expenses.filter(e => group.categories.includes(e.category || 'Other'));
@@ -75,7 +75,7 @@ export function renderExpenseGroups(expenses) {
           return `
           <div class="expense-row" style="--row-color:${eColor};display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
             <div style="width:4px;height:36px;border-radius:2px;background:${eColor};flex-shrink:0"></div>
-            <div style="flex:1;min-width:0;cursor:pointer" onclick="event.stopPropagation();openEditExpense(${e.id})">
+            <div style="flex:1;min-width:0;cursor:pointer" onclick="event.stopPropagation();openEditExpense('${e.id}')">
               <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(e.name)}</div>
               <div style="font-size:11px;color:var(--text-muted)">${e.category || 'Other'}${e.vendor ? ` · ${escHtml(e.vendor)}` : ''} · ${freqDisplayItem(e)}</div>
             </div>
@@ -83,21 +83,12 @@ export function renderExpenseGroups(expenses) {
               <div style="font-size:13px;font-weight:600">${aud(eMo)}/mo</div>
               ${eAct > 0
                 ? `<div style="font-size:11px;font-weight:600;color:${eOver ? 'var(--danger)' : ePct >= 80 ? 'var(--warning)' : 'var(--success)'}">${aud(eAct)} actual${eOver ? ' ▲' : ''}</div>`
-                : `<div style="font-size:11px;color:var(--text-muted);cursor:pointer" onclick="event.stopPropagation();window.editActual(${e.id})">+ add actual</div>`}
+                : `<div style="font-size:11px;color:var(--text-muted);cursor:pointer" onclick="event.stopPropagation();window.editActual('${e.id}')">+ add actual</div>`}
             </div>
-            <div style="position:relative;flex-shrink:0;width:32px;height:32px;cursor:pointer"
-                 onclick="event.stopPropagation();window.editActual(${e.id})"
-                 onmouseenter="this.querySelector('svg').style.opacity='.25';this.querySelector('.ring-overlay').style.opacity='1'"
-                 onmouseleave="this.querySelector('svg').style.opacity='1';this.querySelector('.ring-overlay').style.opacity='0'">
-              <svg width="32" height="32" viewBox="0 0 36 36" style="transform:rotate(-90deg);transition:opacity .15s">
-                <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--border)" stroke-width="3.5"/>
-                <circle cx="18" cy="18" r="15.9" fill="none" stroke="${ringColor}" stroke-width="3.5"
-                  stroke-dasharray="${ePct} 100" stroke-linecap="round"/>
-              </svg>
-              <div class="ring-overlay" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .15s">
-                <span style="font-size:9px;font-weight:700;color:${ringColor};line-height:1">${ePct}%</span>
-              </div>
-            </div>
+            <button onclick="event.stopPropagation();_budgetExpenseMenu('${e.id}')"
+              style="width:32px;height:32px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-muted)">
+              ···
+            </button>
           </div>`;
         }).join('')}
         </div>
@@ -215,6 +206,23 @@ export function renderBudget() {
       <div class="summary-hero-expand" id="budget-expand-label">${_budgetDetailOpen ? 'Hide details ▲' : 'See breakdown ▼'}</div>
     </div>`;
 
+  // Action row — Edit Income · + · Edit Budget
+  html += `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <button onclick="_budgetScrollTo('income')"
+        style="flex:1;padding:9px 12px;border-radius:var(--r-sm);border:1px solid var(--hairline);background:var(--paper);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--sans)">
+        Edit income
+      </button>
+      <button onclick="_budgetShowAddMenu()"
+        style="width:44px;height:44px;border-radius:50%;border:none;background:var(--primary);color:#fff;font-size:22px;font-weight:400;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(91,76,245,0.35)">
+        +
+      </button>
+      <button onclick="_budgetScrollTo('expense')"
+        style="flex:1;padding:9px 12px;border-radius:var(--r-sm);border:1px solid var(--hairline);background:var(--paper);font-size:13px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--sans)">
+        Edit budget
+      </button>
+    </div>`;
+
   // Mini stat cards
   html += `
     <div class="summary-mini-grid">
@@ -254,7 +262,7 @@ export function renderBudget() {
       </div>`;
     }).join('');
     html += `<div class="alloc-section" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;margin-bottom:${_allocExpanded?'12px':'0'}" onclick="_allocExpanded=!_allocExpanded;renderBudget()">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;margin-bottom:${_allocExpanded?'12px':'0'}" onclick="_toggleAllocExpanded()">
         <div class="alloc-title" style="margin-bottom:0">Budget Allocation</div>
         <span style="font-size:11px;color:var(--muted);font-family:var(--mono)">${_allocExpanded?'▲':'▼'}</span>
       </div>
@@ -268,10 +276,7 @@ export function renderBudget() {
   html += `<div class="alloc-section" style="margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;margin-bottom:${_budgetDetailOpen?'16px':'0'}" onclick="toggleBudgetDetail()">
       <div class="alloc-title" style="margin-bottom:0">Detailed Breakdown</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <button onclick="event.stopPropagation();openCsvImport()" style="padding:5px 12px;border-radius:99px;background:var(--purple-soft);color:var(--purple);border:none;font-size:12px;font-weight:600;cursor:pointer">Import</button>
-        <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="budget-expand-chevron">${_budgetDetailOpen?'▲':'▼'}</span>
-      </div>
+      <span style="font-size:11px;color:var(--muted);font-family:var(--mono)" id="budget-expand-chevron">${_budgetDetailOpen?'▲':'▼'}</span>
     </div>
     <div class="detail-panel ${_budgetDetailOpen ? 'expanded' : 'collapsed'}" id="budget-detail" style="margin:0 -4px">`;
 
@@ -295,7 +300,7 @@ export function renderBudget() {
 
   // Income — full width
   html += `
-    <div class="section" style="margin-bottom:20px">
+    <div class="section" id="budget-income-section" style="margin-bottom:20px">
       <div class="section-header">
         <div>
           <div class="section-title">Income</div>
@@ -303,26 +308,29 @@ export function renderBudget() {
         </div>
         <button class="btn btn-primary btn-sm" onclick="openAddIncome()">+ Income</button>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Source</th><th>Amount</th><th>Due</th><th>Repeats</th><th>Monthly</th><th></th></tr></thead>
-          <tbody>
-            ${mi.length === 0 ? `<tr><td colspan="6"><div class="empty"><div class="empty-icon">💵</div>Add your income sources</div></td></tr>` : mi.map(i => {
-              const dueLabel = i.dueDate ? (() => { const [y,m,d] = i.dueDate.split('-'); return `${d}/${m}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
-              const incOneTimeBadge = i.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
-              return `<tr>
-              <td style="font-weight:500;border-left:4px solid ${window.colors.income}">${escHtml(i.name)}${incOneTimeBadge}</td>
-              <td class="amount">${audD(i.amount)}</td>
-              <td>${dueLabel}</td>
-              <td style="color:var(--text-muted)">${freqDisplayItem(i)}</td>
-              <td class="amount" style="color:var(--success)">${aud(itemMonthly(i))}/mo</td>
-              <td class="actions">
-                <button class="btn btn-ghost btn-sm" onclick="openEditIncome(${i.id})">✏️</button>
-                <button class="btn btn-danger-ghost btn-sm" onclick="deleteIncome(${i.id})">🗑</button>
-              </td>
-            </tr>`;}).join('')}
-          </tbody>
-        </table>
+      <div style="padding:0 20px 8px">
+        ${mi.length === 0
+          ? `<div class="empty"><div class="empty-icon">💵</div>Add your income sources</div>`
+          : mi.map(i => {
+              const incColor = window.colors.income || 'var(--good)';
+              const oneTimeBadge = i.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:var(--r-pill);background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px">one-time</span>` : '';
+              return `
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--hairline)">
+                <div style="width:4px;height:44px;border-radius:2px;background:${incColor};flex-shrink:0"></div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:600;margin-bottom:2px">${escHtml(i.name)}${oneTimeBadge}</div>
+                  <div style="font-size:12px;color:var(--text-muted)">${freqDisplayItem(i)}${i.dueDate ? ` · due ${i.dueDate.split('-').reverse().join('/')}` : ''}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                  <div style="font-size:14px;font-weight:700;color:var(--good)">${aud(itemMonthly(i))}<span style="font-size:11px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+                  ${i.amount !== itemMonthly(i) ? `<div style="font-size:12px;color:var(--text-muted)">${audD(i.amount)} ${freqDisplayItem(i).toLowerCase()}</div>` : ''}
+                </div>
+                <div style="display:flex;gap:4px;flex-shrink:0">
+                  <button class="btn btn-ghost btn-sm" onclick="openEditIncome('${i.id}')">✏️</button>
+                  <button class="btn btn-danger-ghost btn-sm" onclick="deleteIncome('${i.id}')">🗑</button>
+                </div>
+              </div>`;
+            }).join('')}
       </div>
     </div>
   `;
@@ -340,100 +348,88 @@ export function renderBudget() {
 
   html += `
     <div class="section">
-      <div class="section-header">
-        <div>
-          <div class="section-title">Expenses</div>
-          <div class="section-subtitle">
-            Budget: ${aud(totalBudgetExpenses)}/mo
-            ${totalActual > 0 ? ` · Actual: ${aud(totalActual)} · <span class="${totalVariance >= 0 ? 'var-under' : 'var-over'}">${totalVariance >= 0 ? '▼' : '▲'} ${aud(Math.abs(totalVariance))}</span>` : ''}
+      <div id="budget-expense-section" style="padding:16px 20px 12px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div class="section-title">Expenses</div>
+            <div class="section-subtitle">
+              Budget: ${aud(totalBudgetExpenses)}/mo
+              ${totalActual > 0 ? ` · Actual: ${aud(totalActual)} · <span class="${totalVariance >= 0 ? 'var-under' : 'var-over'}">${totalVariance >= 0 ? '▼' : '▲'} ${aud(Math.abs(totalVariance))}</span>` : ''}
+            </div>
           </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddExpense()" style="flex-shrink:0">+ Expense</button>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden">
-            <button onclick="setBudgetView('grouped')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:${window.budgetViewMode==='grouped'?'var(--primary)':'var(--surface)'};color:${window.budgetViewMode==='grouped'?'#fff':'var(--text-muted)'}">⊞ Groups</button>
-            <button onclick="setBudgetView('table')" style="padding:5px 12px;font-size:12px;font-weight:600;border:none;border-left:1px solid var(--border);cursor:pointer;background:${window.budgetViewMode==='table'?'var(--primary)':'var(--surface)'};color:${window.budgetViewMode==='table'?'#fff':'var(--text-muted)'}">≡ Table</button>
-          </div>
-          ${window.budgetViewMode === 'table' ? `<select class="form-select" style="width:auto;padding:6px 10px;font-size:12px" onchange="window.setExpenseFilter(this.value)">
-            ${allCats.map(c => `<option value="${c}" ${window.expenseFilterCat===c?'selected':''}>${c === 'all' ? 'All categories' : c}</option>`).join('')}
-          </select>` : ''}
-          <button class="btn btn-primary btn-sm" onclick="openAddExpense()">+ Expense</button>
+        <div style="display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden">
+          <button onclick="setBudgetView('grouped')" style="flex:1;padding:7px 8px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:${window.budgetViewMode==='grouped'?'var(--primary)':'var(--surface)'};color:${window.budgetViewMode==='grouped'?'#fff':'var(--text-muted)'}">⊞ Groups</button>
+          <button onclick="setBudgetView('table')" style="flex:1;padding:7px 8px;font-size:12px;font-weight:600;border:none;border-left:1px solid var(--border);cursor:pointer;background:${window.budgetViewMode==='table'?'var(--primary)':'var(--surface)'};color:${window.budgetViewMode==='table'?'#fff':'var(--text-muted)'}">≡ Table</button>
+          <button onclick="setBudgetView('report')" style="flex:1;padding:7px 8px;font-size:12px;font-weight:600;border:none;border-left:1px solid var(--border);cursor:pointer;background:${window.budgetViewMode==='report'?'var(--primary)':'var(--surface)'};color:${window.budgetViewMode==='report'?'#fff':'var(--text-muted)'}">◕ Report</button>
         </div>
+        ${window.budgetViewMode === 'table' ? `<select class="form-select" style="width:100%;margin-top:8px" onchange="window.setExpenseFilter(this.value)">
+          ${allCats.map(c => `<option value="${c}" ${window.expenseFilterCat===c?'selected':''}>${c === 'all' ? 'All categories' : c}</option>`).join('')}
+        </select>` : ''}
       </div>
 
-      <div style="padding:16px 20px">
-      ${window.budgetViewMode === 'grouped' ? renderExpenseGroups(me) : `
-        <div class="table-wrap" style="margin:0 -20px">
-          <table>
-            <thead>
-              <tr>
-                ${window.thSort('name', 'Item')}
-                ${window.thSort('category', 'Category')}
-                ${window.thSort('frequency', 'Frequency')}
-                ${window.thSort('due', 'Due')}
-                ${window.thSort('budget', 'Budget/mo')}
-                <th>Actual <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-muted)">(click to edit)</span></th>
-                ${window.thSort('variance', 'Variance')}
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              ${filteredExpenses.length === 0
-                ? `<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div>${me.length === 0 ? 'Add your household expenses' : 'No expenses in this category'}</div></td></tr>`
-                : (() => {
-                    const sorted = [...filteredExpenses].sort((a, b) => {
-                      if (!window.expenseSortCol) return 0;
-                      let av, bv;
-                      if (window.expenseSortCol === 'name')           { av = a.name.toLowerCase();                                    bv = b.name.toLowerCase(); }
-                      else if (window.expenseSortCol === 'category')  { av = (a.category||'Other').toLowerCase();                     bv = (b.category||'Other').toLowerCase(); }
-                      else if (window.expenseSortCol === 'frequency') { av = freqDisplayItem(a);                                      bv = freqDisplayItem(b); }
-                      else if (window.expenseSortCol === 'due')       { av = a.dueDate || '\uffff';                                   bv = b.dueDate || '\uffff'; }
-                      else if (window.expenseSortCol === 'budget')    { av = itemMonthly(a);                                          bv = itemMonthly(b); }
-                      else if (window.expenseSortCol === 'actual')    { av = window.getActual(a.id, window.selectedBudgetMonth);                    bv = window.getActual(b.id, window.selectedBudgetMonth); }
-                      else if (window.expenseSortCol === 'variance')  { av = itemMonthly(a)-window.getActual(a.id,window.selectedBudgetMonth);      bv = itemMonthly(b)-window.getActual(b.id,window.selectedBudgetMonth); }
-                      else return 0;
-                      return av < bv ? (window.expenseSortDir==='asc'?-1:1) : av > bv ? (window.expenseSortDir==='asc'?1:-1) : 0;
-                    });
-                    return sorted.map(e => {
-                      const budgetMo = itemMonthly(e);
-                      const actual   = window.getActual(e.id, window.selectedBudgetMonth);
-                      const variance = budgetMo - actual;
-                      const hasAct   = actual > 0;
-                      let varianceHtml;
-                      if (!hasAct) varianceHtml = `<span class="var-none">—</span>`;
-                      else if (variance >= 0) varianceHtml = `<span class="var-under">▼ ${aud(variance)}</span>`;
-                      else varianceHtml = `<span class="var-over">▲ ${aud(Math.abs(variance))}</span>`;
-                      const dueLabel = e.dueDate ? (() => { const [y,mo,d] = e.dueDate.split('-'); return `${d}/${mo}/${y}`; })() : '<span style="color:var(--text-muted)">—</span>';
-                      const rowColor = window.colors.expense[e.category || 'Other'] || '#94a3b8';
-                      const oneTimeBadge = e.recurring === false ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px;white-space:nowrap">one-time</span>` : '';
-                      return `<tr>
-                        <td style="font-weight:500;border-left:4px solid ${rowColor}">${escHtml(e.name)}${oneTimeBadge}${e.vendor ? `<br><span style="font-size:11px;font-weight:400;color:var(--text-muted)">${escHtml(e.vendor)}</span>` : ''}</td>
-                        <td><span style="display:inline-block;padding:2px 10px;border-radius:99px;background:${rowColor};color:#fff;font-size:11px;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span></td>
-                        <td style="color:var(--text-muted)">${freqDisplayItem(e)}</td>
-                        <td>${dueLabel}</td>
-                        <td class="amount">${aud(budgetMo)}</td>
-                        <td class="actual-cell amount" id="actual-${e.id}" onclick="window.editActual(${e.id})">${hasAct ? aud(actual) : '<span style="color:var(--text-muted);font-size:12px">+ add</span>'}</td>
-                        <td>${varianceHtml}</td>
-                        <td class="actions">
-                          <button class="btn btn-ghost btn-sm" onclick="openEditExpense(${e.id})">✏️</button>
-                          <button class="btn btn-danger-ghost btn-sm" onclick="deleteExpense(${e.id})">🗑</button>
-                        </td>
-                      </tr>`;
-                    }).join('');
-                  })()
-              }
-            </tbody>
-            ${filteredExpenses.length > 0 ? `
-            <tfoot>
-              <tr style="background:var(--surface2);border-top:2px solid var(--border)">
-                <td colspan="4" style="padding:11px 16px;font-size:13px;color:var(--text-muted);font-style:italic">Total ${isFiltered ? window.expenseFilterCat : 'all categories'}</td>
-                <td class="amount" style="padding:11px 16px;font-weight:700">${aud(catBudget)}/mo</td>
-                <td class="amount" style="padding:11px 16px;font-weight:700">${catActual > 0 ? aud(catActual) : '—'}</td>
-                <td style="padding:11px 16px;font-weight:700">${catActual > 0 ? `<span class="${catVariance>=0?'var-under':'var-over'}">${catVariance>=0?'▼':'▲'} ${aud(Math.abs(catVariance))}</span>` : '—'}</td>
-                <td></td>
-              </tr>
-            </tfoot>` : ''}
-          </table>
-        </div>`}
+      <div style="padding:0 12px 16px">
+      ${window.budgetViewMode === 'report' ? _budgetRenderReport(me, totalBudgetExpenses, totalActual) : window.budgetViewMode === 'grouped' ? renderExpenseGroups(me) : (() => {
+        
+          if (filteredExpenses.length === 0) return `<div class="empty"><div class="empty-icon">📋</div>${me.length === 0 ? 'Add your household expenses' : 'No expenses in this category'}</div>`;
+          const sorted = [...filteredExpenses].sort((a, b) => {
+            if (!window.expenseSortCol) return 0;
+            let av, bv;
+            if (window.expenseSortCol === 'name')          { av = a.name.toLowerCase(); bv = b.name.toLowerCase(); }
+            else if (window.expenseSortCol === 'category') { av = (a.category||'Other').toLowerCase(); bv = (b.category||'Other').toLowerCase(); }
+            else if (window.expenseSortCol === 'budget')   { av = itemMonthly(a); bv = itemMonthly(b); }
+            else if (window.expenseSortCol === 'actual')   { av = window.getActual(a.id, window.selectedBudgetMonth); bv = window.getActual(b.id, window.selectedBudgetMonth); }
+            else if (window.expenseSortCol === 'variance') { av = itemMonthly(a)-window.getActual(a.id,window.selectedBudgetMonth); bv = itemMonthly(b)-window.getActual(b.id,window.selectedBudgetMonth); }
+            else return 0;
+            return av < bv ? (window.expenseSortDir==='asc'?-1:1) : av > bv ? (window.expenseSortDir==='asc'?1:-1) : 0;
+          });
+          const cards = sorted.map(e => {
+            const budgetMo = itemMonthly(e);
+            const actual   = window.getActual(e.id, window.selectedBudgetMonth);
+            const variance = budgetMo - actual;
+            const hasAct   = actual > 0;
+            const over     = hasAct && actual > budgetMo;
+            const pct      = budgetMo > 0 ? Math.min(100, Math.round(actual / budgetMo * 100)) : 0;
+            const barColor = over ? 'var(--alert)' : pct >= 80 ? 'var(--watch)' : 'var(--good)';
+            const rowColor = window.colors.expense[e.category || 'Other'] || '#94a3b8';
+            const oneTimeBadge = e.recurring === false
+              ? `<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:var(--r-pill);background:#fef9c3;color:#854d0e;border:1px solid #fde047;margin-left:6px">one-time</span>` : '';
+            const varianceHtml = hasAct
+              ? (over
+                ? `<span style="color:var(--alert);font-size:11px;font-weight:600">▲ ${aud(Math.abs(variance))} over</span>`
+                : `<span style="color:var(--good);font-size:11px;font-weight:600">▼ ${aud(variance)} left</span>`)
+              : '';
+            return `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--hairline)">
+              <div style="width:4px;height:44px;border-radius:2px;background:${rowColor};flex-shrink:0"></div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px">
+                  <span style="font-size:14px;font-weight:600">${escHtml(e.name)}${oneTimeBadge}</span>
+                  <span style="font-size:11px;padding:1px 8px;border-radius:var(--r-pill);background:${rowColor};color:#fff;font-weight:600;white-space:nowrap">${e.category || 'Other'}</span>
+                </div>
+                <div style="font-size:12px;color:var(--text-muted)">${freqDisplayItem(e)}${e.dueDate ? ` · due ${e.dueDate.split('-').reverse().join('/')}` : ''}</div>
+                ${hasAct ? `<div style="margin-top:5px"><div style="background:var(--hairline);border-radius:var(--r-pill);height:4px;overflow:hidden;margin-bottom:3px"><div style="height:100%;width:${pct}%;background:${barColor};border-radius:var(--r-pill)"></div></div>${varianceHtml}</div>` : ''}
+              </div>
+              <div style="text-align:right;flex-shrink:0">
+                <div style="font-size:14px;font-weight:700">${aud(budgetMo)}<span style="font-size:11px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+                <div style="font-size:12px;font-weight:600;color:${hasAct ? (over ? 'var(--alert)' : 'var(--good)') : 'var(--teal)'};cursor:pointer;margin-top:2px" onclick="window.editActual('${e.id}')">
+                  ${hasAct ? aud(actual)+' actual' : '+ add actual'}
+                </div>
+              </div>
+              <button onclick="_budgetExpenseMenu('${e.id}')"
+                style="width:32px;height:32px;border-radius:50%;border:1px solid var(--hairline);background:var(--surface2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-muted)">···</button>
+            </div>`;
+          }).join('');
+          const totalRow = filteredExpenses.length > 0 ? `<div style="display:flex;justify-content:space-between;padding:12px 0 0;font-size:13px;font-weight:700;border-top:2px solid var(--hairline);margin-top:4px">
+            <span style="color:var(--text-muted)">Total ${isFiltered ? window.expenseFilterCat : 'all'}</span>
+            <div style="text-align:right">
+              <div>${aud(catBudget)}/mo</div>
+              ${catActual > 0 ? `<div style="font-size:12px"><span class="${catVariance>=0?'var-under':'var-over'}">${catVariance>=0?'▼':'▲'} ${aud(Math.abs(catVariance))}</span> · ${aud(catActual)} actual</div>` : ''}
+            </div>
+          </div>` : '';
+          return `<div>${cards}${totalRow}</div>`;
+        })()}
       </div>
     </div>
   `;
@@ -451,6 +447,123 @@ export function renderBudget() {
 
 export let _budgetDetailOpen = false;
 export let _allocExpanded = false;
+export function _toggleAllocExpanded() { _allocExpanded = !_allocExpanded; renderBudget(); }
+export function _budgetShowAddMenu() {
+  openModal('What would you like to add?', `
+    <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">
+      <button onclick="closeModal();openAddIncome()"
+        style="width:100%;padding:14px 16px;text-align:left;border:1px solid var(--hairline);background:var(--surface2);border-radius:var(--r);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">💰</span>
+        <div>
+          <div>Income source</div>
+          <div style="font-size:12px;font-weight:400;color:var(--text-muted);margin-top:2px">Salary, freelance, rental etc.</div>
+        </div>
+      </button>
+      <button onclick="closeModal();openAddExpense()"
+        style="width:100%;padding:14px 16px;text-align:left;border:1px solid var(--hairline);background:var(--surface2);border-radius:var(--r);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">💸</span>
+        <div>
+          <div>Budget item</div>
+          <div style="font-size:12px;font-weight:400;color:var(--text-muted);margin-top:2px">Groceries, rent, subscriptions etc.</div>
+        </div>
+      </button>
+      <button onclick="closeModal();openCsvImport()"
+        style="width:100%;padding:14px 16px;text-align:left;border:1px solid var(--hairline);background:var(--surface2);border-radius:var(--r);font-size:15px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px">📥</span>
+        <div>
+          <div>Import</div>
+          <div style="font-size:12px;font-weight:400;color:var(--text-muted);margin-top:2px">Import expenses from CSV</div>
+        </div>
+      </button>
+    </div>`, null);
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>`;
+}
+
+export function _budgetScrollTo(section) {
+  _budgetDetailOpen = true;
+  renderBudget();
+  setTimeout(() => {
+    const id = section === 'income' ? 'budget-income-section' : 'budget-expense-section';
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+export function _budgetExpenseMenu(id) {
+  const expense = (state.budget?.expenses || []).find(e => e.id === id);
+  if (!expense) return;
+  openModal(escHtml(expense.name), `
+    <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">
+      <button onclick="closeModal();openEditExpense('${id}')"
+        style="width:100%;padding:13px 16px;text-align:left;border:1px solid var(--hairline);background:var(--surface2);border-radius:var(--r);font-size:14px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">✏️</span> Edit expense
+      </button>
+      <button onclick="closeModal();window.editActual('${id}')"
+        style="width:100%;padding:13px 16px;text-align:left;border:1px solid var(--hairline);background:var(--surface2);border-radius:var(--r);font-size:14px;font-weight:600;color:var(--text);cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">💰</span> Update actual spend
+      </button>
+      <button onclick="closeModal();deleteExpense('${id}')"
+        style="width:100%;padding:13px 16px;text-align:left;border:1px solid rgba(220,79,79,.2);background:#fbeaea;border-radius:var(--r);font-size:14px;font-weight:600;color:var(--alert);cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">🗑</span> Delete expense
+      </button>
+    </div>`, null);
+  document.getElementById('modal-footer').innerHTML = `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>`;
+}
+
+export function _budgetRenderReport(expenses, totalBudget, totalActual) {
+  if (!expenses.length) return `<div style="text-align:center;padding:32px;color:var(--text-muted)">No expenses to report on.</div>`;
+
+  // Group by category
+  const byCategory = {};
+  expenses.forEach(e => {
+    const cat = e.category || 'Other';
+    if (!byCategory[cat]) byCategory[cat] = { budget: 0, actual: 0 };
+    const mo = window.itemMonthly ? window.itemMonthly(e) : (e.amount || 0);
+    byCategory[cat].budget += mo;
+    byCategory[cat].actual += window.getActual ? window.getActual(e.id, window.selectedBudgetMonth) : 0;
+  });
+
+  const cats = Object.entries(byCategory).sort((a, b) => b[1].budget - a[1].budget);
+  const colors = ['#5B4CF5','#0891b2','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16','#f97316','#ec4899'];
+
+  // SVG donut
+  const total = cats.reduce((s, [, v]) => s + v.budget, 0);
+  let offset = 0;
+  const r = 70; const cx = 90; const cy = 90; const circumference = 2 * Math.PI * r;
+  const slices = cats.map(([cat, v], i) => {
+    const pct = total > 0 ? v.budget / total : 0;
+    const dash = pct * circumference;
+    const gap  = circumference - dash;
+    const slice = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[i % colors.length]}" stroke-width="28"
+      stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+      stroke-dashoffset="${(-offset * circumference).toFixed(2)}"
+      style="transform:rotate(-90deg);transform-origin:${cx}px ${cy}px"/>`;
+    offset += pct;
+    return slice;
+  }).join('');
+
+  const donut = `<div style="display:flex;justify-content:center;margin-bottom:20px">
+    <svg width="180" height="180" viewBox="0 0 180 180">
+      ${slices}
+      <text x="${cx}" y="${cy - 6}" text-anchor="middle" style="font-size:11px;fill:var(--text-muted);font-family:var(--mono)">BUDGET</text>
+      <text x="${cx}" y="${cy + 12}" text-anchor="middle" style="font-size:16px;font-weight:700;fill:var(--text);font-family:var(--mono)">${aud(total)}</text>
+    </svg>
+  </div>`;
+
+  const legend = cats.map(([cat, v], i) => {
+    const pct = total > 0 ? Math.round(v.budget / total * 100) : 0;
+    const over = v.actual > v.budget && v.actual > 0;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--hairline)">
+      <div style="width:12px;height:12px;border-radius:3px;background:${colors[i % colors.length]};flex-shrink:0"></div>
+      <div style="flex:1;font-size:13px;font-weight:500">${escHtml(cat)}</div>
+      <div style="text-align:right;font-size:12px">
+        <div style="font-weight:700">${aud(v.budget)}/mo <span style="color:var(--text-muted);font-weight:400">(${pct}%)</span></div>
+        ${v.actual > 0 ? `<div style="color:${over ? 'var(--alert)' : 'var(--good)'};">${aud(v.actual)} actual${over ? ' ▲' : ''}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  return donut + `<div>${legend}</div>`;
+}
 export function toggleBudgetDetail() {
   _budgetDetailOpen = !_budgetDetailOpen;
   const panel = document.getElementById('budget-detail');

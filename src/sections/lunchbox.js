@@ -48,7 +48,7 @@ export function renderLunchbox() {
 
   // Kid tabs
   const kidTabs = profiles.map(p =>
-    `<button class="lb-kid-tab${p.id === _lbActiveKid ? ' active' : ''}" onclick="_lbActiveKid=${p.id};renderLunchbox()">${escHtml(p.name)}</button>`
+    `<button class="lb-kid-tab${p.id === _lbActiveKid ? ' active' : ''}" onclick="_lbActiveKid='${p.id}';renderLunchbox()">${escHtml(p.name)}</button>`
   ).join('');
 
   // Week label
@@ -84,7 +84,7 @@ export function renderLunchbox() {
         <button class="lb-kid-tab" onclick="openLunchboxProfile()" style="border-style:dashed">+</button>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" onclick="openLunchboxProfile(${kid.id})">Edit profile</button>
+        <button class="btn btn-sm" onclick="openLunchboxProfile('${kid.id}')">Edit profile</button>
       </div>
     </div>
 
@@ -110,8 +110,8 @@ export function renderLunchbox() {
         ${_lbWeekOffset !== 0 ? `<button class="btn btn-sm" onclick="_lbWeekOffset=0;renderLunchbox()">This week</button>` : ''}
       </div>
       <div style="display:flex;gap:8px">
-        ${hasKey ? `<button class="btn btn-primary btn-sm" id="lb-ai-btn" onclick="aiPlanLunchbox('${weekKey}',${kid.id})">Plan this week</button>` : ''}
-        ${filledSlots > 0 ? `<button class="btn btn-sm" onclick="lbToShoppingList('${weekKey}',${kid.id})">Add to shopping list</button>` : ''}
+        ${hasKey ? `<button class="btn btn-primary btn-sm" id="lb-ai-btn" onclick="aiPlanLunchbox('${weekKey}','${kid.id}')">Plan this week</button>` : ''}
+        ${filledSlots > 0 ? `<button class="btn btn-sm" onclick="lbToShoppingList('${weekKey}','${kid.id}')">Add to shopping list</button>` : ''}
       </div>
     </div>
 

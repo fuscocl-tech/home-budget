@@ -981,7 +981,7 @@ export function _routineEdit(routineId) {
       <span style="flex:1;font-size:13px;font-weight:500">${escHtml(s.label)}</span>
       <span style="font-size:11px;color:var(--text-muted)">${s.durationMin || 0}m</span>
       ${isChildRoutine ? `<span style="font-size:11px;color:var(--text-muted)">⭐${s.points || 0}</span>` : ''}
-      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteStep(${routineId},${s.id},true)">✕</button>
+      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteStep(${routineId},'${s.id}',true)">✕</button>
     </div>`).join('');
 
   // Points field only for child (household) routines

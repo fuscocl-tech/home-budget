@@ -109,7 +109,7 @@ export async function renderReceiptsList(itemKey, itemName) {
         : `<span>${fileSizeStr(r.fileSize)} · ${new Date(r.uploadedAt).toLocaleDateString('en-AU')}</span>`;
       const action = isLink
         ? `<button class="btn btn-ghost btn-sm" onclick="window.open('${r.url.replace(/'/g,'\\\'').replace(/"/g,'&quot;')}','_blank')">Open</button>`
-        : `<button class="btn btn-ghost btn-sm" onclick="viewReceipt(${r.id})">View</button>`;
+        : `<button class="btn btn-ghost btn-sm" onclick="viewReceipt('${r.id}')">View</button>`;
       html += `
         <div class="receipt-row">
           <div class="receipt-icon">${icon}</div>
@@ -118,7 +118,7 @@ export async function renderReceiptsList(itemKey, itemName) {
             <div class="receipt-meta">${meta} · ${new Date(r.uploadedAt).toLocaleDateString('en-AU')}</div>
           </div>
           ${action}
-          <button class="btn btn-danger-ghost btn-sm" onclick="removeReceipt(${r.id},'${safeKey}','${safeName}')" title="Delete">🗑</button>
+          <button class="btn btn-danger-ghost btn-sm" onclick="removeReceipt('${r.id}','${safeKey}','${safeName}')" title="Delete">🗑</button>
         </div>`;
     });
   } else {

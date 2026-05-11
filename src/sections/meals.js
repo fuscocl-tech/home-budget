@@ -389,7 +389,7 @@ export function _renderShoppingList() {
               style="width:18px;height:18px;cursor:pointer;accent-color:#0891b2;flex-shrink:0">
             <span style="flex:1;font-size:14px;${item.checked?'text-decoration:line-through;color:var(--text-muted)':''}">${escHtml(item.name)}</span>
             ${item.qty ? `<span style="font-size:12px;color:var(--text-muted);white-space:nowrap">${item.qty}</span>` : ''}
-            <button onclick="removeShopItem(${item.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;padding:2px 4px">×</button>
+            <button onclick="removeShopItem('${item.id}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;padding:2px 4px">×</button>
           </div>`).join('')}
       </div>`;
   });

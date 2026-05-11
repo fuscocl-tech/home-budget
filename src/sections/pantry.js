@@ -67,14 +67,14 @@ export function renderPantry() {
       const statusIcon = item.status === 'stocked' ? '✓' : item.status === 'low' ? '!' : '✗';
       const nextStatus = item.status === 'stocked' ? 'low' : item.status === 'low' ? 'need' : 'stocked';
       html += `<div class="pantry-item">
-        <div class="pantry-status ${item.status}" onclick="cyclePantryStatus(${item.id})" title="Tap to change">${statusIcon}</div>
+        <div class="pantry-status ${item.status}" onclick="cyclePantryStatus('${item.id}')" title="Tap to change">${statusIcon}</div>
         <div class="pantry-body">
           <div class="pantry-name">${escHtml(item.name)}</div>
           ${item.qty ? `<div class="pantry-meta">${escHtml(item.qty)}</div>` : ''}
         </div>
         <div class="pantry-actions">
-          <button class="btn btn-sm" style="font-size:11px" onclick="openPantryForm(${item.id})">Edit</button>
-          <button class="btn btn-sm" style="font-size:11px;color:var(--danger)" onclick="deletePantryItem(${item.id})">×</button>
+          <button class="btn btn-sm" style="font-size:11px" onclick="openPantryForm('${item.id}')">Edit</button>
+          <button class="btn btn-sm" style="font-size:11px;color:var(--danger)" onclick="deletePantryItem('${item.id}')">×</button>
         </div>
       </div>`;
     });
