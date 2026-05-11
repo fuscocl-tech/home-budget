@@ -90,8 +90,8 @@ export function renderVehicles() {
             ${v.plate ? `<span class="veh-plate">${escHtml(v.plate)}${v.state ? ' · ' + v.state : ''}</span>` : ''}
           </div>
           <div style="display:flex;gap:6px">
-            <button class="btn btn-sm" onclick="openVehicleForm(${v.id})">Edit</button>
-            <button class="btn btn-sm" style="color:var(--danger)" onclick="deleteVehicle(${v.id})">Delete</button>
+            <button class="btn btn-sm" onclick="openVehicleForm('${v.id}')">Edit</button>
+            <button class="btn btn-sm" style="color:var(--danger)" onclick="deleteVehicle('${v.id}')">Delete</button>
           </div>
         </div>
 
@@ -116,7 +116,7 @@ export function renderVehicles() {
         <div class="section" style="margin-top:8px">
           <div class="section-header">
             <div class="section-title">Service History</div>
-            <button class="btn btn-sm" onclick="openServiceForm(${v.id})">+ Add Service</button>
+            <button class="btn btn-sm" onclick="openServiceForm('${v.id}')">+ Add Service</button>
           </div>
           ${(v.services || []).length === 0
             ? `<div style="padding:16px 20px;color:var(--text-muted);font-size:13px;text-align:center">No service records yet</div>`
@@ -129,7 +129,7 @@ export function renderVehicles() {
                     <td>${s.odometer ? s.odometer.toLocaleString() + ' km' : '—'}</td>
                     <td style="color:var(--text-muted)">${escHtml(s.provider || '—')}</td>
                     <td class="amount">${s.cost ? aud(s.cost) : '—'}</td>
-                    <td><button class="btn btn-sm" style="color:var(--danger);font-size:11px" onclick="deleteService(${v.id},${s.id})">×</button></td>
+                    <td><button class="btn btn-sm" style="color:var(--danger);font-size:11px" onclick="deleteService('${v.id}','${s.id}')">×</button></td>
                   </tr>`).join('')}
                 </tbody>
               </table></div>`}

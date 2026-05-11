@@ -221,10 +221,11 @@ export function _devLoadRoutines() {
     { id: uid(), label: 'Lights out', emoji: '💤', points: 0, durationMin: 0 },
   ];
   const hour = new Date().getHours();
+  const currentUid = window._currentUser?.uid || window.uid || window._routineCurrentUserId?.() || 'guest';
   const r1id = uid(); const r2id = uid(); const r3id = uid(); const r4id = uid();
   const routines = [
-    { id: r1id, name: 'Morning', emoji: '☀️', ownerType: 'adult', ownerId: 'dev', sharedWith: [], steps: adultMorning, pointsPerCompletion: 0, triggerTime: '07:00', recurrence: { type:'weekdays', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [], completions: {} },
-    { id: r2id, name: 'Evening', emoji: '🌙', ownerType: 'adult', ownerId: 'dev', sharedWith: [], steps: adultEvening, pointsPerCompletion: 0, triggerTime: `${String(hour).padStart(2,'0')}:00`, recurrence: { type:'daily', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [], completions: {} },
+    { id: r1id, name: 'Morning', emoji: '☀️', ownerType: 'adult', ownerId: currentUid, sharedWith: [], steps: adultMorning, pointsPerCompletion: 0, triggerTime: '07:00', recurrence: { type:'weekdays', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [], completions: {} },
+    { id: r2id, name: 'Evening', emoji: '🌙', ownerType: 'adult', ownerId: currentUid, sharedWith: [], steps: adultEvening, pointsPerCompletion: 0, triggerTime: `${String(hour).padStart(2,'0')}:00`, recurrence: { type:'daily', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [], completions: {} },
     { id: r3id, name: 'Morning routine', emoji: '🌤️', ownerType: 'household', ownerId: 'household', sharedWith: [], steps: morningSteps, pointsPerCompletion: 10, triggerTime: '07:30', recurrence: { type:'weekdays', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [] },
     { id: r4id, name: 'Evening routine', emoji: '🌙', ownerType: 'household', ownerId: 'household', sharedWith: [], steps: eveningSteps, pointsPerCompletion: 10, triggerTime: `${String(hour).padStart(2,'0')}:00`, recurrence: { type:'daily', startDate:'2026-01-01' }, skippedDates: [], pausePeriods: [] },
   ];

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toto UI Consistency — Fix Proposal v2</title>
+<style>
+  :root {
+    --pearl: #FAFAF7;
+    --paper: #FFFFFF;
+    --ink: #16140F;
+    --muted: #8A8278;
+    --hairline: #ECE7DD;
+    --purple: #5B4CF5;
+    --good: #2EA86B;
+    --alert: #DC4F4F;
+    --watch: #D9852C;
+    --r: 16px;
+    --r-lg: 24px;
+    --r-sm: 10px;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--pearl); color: var(--ink); font-size: 15px; line-height: 1.6; }
+
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { margin-bottom: 48px; border-bottom: 1px solid var(--hairline); padding-bottom: 32px; }
+  header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  header p { color: var(--muted); font-size: 14px; }
+
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 48px; }
+  .nav a { padding: 6px 14px; border-radius: 99px; border: 1px solid var(--hairline); background: var(--paper); font-size: 13px; color: var(--ink); text-decoration: none; font-weight: 500; transition: all 0.15s; }
+  .nav a:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+  /* Principle banner */
+  .principle { background: #F7F6FF; border: 1.5px solid #DDD6FE; border-radius: var(--r-lg); padding: 28px 32px; margin-bottom: 48px; }
+  .principle h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: var(--purple); }
+  .principle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .principle-col h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .principle-col.global h3 { color: var(--good); }
+  .principle-col.section h3 { color: var(--watch); }
+  .principle-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .principle-col li { font-size: 13px; padding: 8px 12px; border-radius: 10px; display: flex; align-items: flex-start; gap: 8px; }
+  .principle-col.global li { background: #F0FDF4; color: #166534; }
+  .principle-col.section li { background: #FFF7ED; color: #92400E; }
+  .principle-col li span { font-size: 15px; flex-shrink: 0; }
+
+  /* Section colour palette */
+  .palette-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; }
+  .palette-card { border-radius: var(--r); overflow: hidden; border: 1px solid var(--hairline); }
+  .palette-swatch { height: 80px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .palette-body { padding: 12px 14px; background: var(--paper); }
+  .palette-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .palette-colours { display: flex; flex-direction: column; gap: 3px; }
+  .palette-colour { font-family: var(--mono); font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .swatch-dot { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0; }
+  .palette-tag { display: inline-block; margin-top: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 99px; }
+  .tag-keep { background: #FEF3C7; color: #92400E; }
+  .tag-fix { background: #DCFCE7; color: #166534; }
+
+  /* Section */
+  .section { margin-bottom: 56px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .section-header h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .section-desc { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  .section-tag { padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tag-safe { background: #DCFCE7; color: #166534; }
+  .tag-careful { background: #FEF3C7; color: #92400E; }
+  .tag-skip { background: #F1F5F9; color: #64748B; }
+  .tag-high { background: #FEE2E2; color: #991B1B; }
+  .tag-med { background: #FEF3C7; color: #92400E; }
+  .tag-low { background: #DCFCE7; color: #166534; }
+
+  /* Issue cards */
+  .issues { display: flex; flex-direction: column; gap: 16px; }
+  .issue { background: var(--paper); border: 1px solid var(--hairline); border-radius: var(--r); overflow: hidden; }
+  .issue.skip { opacity: 0.6; }
+  .issue-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--hairline); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .issue-header-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .issue-title { font-size: 14px; font-weight: 600; }
+  .issue-file { font-family: var(--mono); font-size: 11px; color: var(--muted); background: var(--pearl); padding: 2px 7px; border-radius: 6px; }
+  .issue-body { padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .code-block { display: flex; flex-direction: column; gap: 6px; }
+  .code-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .code-label.before { color: var(--alert); }
+  .code-label.after { color: var(--good); }
+  .code-label.keep { color: var(--watch); }
+  pre { background: #1E1E2E; color: #CDD6F4; padding: 12px 14px; border-radius: 10px; font-family: var(--mono); font-size: 12px; line-height: 1.6; overflow-x: auto; white-space: pre-wrap; word-break: break-all; }
+  pre.before { border-left: 3px solid var(--alert); }
+  pre.after { border-left: 3px solid var(--good); }
+  pre.keep { border-left: 3px solid var(--watch); }
+  .note { font-size: 12px; color: var(--muted); padding: 10px 18px 14px; border-top: 1px solid var(--hairline); line-height: 1.5; }
+  .note strong { color: var(--ink); }
+
+  /* Visual demos */
+  .demos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .demo { border-radius: var(--r); border: 1px solid var(--hairline); overflow: hidden; }
+  .demo-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 14px; border-bottom: 1px solid var(--hairline); }
+  .demo-label.before { color: var(--alert); background: #FEF2F2; }
+  .demo-label.after { color: var(--good); background: #F0FDF4; }
+  .demo-label.keep { color: var(--watch); background: #FFF7ED; }
+  .demo-content { padding: 16px; background: var(--paper); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  /* Variable table */
+  .var-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .var-table th { text-align: left; padding: 8px 12px; background: var(--pearl); border-bottom: 2px solid var(--hairline); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .var-table td { padding: 8px 12px; border-bottom: 1px solid var(--hairline); vertical-align: middle; }
+  .var-table tr:last-child td { border-bottom: none; }
+  .var-name { font-family: var(--mono); font-size: 12px; color: var(--purple); }
+  .var-value { font-family: var(--mono); font-size: 12px; }
+  .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); vertical-align: middle; margin-right: 6px; }
+
+  /* Summary */
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+  .summary-card { background: var(--paper); border: 1px solid var(--hairline); border-radius: var(--r); padding: 20px; text-align: center; }
+  .summary-num { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+  .summary-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* Approval */
+  .approval { background: var(--paper); border: 1px solid var(--hairline); border-radius: var(--r-lg); padding: 28px; margin-top: 48px; text-align: center; }
+  .approval h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .approval p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .approval-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn { padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; font-family: var(--sans); transition: opacity 0.15s; }
+  .btn:hover { opacity: 0.85; }
+  .btn-approve { background: var(--good); color: #fff; }
+  .btn-partial { background: #FEF3C7; color: #92400E; }
+  .btn-skip { background: var(--pearl); color: var(--muted); border: 1px solid var(--hairline); }
+
+  @media (max-width: 640px) {
+    .issue-body, .demos, .principle-grid, .palette-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .palette-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🎨 Toto UI Consistency — Fix Proposal v2</h1>
+    <p>Updated 8 May 2026 · Revised to preserve intentional section accent colours</p>
+  </header>
+
+  <nav class="nav">
+    <a href="#principle">Principle</a>
+    <a href="#palette">Section Colours</a>
+    <a href="#safe-fixes">Safe Fixes</a>
+    <a href="#border-radius">Border Radius</a>
+    <a href="#neutrals">Neutral Grays</a>
+    <a href="#semantic">Semantic Colours</a>
+    <a href="#skip">Leave Alone</a>
+  </nav>
+
+  <!-- Core Principle -->
+  <div id="principle">
+    <div class="principle">
+      <h2>Core Principle — Two Tiers of Colour</h2>
+      <div class="principle-grid">
+        <div class="principle-col global">
+          <h3>✅ Global tokens — standardise these</h3>
+          <ul>
+            <li><span>📐</span>Border radius — use --r-sm, --r, --r-lg, --r-pill everywhere</li>
+            <li><span>🩶</span>Neutral grays — replace Tailwind grays with Toto warm grays</li>
+            <li><span>🟢</span>Semantic states — success, warning, danger should be consistent app-wide</li>
+            <li><span>🔤</span>Typography — font family, line-height, letter-spacing</li>
+            <li><span>📏</span>Spacing — padding and gap values</li>
+          </ul>
+        </div>
+        <div class="principle-col section">
+          <h3>⚠️ Section accents — leave these alone</h3>
+          <ul>
+            <li><span>💜</span>Home/Today — purple (#5B4CF5) identity</li>
+            <li><span>💚</span>Wallet/Budget — green teal (#0891b2) identity</li>
+            <li><span>🔵</span>Planner — blue (#2563eb) identity</li>
+            <li><span>🟠</span>Home Build — warm orange/amber identity</li>
+            <li><span>💛</span>Kids — amber/yellow identity</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section colour palette -->
+  <div class="section" id="palette">
+    <div class="section-header">
+      <h2>Section Colour Identities — Keep These</h2>
+    </div>
+    <p class="section-desc">Each section has an intentional accent colour that gives it personality. These are NOT bugs — they are features. The fixes below will never touch these.</p>
+
+    <div class="palette-grid">
+      <div class="palette-card">
+        <div class="palette-swatch" style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE)">💜</div>
+        <div class="palette-body">
+          <div class="palette-name">Home / Today</div>
+          <div class="palette-colours">
+            <div class="palette-colour"><span class="swatch-dot" style="background:#5B4CF5"></span>#5B4CF5 purple</div>
+            <div class="palette-colour"><span class="swatch-dot" style="background:#EFEDFF"></span>#EFEDFF soft</div>
+          </div>
+          <span class="palette-tag tag-keep">Keep as-is</span>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="palette-swatch" style="background:linear-gradient(135deg,#CFFAFE,#A5F3FC)">💚</div>
+        <div class="palette-body">
+          <div class="palette-name">Wallet / Budget</div>
+          <div class="palette-colours">
+            <div class="palette-colour"><span class="swatch-dot" style="background:#0891b2"></span>#0891b2 teal</div>
+            <div class="palette-colour"><span class="swatch-dot" style="background:#ecfeff"></span>#ecfeff soft</div>
+          </div>
+          <span class="palette-tag tag-keep">Keep as-is</span>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="palette-swatch" style="background:linear-gradient(135deg,#DBEAFE,#BFDBFE)">🔵</div>
+        <div class="palette-body">
+          <div class="palette-name">Planner</div>
+          <div class="palette-colours">
+            <div class="palette-colour"><span class="swatch-dot" style="background:#2563eb"></span>#2563eb blue</div>
+            <div class="palette-colour"><span class="swatch-dot" style="background:#eff6ff"></span>#eff6ff soft</div>
+          </div>
+          <span class="palette-tag tag-keep">Keep as-is</span>
+        </div>
+      </div>
+      <div class="palette-card">
+        <div class="palette-swatch" style="background:linear-gradient(135deg,#FEF3C7,#FDE68A)">🟠</div>
+        <div class="palette-body">
+          <div class="palette-name">Home Build</div>
+          <div class="palette-colours">
+            <div class="palette-colour"><span class="swatch-dot" style="background:#d97706"></span>#d97706 amber</div>
+            <div class="palette-colour"><span class="swatch-dot" style="background:#fffbeb"></span>#fffbeb soft</div>
+          </div>
+          <span class="palette-tag tag-keep">Keep as-is</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary counts -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-num" style="color:var(--good)">~40</div>
+      <div class="summary-lbl">Safe fixes (no visual change)</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" style="color:var(--watch)">~15</div>
+      <div class="summary-lbl">Careful fixes (minor visual change)</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" style="color:var(--muted)">~50</div>
+      <div class="summary-lbl">Leave alone (intentional section colours)</div>
+    </div>
+  </div>
+
+  <!-- Safe Fixes Overview -->
+  <div class="section" id="safe-fixes">
+    <div class="section-header">
+      <h2>Safe Fixes — No Visual Change</h2>
+      <span class="section-tag tag-safe">Zero risk</span>
+    </div>
+    <p class="section-desc">Pure variable substitutions. The values are identical — only the reference changes. Makes the codebase maintainable without touching what users see.</p>
+
+    <table class="var-table">
+      <thead>
+        <tr><th>Add to :root in main.css</th><th>Value</th><th>Replaces</th><th>Used in</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="var-name">--r-pill</td>
+          <td class="var-value">99px</td>
+          <td>Hardcoded <code>99px</code> on badges/chips</td>
+          <td>budget.js, kids.js, routines.js (30+ places)</td>
+        </tr>
+        <tr>
+          <td class="var-name">--good-light</td>
+          <td><span class="swatch" style="background:#f0fdf4"></span><span class="var-value">#f0fdf4</span></td>
+          <td><code>#f0fdf4</code>, <code>#ecfdf5</code></td>
+          <td>kids.js, onboarding.js</td>
+        </tr>
+        <tr>
+          <td class="var-name">--watch-light</td>
+          <td><span class="swatch" style="background:#fffbeb"></span><span class="var-value">#fffbeb</span></td>
+          <td><code>#fffbeb</code>, <code>#fff7ed</code>, <code>#fef9c3</code></td>
+          <td>kids.js, onboarding.js, budget.js</td>
+        </tr>
+        <tr>
+          <td class="var-name">--alert-light</td>
+          <td><span class="swatch" style="background:#fef2f2"></span><span class="var-value">#fef2f2</span></td>
+          <td><code>#fef2f2</code>, <code>#fee2e2</code></td>
+          <td>planner.js, onboarding.js</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Border Radius -->
+  <div class="section" id="border-radius">
+    <div class="section-header">
+      <h2>Border Radius — Standardise to 4 Values</h2>
+      <span class="section-tag tag-safe">Safe</span>
+    </div>
+    <p class="section-desc">The design system already defines 4 radius values. The fix is replacing hardcoded numbers with the right variable. No section accents involved.</p>
+
+    <div class="demos">
+      <div class="demo">
+        <div class="demo-label before">Current — 6 different values</div>
+        <div class="demo-content">
+          <div style="background:#e0e7ff;border-radius:4px;padding:8px 12px;font-size:12px">4px</div>
+          <div style="background:#e0e7ff;border-radius:8px;padding:8px 12px;font-size:12px">8px</div>
+          <div style="background:#e0e7ff;border-radius:10px;padding:8px 12px;font-size:12px">10px</div>
+          <div style="background:#e0e7ff;border-radius:12px;padding:8px 12px;font-size:12px">12px</div>
+          <div style="background:#e0e7ff;border-radius:16px;padding:8px 12px;font-size:12px">16px</div>
+          <div style="background:#e0e7ff;border-radius:20px;padding:8px 12px;font-size:12px">20px</div>
+          <div style="background:#e0e7ff;border-radius:24px;padding:8px 12px;font-size:12px">24px</div>
+          <div style="background:#e0e7ff;border-radius:99px;padding:8px 12px;font-size:12px">99px</div>
+        </div>
+      </div>
+      <div class="demo">
+        <div class="demo-label after">Proposed — 4 named values</div>
+        <div class="demo-content">
+          <div style="background:#dcfce7;border-radius:10px;padding:8px 12px;font-size:12px">--r-sm (10px)<br><span style="font-size:10px;opacity:0.7">inputs, small chips</span></div>
+          <div style="background:#dcfce7;border-radius:16px;padding:8px 12px;font-size:12px">--r (16px)<br><span style="font-size:10px;opacity:0.7">standard cards</span></div>
+          <div style="background:#dcfce7;border-radius:24px;padding:8px 12px;font-size:12px">--r-lg (24px)<br><span style="font-size:10px;opacity:0.7">hero cards, sheets</span></div>
+          <div style="background:#dcfce7;border-radius:99px;padding:8px 12px;font-size:12px">--r-pill (99px)<br><span style="font-size:10px;opacity:0.7">badges, tags</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="issues">
+      <div class="issue">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Kids section buttons — 4px edit buttons</span>
+            <span class="issue-file">kids.js:79</span>
+            <span class="section-tag tag-careful">Minor visual change</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label before">Before</span>
+            <pre class="before">border-radius:4px</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label after">After</span>
+            <pre class="after">border-radius:var(--r-sm)</pre>
+          </div>
+        </div>
+        <div class="note">4px → 10px. Buttons become slightly more rounded. <strong>Section teal colour is untouched.</strong></div>
+      </div>
+
+      <div class="issue">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Goals empty state — 16px, Scenarios cards — 20px</span>
+            <span class="issue-file">goals-scenarios.js:63, 95</span>
+            <span class="section-tag tag-safe">Safe</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label before">Before</span>
+            <pre class="before">border-radius:16px /* goals */
+border-radius:20px /* scenarios */</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label after">After</span>
+            <pre class="after">border-radius:var(--r)    /* 16px — no change */
+border-radius:var(--r-lg) /* 24px — minor */</pre>
+          </div>
+        </div>
+        <div class="note">Goals: no visual change (16px = --r). Scenarios: 20px → 24px, very subtle. <strong>Section colours untouched.</strong></div>
+      </div>
+
+      <div class="issue">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Budget allocation cards — 10px hardcoded</span>
+            <span class="issue-file">budget.js:37</span>
+            <span class="section-tag tag-safe">Zero visual change</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label before">Before</span>
+            <pre class="before">border-radius:10px</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label after">After</span>
+            <pre class="after">border-radius:var(--r-sm)</pre>
+          </div>
+        </div>
+        <div class="note">Pure variable substitution. 10px = --r-sm. Zero visual change.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Neutral grays -->
+  <div class="section" id="neutrals">
+    <div class="section-header">
+      <h2>Neutral Grays — Replace Tailwind with Toto Warm Grays</h2>
+      <span class="section-tag tag-careful">Minor visual change</span>
+    </div>
+    <p class="section-desc">Onboarding and parts of Planner use Tailwind's cool slate grays. Toto uses warm beige-grays. This fix makes those sections feel warmer and more consistent — <strong>no section accent colours are changed.</strong></p>
+
+    <div class="demos">
+      <div class="demo">
+        <div class="demo-label before">Tailwind cool grays (current)</div>
+        <div class="demo-content" style="background:#f8fafc;flex-direction:column;align-items:stretch">
+          <div style="padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;color:#475569">Container background #f8fafc</div>
+          <div style="padding:6px 0;font-size:12px;color:#64748b;margin-top:8px">Label text #64748b</div>
+          <div style="border:2px dashed #cbd5e1;padding:12px;border-radius:8px;font-size:13px;color:#94a3b8;text-align:center">Dashed border #cbd5e1</div>
+        </div>
+      </div>
+      <div class="demo">
+        <div class="demo-label after">Toto warm grays (proposed)</div>
+        <div class="demo-content" style="background:#FDFBF6;flex-direction:column;align-items:stretch">
+          <div style="padding:12px;background:#FDFBF6;border:1px solid #ECE7DD;border-radius:10px;font-size:13px;color:#3a352e">Container background --surface2</div>
+          <div style="padding:6px 0;font-size:12px;color:#8A8278;margin-top:8px">Label text --muted</div>
+          <div style="border:2px dashed #ECE7DD;padding:12px;border-radius:10px;font-size:13px;color:#b5aea2;text-align:center">Dashed border --hairline</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="issues">
+      <div class="issue">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Onboarding — Tailwind palette throughout</span>
+            <span class="issue-file">onboarding.js:52, 156, 251, 367</span>
+            <span class="section-tag tag-careful">Warm → warmer</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label before">Before</span>
+            <pre class="before">background:#f8fafc
+border:1px solid #e2e8f0
+color:#64748b
+border:2px dashed #cbd5e1</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label after">After</span>
+            <pre class="after">background:var(--surface2)
+border:1px solid var(--hairline)
+color:var(--text-muted)
+border:2px dashed var(--hairline)</pre>
+          </div>
+        </div>
+        <div class="note">The only visual change is cool gray → warm beige-gray. Makes the first-time setup screen feel like the rest of the app.</div>
+      </div>
+
+      <div class="issue">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Planner inactive month/week backgrounds</span>
+            <span class="issue-file">planner.js:1120</span>
+            <span class="section-tag tag-careful">Subtle</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label before">Before</span>
+            <pre class="before">background:#f1f5f9 /* inactive month */
+color:#1e293b</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label after">After</span>
+            <pre class="after">background:var(--surface2) /* warm beige */
+color:var(--text)</pre>
+          </div>
+        </div>
+        <div class="note"><strong>Active month stays blue (#2563eb) — untouched.</strong> Only the inactive/default state background warms up slightly.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Semantic colours -->
+  <div class="section" id="semantic">
+    <div class="section-header">
+      <h2>Semantic States — Success / Warning / Danger</h2>
+      <span class="section-tag tag-careful">Minor colour shift</span>
+    </div>
+    <p class="section-desc">These are app-wide states (overdue, on-track, over-budget) that should look the same everywhere. Currently some places use Toto variables, others use hardcoded hex from different green/red families.</p>
+
+    <div class="demos">
+      <div class="demo">
+        <div class="demo-label before">Current — two different greens in same app</div>
+        <div class="demo-content">
+          <div style="background:#dcfce7;color:#166534;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600">#10b981 (Budget)</div>
+          <div style="background:#dcfce7;color:#166534;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600">var(--good) (Routines)</div>
+          <div style="font-size:11px;color:var(--muted)">Both mean "success" but are different greens</div>
+        </div>
+      </div>
+      <div class="demo">
+        <div class="demo-label after">Proposed — one semantic green everywhere</div>
+        <div class="demo-content">
+          <div style="background:#e5f5ed;color:#2EA86B;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600">var(--good) — #2EA86B</div>
+          <div style="background:#e5f5ed;color:#2EA86B;padding:6px 12px;border-radius:99px;font-size:12px;font-weight:600">var(--good) — #2EA86B</div>
+          <div style="font-size:11px;color:var(--muted)">Consistent across all sections</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="issues">
+      <div class="issue">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Budget surplus/deficit — hardcoded green/red</span>
+            <span class="issue-file">budget.js:222, 230</span>
+            <span class="section-tag tag-careful">Tiny colour shift</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label before">Before</span>
+            <pre class="before">color:#10b981  /* surplus — emerald */
+color:#ef4444  /* deficit — red-500 */</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label after">After</span>
+            <pre class="after">color:var(--good)   /* #2EA86B — Toto green */
+color:var(--alert)  /* #DC4F4F — Toto red */</pre>
+          </div>
+        </div>
+        <div class="note">#10b981 (emerald) is slightly brighter/cooler than --good (#2EA86B). Tiny shift — both read as "green". <strong>Teal wallet accent colour is untouched.</strong></div>
+      </div>
+
+      <div class="issue">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Planner urgency indicators — mixed hardcoded and vars</span>
+            <span class="issue-file">planner.js:82–83</span>
+            <span class="section-tag tag-careful">Minor</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label before">Before</span>
+            <pre class="before">urgencyColor = overdue ? '#ef4444'
+  : urgent ? 'var(--good)'
+  : soon ? '#f59e0b'
+  : '#94a3b8'</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label after">After</span>
+            <pre class="after">urgencyColor = overdue ? 'var(--alert)'
+  : urgent ? 'var(--good)'
+  : soon ? 'var(--watch)'
+  : 'var(--muted)'</pre>
+          </div>
+        </div>
+        <div class="note"><strong>Planner blue accent is untouched.</strong> Only the overdue/soon state indicators (red/amber) are standardised.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skip section -->
+  <div class="section" id="skip">
+    <div class="section-header">
+      <h2>Leave Alone — Intentional Section Colours</h2>
+      <span class="section-tag tag-skip">Do not touch</span>
+    </div>
+    <p class="section-desc">These are intentional design decisions that give each section its identity. Changing them would make the app feel flat and generic.</p>
+
+    <div class="issues">
+      <div class="issue skip">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Planner active month — blue (#2563eb)</span>
+            <span class="issue-file">planner.js:1115</span>
+            <span class="section-tag tag-skip">Leave alone</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label keep">Current — intentional</span>
+            <pre class="keep">background:#2563eb /* planner blue */
+color:#fff</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label keep">Why keep it</span>
+            <pre class="keep">/* Planner's blue identity.
+   Changing to --primary (purple)
+   would break its visual brand. */</pre>
+          </div>
+        </div>
+        <div class="note">The Planner is intentionally blue. This is its section colour, not a mistake.</div>
+      </div>
+
+      <div class="issue skip">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Kids / Wallet teal accent (#0891b2) — section identity</span>
+            <span class="issue-file">kids.js, goals-scenarios.js, quick-add.js</span>
+            <span class="section-tag tag-skip">Leave alone</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label keep">Current — intentional</span>
+            <pre class="keep">color:#0891b2
+border:1.5px solid #0891b2
+background:#ecfeff</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label keep">Why keep it</span>
+            <pre class="keep">/* Teal is the Wallet/Kids section
+   accent. It differentiates these
+   sections from the purple home. */</pre>
+          </div>
+        </div>
+        <div class="note">We could add <code>--teal: #0891b2</code> as a variable for maintainability, but the colour itself stays.</div>
+      </div>
+
+      <div class="issue skip">
+        <div class="issue-header">
+          <div class="issue-header-left">
+            <span class="issue-title">Home Build amber/orange tones</span>
+            <span class="issue-file">budget.js (build section)</span>
+            <span class="section-tag tag-skip">Leave alone</span>
+          </div>
+        </div>
+        <div class="issue-body">
+          <div class="code-block">
+            <span class="code-label keep">Current — intentional</span>
+            <pre class="keep">color:#d97706  /* amber */
+background:#fffbeb</pre>
+          </div>
+          <div class="code-block">
+            <span class="code-label keep">Why keep it</span>
+            <pre class="keep">/* Build/construction section uses
+   warm amber to evoke the physical
+   home building theme. */</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approval -->
+  <div class="approval">
+    <h3>Ready to implement?</h3>
+    <p>Suggested order: Add variables → Border radius → Neutral grays → Semantic states<br>
+    Estimated effort: ~2 hours. All section accent colours preserved.</p>
+    <div class="approval-btns">
+      <button class="btn btn-approve" onclick="this.textContent='✓ Approved — will implement'; this.disabled=true">Approve all fixes</button>
+      <button class="btn btn-partial" onclick="this.textContent='✓ Noted'">Discuss first</button>
+      <button class="btn btn-skip" onclick="this.textContent='✓ Skipped'">Skip for now</button>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

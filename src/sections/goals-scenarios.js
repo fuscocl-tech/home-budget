@@ -120,9 +120,9 @@ export function renderGoals() {
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
               ${statusBadge}
-              ${g.status === 'active' ? `<button class="btn btn-ghost btn-sm" title="Mark achieved" onclick="markGoalAchieved(${g.id})">✓</button>` : ''}
-              <button class="btn btn-ghost btn-sm" onclick="openEditGoal(${g.id})">✏️</button>
-              <button class="btn btn-danger-ghost btn-sm" onclick="deleteGoal(${g.id})">🗑</button>
+              ${g.status === 'active' ? `<button class="btn btn-ghost btn-sm" title="Mark achieved" onclick="markGoalAchieved('${g.id}')">✓</button>` : ''}
+              <button class="btn btn-ghost btn-sm" onclick="openEditGoal('${g.id}')">✏️</button>
+              <button class="btn btn-danger-ghost btn-sm" onclick="deleteGoal('${g.id}')">🗑</button>
             </div>
           </div>
           ${progressHtml}
@@ -339,7 +339,7 @@ export function renderScenarios() {
 
       html += `
         <div class="scenario-card">
-          <div class="scenario-card-header" onclick="toggleScenario(${sc.id})">
+          <div class="scenario-card-header" onclick="toggleScenario('${sc.id}')">
             <div style="flex:1">
               <div style="font-weight:600;font-size:14px">${escHtml(sc.name)}</div>
               ${sc.description ? `<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${escHtml(sc.description)}</div>` : ''}
@@ -350,8 +350,8 @@ export function renderScenarios() {
                 <div style="font-size:14px;font-weight:700;color:${surplusDiff>=0?'var(--success)':'var(--danger)'}">${surplusDiff>=0?'+':''}${aud(surplusDiff)}/mo</div>
               </div>
               <div style="display:flex;gap:4px">
-                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditScenario(${sc.id})">✏️</button>
-                <button class="btn btn-danger-ghost btn-sm" onclick="event.stopPropagation();deleteScenario(${sc.id})">🗑</button>
+                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditScenario('${sc.id}')">✏️</button>
+                <button class="btn btn-danger-ghost btn-sm" onclick="event.stopPropagation();deleteScenario('${sc.id}')">🗑</button>
               </div>
               <span style="color:var(--text-muted);font-size:18px">${isOpen ? '▲' : '▼'}</span>
             </div>
@@ -359,7 +359,7 @@ export function renderScenarios() {
           <div class="scenario-card-body${isOpen?' open':''}">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
               <div style="font-size:13px;font-weight:600">Adjustments (${(sc.adjustments||[]).length})</div>
-              <button class="btn btn-primary btn-sm" onclick="openAddAdjustment(${sc.id})">+ Adjustment</button>
+              <button class="btn btn-primary btn-sm" onclick="openAddAdjustment('${sc.id}')">+ Adjustment</button>
             </div>
             <div class="adj-list">
               ${(sc.adjustments||[]).length === 0
@@ -380,7 +380,7 @@ export function renderScenarios() {
                         <span style="font-weight:500">${at.label}</span>
                         <span style="color:var(--text-muted);margin-left:6px">${detail}</span>
                       </div>
-                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteAdjustment(${sc.id},${adj.id})">🗑</button>
+                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteAdjustment('${sc.id}','${adj.id}')">🗑</button>
                     </div>`;
                   }).join('')
               }

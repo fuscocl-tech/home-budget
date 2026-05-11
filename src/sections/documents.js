@@ -122,7 +122,7 @@ export function renderDocuments() {
       const subParts = [d.provider ? escHtml(d.provider) : '', d.reference ? escHtml(d.reference) : '', d.storedAt ? `📍 ${escHtml(d.storedAt)}` : ''].filter(Boolean);
 
       html += `
-        <div class="doc-card" onclick="openDocForm(${d.id})">
+        <div class="doc-card" onclick="openDocForm('${d.id}')">
           <div class="doc-cat-icon" style="background:${catDef.bg}">${catDef.icon}</div>
           <div class="doc-card-body">
             <div class="doc-card-name">${escHtml(d.name)}</div>

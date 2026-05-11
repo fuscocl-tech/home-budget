@@ -79,8 +79,8 @@ export function renderPlanner() {
   const nudges = _plannerNudges();
   const nudgeHtml = nudges.map(n => {
     const daysLabel = n.days < 0 ? 'Now!' : n.days === 0 ? 'Today!' : n.days === 1 ? 'Tomorrow' : `In ${n.days} days`;
-    const urgencyColor = n.days <= 0 ? '#ef4444' : n.days === 1 ? 'var(--good)' : n.days <= 3 ? '#f59e0b' : 'var(--iris-1)';
-    const iconBg = n.days <= 0 ? '#FEF2F2' : n.days === 1 ? '#ECFDF5' : n.days <= 3 ? '#FFF7ED' : '#EEF2FF';
+    const urgencyColor = n.days <= 0 ? 'var(--alert)' : n.days === 1 ? 'var(--good)' : n.days <= 3 ? 'var(--watch)' : 'var(--iris-1)';
+    const iconBg = n.days <= 0 ? 'var(--alert-light)' : n.days === 1 ? 'var(--good-light)' : n.days <= 3 ? 'var(--watch-light)' : 'var(--purple-tint)';
     return `<div class="pl-nudge-tile">
       <div class="pl-nudge-tile-icon" style="background:${iconBg}">${n.emoji}</div>
       <div class="pl-nudge-tile-body">
@@ -1068,7 +1068,7 @@ export function _pmDpOpen(target) {
   if (!popover) {
     popover = document.createElement('div');
     popover.id = 'pm-dp-popover';
-    popover.style.cssText = 'display:none;position:fixed;width:260px;background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.16);padding:14px;z-index:9999';
+    popover.style.cssText = 'display:none;position:fixed;width:260px;background:var(--paper);border:1.5px solid var(--hairline);border-radius:var(--r);box-shadow:0 12px 40px rgba(0,0,0,.16);padding:14px;z-index:9999';
     document.body.appendChild(popover);
     document.addEventListener('click', _pmDpOutsideClick);
   }
@@ -1117,15 +1117,15 @@ export function _pmDpRender(pop) {
   }).join('');
   pop.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <button type="button" onclick="_pmDpPrev()" style="width:28px;height:28px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;font-size:16px;color:#64748b">‹</button>
-      <div style="font-size:14px;font-weight:700;color:#1e293b">${_monthLabelStr}</div>
-      <button type="button" onclick="_pmDpNext()" style="width:28px;height:28px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;font-size:16px;color:#64748b">›</button>
+      <button type="button" onclick="_pmDpPrev()" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--surface2);cursor:pointer;font-size:16px;color:var(--text-muted)">‹</button>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">${_monthLabelStr}</div>
+      <button type="button" onclick="_pmDpNext()" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--surface2);cursor:pointer;font-size:16px;color:var(--text-muted)">›</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:4px">
-      ${['M','T','W','T','F','S','S'].map(d=>`<div style="text-align:center;font-size:10px;font-weight:700;color:#94a3b8;padding:3px 0">${d}</div>`).join('')}
+      ${['M','T','W','T','F','S','S'].map(d=>`<div style="text-align:center;font-size:10px;font-weight:700;color:var(--muted);padding:3px 0">${d}</div>`).join('')}
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px">${grid}</div>
-    <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0">
+    <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--hairline)">
       <button type="button" onclick="_pmDpClear()" style="font-size:13px;font-weight:600;color:#2563eb;background:none;border:none;cursor:pointer">Clear</button>
       <button type="button" onclick="_pmDpToday()" style="font-size:13px;font-weight:600;color:#2563eb;background:none;border:none;cursor:pointer">Today</button>
     </div>`;
@@ -1138,7 +1138,7 @@ export function _pmDpSelect(dateStr) {
   const input = document.getElementById(inputId);
   const disp  = document.getElementById(displayId);
   if (input) input.value = dateStr;
-  if (disp)  { disp.textContent = _pmFmtDateShort(dateStr); disp.style.color = '#1e293b'; }
+  if (disp)  { disp.textContent = _pmFmtDateShort(dateStr); disp.style.color = 'var(--text)'; }
   _pmDpMonth = dateStr.slice(0,7);
   document.getElementById('pm-dp-popover').style.display = 'none';
 }

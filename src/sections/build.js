@@ -71,7 +71,7 @@ export function renderBuild() {
             const dateLabel = s.paid && s.paidDate ? fmtDate(s.paidDate) : (s.expectedDate ? 'Exp. '+fmtDate(s.expectedDate) : '');
             const overdue = !s.paid && s.expectedDate && isOverdue(s.expectedDate);
             return `
-            <div style="flex:1;min-width:0;border:1px solid ${overdue ? 'var(--danger)' : border};border-radius:8px;padding:10px 10px 8px;margin-right:${idx < c.stages.length-1 ? '6px' : '0'};background:${overdue ? '#fef2f2' : bg};cursor:pointer;position:relative" onclick="openEditStage(${s.id})" title="Edit ${escAttr(s.name)}">
+            <div style="flex:1;min-width:0;border:1px solid ${overdue ? 'var(--danger)' : border};border-radius:8px;padding:10px 10px 8px;margin-right:${idx < c.stages.length-1 ? '6px' : '0'};background:${overdue ? '#fef2f2' : bg};cursor:pointer;position:relative" onclick="openEditStage('${s.id}')" title="Edit ${escAttr(s.name)}">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
                 <span style="font-size:11px;font-weight:700;color:${overdue ? 'var(--danger)' : textColor};width:20px;height:20px;border-radius:50%;background:${s.paid ? '#16a34a' : isNext ? 'var(--primary)' : '#94a3b8'};color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">${icon}</span>
                 <span style="font-size:11px;color:${overdue ? 'var(--danger)' : 'var(--text-muted)'};font-weight:600">${pct}%</span>
@@ -110,8 +110,8 @@ export function renderBuild() {
                 <td style="color:var(--text-muted)">${escHtml(s.invoiceRef || '—')}</td>
                 <td class="actions">
                   ${attachBtn(`stage-${s.id}`, escAttr(s.name))}
-                  <button class="btn btn-ghost btn-sm" onclick="openEditStage(${s.id})">✏️</button>
-                  <button class="btn btn-danger-ghost btn-sm" onclick="deleteStage(${s.id})">🗑</button>
+                  <button class="btn btn-ghost btn-sm" onclick="openEditStage('${s.id}')">✏️</button>
+                  <button class="btn btn-danger-ghost btn-sm" onclick="deleteStage('${s.id}')">🗑</button>
                 </td>
               </tr>`;
             }).join('')}
@@ -156,8 +156,8 @@ export function renderBuild() {
                   <td>${fmtDate(v.dateApproved)}</td>
                   <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(v.notes || '—')}</td>
                   <td class="actions">
-                    <button class="btn btn-ghost btn-sm" onclick="openEditVariation(${v.id})">✏️</button>
-                    <button class="btn btn-danger-ghost btn-sm" onclick="deleteVariation(${v.id})">🗑</button>
+                    <button class="btn btn-ghost btn-sm" onclick="openEditVariation('${v.id}')">✏️</button>
+                    <button class="btn btn-danger-ghost btn-sm" onclick="deleteVariation('${v.id}')">🗑</button>
                   </td>
                 </tr>`).join('')}
               </tbody>
@@ -216,8 +216,8 @@ export function renderBuild() {
                 <td>${fundingBadge(e.funding || 'loan')}</td>
                 <td class="actions">
                   ${attachBtn(`extra-${e.id}`, escAttr(e.name))}
-                  <button class="btn btn-ghost btn-sm" onclick="openEditExtra(${e.id})">✏️</button>
-                  <button class="btn btn-danger-ghost btn-sm" onclick="deleteExtra(${e.id})">🗑</button>
+                  <button class="btn btn-ghost btn-sm" onclick="openEditExtra('${e.id}')">✏️</button>
+                  <button class="btn btn-danger-ghost btn-sm" onclick="deleteExtra('${e.id}')">🗑</button>
                 </td>
               </tr>`;
             }).join('')}
@@ -278,8 +278,8 @@ export function renderBuild() {
                     <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(f.notes || '—')}</td>
                     <td class="actions">
                       ${attachBtn(`furniture-${f.id}`, escAttr(f.name))}
-                      <button class="btn btn-ghost btn-sm" onclick="openEditFurniture(${f.id})">✏️</button>
-                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteFurniture(${f.id})">🗑</button>
+                      <button class="btn btn-ghost btn-sm" onclick="openEditFurniture('${f.id}')">✏️</button>
+                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteFurniture('${f.id}')">🗑</button>
                     </td>
                   </tr>`;
                 }).join('')}
@@ -348,8 +348,8 @@ export function renderBuild() {
                     <td style="color:var(--text-muted);font-size:12px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(a.notes || '—')}</td>
                     <td class="actions">
                       ${attachBtn(`appliance-${a.id}`, escAttr(a.name))}
-                      <button class="btn btn-ghost btn-sm" onclick="openEditAppliance(${a.id})">✏️</button>
-                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteAppliance(${a.id})">🗑</button>
+                      <button class="btn btn-ghost btn-sm" onclick="openEditAppliance('${a.id}')">✏️</button>
+                      <button class="btn btn-danger-ghost btn-sm" onclick="deleteAppliance('${a.id}')">🗑</button>
                     </td>
                   </tr>`;
                 }).join('')}

@@ -207,23 +207,23 @@ export function renderBills() {
 
     ${billsModal()}
     <div id="sub-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
-      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+      <div style="background:var(--paper);border-radius:var(--r-lg);padding:28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
         <h3 id="sub-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px">Add Subscription</h3>
         <input type="hidden" id="sub-edit-id">
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
-            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Name</label>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">Name</label>
             <input id="sub-name" type="text" maxlength="200" placeholder="e.g. Netflix, Spotify" class="form-input" style="width:100%">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Category</label>
+              <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">Category</label>
               <select id="sub-cat" class="form-select" style="width:100%">
                 ${SUB_CATS.map(c => `<option value="${c.label}">${c.icon} ${c.label}</option>`).join('')}
               </select>
             </div>
             <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Frequency</label>
+              <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">Frequency</label>
               <select id="sub-freq" class="form-select" style="width:100%">
                 <option>Monthly</option><option>Annual</option><option>Weekly</option>
               </select>
@@ -231,11 +231,11 @@ export function renderBills() {
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Amount ($)</label>
+              <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">Amount ($)</label>
               <input id="sub-amount" type="number" max="99999999" min="0" step="0.01" placeholder="0.00" class="form-input" style="width:100%">
             </div>
             <div>
-              <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px">Renewal date</label>
+              <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px">Renewal date</label>
               <input id="sub-renewal" type="date" class="form-input" style="width:100%">
             </div>
           </div>
@@ -256,12 +256,12 @@ export function billsModal(id) {
   const cats = BILL_CATS.map(c => `<option value="${c.label}" ${bill&&bill.category===c.label?'selected':''}>${c.icon} ${c.label}</option>`).join('');
   const freqs = BILL_FREQS.map(f => `<option value="${f}" ${(bill&&bill.frequency===f)||((!bill||!bill.frequency)&&f==='Monthly')?'selected':''}>${f}</option>`).join('');
 
-  const inputStyle = 'width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;outline:none';
-  const labelStyle = 'font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:5px';
+  const inputStyle = 'width:100%;border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 12px;font-size:14px;outline:none';
+  const labelStyle = 'font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:5px';
 
   return `
     <div id="bill-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:center;justify-content:center;padding:20px">
-      <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto">
+      <div style="background:var(--paper);border-radius:var(--r-lg);padding:28px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.2);max-height:90vh;overflow-y:auto">
         <h3 id="bill-modal-title" style="font-size:17px;font-weight:700;margin-bottom:20px">Add Bill</h3>
         <input type="hidden" id="bill-edit-id">
         <div style="display:flex;flex-direction:column;gap:14px">
@@ -299,7 +299,7 @@ export function billsModal(id) {
           </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:22px;justify-content:flex-end">
-          <button class="btn-outline" onclick="closeBillModal()">Cancel</button>
+          <button class="btn btn-ghost" onclick="closeBillModal()">Cancel</button>
           <button class="btn btn-primary" onclick="saveBill()">Save</button>
         </div>
       </div>

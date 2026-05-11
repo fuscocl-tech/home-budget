@@ -521,7 +521,8 @@ export function renderToday() {
     const hasKids = state.kids?.profiles?.length > 0;
 
     const shopTile = `
-      <div onclick="_listsActiveType='food';_listsView='list';activateTab('lists')" style="flex:1;min-width:0;background:var(--purple-soft);border-radius:var(--r-lg);padding:16px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:130px;border:1px solid rgba(91,76,245,.12);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 8px rgba(91,76,245,.08)">
+      <div onclick="_listsActiveType='food';_listsView='list';activateTab('lists')" style="flex:1;min-width:0;background:var(--purple-soft);border-radius:var(--r-lg);padding:16px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:130px;border:1px solid rgba(91,76,245,.12);box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 8px rgba(91,76,245,.08);position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(91,76,245,.18) 0%,transparent 70%);pointer-events:none"></div>
         <div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--iris-2);margin-bottom:6px">Shopping List</div>
           <div style="font-size:28px;font-weight:800;color:var(--iris-1);letter-spacing:-.04em;line-height:1">${activeFood.length}</div>
@@ -530,14 +531,20 @@ export function renderToday() {
         <div style="font-size:12px;font-weight:700;color:var(--iris-1);margin-top:10px">View list →</div>
       </div>`;
 
+    const kidsBg    = pendingApprovals > 0 ? '#FFF4EE' : '#F0FDF4';
+    const kidsBorder = pendingApprovals > 0 ? 'rgba(249,115,22,.18)' : 'rgba(16,185,129,.18)';
+    const kidsGlow   = pendingApprovals > 0 ? 'rgba(249,115,22,.15)' : 'rgba(16,185,129,.15)';
+    const kidsLabel  = pendingApprovals > 0 ? '#c2410c' : '#059669';
+    const kidsNum    = pendingApprovals > 0 ? 'var(--ember)' : 'var(--good)';
     const kidsTile = hasKids ? `
-      <div onclick="activateTab('kids')" style="flex:1;min-width:0;background:${pendingApprovals > 0 ? '#FFF7ED' : '#F0FDF4'};border-radius:var(--r-lg);padding:16px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:130px;border:1px solid ${pendingApprovals > 0 ? 'rgba(249,115,22,.15)' : 'rgba(16,185,129,.15)'};box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 8px rgba(22,20,15,.05)">
+      <div onclick="activateTab('kids')" style="flex:1;min-width:0;background:${kidsBg};border-radius:var(--r-lg);padding:16px;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;min-height:130px;border:1px solid ${kidsBorder};box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 2px 8px ${kidsGlow};position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,${kidsGlow} 0%,transparent 70%);pointer-events:none"></div>
         <div>
-          <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${pendingApprovals > 0 ? '#c2410c' : '#059669'};margin-bottom:6px">Kids</div>
-          <div style="font-size:28px;font-weight:800;color:${pendingApprovals > 0 ? 'var(--ember)' : 'var(--good)'};letter-spacing:-.04em;line-height:1">${pendingApprovals > 0 ? pendingApprovals : '✓'}</div>
-          <div style="font-size:12px;color:${pendingApprovals > 0 ? '#c2410c' : '#059669'};margin-top:2px">${pendingApprovals > 0 ? `approval${pendingApprovals !== 1 ? 's' : ''} pending` : 'all clear'}</div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${kidsLabel};margin-bottom:6px">Kids</div>
+          <div style="font-size:28px;font-weight:800;color:${kidsNum};letter-spacing:-.04em;line-height:1">${pendingApprovals > 0 ? pendingApprovals : '✓'}</div>
+          <div style="font-size:12px;color:${kidsLabel};margin-top:2px">${pendingApprovals > 0 ? `approval${pendingApprovals !== 1 ? 's' : ''} pending` : 'all clear'}</div>
         </div>
-        <div style="font-size:12px;font-weight:700;color:${pendingApprovals > 0 ? 'var(--ember)' : 'var(--good)'};margin-top:10px">${pendingApprovals > 0 ? 'Review →' : 'View kids →'}</div>
+        <div style="font-size:12px;font-weight:700;color:${kidsNum};margin-top:10px">${pendingApprovals > 0 ? 'Review →' : 'View kids →'}</div>
       </div>` : '';
 
     cards.push({ type: 'lists', urgency: pendingApprovals > 0 ? 1 : 0,

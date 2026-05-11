@@ -248,7 +248,7 @@ export function renderObStep() {
           onclick="_ob.incomes[${i}].frequency='${f}';renderObStep()">${f}</button>`
       ).join('');
       return `
-        <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f1f5f9">
+        <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--hairline)">
           <div style="margin-bottom:10px">
             <div class="ob-input-label">Income source</div>
             <input class="ob-input" placeholder="${escAttr(ph)}" value="${escAttr(inc.name)}"
@@ -306,7 +306,7 @@ export function renderObStep() {
 
     bodyContent = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <p style="font-size:13px;color:#64748b;margin:0">Monthly amounts — adjust to match your actual spending.</p>
+        <p style="font-size:13px;color:var(--text-muted);margin:0">Monthly amounts — adjust to match your actual spending.</p>
         <button class="ob-add-link" onclick="obSkipExpenses()" style="white-space:nowrap;margin-left:12px">Add this later</button>
       </div>
       ${rows}`;
@@ -342,7 +342,7 @@ export function renderObStep() {
         <div class="ob-summary-avatar">👤</div>
         <div>
           <div style="font-size:14px;font-weight:600">${escHtml(adultsDisplay)}</div>
-          <div style="font-size:12px;color:#64748b">Adults · ${homeLabel}</div>
+          <div style="font-size:12px;color:var(--text-muted)">Adults · ${homeLabel}</div>
         </div>
       </div>`];
 
@@ -353,7 +353,7 @@ export function renderObStep() {
           <div class="ob-summary-avatar">${escHtml(kid.emoji)}</div>
           <div>
             <div style="font-size:14px;font-weight:600">${escHtml(kid.name)}${kid.age ? `, age ${kid.age}` : ''}</div>
-            <div style="font-size:12px;color:#64748b">Chores &amp; lunchbox ready</div>
+            <div style="font-size:12px;color:var(--text-muted)">Chores &amp; lunchbox ready</div>
           </div>
         </div>`);
     });
@@ -364,17 +364,17 @@ export function renderObStep() {
       <div class="ob-subtitle" style="text-align:center">Here's what Toto knows about your household</div>`;
 
     bodyContent = `
-      <div style="background:#f8fafc;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid #e2e8f0">
+      <div style="background:var(--surface2);border-radius:var(--r);padding:16px;margin-bottom:16px;border:1px solid var(--hairline)">
         ${memberRows.join('')}
       </div>
       <div style="display:flex;gap:12px">
         <div style="flex:1;background:#f0fdf4;border-radius:10px;padding:14px;text-align:center">
           <div style="font-size:20px;font-weight:700;color:#16a34a">$${Math.round(monthlyIncome).toLocaleString()}</div>
-          <div style="color:#64748b;font-size:11px">monthly income</div>
+          <div style="color:var(--text-muted);font-size:11px">monthly income</div>
         </div>
         <div style="flex:1;background:#fff7ed;border-radius:10px;padding:14px;text-align:center">
           <div style="font-size:20px;font-weight:700;color:#ea580c">$${Math.round(monthlyExpenses).toLocaleString()}</div>
-          <div style="color:#64748b;font-size:11px">monthly expenses</div>
+          <div style="color:var(--text-muted);font-size:11px">monthly expenses</div>
         </div>
       </div>`;
 

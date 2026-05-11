@@ -3,6 +3,9 @@ import { state } from '../store.js';
 import { escHtml, aud, audD } from './format.js';
 import { prefsGet } from '../prefs.js';
 
+let _qaExpenseId = null;
+let _qaAmount = '';
+
 export function openQuickAdd() {
   _renderQAHub();
   document.getElementById('qa-overlay').classList.add('open');
@@ -239,8 +242,10 @@ export function _renderQASheet(expensesArg) {
   const display  = _qaAmount ? `$${_qaAmount}` : '$0';
   const isZero   = !_qaAmount;
 
-  const catPills = expenses.length
-    ? expenses.map(e => `<button class="qa-cat${e.id === _qaExpenseId ? ' selected' : ''}" onclick="_qaSelectCat(${e.id})">${escHtml(e.name)}</button>`).join('')
+  const catSelect = expenses.length
+    ? `<select class="form-select" style="width:100%" onchange="_qaSelectCat(this.value)">
+        ${expenses.map(e => `<option value="${e.id}" ${e.id === _qaExpenseId ? 'selected' : ''}>${escHtml(e.name)}</option>`).join('')}
+       </select>`
     : `<span style="color:var(--text-muted);font-size:13px;padding:6px 4px">Add budget expenses first</span>`;
 
   const numKeys = ['1','2','3','4','5','6','7','8','9','.','0','⌫'];
@@ -254,8 +259,8 @@ export function _renderQASheet(expensesArg) {
 
     <div class="qa-amount-display${isZero ? ' zero' : ''}" id="qa-display">${display}</div>
 
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);padding:0 20px 8px">Category</div>
-    <div class="qa-cats" id="qa-cats">${catPills}</div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);padding:0 20px 6px">Category</div>
+    <div style="padding:0 20px 12px">${catSelect}</div>
 
     <div class="qa-numpad">
       ${numKeys.map(k => `<button class="qa-key${k==='⌫'?' qa-key-del':''}" onclick="_qaKey('${k}')">${k}</button>`).join('')}
@@ -292,9 +297,6 @@ export function _qaKey(k) {
 
 export function _qaSelectCat(id) {
   _qaExpenseId = id;
-  document.querySelectorAll('.qa-cat').forEach(b => {
-    b.classList.toggle('selected', parseInt(b.getAttribute('onclick').match(/\d+/)[0]) === id);
-  });
 }
 
 export function saveQuickAdd() {

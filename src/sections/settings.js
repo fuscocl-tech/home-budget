@@ -315,7 +315,7 @@ export function renderSettings() {
                   <div style="font-size:11px;color:#64748b">Too many failed attempts</div>
                 </div>
               </div>
-              <button onclick="event.stopPropagation();window.resetKidPinLock(${kidProfile.id})" style="width:100%;padding:7px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer">Reset PIN lock</button>
+              <button onclick="event.stopPropagation();window.resetKidPinLock('${kidProfile.id}')" style="width:100%;padding:7px;border:1px solid #fecaca;border-radius:6px;background:#fff;font-size:12px;font-weight:600;color:#b91c1c;cursor:pointer">Reset PIN lock</button>
             </div>`;
           } else if (!hasName) {
             accessHtml = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
@@ -338,7 +338,7 @@ export function renderSettings() {
                 <div style="font-size:12px;font-weight:600;color:${hasPin?'#16a34a':'var(--text)'}">PIN login · ${hasPin ? 'Set up ✓' : 'Not set up'}</div>
                 <div style="font-size:11px;color:var(--text-muted)">${hasPin ? 'PIN is active — tap to change it' : 'Set a PIN so ' + escHtml(m.name) + ' can log in'}</div>
               </div>
-              <button onclick="event.stopPropagation();window.openPinSetup(${kidProfile.id})" style="padding:6px 10px;border:1px solid ${hasPin?'#bbf7d0':'var(--border)'};border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">${hasPin ? 'Change' : 'Set PIN'}</button>
+              <button onclick="event.stopPropagation();window.openPinSetup('${kidProfile.id}')" style="padding:6px 10px;border:1px solid ${hasPin?'#bbf7d0':'var(--border)'};border-radius:6px;background:var(--surface);font-size:11px;font-weight:600;color:var(--text);cursor:pointer">${hasPin ? 'Change' : 'Set PIN'}</button>
             </div>`;
           }
         }
@@ -456,20 +456,20 @@ export function renderSettings() {
         ${(state.categoryGroups||[]).map(g => `
           <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-              <button id="grp-icon-btn-${g.id}" type="button" onclick="openIconPickerForGroup(${g.id})" style="width:52px;height:40px;font-size:22px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer" title="Choose icon">${g.icon}</button>
+              <button id="grp-icon-btn-${g.id}" type="button" onclick="openIconPickerForGroup('${g.id}')" style="width:52px;height:40px;font-size:22px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer" title="Choose icon">${g.icon}</button>
               <input type="text" maxlength="200" class="form-input" style="flex:1;font-weight:600" value="${g.name.replace(/"/g,'&quot;')}"
                 onchange="updateCategoryGroup(${g.id},'name',this.value)">
-              <button class="btn btn-danger-ghost btn-sm" onclick="deleteCategoryGroup(${g.id})">Delete</button>
+              <button class="btn btn-danger-ghost btn-sm" onclick="deleteCategoryGroup('${g.id}')">Delete</button>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
               ${g.categories.map(cat => `
                 <span style="display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;font-size:13px">
                   ${cat}
-                  <button onclick="removeCatFromGroup(${g.id},'${cat.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:15px;line-height:1;padding:0 2px">&times;</button>
+                  <button onclick="removeCatFromGroup('${g.id}','${cat.replace(/'/g,"\\'")}')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:15px;line-height:1;padding:0 2px">&times;</button>
                 </span>`).join('')}
               ${g.categories.length === 0 ? `<span style="font-size:13px;color:var(--text-muted);font-style:italic">No categories assigned</span>` : ''}
             </div>
-            <button class="btn btn-ghost btn-sm" onclick="openAddCatToGroup(${g.id})" style="font-size:12px">+ Add Category</button>
+            <button class="btn btn-ghost btn-sm" onclick="openAddCatToGroup('${g.id}')" style="font-size:12px">+ Add Category</button>
           </div>`).join('')}
         ${(state.categoryGroups||[]).length === 0 ? `<p style="color:var(--text-muted);font-size:13px">No groups yet.</p>` : ''}
       </div>`,

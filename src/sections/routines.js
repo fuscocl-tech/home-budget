@@ -166,7 +166,7 @@ export function _routinesForHousehold() {
 
 export function _routineIsOwner(r) { return r.ownerId === _routineCurrentUserId(); }
 export function _routineKids()     { return state.kids?.profiles || []; }
-export function _routineNextId()   { return Math.max(0, ...(state.routines || []).map(r => r.id)) + 1; }
+export function _routineNextId()   { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
 export function _routineOtherAdults() {
   const _uid = _routineCurrentUserId();
@@ -379,12 +379,10 @@ export function _renderAdultRoutines() {
   // Lazy UID claim: migrate guest-owned routines once the user has a real UID
   const _uid = _routineCurrentUserId();
   let claimed = false;
-  if (_uid !== 'guest') {
-    (state.routines || []).forEach(r => {
-      if (r.ownerType === 'adult' && r.ownerId === 'guest') { r.ownerId = _uid; claimed = true; }
-    });
-    if (claimed) _routineSaveValidated('lazy-uid-claim');
-  }
+  (state.routines || []).forEach(r => {
+    if (r.ownerType === 'adult' && (r.ownerId === 'guest' || r.ownerId === 'dev')) { r.ownerId = _uid; claimed = true; }
+  });
+  if (claimed) _routineSaveValidated('lazy-uid-claim');
 
   const todayStr   = new Date().toISOString().slice(0, 10);
   const myRoutines = _routinesForCurrentUser().filter(r => _routineMatchesDate(r, todayStr));
@@ -422,11 +420,11 @@ export function _renderAdultRoutines() {
 
     const stepsHtml = routine.steps.map((step, idx) => {
       const isDone = done.includes(step.id);
-      return `<div class="routine-step"${canEdit ? ` draggable="true" data-routine="${routine.id}" data-step="${step.id}" data-idx="${idx}"
+      return `<div class="routine-step"${canEdit ? ` draggable="true" data-routine="'${routine.id}'" data-step="'${step.id}'" data-idx="${idx}"
           ondragstart="_routineDragStart(event)" ondragover="_routineDragOver(event)"
-          ondrop="_routineDrop(event,${routine.id})" ondragend="_routineDragEnd(event)"` : ''}>
+          ondrop="_routineDrop(event,'${routine.id}')" ondragend="_routineDragEnd(event)"` : ''}>
         ${canEdit ? `<span class="routine-step-grab" title="Drag to reorder">⠿</span>` : '<span style="width:18px;flex-shrink:0"></span>'}
-        <div class="routine-step-check${isDone ? ' done' : ''}" onclick="_routineToggleStep(${routine.id},${step.id})">
+        <div class="routine-step-check${isDone ? ' done' : ''}" onclick="_routineToggleStep('${routine.id}','${step.id}')">
           <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <span class="routine-step-emoji">${step.emoji}</span>
@@ -439,22 +437,22 @@ export function _renderAdultRoutines() {
     // Icon buttons for the card header — always visible actions
     const skippedToday = (routine.skippedDates || []).includes(new Date().toISOString().slice(0,10));
     const headerIcons = canEdit ? `
-      <button class="btn btn-sm btn-ghost" onclick="_routineSkipDay(${routine.id})" title="${skippedToday ? 'Un-skip today' : 'Skip today'}" style="${skippedToday ? 'color:#d97706' : ''}">${skippedToday ? '⏭' : '⏭'}</button>
-      <button class="btn btn-sm btn-ghost" onclick="_routinePauseMenu(${routine.id})" title="Pause">⏸</button>
-      <button class="btn btn-sm btn-ghost" onclick="_routineEdit(${routine.id})" title="Edit">✏️</button>
-      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDelete(${routine.id})" title="Delete">🗑</button>` : '';
+      <button class="btn btn-sm btn-ghost" onclick="_routineSkipDay('${routine.id}')" title="${skippedToday ? 'Un-skip today' : 'Skip today'}" style="${skippedToday ? 'color:#d97706' : ''}">${skippedToday ? '⏭' : '⏭'}</button>
+      <button class="btn btn-sm btn-ghost" onclick="_routinePauseMenu('${routine.id}')" title="Pause">⏸</button>
+      <button class="btn btn-sm btn-ghost" onclick="_routineEdit('${routine.id}')" title="Edit">✏️</button>
+      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDelete('${routine.id}')" title="Delete">🗑</button>` : '';
 
     // Bottom row: secondary actions only
-    let btns = `<button class="btn btn-sm btn-secondary" onclick="_routineResetToday(${routine.id})">↺ Reset today</button>
-      <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory(${routine.id},null)">📅 History</button>`;
+    let btns = `<button class="btn btn-sm btn-secondary" onclick="_routineResetToday('${routine.id}')">↺ Reset today</button>
+      <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory('${routine.id}',null)">📅 History</button>`;
     if (canEdit) {
-      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineShareMenu(${routine.id})">👥 Share</button>`;
+      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineShareMenu('${routine.id}')">👥 Share</button>`;
     } else if (isJoined) {
-      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineDuplicateFromJoined(${routine.id})">📋 Duplicate to mine</button>
-        <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto" onclick="_routineLeave(${routine.id})">Leave</button>`;
+      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineDuplicateFromJoined('${routine.id}')">📋 Duplicate to mine</button>
+        <button class="btn btn-sm btn-ghost" style="color:#ef4444;margin-left:auto" onclick="_routineLeave('${routine.id}')">Leave</button>`;
     } else if (isSharedToMe) {
-      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineDuplicateTo(${routine.id})">📋 Duplicate to mine</button>
-        <button class="btn btn-sm btn-secondary" onclick="_routineJoin(${routine.id})">🔗 Join (stay in sync)</button>`;
+      btns += `<button class="btn btn-sm btn-secondary" onclick="_routineDuplicateTo('${routine.id}')">📋 Duplicate to mine</button>
+        <button class="btn btn-sm btn-secondary" onclick="_routineJoin('${routine.id}')">🔗 Join (stay in sync)</button>`;
     }
 
     html += `<div class="routine-card">
@@ -473,7 +471,7 @@ export function _renderAdultRoutines() {
       </div>
       <div class="routine-steps">${stepsHtml}</div>
       ${allDone ? `<div class="routine-all-done">✓ Complete — great work!</div>` : ''}
-      ${canEdit ? `<button class="routine-add-step-btn" onclick="_routineAddStep(${routine.id})">+ Add step</button>` : ''}
+      ${canEdit ? `<button class="routine-add-step-btn" onclick="_routineAddStep('${routine.id}')">+ Add step</button>` : ''}
       ${canEdit ? _renderSuggestionsSection(routine) : ''}
       <div class="routine-card-btns" style="margin-top:12px">${btns}</div>
     </div>`;
@@ -505,23 +503,23 @@ export function _renderSuggestionsSection(routine) {
   const hiddenCount  = suggestions.length - SUGG_PREVIEW;
   const isChild = routine.ownerType === 'household';
   const rowsHtml = visible.map(s => `
-    <div class="routine-suggestion-row">
-      <span class="routine-suggestion-emoji">${s.emoji}</span>
-      <span class="routine-suggestion-label">${escHtml(s.label)}</span>
-      ${s.durationMin ? `<span class="routine-suggestion-dur">${s.durationMin}m</span>` : ''}
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto">
-        ${isChild ? `<button class="btn btn-sm btn-ghost" style="padding:2px 7px;font-size:12px"
-          onclick="event.stopPropagation();_routineEditSuggestion(${routine.id},'${escHtml(s.label).replace(/'/g,"\\'")}','${s.emoji}',${s.durationMin})"
+    <div class="routine-suggestion-row"
+      onclick="_routineAddSuggestion('${routine.id}','${escHtml(s.label).replace(/'/g,"\\'")}','${s.emoji}',${s.durationMin})" style="cursor:pointer">
+      <span class="routine-suggestion-emoji" style="pointer-events:none">${s.emoji}</span>
+      <span class="routine-suggestion-label" style="pointer-events:none">${escHtml(s.label)}</span>
+      ${s.durationMin ? `<span class="routine-suggestion-dur" style="pointer-events:none">${s.durationMin}m</span>` : ''}
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto;pointer-events:none">
+        ${isChild ? `<button class="btn btn-sm btn-ghost" style="padding:2px 7px;font-size:12px;pointer-events:auto"
+          onclick="event.stopPropagation();_routineEditSuggestion('${routine.id}','${escHtml(s.label).replace(/'/g,"\\'")}','${s.emoji}',${s.durationMin})"
           title="Add with points">✏️</button>` : ''}
-        <span class="routine-suggestion-add"
-          onclick="_routineAddSuggestion(${routine.id},'${escHtml(s.label).replace(/'/g,"\\'")}','${s.emoji}',${s.durationMin})">+</span>
+        <span class="routine-suggestion-add" style="pointer-events:none">+</span>
       </div>
     </div>`).join('');
   const moreBtn = !showAll && hiddenCount > 0
-    ? `<button class="btn btn-sm btn-ghost" style="margin-top:4px;width:100%;font-size:12px" onclick="_routineExpandSugg(${routine.id})">Show ${hiddenCount} more ▼</button>`
+    ? `<button class="btn btn-sm btn-ghost" style="margin-top:4px;width:100%;font-size:12px" onclick="_routineExpandSugg('${routine.id}')">Show ${hiddenCount} more ▼</button>`
     : '';
   return `<div class="routine-suggestions">
-    <div class="routine-suggestions-toggle${isOpen ? ' open' : ''}" onclick="_routineToggleSugg(${routine.id})">
+    <div class="routine-suggestions-toggle${isOpen ? ' open' : ''}" onclick="_routineToggleSugg('${routine.id}')">
       <span>Suggested steps (${suggestions.length})</span><span class="chevron">▼</span>
     </div>
     <div class="routine-suggestions-list" style="display:${isOpen ? 'flex' : 'none'};flex-direction:column">
@@ -612,7 +610,7 @@ export function _renderChildRoutines(kids) {
     const childChipsHtml = kids.map(kid => {
       const isAssigned = routineAssignments.some(a => a.childId === kid.id);
       return `<span class="routine-member-chip${isAssigned ? ' active' : ''}"
-        onclick="_routineToggleAssignment(${routine.id},'${kid.id}')"
+        onclick="_routineToggleAssignment('${routine.id}','${kid.id}')"
         title="${isAssigned ? 'Remove' : 'Assign'} ${escHtml(kid.name)}">
         ${kid.emoji || '👤'} ${escHtml(kid.name)}
       </span>`;
@@ -641,9 +639,9 @@ export function _renderChildRoutines(kids) {
     // ── Step list (adult editable) ─────────────────────────────
     const stepsHtml = routine.steps.map((step, idx) => `
       <div class="routine-step" draggable="true"
-          data-routine="${routine.id}" data-step="${step.id}" data-idx="${idx}"
+          data-routine="'${routine.id}'" data-step="'${step.id}'" data-idx="${idx}"
           ondragstart="_routineDragStart(event)" ondragover="_routineDragOver(event)"
-          ondrop="_routineDrop(event,${routine.id})" ondragend="_routineDragEnd(event)">
+          ondrop="_routineDrop(event,'${routine.id}')" ondragend="_routineDragEnd(event)">
         <span class="routine-step-grab">⠿</span>
         <span class="routine-step-emoji">${step.emoji}</span>
         <span class="routine-step-label">${escHtml(step.label)}</span>
@@ -651,9 +649,9 @@ export function _renderChildRoutines(kids) {
         ${step.notes ? `<span class="routine-step-dur" style="font-style:italic">${escHtml(step.notes)}</span>` : ''}
         <div style="display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0">
           ${step.points > 0 ? `<span style="font-size:10px;font-weight:700;background:#fef9c3;color:#854d0e;padding:2px 6px;border-radius:99px">⭐${step.points}</span>` : ''}
-          <button onclick="event.stopPropagation();_routineEditStep(${routine.id},${step.id})"
+          <button onclick="event.stopPropagation();_routineEditStep('${routine.id}','${step.id}')"
             style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px;padding:0 3px;line-height:1" title="Edit step">✏️</button>
-          <button onclick="event.stopPropagation();_routineDeleteStep(${routine.id},${step.id},false)"
+          <button onclick="event.stopPropagation();_routineDeleteStep('${routine.id}','${step.id}',false)"
             style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:14px;padding:0 3px;line-height:1" title="Remove step">✕</button>
         </div>
       </div>`).join('');
@@ -664,10 +662,10 @@ export function _renderChildRoutines(kids) {
         <div class="routine-card-title">${routine.emoji} ${escHtml(routine.name)}</div>
         <div style="display:flex;align-items:center;gap:2px">
           <span style="font-size:11px;color:var(--text-muted);margin-right:4px">${routine.triggerTime}</span>
-          <button class="btn btn-sm btn-ghost" onclick="_routineSkipDay(${routine.id})" title="${childSkippedToday ? 'Un-skip today' : 'Skip today'}" style="${childSkippedToday ? 'color:#d97706' : ''}">⏭</button>
-          <button class="btn btn-sm btn-ghost" onclick="_routinePauseMenu(${routine.id})" title="Pause">⏸</button>
-          <button class="btn btn-sm btn-ghost" onclick="_routineEdit(${routine.id})" title="Edit">✏️</button>
-          <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteChild(${routine.id})" title="Delete">🗑</button>
+          <button class="btn btn-sm btn-ghost" onclick="_routineSkipDay('${routine.id}')" title="${childSkippedToday ? 'Un-skip today' : 'Skip today'}" style="${childSkippedToday ? 'color:#d97706' : ''}">⏭</button>
+          <button class="btn btn-sm btn-ghost" onclick="_routinePauseMenu('${routine.id}')" title="Pause">⏸</button>
+          <button class="btn btn-sm btn-ghost" onclick="_routineEdit('${routine.id}')" title="Edit">✏️</button>
+          <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteChild('${routine.id}')" title="Delete">🗑</button>
         </div>
       </div>
       ${childSkippedToday ? `<div style="font-size:11px;color:#d97706;font-weight:700;margin-bottom:8px">⏭ Skipped today</div>` : ''}
@@ -684,13 +682,13 @@ export function _renderChildRoutines(kids) {
       <!-- Steps -->
       <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px">Steps</div>
       <div class="routine-steps">${stepsHtml || `<div style="font-size:13px;color:var(--text-muted);padding:8px 0">No steps yet — add from suggestions or create your own.</div>`}</div>
-      <button class="routine-add-step-btn" onclick="_routineAddStep(${routine.id})">+ Add step</button>
+      <button class="routine-add-step-btn" onclick="_routineAddStep('${routine.id}')">+ Add step</button>
       ${_renderSuggestionsSection(routine)}
 
       <!-- Actions -->
       <div class="routine-card-btns" style="margin-top:12px">
-        <button class="btn btn-sm btn-secondary" onclick="_routineResetTodayAllKids(${routine.id})">↺ Reset today</button>
-        <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory(${routine.id},null)">📅 History</button>
+        <button class="btn btn-sm btn-secondary" onclick="_routineResetTodayAllKids('${routine.id}')">↺ Reset today</button>
+        <button class="btn btn-sm btn-secondary" onclick="_routineShowHistory('${routine.id}',null)">📅 History</button>
         ${routine.pointsPerCompletion > 0 ? `<span style="font-size:12px;color:var(--text-muted);align-self:center">⭐ ${routine.pointsPerCompletion} pts</span>` : ''}
       </div>
     </div>`;
@@ -767,7 +765,7 @@ export function _routineAwardStepPoints(routine, step, childId) {
   if (!state.kids) return;
   if (!state.kids.completions) state.kids.completions = [];
   if (!state.kids.chores) state.kids.chores = [];
-  const syntheticId = `routine-${routine.id}-step-${step.id}`;
+  const syntheticId = `routine-'${routine.id}'-step-'${step.id}'`;
   // Ensure a matching synthetic chore exists
   const existing = state.kids.chores.find(c => c.id === syntheticId);
   if (!existing) {
@@ -793,7 +791,7 @@ export function _routineAwardPoints(routine, childId) {
   if (!state.kids) return;
   if (!state.kids.completions) state.kids.completions = [];
   // Create a synthetic chore completion for the points system
-  const syntheticChoreId = `routine-${routine.id}`;
+  const syntheticChoreId = `routine-'${routine.id}'`;
   // Ensure a matching "chore" entry exists so kidBalance can read the points
   if (!state.kids.chores) state.kids.chores = [];
   const existing = state.kids.chores.find(c => c.id === syntheticChoreId);
@@ -983,7 +981,7 @@ export function _routineEdit(routineId) {
       <span style="flex:1;font-size:13px;font-weight:500">${escHtml(s.label)}</span>
       <span style="font-size:11px;color:var(--text-muted)">${s.durationMin || 0}m</span>
       ${isChildRoutine ? `<span style="font-size:11px;color:var(--text-muted)">⭐${s.points || 0}</span>` : ''}
-      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteStep(${routineId},${s.id},true)">✕</button>
+      <button class="btn btn-sm btn-ghost" style="color:#ef4444" onclick="_routineDeleteStep(${routineId},'${s.id}',true)">✕</button>
     </div>`).join('');
 
   // Points field only for child (household) routines
